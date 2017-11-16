@@ -1,0 +1,313 @@
+﻿<style>
+    ul
+    {
+        list-style-type: none;
+    }
+</style>
+<div ng-controller="Controller.AccessCntrl">
+    <div class="panel panel-default mcu-panel">
+        <div class="panel-body" style="padding: 1.5px">
+            <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 no-padding" id="leftpanel">
+                <div class="panel panel-primary mcu-panel no-padding">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            <span>Case Selection</span>
+                        </div>
+                    </div>
+                    <div class="panel-body overflowScroll" style="height: 350px">
+                        <!--<div ng-include="'Views/Masscaseupdate/mcu_EthernetTree.htm'">
+                        </div>-->
+                        <select id="lstRegionlist"
+                                class="listbox">
+                                <option selected value="0">All Regions</option>
+                                <option value="6">Africa</option>
+                                <option value="2">Americas</option>
+                                <option value="4">Asia/Pacific</option>
+                                <option value="5">Europe</option>
+                                <option value="61">Middle East</option>
+                            </select>
+                            <ul style="padding:0px;margin:0px">
+                            <LI id=253 cases=""><INPUT onclick="javascript:chkDone(this,'Checkbox253gpop','divTree253gpop','253','5','gpop','253');" id=Checkbox253gpop type=checkbox value="">&nbsp;<SPAN onclick="javascript:if (Toggle(this))showContentshvpnEx('divTree253gpop','253','','gpop','');" title=Anguilla valign="bottom"><IMG src="http://cpesc.t2.nat.bt.com/prodcat22/Images/closefolder.gif" align=bottom><SPAN class=lbltxt>&nbsp;Anguilla</SPAN></SPAN><SPAN id=divTree253gpop></SPAN></LI>
+<LI id=243 cases=""><INPUT onclick="javascript:chkDone(this,'Checkbox243gpop','divTree243gpop','243','5','gpop','243');" id=Checkbox243gpop type=checkbox>&nbsp;<SPAN onclick="javascript:if (Toggle(this))showContentshvpnEx('divTree243gpop','243','','gpop','');" title="Antigua and Barbuda" valign="bottom"><IMG src="http://cpesc.t2.nat.bt.com/prodcat22/Images/closefolder.gif" align=bottom><SPAN class=lbltxt>&nbsp;Antigua and Barbuda</SPAN></SPAN><SPAN id=divTree243gpop></SPAN></LI>
+<LI id=71 cases=""><INPUT onclick="javascript:chkDone(this,'Checkbox71gpop','divTree71gpop','71','5','gpop','71');" id=Checkbox71gpop type=checkbox>&nbsp;<SPAN onclick="javascript:if (Toggle(this))showContentshvpnEx('divTree71gpop','71','','gpop','');" title=Argentina valign="bottom"><IMG src="http://cpesc.t2.nat.bt.com/prodcat22/Images/closefolder.gif" align=bottom><SPAN class=lbltxt>&nbsp;Argentina</SPAN></SPAN><SPAN id=divTree71gpop></SPAN></LI>
+<LI id=256 cases=""><INPUT onclick="javascript:chkDone(this,'Checkbox256gpop','divTree256gpop','256','5','gpop','256');" id=Checkbox256gpop type=checkbox>&nbsp;<SPAN onclick="javascript:if (Toggle(this))showContentshvpnEx('divTree256gpop','256','','gpop','');" title=Aruba valign="bottom"><IMG src="http://cpesc.t2.nat.bt.com/prodcat22/Images/closefolder.gif" align=bottom><SPAN class=lbltxt>&nbsp;Aruba</SPAN></SPAN><SPAN id=divTree256gpop></SPAN></LI>
+<LI id=103 cases=""><INPUT onclick="javascript:chkDone(this,'Checkbox103gpop','divTree103gpop','103','5','gpop','103');" id=Checkbox103gpop CHECKED type=checkbox>&nbsp;<SPAN onclick="javascript:if (Toggle(this))showContentshvpnEx('divTree103gpop','103','','gpop','');" title=Bahamas valign="bottom"><IMG src="http://cpesc.t2.nat.bt.com/prodcat22/Images/openfolder.gif" align=bottom><SPAN class=lbltxt>&nbsp;Bahamas</SPAN></SPAN><SPAN id=divTree103gpop style="DISPLAY: block"> 
+</ul>
+
+                    </div>
+                </div>
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 no-padding">
+                    <div class="panel panel-primary mcu-panel" style="border-right-width: 0px">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                <span>Case Availability</span>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="height: 80px; padding: 7px">
+                            <!--<select ng-model="modCaseAvail" style="width: 100%" ng-options="option.AVAIL_DESC for option in lstCaseAvail track by option.AVAIL_CD">
+                            </select>-->
+                              <select id="CaseAvailDDL" class="lbltxt" style="width: 100%;margin-bottom:10px" name="CaseAvailDDL">
+                                <option selected value="0">--No change--</option>
+                                <option value="1">Available</option>
+                                <option value="2">Not Available</option>
+                                <option value="3">Individual Case Basis</option>
+                                <option value="4">Planned</option>
+                                <option value="11">Limited</option>
+                                <option value="12">Requires Access Site Survey</option>
+                                <option value="13">Restricted</option>
+                                <option value="14">Network Capacity Check</option>
+                                <option value="15">Temporarily Unavailable</option>
+                                <option value="16">Access Supplier Limitation</option>
+                                <option value="17">Watch</option>
+                                <option value="23">Enhanced UK Capacity Check</option>
+                            </select>
+                            <br />
+                            <span style="margin-top: 40%">
+                                <button ng-click="addCasePop()" id="caseGo">
+                                    Go</button>
+                                <button id="caseReset" ng-click="ResetCountrySel(0)">
+                                    Reset</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 no-padding">
+                    <div class="panel panel-primary mcu-panel " style="border-left-width: 0px; border-right-width: 0px;">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                <span>Case Validity</span>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="height: 80px; padding: 7px">
+                           <!-- <select ng-model="modValidCase" class="autowidth" ng-options="option.text for option in lstValidCase track by option.id">
+                            </select>-->
+                            <select id="ValidCaseDDL" class="lbltxt" style="width: 100%" name="ValidCaseDDL">
+                                <option selected value="-1">--No change--</option>
+                                <option value="0">Invalid</option>
+                                <option value="1">Valid</option>
+                            </select>
+                          
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 no-padding">
+                   <!-- <div ng-include="'Views/Masscaseupdate/AccessFilterTemplate.htm'">
+                    </div>-->
+                     <div class="panel panel-primary mcu-panel " style="border-left-width: 0px;">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                Case Type
+                            </div>
+                        </div>
+                        <div class="panel-body" style="height: 80px; padding: 7px; padding-right: 0px">
+
+                                <input type="radio" name="radioGroup" ng-value="-1" ng-change="ResetCountrySel(1)"
+                                    ng-model="formData.resetCase" style="margin: 0px">
+                                All&nbsp;
+
+                                <input type="radio" name="radioGroup" ng-value="1" checked="checked" ng-change="ResetCountrySel(1)"
+                                    ng-model="formData.resetCase" style="margin: 0px">
+                                Valid&nbsp;
+
+                                <input type="radio" name="radioGroup" ng-value="0" ng-change="ResetCountrySel(1)"
+                                    ng-model="formData.resetCase" style="margin: 0px">
+                                Invalid
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-padding">
+                    <!--<div ng-include="'Views/Masscaseupdate/AccessSpeedTemplate.htm'">
+                    </div>-->
+                    <div class="panel panel-primary mcu-panel no-padding">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                <span>Supplier Selection Here</span>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <!--<select style="height: 390px; width: 100%" multiple ng-model="modAccSpeed"
+                             ng-options="option.ACCESSACTUALVAL+' '+option.ACCESSUOM+' / '+option.SUPPLIERNAME+' / '+option.TYPENAME+' / '+option.NAMENAME
+         for option in lstAccSpeed track by option.ACCESSID+option.SUPPLIERID+option.TYPEID+option.NAMEID" style="width: 100%">
+                            </select>-->
+                            <select class="lbltxt" id="lstSuppliers" size="22" multiple="multiple" style="width:100%;font-size:13px!important"><option value="5470-5641-8207">Verizon Business Services/Leased Line/Verizon Business Services</option></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 no-padding" id="rightpanel">
+                <div class="panel panel-primary mcu-panel no-padding">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            <span>Speed Selection</span>
+                        </div>
+                    </div>
+                    <div class="panel-body small-padding-panel">
+                        <SELECT onchange=CheckPortLimit(); id=lstPortSpeeds class=lbltxt style="width:100%" multiple size="11"><OPTION value=22961>64 K / 64 K</OPTION><OPTION value=22962>128 K / 64 K</OPTION><OPTION value=22963>128 K / 128 K</OPTION><OPTION value=22964>256 K / 64 K</OPTION><OPTION value=22965>256 K / 128 K</OPTION><OPTION value=22966>256 K / 256 K</OPTION><OPTION selected value=22967>512 K / 64 K</OPTION><OPTION selected value=22968>512 K / 128 K</OPTION><OPTION selected value=22969>512 K / 256 K</OPTION><OPTION selected value=22970>512 K / 512 K</OPTION><OPTION selected value=87761>768 K / 384 K</OPTION><OPTION selected value=87763>768 K / 768 K</OPTION><OPTION value=22971>1024 K / 128 K</OPTION><OPTION value=22972>1024 K / 256 K</OPTION><OPTION value=22973>1024 K / 512 K</OPTION><OPTION value=22974>1024 K / 1024 K</OPTION><OPTION value=87762>1024 K / 384 K</OPTION><OPTION value=87764>1536 K / 512 K</OPTION><OPTION value=87765>1536 K / 640 K</OPTION><OPTION value=87766>1536 K / 1024 K</OPTION><OPTION value=87767>1536 K / 1536 K</OPTION><OPTION value=22975>2048 K / 128 K</OPTION><OPTION value=22976>2048 K / 256 K</OPTION><OPTION value=22977>2048 K / 512 K</OPTION><OPTION value=22978>2048 K / 1024 K</OPTION><OPTION value=22979>2048 K / 2048 K</OPTION><OPTION value=87768>2048 K / 384 K</OPTION><OPTION value=87769>2048 K / 640 K</OPTION><OPTION value=87770>2048 K / 768 K</OPTION><OPTION value=87771>3 Mbps / 384 K</OPTION><OPTION value=87772>3 Mbps / 768 K</OPTION><OPTION value=87773>3 Mbps / 256 K</OPTION><OPTION value=87774>3 Mbps / 512 K</OPTION><OPTION value=87775>3 Mbps / 1024 K</OPTION><OPTION value=87776>3 Mbps / 3 Mbps</OPTION><OPTION value=22980>4 Mbps / 256 kbps</OPTION><OPTION value=22981>4 Mbps / 512 K</OPTION><OPTION value=22982>4 Mbps / 1024 K</OPTION><OPTION value=22983>4 Mbps / 2048 K</OPTION><OPTION value=22984>4 Mbps / 4 Mbps</OPTION><OPTION value=87777>4 Mbps / 640 K</OPTION><OPTION value=87778>4 Mbps / 768 K</OPTION><OPTION value=22985>6 Mbps / 256 K</OPTION><OPTION value=22986>6 Mbps / 512 K</OPTION><OPTION value=22987>6 Mbps / 1024 K</OPTION><OPTION value=22988>6 Mbps / 2048 K</OPTION><OPTION value=22989>6 Mbps / 4 Mbps</OPTION><OPTION value=22990>6 Mbps / 6 Mbps</OPTION><OPTION value=87784>6 Mbps / 640K</OPTION><OPTION value=87785>6 Mbps / 768 K</OPTION><OPTION value=22991>7 Mbps / 512 K</OPTION><OPTION value=22992>7 Mbps / 1024 K</OPTION><OPTION value=87786>7 Mbps / 3 Mbps</OPTION><OPTION value=87787>7 Mbps / 7 Mbps</OPTION><OPTION value=22993>8 Mbps / 512 K</OPTION><OPTION value=22994>8 Mbps / 1024 K</OPTION><OPTION value=87779>8 Mbps / 384 K</OPTION><OPTION value=87780>8 Mbps / 640 K</OPTION><OPTION value=87781>8 Mbps / 768 K</OPTION><OPTION value=87782>8 Mbps / 2048 K</OPTION><OPTION value=87783>8 Mbps / 8 Mbps</OPTION><OPTION value=22995>10 Mbps / 512 K</OPTION><OPTION value=22996>10 Mbps / 1024 K</OPTION><OPTION value=87788>10 Mbps / 10 Mbps</OPTION><OPTION value=87789>10 Mbps / 768 K</OPTION><OPTION value=87790>10 Mbps / 2048 K</OPTION><OPTION value=87791>10 Mbps / 5 Mbps</OPTION></SELECT>
+                    </div>
+                </div>
+                
+
+                <br />
+                <div class="panel panel-primary mcu-panel">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            Characteristic Type
+                        </div>
+                    </div>
+                    <div class="panel-body small-padding-panel">
+                       <!-- <select style="width: 100%" multiple size="9" ng-model="modSelectedchar" ng-options="option.CHAR_TYPE_NAME for option in lstCharecteristics track by option.CHAR_TYPE_ID">
+                        </select>-->
+                        <select  style="width: 100%; height: 190px" multiple="multiple">
+                        <option value="49" label="Access Method">Access Method</option><option value="-1" label="Access Suppliers">Access Suppliers</option><option value="386" label="NOTE">NOTE</option>
+                        </select>
+                        <span>
+                            <button ng-click="addSelectedChar()" id="charAdd">
+                                Add</button>
+                            <button>
+                                Reset</button>
+                        </span>
+                    </div>
+                </div>
+                <div class="panel panel-primary mcu-panel">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            Characteristics
+                        </div>
+                    </div>
+                    <div class="panel-body small-padding-panel  overflowScroll" style="height: 369px">
+                        <div id="selectedChar">
+                        <table width="100%" class="table table-bordered table-striped ng-scope" id="tblChar"><thead><tr><th>Change</th><th>Characteristic</th><th class="lbltxt">Valid</th><th class="lbltxt">Availability</th><th class="lbltxt">Change Value</th><th class="lbltxt">Value</th></tr></thead><tbody><tr><td class="chkSelectcol"><input id="chkSelect2495" type="checkbox" ng-click="toggleCheckox(2495)"></td><td><span id="charname2495">MPLS GPOP-GPOP</span></td><td><input disabled="" id="chkValid2495" type="checkbox" ng-click="ValidateChar('2495')"></td><td><select id="avail2495" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr><tr><td class="chkSelectcol"><input id="chkSelect2497" type="checkbox" ng-click="toggleCheckox(2497)"></td><td><span id="charname2497">APOP</span></td><td><input disabled="" id="chkValid2497" type="checkbox" ng-click="ValidateChar('2497')"></td><td><select id="avail2497" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr><tr><td class="chkSelectcol"><input id="chkSelect123861" type="checkbox" ng-click="toggleCheckox(123861)"></td><td><span id="charname123861">MSE GPOP</span></td><td><input disabled="" id="chkValid123861" type="checkbox" ng-click="ValidateChar('123861')"></td><td><select id="avail123861" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr><tr><td class="chkSelectcol"><input id="chkSelect23061" type="checkbox" ng-click="toggleCheckox(23061)"></td><td><span id="charname23061">EPOP</span></td><td><input disabled="" id="chkValid23061" type="checkbox" ng-click="ValidateChar('23061')"></td><td><select id="avail23061" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr><tr><td class="chkSelectcol"><input id="chkSelect16161" type="checkbox" ng-click="toggleCheckox(16161)"></td><td><span id="charname16161">HVPN</span></td><td><input disabled="" id="chkValid16161" type="checkbox" ng-click="ValidateChar('16161')"></td><td><select id="avail16161" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr><tr><td class="chkSelectcol"><input id="chkSelect9386" type="checkbox" ng-click="toggleCheckox(9386)"></td><td><span id="charname9386">UK Ethernet LTAP</span></td><td><input disabled="" id="chkValid9386" type="checkbox" ng-click="ValidateChar('9386')"></td><td><select id="avail9386" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr><tr><td class="chkSelectcol"><input id="chkSelect9385" type="checkbox" ng-click="toggleCheckox(9385)"></td><td><span id="charname9385">UK Ethernet POP</span></td><td><input disabled="" id="chkValid9385" type="checkbox" ng-click="ValidateChar('9385')"></td><td><select id="avail9385" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr><tr><td class="chkSelectcol"><input id="chkSelect9384" type="checkbox" ng-click="toggleCheckox(9384)"></td><td><span id="charname9384">UK VPN POP</span></td><td><input disabled="" id="chkValid9384" type="checkbox" ng-click="ValidateChar('9384')"></td><td><select id="avail9384" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr><tr><td class="chkSelectcol"><input id="chkSelect4881" type="checkbox" ng-click="toggleCheckox(4881)"></td><td><span id="charname4881">LLPoP</span></td><td><input disabled="" id="chkValid4881" type="checkbox" ng-click="ValidateChar('4881')"></td><td><select id="avail4881" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr><tr><td class="chkSelectcol"><input id="chkSelect3941" type="checkbox" ng-click="toggleCheckox(3941)"></td><td><span id="charname3941">VPOP</span></td><td><input disabled="" id="chkValid3941" type="checkbox" ng-click="ValidateChar('3941')"></td><td><select id="avail3941" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr><tr><td class="chkSelectcol"><input id="chkSelect2498" type="checkbox" ng-click="toggleCheckox(2498)"></td><td><span id="charname2498">NNI POP</span></td><td><input disabled="" id="chkValid2498" type="checkbox" ng-click="ValidateChar('2498')"></td><td><select id="avail2498" style="width: 100%;"><option value="1">Available</option><option value="2">Not Available</option><option value="3">Individual Case Basis</option><option value="4">Planned</option><option value="11">Limited</option><option value="12">Requires Access Site Survey</option><option value="13">Restricted</option><option value="14">Network Capacity Check</option><option value="15">Temporarily Unavailable</option><option value="16">Access Supplier Limitation</option><option value="17">Watch</option><option value="23">Enhanced UK Capacity Check</option></select></td><td></td></tr></tbody></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 small-padding-panel" id="savecontinuepanel">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: Green" title="Pops coloured green indicate that a valid case exists for that pop.">
+                    Valid Case</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: Black"
+                        title="Pops coloured black indicate that an invalid case exists for that pop.If a Port-Access combination is coloured black it indicates that the combination exists for the case selected."
+                        class="">Invalid Case</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="lblNoCase"
+                            style="color: Red" title="Pops coloured red indicate that a case does not exist for that pop.If a Port-Access combination is coloured red it indicates that the combination does not exist for the case selected."
+                            class="lbltxtred">Case Doesn't Exist</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>
+                    <input class="button" type="button" value="Save And Continue" ng-click="writeSavedCases()" id="saveContinue"
+                        ng-enable="enableSaveButton" /></span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-padding" style="overflow:scroll;height:300px">
+            
+                <table class="table table-bordered table-striped tblSavedDetails" width="100%">
+                    <tr>
+                        <th ng-if="showPortSpeed || showPortAccessSpeed">
+                        </th>
+                        <th>
+                            Region
+                        </th>
+                        <th>
+                            Country
+                        </th>
+                        <th>
+                            City (State)
+                        </th>
+                        <th>
+                            PoP
+                        </th>
+                        <th>
+                            Platform
+                        </th>
+                        <th>
+                            Case Validity
+                        </th>
+                        <th>
+                            Case Availability
+                        </th>
+                        <th>
+                            Port Availability
+                        </th>
+                        <th>
+                            Port Validity
+                        </th>
+                        <th>
+                            Lead Time
+                        </th>
+                        <th ng-if="showPortAccessSpeed">
+                         Create Exception
+                        </th>
+                        <th ng-if="showPortAccessSpeed">
+                         Remove Exception
+                        </th>
+                    </tr>
+                    <tr ng-repeat="item in savedCaseDetails">
+                        <td ng-show="showPortSpeed || showPortAccessSpeed" class="popoverRootTd">
+                            <button ng-click="openInnerTabe(item.popID)" id="iconSymbol{{item.popID}}">+</button>
+                            <div class="popoverDiv panel panel-primary mcu-panel no-padding overflowScroll" id="innerTable{{item.popID}}"
+                                style="display: none">
+                                <div class="panel-heading mcu-panel-heading-height">
+                                    <div class="panel-title">
+                                        {{innerTableHeading}}
+                                    </div>
+                                </div>
+                                <div class="panel-body small-padding-panel " style="height:200px;width:600px">
+                                    <div ng-show="showPortSpeed">
+                                        <span ng-repeat="itemPort in portspeedList">{{itemPort.CharName}}<br /> </span>
+                                        
+                                    </div>
+                                    <div ng-show="showPortAccessSpeed">
+                                        <span ng-repeat="itemPortAccess in portAccessJson">
+                                        <span style="color: Red" ng-if="!validCombo">{{itemPortAccess.portSpeedName}}
+                                            {{itemPortAccess.AccessActualValue}}-{{itemPortAccess.SupplierName}}-{{itemPortAccess.AccessTypeName}}-{{itemPortAccess.SupplierNameName}}
+                                            <br/> </span>
+                                            <span ng-if="validCombo">
+                                            {{itemPortAccess.portSpeedName}} {{itemPortAccess.AccessActualValue}}-{{itemPortAccess.SupplierName}}-{{itemPortAccess.AccessTypeName}}-{{SupplierNameName}}
+                                           <br /> </span>
+                                            </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{ item.regionName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.countryName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.cityName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.popName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.platformName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.CaseAvailtxt}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.caseValidText}}
+                        </td>
+                        <td id="PortAvail0" ng-style="set_color(item.caseValidCD)">
+                            {{item.portAvailText}}
+                        </td>
+                        <td id="PortValidity0" ng-style="set_color(item.caseValidCD)">
+                            {{item.portValidText}}
+                        </td>
+                        <td id="LeadTimeList0" ng-style="set_color(item.caseValidCD)">
+                            {{item.leadTime}}
+                        </td>
+                        <td ng-if="showPortAccessSpeed">
+                        <input type="checkbox" ng-model="IsCaseIdExists" id="createException{{item.caseID}}" country="createExcountry{{item.countryID}}"/>
+                        </td>
+                        <td ng-if="showPortAccessSpeed">
+                         <input type="checkbox" ng-model="removeException" id="removeException{{item.caseID}}" country="removeExcountry{{item.countryID}}"/>
+                        </td>
+                    </tr>
+                </table>
+                  </div>
+
+                <button id="processChanges" style="margin-left: 32%" title="Processes the selections you have made" class="button" ng-click="processChanges()">
+                    Process Changes</button>
+                    <button style="margin-left: 20%;display:none" class="button" id="updatecase" ng-click="onUpdateCases()">Update changes</button>&nbsp;&nbsp;
+                    <button id="cancelcase" style="display:none" class="button" ng-click="onCancelCases()">Cancel Changes</button> 
+        
+        </div>
+    </div>
+</div>

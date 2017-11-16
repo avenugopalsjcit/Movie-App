@@ -1,0 +1,173 @@
+﻿<div ng-controller="Controllers.ServicetypeCtrl as vm">
+    <div class="container panel panel-primary">
+        <h3>
+            <span style="float: left; cursor: default">Service type</span></h3>
+        <br />
+        <div class="row">
+            <div style="margin-left: 87%">
+                <a data-target="#addNewServiceModal" data-toggle="modal" class="btn btn-primary btn-sm">
+                    Add Service type</a>
+            </div>
+        </div>
+        </br>
+        <table ng-table="vm.tableParams" class="table" show-filter="true" class="table table-striped table-bordered">
+            <tr ng-repeat="user in $data">
+                <td data-title="'Service'" style="width: 90%" filter="{ Name: 'text'}" sortable="'name'">
+                    {{user.Name}}
+                </td>
+                <td data-title="'Delete'" style="width: 5%">
+                    <button value="Delete" class="btn btn-sm btn-danger" data-target="#divshowData1"
+                        data-toggle="modal">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                </td>
+                <td data-title="'Edit'" style="width: 20%">
+                    <button data-target="#divshowdata2" class="btn btn-sm btn-default" data-toggle="modal"
+                        type="button" id="EditAnnouncement">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="addNewServiceModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add Service Type</h4>
+                    </div>
+                    <div class="container" style="margin-right: 74px">
+                        <div class="modal-body">
+                            <div class="form-group col-md-10">
+                                <div class="col-md-3">
+                                    <label class="control-label" for="inputDescription">
+                                        Description<span style="color: red">&nbsp;*</span></label>
+                                </div>
+                                <div class="col-md-7">
+                                    <input class="form-control" id="inputDescription" type="text" value="">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <div class="col-md-3">
+                                    <label class="control-label" for="inputValid">
+                                        Valid</label>
+                                </div>
+                                <div class="col-md-5">
+                                    <input id="inputValid" type="checkbox" checked="true">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Add" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="divshowdata2" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H2">
+                            Service Type</h4>
+                    </div>
+                    <div class="container" style="margin-right: 74px">
+                        <div class="modal-body">
+                            <div class="form-group col-md-10">
+                                <div class="col-md-3">
+                                    <label class="control-label" for="inputDescription">
+                                        Description<span style="color: red">&nbsp;*</span></label>
+                                </div>
+                                <div class="col-md-7">
+                                    <input class="form-control" id="Text1" type="text" value="">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <div class="col-md-3">
+                                    <label class="control-label" for="inputValid">
+                                        Valid</label>
+                                </div>
+                                <div class="col-md-5">
+                                    <input id="Checkbox1" type="checkbox" checked="true">
+                                </div>
+                            </div>
+                            <!--<div style="font-size: 13px" class="form-horizontal">
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-3">
+                                        <u><b><span>Created by</span></b></u><br>
+                                       
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Created Date</span></b></u><br>
+                                        <span>21-MAY-1999 09:58&nbsp;GMT</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Updated by</span></b></u><br>
+                                        
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Date Last Updated</span></b></u><br>
+                                       
+                                    </div>
+                                </div>
+                            </div>-->
+                            <table style="margin-left:31px;">
+                                <tr>
+                                    <td>
+                                        <b><span>Created by</span></b>
+                                    </td>
+                                    <td>
+                                        <b><span>Created Date</span></b>
+                                    </td>
+                                    <td>
+                                        <b><span>Updated by</span></b>
+                                    </td>
+                                    <td>
+                                        <b><span>Date Last Updated</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span>MacGamwell,John</span>
+                                    </td>
+                                    <td>
+                                        <span>Prasad, Achutha</span>
+                                    </td>
+                                    <td>
+                                        Prasad, Achutha
+                                    </td>
+                                    <td>
+                                        <span>18-DEC-2003 06:47PM&nbsp;GMT</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Update" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Delete" />
+                        <input type="button" class="btn btn-default" value="Close" data-dismiss="modal" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div style="display: none" class="alert alert-success alert-dismissable">
+            Success! message sent successfully.
+        </div>
+    </div>

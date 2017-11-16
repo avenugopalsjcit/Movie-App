@@ -1,0 +1,106 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+  public  class AdminAccessSupplierDAL
+    {
+
+
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+        public DataTable GetGridAdminAccessSupplierDAL()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+            str = @" SELECT DISTINCT char_name AS supplier_name, crvc.char_id as supplierid,  (select User_name from CSU_USER where EMP_Id = crvc.Created_emp_id) Created_By, to_char(crvc.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt, (select User_name from CSU_USER where EMP_Id = crvc.Updated_emp_id) Updated_By,to_char(crvc.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt FROM csu_ref_valid_char crvc,
+                     capman_access_cases_map cacm,
+                     capman_supplier_map supplier_map 
+                     WHERE char_type_id = 505 
+                     AND cacm.c_supplier_id = supplier_map.c_supplier_id 
+                     AND supplier_map.pc_supplier_id = crvc.char_id 
+                     order by Upper(char_name)";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+
+        public DataTable GetAdminAccessSupplierDistDAL(string supplierid)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+            str = @"  select dist_name as name, dist_id as id, dist_short_name as short, dist_valid_cd as valid 
+	 from csu_distributor where dist_id > 0 and dist_valid_cd > 0 and dist_id not in(select distinct segregation_id from csu_segregation where access_supplier_char_id = "+supplierid+") order by upper(name)  ";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public DataTable GetAdminAccessSupplierAssignDistDAL(string supplierid)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+            str = @"   select dist_name as name, dist_id as id, dist_short_name as short, dist_valid_cd as valid 
+	 from csu_distributor where dist_id > 0 and dist_valid_cd > 0 and dist_id  in(select distinct segregation_id from csu_segregation where access_supplier_char_id = "+supplierid+") order by upper(name)   ";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+        public DataTable GetAdminAccessSupplierCountryDAL(string supplierid)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+            str = @"  select a.country_id, a.country_name,b.priority from csu_country a, csu_supplier_country b 
+		 where b.country_id(+) = a.country_id and b.supplier_id(+) ="+supplierid+" and priority is null	order by upper(country_name)";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+        public DataTable GetAdminAccessSupplierAssignCountryDAL(string supplierid)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+            str = @"    select a.country_id, a.country_name,b.priority from csu_country a, csu_supplier_country b 
+		 where b.country_id(+) = a.country_id and b.supplier_id(+) ="+supplierid+" and priority is not null		order by upper(country_name)";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+    }
+}

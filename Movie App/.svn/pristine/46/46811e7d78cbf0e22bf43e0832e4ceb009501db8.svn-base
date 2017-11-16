@@ -1,0 +1,350 @@
+﻿app.factory('UnitofMeasureGridFactory', function ($http) {
+
+    var UnitofMeasureGridFactory = {};
+
+    UnitofMeasureGridFactory.UnitofMeasureGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridMapUnitOfMeasureDetails', {});
+
+    }
+
+    return UnitofMeasureGridFactory;
+});
+app.factory('MapUOMListBoxFactory', function ($http) {
+
+    var MapUOMListBoxFactory = {};
+
+    MapUOMListBoxFactory.GetListBox = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetListBoxMapUnitOfMeasureDetails', { 'CharTypeID': CharTypeID });
+
+    }
+
+    return MapUOMListBoxFactory;
+});
+
+app.factory('MapUOMInsertFactory', function ($http) {
+
+    var MapUOMInsertFactory = {};
+      
+    MapUOMInsertFactory.GetMapUOMInsert = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/InsertAdminMapUnitOfMeasure', { 'strAvailCd': strAvailCd, 'CharTypeID': CharTypeID, 'UOMId': UOMId,  'User_id': User_id });
+
+    }
+
+    return MapUOMInsertFactory;
+});
+
+app.factory('MapUOMDropdownFactory', function ($http) {
+
+    var MapUOMDropdownFactory = {};
+
+    MapUOMDropdownFactory.GetDropdown = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetDropdownMapUnitOfMeasureDetails', { 'CharTypeID': CharTypeID });
+
+    }
+
+    return MapUOMDropdownFactory;
+});
+
+
+app.factory('MapUOMDeleteFactory', function ($http) {
+
+    var MapUOMDeleteFactory = {};
+
+    MapUOMDeleteFactory.GetMapUOMDelete = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/DeleteAdminMapUnitOfMeasure', { 'UOMSubsetID': UOMSubsetID });
+
+    }
+
+    return MapUOMDeleteFactory;
+});
+
+app.factory('MapUOMPopupGrid', function ($http) {
+
+    var MapUOMPopupGrid = {};
+
+    MapUOMPopupGrid.GetMapUOMPopup = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/PopupGridAdminMapUnitOfMeasure', { 'UOMId': UOMId, 'CharTypeID': CharTypeID });
+
+    }
+
+    return MapUOMPopupGrid;
+});
+
+app.factory('MapUOMMaxValueFactory', function ($http) {
+
+    var MapUOMMaxValueFactory = {};
+
+    MapUOMMaxValueFactory.GetMapUOMMaxValue = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxMapUOMCD', { });
+
+    }
+
+    return MapUOMMaxValueFactory;
+});
+app.factory('MapUOMSubsetValueFactory', function ($http) {
+
+    var MapUOMSubsetValueFactory = {};
+
+    MapUOMSubsetValueFactory.GetMapUOMSubsetValue = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetUOMSubsetUnitOfMeasureDetails', { 'CharTypeID': CharTypeID, 'UOMId': UOMId });
+
+    }
+
+    return MapUOMSubsetValueFactory;
+});
+app.controller('MapUnitsofMeasureCtrl', ['$scope', 'UnitofMeasureGridFactory', 'NgTableParams', 'MapUOMListBoxFactory', 'MapUOMDropdownFactory', 'MapUOMDeleteFactory', 'MapUOMPopupGrid', 'MapUOMInsertFactory', 'MapUOMMaxValueFactory', 'MapUOMSubsetValueFactory', function ($scope, UnitofMeasureGridFactory, NgTableParams, MapUOMListBoxFactory, MapUOMDropdownFactory, MapUOMDeleteFactory, MapUOMPopupGrid, MapUOMInsertFactory, MapUOMMaxValueFactory, MapUOMSubsetValueFactory) {
+
+
+
+
+
+
+    UnitofMeasureGridFactory.UnitofMeasureGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+        $scope.AvailabilityGrid = data;
+
+
+       
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+    //$(".pageLoaderOverlay").hide();
+
+    var CharTypeNAME, CharTypeId, availDesc, availValid = "";
+
+    $scope.EditRecord = function (category) {
+        CharTypeID = category.CharTypeId
+        $scope.CharTypeNAME = category.CharTypeName;
+        $scope.Reset = 1;
+        MapUOMDropdownFactory.GetDropdown().success(function (data) {
+            $scope.DropdownData = data.d;
+            $("#ddlCharacteristicType").select2({
+            });
+            $scope.CharTypeName = "--- Select ---";
+            $scope.UOMName = 0;
+            $('#divddlCharacteristicType .select2-chosen').html("--- Select ---");
+
+
+            var characteristic = $('#divddlCharacteristicType .select2-chosen')[0].innerHTML;
+
+            if (characteristic == "--- Select ---") {
+                $("#Deletebtn").prop('disabled', true);
+            }
+            else {
+
+                $("#Deletebtn").prop('disabled', false);
+            }
+            $(".pageLoaderOverlay").hide();
+
+        });
+    }
+
+    $scope.CharacteristicChange = function () {
+        $scope.Reset = 2;
+        UomName = $scope.UOMName;
+       
+        UOMId = $scope.UOMName;
+        //$scope.CharTypeId = CharTypeID;
+        if (UOMId == null || angular.isUndefined(UOMId)) {
+            $scope.Reset = 1;
+        }
+        else {
+            CharTypeNAME = $scope.CharTypeNAME;
+            MapUOMPopupGrid.GetMapUOMPopup().success(function (data) {
+                $scope.usersTable2 = data.d;
+                var characteristic = $('#divddlCharacteristicType .select2-chosen')[0].innerHTML;
+                if (characteristic == "--- Select ---") {
+                    $("#Deletebtn").prop('disabled', true);
+                }
+                else {
+
+                    $("#Deletebtn").prop('disabled', false);
+                }
+                $(".pageLoaderOverlay").hide();
+            });
+        }
+    }
+
+    $scope.addNewTask = function (category) {
+        if (angular.isDefined($scope.listData)) {
+            delete $scope.UOM;
+        }
+        $scope.AvailabilityAbbr = $scope.Description = $scope.Valid = "";
+        $scope.Reset = 0;
+        $scope.CharTypeNAME = category.CharTypeName;
+        CharTypeID = category.CharTypeId;
+        MapUOMListBoxFactory.GetListBox().success(function (data) {
+            $scope.listData = data.d;
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+
+
+
+
+    $scope.SaveAdminAvail = function () {
+
+
+        MapUOMMaxValueFactory.GetMapUOMMaxValue().success(function (data) {
+            UOMId = $scope.UOM.join(',');
+            User_id = $scope.User_Id;
+            strAvailCd = data.d;
+            strAvailCd = strAvailCd + 1;
+            MapUOMInsertFactory.GetMapUOMInsert().success(function (data) {
+                //alert("hi");
+                // str = data.d;
+                UnitofMeasureGridFactory.UnitofMeasureGrid().success(function (data) {
+
+                    $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                    $(".pageLoaderOverlay").hide();
+                });
+
+
+            });
+        });
+
+
+
+
+    }
+
+
+
+    $scope.UpdateAdminAvail = function () {
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to update Map Units of Measure?",
+            callback: function (result) {
+                if (result) {
+                    strAvailDesc = $scope.Description;
+                    strAvailCd = AvailValidCd;
+                    strAvailAbbr = $scope.AvailabilityAbbr;
+                    User_id = $scope.User_Id;
+                    if ($('#inputValid')[0].checked == true) {
+                        strAvailValidCd = true;
+                    }
+                    else {
+                        strAvailValidCd = false;
+                    }
+                    // strAvailValidCd = $scope.Valid;
+
+                    AvailabilityUpdateFactory.GetAvailabilityUpdate().success(function (data) {
+                        AvailabilityGridFactory.GetAvailabilityGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert({
+                                "message": "Map Units of Measure Updated Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+                    });
+                }
+            }
+        });
+
+    }
+
+   
+
+    $scope.ResetRecord = function () {
+
+        if (angular.isDefined($scope.listData)) {
+            delete $scope.UOM;
+        }
+
+    }
+
+    $scope.DeleteAdminAvail = function () {
+        UOMId = $scope.UOMName;
+        for (var i = 0; i < $scope.DropdownData.length; i++) {
+            if (UOMId == $scope.DropdownData[i].UOMId) {
+                UOMNameMsg = $scope.DropdownData[i].UOMName;
+            }
+        }
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Availability? " + UOMNameMsg,
+            callback: function (result) {
+                if (result) {
+                    $(".pageLoaderOverlay").hide();
+                    MapUOMSubsetValueFactory.GetMapUOMSubsetValue().success(function (data) {
+                        $scope.UOMSubsetId = data.d[0].UOMSubsetId;
+                        UOMSubsetID = $scope.UOMSubsetId;
+                        MapUOMDeleteFactory.GetMapUOMDelete(UOMSubsetID).success(function (data) {
+
+                            $scope.del = data.d;
+
+                            UnitofMeasureGridFactory.UnitofMeasureGrid().success(function (data) {
+
+                                $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                                $(".pageLoaderOverlay").hide();
+                            });
+
+                        });
+                    });
+
+                }
+            }
+
+
+        });
+
+
+    }
+
+
+
+
+
+
+
+
+
+} ]);
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

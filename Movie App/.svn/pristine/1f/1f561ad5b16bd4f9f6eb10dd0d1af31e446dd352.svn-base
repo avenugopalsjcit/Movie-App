@@ -1,0 +1,734 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+namespace SCAdminDAL
+{
+    public class CaseDefDAL
+    {
+
+        OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        public DataSet GetProducts()
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            strQry.Append("Select product_cd as ProductID, product_name as ProductName from csu_product where PRODUCT_cd in ( 121, 104, 102, 76, 128, 58, 98, 25, 62, 31, 103, 32, 16, 11, 124, 126, 112, 125, 77, 110, 15, 101, 82, 123, 75, 21, 122, 129, 30, 79, 105, 72, 109, 115, 111, 85, 12, 96, 63, 108, 14, 127, 130, 78, 100, 67, 97 ) and product_cd != (select distinct fieldvalue from csu_config_tbl where upper(FIELDNAME) = 'DSL ACCESS') and product_cd <> 11 order by upper(product_name)");
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+        }
+
+        public DataSet GetRegions()
+        {
+            string strQry = "Select region_id as RegionID,region_name as RegionName from Csu_Region Where region_name is not null and Region_id <>0 order by UPPER(region_name)";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        public DataSet GetRegionByCountry(int CountryId)
+        {
+            string strQry = "select r.REGION_ID,r.REGION_NAME from csu_region r, csu_country c where c.REGION_ID = r.REGION_ID and c.Country_id=" + CountryId;
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        public DataSet GetCountries(int RegionID, int ProductID)
+        {
+
+            string strQry = "select distinct country_id AS CountryID, (select country_name from csu_country b where b.country_id=a.country_id and b.region_id=a.region_id) as CountryName  from csu_cases a where ";
+            if (RegionID > 0)
+            {
+                strQry += " a.region_id= " + RegionID + " and a.country_id<> 0 and";
+            }
+            strQry += " a.product_cd=" + ProductID + "and exists(select 1 from csu_country d where d.country_id= a.country_id and d.region_id=a.region_id) order by UPPER(CountryName)";
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        public DataSet GetCountriesForCountryLevel(int ProductID)
+        {
+
+            string strQry = "select distinct country_id AS CountryID, (select country_name from csu_country b where b.country_id=a.country_id and b.region_id=a.region_id) as CountryName  from CLA_PRODUCT_CASES a where ";           
+            strQry += " a.product_cd=" + ProductID + "and exists(select 1 from csu_country d where d.country_id= a.country_id and d.region_id=a.region_id) order by UPPER(CountryName)";
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        private DataSet GetProductsList(int AccessLevel, int UserID)
+        {
+            string strQry = "";
+            if (AccessLevel == 1)
+            {
+                strQry = "Select PRODUCT_cd from csu_PRODUCT ";
+                return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+            }
+            else
+            {
+                strQry = "Select PRODUCT_cd  from csu_user_PRODUCT_owner  where Upper(emp_id) = '" + UserID + "' and PRODUCT_owner_status_cd = 1";
+                return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+            }
+        }
+
+        public DataSet GetCases(int ProductID, int SubProductID, int RegionID, int CountryID, int AccessLevel, int UserID)
+        {
+            string strQry = "";
+            string ProductList = "";
+            DataSet ds = GetProductsList(AccessLevel, UserID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                var ProdList = ds.Tables[0].AsEnumerable().Select(t => new { ProductID = t.Field<int>("PRODUCT_cd") });
+                foreach (var item in ProdList)
+                {
+                    ProductList = string.IsNullOrEmpty(ProductList) ? item.ProductID.ToString() : ProductList + "," + item.ProductID.ToString();
+                }
+
+            }
+
+            int tempProductId = 0;
+
+            if (SubProductID == 0)
+            {
+                tempProductId = ProductID;
+            }
+            else {
+                tempProductId = SubProductID;
+            }
+
+            strQry = " SELECT CASE_ID,A.HUB_SITE_ID,A.COUNTRY_ID,A.CITY_ID, F.STATE_PROVINCE_ID AS StateProvinceID,REGION_NAME,COUNTRY_NAME,STATE_PROVINCE_NAME,CITY_NAME,HUB_SITE_NAME,CAPMAN_PLATFORM_NAME, DECODE(CASE_VALID_CD,1,'VALID','INVALID') SHOWVALID, REGION_NAME || '-' || COUNTRY_NAME || '-' || STATE_PROVINCE_NAME || '-' || CITY_NAME || '-' || HUB_SITE_NAME ||'-'||CAPMAN_PLATFORM_NAME X_NAME,to_char(site_availability_dt,'DD-MON-YYYY') SiteAvailability,support_resilient_pop,exception FROM CSU_CASES A, CSU_REGION B, CSU_COUNTRY C, CSU_CITY D, CSU_HUB_SITE E, CSU_STATE_PROVINCE F ,CAPMAN_PLATFORMS G WHERE A.PRODUCT_CD = " + tempProductId + " AND A.PRODUCT_CD IN ( " + ProductList + ") AND A.SUBPRODUCT_CD IS NULL AND A.REGION_ID = B.REGION_ID AND A.REGION_ID = " + RegionID + " AND A.COUNTRY_ID = C.COUNTRY_ID AND A.CITY_ID = D.CITY_ID(+) AND A.HUB_SITE_ID = E.HUB_SITE_ID(+) AND A.COUNTRY_ID = " + CountryID + " AND D.STATE_PROVINCE_ID = F.STATE_PROVINCE_ID(+) AND A.CAPMAN_PLATFORM_ID=G.CAPMAN_PLATFORM_ID(+)";
+
+            strQry = strQry + " UNION SELECT CASE_ID,A.HUB_SITE_ID,A.COUNTRY_ID,A.CITY_ID, F.STATE_PROVINCE_ID AS StateProvinceID,REGION_NAME,COUNTRY_NAME,STATE_PROVINCE_NAME,CITY_NAME,HUB_SITE_NAME,CAPMAN_PLATFORM_NAME, DECODE(CASE_VALID_CD,1,'VALID','INVALID') SHOWVALID, REGION_NAME || '-' || COUNTRY_NAME || '-' || STATE_PROVINCE_NAME || '-' || CITY_NAME || '-' || HUB_SITE_NAME ||'-'||CAPMAN_PLATFORM_NAME X_NAME,to_char(site_availability_dt,'DD-MON-YYYY') SiteAvailability,support_resilient_pop,exception FROM CSU_CASES A, CSU_REGION B, CSU_COUNTRY C, CSU_CITY D, CSU_HUB_SITE E, CSU_STATE_PROVINCE F ,CAPMAN_PLATFORMS G WHERE A.PRODUCT_CD = " + ProductID + " AND A.PRODUCT_CD IN ( " + ProductList + ") AND A.SUBPRODUCT_CD = " + SubProductID + " AND A.REGION_ID = B.REGION_ID AND A.REGION_ID = " + RegionID + " AND A.COUNTRY_ID = C.COUNTRY_ID AND A.CITY_ID = D.CITY_ID(+) AND A.HUB_SITE_ID = E.HUB_SITE_ID(+) AND A.COUNTRY_ID = " + CountryID + " AND D.STATE_PROVINCE_ID = F.STATE_PROVINCE_ID(+) AND A.CAPMAN_PLATFORM_ID=G.CAPMAN_PLATFORM_ID(+)";
+            DataSet ds1 = OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+
+            //if (ds1.Tables[0].Rows.Count == 0)
+            //{
+            //    strQry = " Select case_id, DECODE(CASE_VALID_CD,1,'VALID','INVALID') SHOWVALID, a.hub_site_id,a.country_id,a.city_id, region_name || '-' || country_name || '-' || state_province_name || '-' || city_name || '-' || hub_site_name ||'-'||capman_platform_name x_name from CSU_CASES a, CSU_REGION b, CSU_COUNTRY c, CSU_CITY d, CSU_HUB_SITE e, CSU_STATE_PROVINCE f ,CAPMAN_PLATFORMS g where a.product_cd = " + ProductID + " and a.PRODUCT_cd in ( " + ProductList + " )  and a.subproduct_cd = " + SubProductID + " and a.region_id = b.region_id and a.region_id = " + RegionID + " and a.country_id = c.country_id and a.city_id = d.city_id(+) and a.hub_site_id = e.hub_site_id(+) and a.country_id = " + CountryID + " and d.state_province_id = f.state_province_id(+) AND a.CAPMAN_PLATFORM_ID=g.CAPMAN_PLATFORM_ID(+) and a.case_id = (Select max(case_id) as case_id from CSU_CASES t where t.product_cd = a.product_cd and t.subproduct_cd = a.subproduct_cd and t.region_id = a.region_id and t.country_id = a.country_id and t.city_id = a.city_id and t.hub_site_id = a.hub_site_id and nvl(t.state_province_id,0) = nvl(a.state_province_id,0)) order by upper(x_name) ";
+            //    ds1 = OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+            //}
+            return ds1;
+
+        }
+
+        public DataSet GetCPECases(int ProductID, int RegionID, int CountryID, int AccessLevel, int UserID)
+        {
+            string strQry = "";
+            string ProductList = "";
+            DataSet ds = GetProductsList(AccessLevel, UserID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                var ProdList = ds.Tables[0].AsEnumerable().Select(t => new { ProductID = t.Field<int>("PRODUCT_cd") });
+                foreach (var item in ProdList)
+                {
+                    ProductList = string.IsNullOrEmpty(ProductList) ? item.ProductID.ToString() : ProductList + "," + item.ProductID.ToString();
+                }
+
+            }
+
+            strQry = " Select case_id,a.hub_site_id,a.country_id,a.city_id, CITY_NAME, d.STATE_PROVINCE_ID AS StateProvinceID, STATE_PROVINCE_NAME, DECODE(case_valid_cd,1,'VALID','INVALID') ShowValid, region_name || '-' || country_name || '-' || state_province_name || '-' || city_name || '-(' || h.char_name || ')' x_name, to_char(site_availability_dt,'DD-MON-YYYY') SiteAvailability from CSU_CASES a, CSU_REGION b, CSU_COUNTRY c, CSU_STATE_PROVINCE d, CSU_CITY e ,csu_ref_valid_char h where a.product_cd = " + ProductID + " AND A.PRODUCT_CD IN ( " + ProductList + ") and a.subproduct_cd is Null and a.region_id = b.region_id and a.country_id = c.country_id and a.city_id = e.city_id(+) and a.region_id = " + RegionID + " and e.state_province_id = d.state_province_id(+) AND A.CITY_ID = e.CITY_ID(+) and h.char_id = a.access_supplier_char_id AND A.COUNTRY_ID = " + CountryID + "  order by upper(x_name)";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+        public DataSet GetCPECaseData(int CaseId)
+        {
+            string strQry = "";
+            //strQry = "SELECT case_id, product_cd, subproduct_cd, region_id, country_id, city_id, hub_site_id, access_supplier_char_id, access_speed_char_id, case_avail_cd, bundled_unbundled_flag, to_char(site_availability_dt,'DD-MON-YYYY') site_availability_dt, case_valid_cd, support_resilient_pop, exception FROM CSU_CASES  WHERE case_id = " + CaseId;
+            strQry = "Select a.case_id,a.country_id, a.case_avail_cd, access_supplier_char_id, exception, a.CITY_ID, ct.CITY_NAME, (select AVAIL_DESC from csu_ref_availability where AVAIL_CD = a.case_avail_cd) as CaseAvailability,DECODE(case_valid_cd,1,'Valid','Invalid') ShowValid, region_name, country_name, case_avail_cd," +
+                        " (select User_name from CSU_USER where EMP_Id = a.created_emp_id) AS Created_user," +
+                        " TO_CHAR(a.created_dt,'DD-MON-YYYY HH24:MI') as created_dt," +
+                        " (select User_name from CSU_USER where EMP_Id = a.updated_emp_id) AS Updated_user," +
+                        " TO_CHAR(a.updated_dt,'DD-MON-YYYY HH24:MI') as updated_dt, to_char(a.site_availability_dt,'DD-MON-YYYY') SiteAvailability" +
+                        " from CSU_CASES a, CSU_REGION b, CSU_COUNTRY c, CSU_CITY ct where ct.CITY_ID = a.CITY_ID and  a.region_id = b.region_id  and a.country_id = c.country_id and case_id = " + CaseId +
+                        " order by country_name";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        public DataSet GetCPESuppliers()
+        {
+            string strQry = "";
+            strQry = "select a.char_id, a.char_name from csu_ref_valid_char a, csu_ref_char_type b where a.char_type_id = b.char_type_id and b.char_type_name='CPE Suppliers' order by a.char_name";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+
+        public DataSet GetProductLevel(int ProductID)
+        {
+            string strQry = "";
+            strQry = " Select b.product_loc_level_desc from csu_product a,csu_ref_product_loc_level b where a.product_loc_level_cd = b.product_loc_level_cd and product_cd = " + ProductID;
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        public DataSet GetAvailDesc()
+        {
+            string strQry = "";
+            strQry = " select avail_cd, avail_abbr, avail_desc from csu_ref_availability where avail_valid_cd =1 ORDER BY Upper(avail_desc) ";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        public DataSet GetPoPChars(int HubSiteID, int ProductID)
+        {
+            string strQry = "";
+            strQry = " select cpc.char_name,cpv.char_value,cpv.char_id from capman_pop_chars cpc, capman_pop_char_values cpv, csu_product_pop_char cpp where cpc.char_id = cpv.char_id and cpv.char_id = cpp.char_id and cpv.site_id = '" + HubSiteID + "' and cpp.product_cd = " + ProductID + " and cpp.display_search = 1 and trim(cpc.char_name) in ('NETWORK_COLOUR','POP_PLATFORM_CODE')";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+
+        }
+
+        public DataSet GetNetworkDetails(int CaseID)
+        {
+            string strQry = "";
+            strQry = " Select distinct Network_Name From Capman_Pop_Capability,Csu_Cases WHERE case_id = " + CaseID + " And Capman_Pop_Capability.ServiceId = Csu_Cases.Capman_Platform_Id ";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+
+        }
+
+        public DataSet GetPoPCharValues(int HubSiteID, int ProductID)
+        {
+            string strQry = "";
+            //strQry = " SELECT CPC.CHAR_NAME,CPV.CHAR_VALUE,CPV.CHAR_ID FROM CAPMAN_POP_CHARS CPC, CAPMAN_POP_CHAR_VALUES CPV, CSU_PRODUCT_POP_CHAR CPP WHERE CPC.CHAR_ID = CPV.CHAR_ID AND CPV.CHAR_ID = CPP.CHAR_ID AND CPV.SITE_ID = '" + HubSiteID + "' AND CPP.PRODUCT_CD = " + ProductID + " AND CPP.DISPLAY_SEARCH = 1 AND TRIM(CPC.CHAR_NAME) NOT IN ('NETWORK_COLOUR','POP_PLATFORM_CODE') ORDER BY CPP.DISPLAY_ORDER ";
+
+            strQry = " SELECT nmap.Display_Name AS Char_Name,Cpc.Char_Name AS CharName, CASE WHEN Pcp.Char_Name IS NULL THEN Cpv.Char_Value ELSE DECODE (NVL(Cpv.Char_Value,0),0, 'Not Supported',1, Cpv.Char_Value || ' Router', Cpv.Char_Value || ' Routers')   END AS Char_Value,Cpv.Char_Id FROM capman_pop_chars cpc, capman_pop_char_values cpv,csu_product_pop_char cpp, pop_char_config pcp,capman_pop_char_name_map nmap WHERE Cpc.Char_Id = Cpv.Char_Id AND Cpv.Char_Id = Cpp.Char_Id AND Cpv.Site_Id = " + HubSiteID + " AND Cpp.Product_Cd  = " + ProductID + " AND Cpp.Display_Search = 1 AND Trim(Upper(Cpc.Char_Name))=Trim(Upper(Pcp.Char_Name(+))) AND Trim(Cpc.Char_Name) NOT IN ('NETWORK_COLOUR','POP_PLATFORM_CODE') AND upper(nmap.column_Name) = upper(cpc.char_name) ORDER BY cpp.display_order ";
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+
+        }
+
+        public DataSet GetCaseDetails(int CaseID)
+        {
+            string strQry = "";
+            strQry = " SELECT case_id, product_cd, subproduct_cd, region_id, country_id, city_id, hub_site_id, access_supplier_char_id, access_speed_char_id, case_avail_cd, bundled_unbundled_flag, to_char(site_availability_dt,'DD-MON-YYYY') site_availability_dt, case_valid_cd, support_resilient_pop FROM CSU_CASES WHERE case_id = " + CaseID;
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        public DataSet GetStateProvinceFlag(int CountryID)
+        {
+            string strQry = "";
+            strQry = " select state_province_flag  from csu_country where country_id = " + CountryID;
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+
+        public DataSet GetHubSiteType(int CaseID)
+        {
+            string strQry = "";
+            strQry = " Select Char_Name from csu_ref_valid_char a, csu_case_details b where case_id = " + CaseID + " and b.char_type_id = '49' and b.char_id = a.char_id and case_detail_valid_cd = 1 ";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        public DataSet GetSupplierDetails(int HubSiteID, int CaseID, int ProductID)
+        {
+            string strQry = "";
+            strQry = " SELECT DISTINCT A.CHAR_ID, A.CHAR_NAME FROM CSU_REF_VALID_CHAR A, CSU_CASES C WHERE C.PRODUCT_CD = 25 AND C.CASE_VALID_CD = 1 AND C.HUB_SITE_ID = " + HubSiteID + " AND A.CHAR_ID = C.ACCESS_SUPPLIER_CHAR_ID AND A.CHAR_ID NOT IN (SELECT SUPPLIER_ID FROM CSU_CASE_SUPPLIER J WHERE J.CASE_ID = " + CaseID + " AND J.SUPPLIER_ID=C.ACCESS_SUPPLIER_CHAR_ID)AND C.ACCESS_SPEED_CHAR_ID IN (SELECT ACCESS_CHAR_ID FROM CSU_PRODUCT_ACCESS_INTERFACES WHERE PRODUCT_CD=" + ProductID + ") ORDER BY UPPER(A.CHAR_NAME) ";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        public DataSet GetSupplierDetails(int HubSiteID, int CaseID)
+        {
+            string strQry = "";
+            strQry = " SELECT distinct a.char_id, a.char_name FROM csu_ref_valid_char a, csu_cases c WHERE c.product_cd = 25 and c.case_valid_cd = 1 and c.hub_site_id = '" + HubSiteID + "' and a.char_id = c.access_supplier_char_id and a.char_id in (select supplier_id from csu_case_supplier j where j.case_id = " + CaseID + " and j.supplier_id=c.access_supplier_char_id) order by a.char_name ";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+        }
+
+        public int SaveCaseDetails(int CaseID, int CityID, int StateProvinceID, int HubSiteID, string EmpID, string SiteAvailabilityDate, int SupportResilientPOP, int ExceptionRequired, string SelectedSuppliers, int Availability, int CaseValid, int CPESupplierId)
+        {
+
+            string strQry = "";
+            //strQry = " Select case_Avail_cd, TO_CHAR(site_availability_dt,'DD-MON-RRRR') from csu_cases where case_id = " + CaseID;
+            //DataSet dsSiteAvailability = OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+
+            //if (dsSiteAvailability != null && dsSiteAvailability.Tables.Count > 0 && dsSiteAvailability.Tables[0].Rows.Count > 0)
+            //{
+
+            //}
+            string SiteAvailabilitydt = "";
+            if (SiteAvailabilityDate != "")
+            {
+                DateTime SiteAvailability = DateTime.ParseExact(SiteAvailabilityDate, "MM/dd/yyyy", null);
+                SiteAvailabilitydt = String.Format("{0:dd-MMM-yyyy}", SiteAvailability);
+            }
+
+            if (CityID > 0 || StateProvinceID > 0 || HubSiteID > 0)
+            {
+                strQry = " update csu_cases set case_avail_cd = " + Availability + ", city_id = " + CityID + ", state_province_id = " + StateProvinceID + ", hub_site_id = " + HubSiteID + ", bundled_unbundled_flag = 0, site_availability_dt =  '" + SiteAvailabilitydt + "', case_valid_cd = " + CaseValid + ", updated_emp_id = '" + EmpID + "', updated_dt = sysdate, support_resilient_pop = " + SupportResilientPOP;               
+            }
+            else
+            {
+                strQry = " update csu_cases set case_avail_cd = " + Availability + ", city_id = Null, state_province_id = Null, hub_site_id = Null, bundled_unbundled_flag = 0, site_availability_dt =  '" + SiteAvailabilitydt + "', case_valid_cd = " + CaseValid + ", updated_emp_id = '" + EmpID + "', updated_dt = sysdate, support_resilient_pop = " + SupportResilientPOP;
+            }
+
+            if (CPESupplierId > 0)
+            {
+                strQry = strQry + ", access_supplier_char_id = " + CPESupplierId;
+            }
+            strQry = strQry + ", exception = " + ExceptionRequired + " where case_id = " + CaseID;
+
+            int recordsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry);
+
+
+            strQry = " delete from csu_case_supplier where case_id = " + CaseID;
+            OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry);
+
+            strQry = " SELECT DISTINCT A.CHAR_ID, A.CHAR_NAME, S.SUPPLIER_ID FROM CSU_REF_VALID_CHAR A, CSU_CASES C, CSU_CASE_SUPPLIER S WHERE C.PRODUCT_CD = 25 AND C.CITY_ID = " + CityID + " AND A.CHAR_ID = C.ACCESS_SUPPLIER_CHAR_ID AND S.CASE_ID(+) = " + CaseID + " AND S.SUPPLIER_ID(+) = C.ACCESS_SUPPLIER_CHAR_ID ORDER BY S.SUPPLIER_ID, A.CHAR_NAME";
+            DataSet dsSuppliers = OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry);
+            string[] strSuppList = SelectedSuppliers.Split(',');
+            int isValid = 0;
+            if (dsSuppliers != null && dsSuppliers.Tables.Count > 0 && dsSuppliers.Tables[0].Rows.Count > 0)
+            {
+                foreach (DataRow item in dsSuppliers.Tables[0].Rows)
+                {
+                    isValid = 0;
+                    foreach (string supp in strSuppList)
+                    {
+                        if (supp == item["CHAR_ID"].ToString())
+                        {
+                            isValid = 1;
+                        }
+                    }
+                    if (isValid == 0)
+                    {
+                        strQry = " Insert into csu_case_supplier values (" + CaseID + "," + item["CHAR_ID"].ToString() + ")";
+                        OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry);
+                    }
+                }
+            }
+
+            strQry = " update csu_cases set updated_emp_id = '" + EmpID + "', updated_dt = sysdate where case_id = " + CaseID;
+            OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry);
+
+            return recordsAffected;
+        }
+
+        public int DeleteCaseDetails(int AccessLevel, int CaseID, int UserID)
+        {
+            string Sql = "";
+            if (AccessLevel == 1)
+            {
+                Sql = "DECLARE DUMMY NUMBER; ";
+                Sql = Sql + "BEGIN ";
+
+                Sql = Sql + "Delete from csu_case_details ";
+                Sql = Sql + " where case_id = " + CaseID;
+                Sql = Sql + " ; ";
+
+                Sql = Sql + "Delete from csu_port_access_interfaces ";
+                Sql = Sql + " where case_id = " + CaseID;
+                Sql = Sql + " ; ";
+
+                Sql = Sql + "Delete from csu_case_port_access_speeds ";
+                Sql = Sql + " where case_id = " + CaseID;
+                Sql = Sql + " ; ";
+
+                Sql = Sql + "Delete from csu_case_supplier";
+                Sql = Sql + " where case_id = " + CaseID;
+                Sql = Sql + " ; ";
+
+                Sql = Sql + "Delete from csu_cases ";
+                Sql = Sql + " where case_id = " + CaseID;
+                Sql = Sql + " ; ";
+
+                Sql = Sql + "Delete from csu_cpe_case_products ";
+                Sql = Sql + " where case_id = " + CaseID;
+                Sql = Sql + " ; ";
+
+                Sql = Sql + " COMMIT; ";
+                Sql = Sql + " END; ";
+
+            }
+            else
+            {
+                Sql = "DECLARE DUMMY NUMBER; ";
+                Sql = Sql + "BEGIN ";
+
+                Sql = Sql + "update csu_cases ";
+                Sql = Sql + " set ";
+                Sql = Sql + " case_valid_cd = 0, ";
+                Sql = Sql + " updated_emp_id = '" + UserID + "',";
+                Sql = Sql + " updated_dt = sysdate";
+                Sql = Sql + " where case_id = " + CaseID;
+
+                Sql = Sql + " ; ";
+
+                Sql = Sql + "update csu_case_details ";
+                Sql = Sql + " set ";
+                Sql = Sql + " case_detail_valid_cd = 0, ";
+                Sql = Sql + " updated_emp_id = '" + UserID + "',";
+                Sql = Sql + " updated_dt = sysdate";
+                Sql = Sql + " where case_id = " + CaseID;
+
+                Sql = Sql + " ; ";
+
+                Sql = Sql + " COMMIT; ";
+                Sql = Sql + " END; ";
+            }
+
+            return OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, Sql);
+            //return 1;
+        }
+
+        public DataSet GetCaseCharDetails(int CaseID)
+        {
+            string Sql = "select case_id, a.option_matrix_id, a.char_type_id, a.char_id, char_type_name, char_name, a.char_value, CHAR_ACTUAL_VALUE, CHAR_UNIT_OF_MEASURE, a.char_avail_cd, a.char_value_2, to_char(a.char_avail_dt,'DD-MON-YYYY') char_avail_dt, a.char_value, a.case_detail_valid_cd, c.char_type_value_count from csu_case_details a, csu_ref_valid_char b, csu_ref_char_type c, csu_ref_product_opt_matrix d where case_id = " + CaseID + " and a.char_type_id = b.char_type_id and a.char_id = b.char_id and a.char_type_id = c.char_type_id and a.option_matrix_id = d.option_matrix_id and d.option_matrix_valid_cd = 1 and d.char_level = 'POP' order by CPE_PRODUCT_MAP, UPPER(CHAR_TYPE_NAME), CHAR_NUM_VALUE, UPPER(CHAR_NAME), UPPER(A.CHAR_VALUE) ";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+        public DataSet GetNetworkID(int CaseID)
+        {
+            string Sql = "Select distinct Network_Name,ServiceId From Capman_Pop_Capability,Csu_Cases WHERE case_id = " + CaseID + " And Capman_Pop_Capability.ServiceId = Csu_Cases.Capman_Platform_Id";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+
+        }
+
+        public DataSet GetParentPortSpeeds(int HubSiteID, int ParentID, int NetworkID)
+        {
+            string Sql = "SELECT A.CASE_ID, A.OPTION_MATRIX_ID, A.CHAR_TYPE_ID, A.CHAR_ID, B.CHAR_NAME, A.CHAR_VALUE, A.CHAR_AVAIL_CD, A.CHAR_VALUE_2, B.CHAR_ACTUAL_VALUE, B.CHAR_UNIT_OF_MEASURE, TO_CHAR(A.CHAR_AVAIL_DT,'DD-MON-YYYY') CHAR_AVAIL_DT, A.CASE_DETAIL_VALID_CD, B.CHAR_NUM_VALUE FROM CSU_CASES A1, CSU_CASE_DETAILS A, CSU_REF_VALID_CHAR B, CAPMAN_POP_MAP CPM WHERE A1.PRODUCT_CD = " + ParentID + " AND A1.HUB_SITE_ID = " + HubSiteID + " AND A1.CASE_VALID_CD = 1 AND A1.CAPMAN_PLATFORM_ID = " + NetworkID + " AND A.CASE_ID = A1.CASE_ID AND A.CASE_DETAIL_VALID_CD = 1 AND A.CHAR_AVAIL_CD != 2 AND A.CHAR_TYPE_ID = B.CHAR_TYPE_ID AND A.CHAR_TYPE_ID = 28 AND A.CHAR_ID = B.CHAR_ID AND CPM.PC_POP_ID = A1.HUB_SITE_ID ORDER BY CHAR_NUM_VALUE ";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+
+        }
+
+        public DataSet GetParentPortSpeedMapping(string PortSpeedCharID, int CaseID, int HubSiteID, int ParentID, int ProductID, int OrgCaseID, 
+            string Supplier, string AccessType, string SupplierProduct, string AccessSpeedIds)
+        {
+            string Sql = "SELECT DISTINCT PAS.ACCESS_SPEED_CHAR_ID,PAS.PORT_SPEED_CHAR_ID, C.CHAR_ACTUAL_VALUE, C.CHAR_UNIT_OF_MEASURE, C.CHAR_NUM_VALUE,CS.ACCESS_PRODUCT_TYPE_ID,D.CHAR_NAME AS TYPE, CS.ACCESS_SUPPLIER_NAME_ID, E.CHAR_NAME AS NAME,CS.ACCESS_SUPPLIER_CHAR_ID, F.CHAR_NAME AS SUPPLIER ,VP.ETHERNET_PHASE_ID,ccp.PORT_SPEED_AVAIL_CD, ccp.VALID_CD, h.AVAIL_DESC FROM PORT_TO_ACCESS_SPEEDS PAS, CSU_REF_VALID_CHAR C, CSU_REF_VALID_CHAR D, CSU_REF_VALID_CHAR E, CSU_CASES CS, CSU_CASE_DETAILS CD, CSU_CASE_PORT_ACCESS_SPEEDS CCP,CSU_REF_AVAILABILITY h, CSU_REF_VALID_CHAR F,CSU_PRODUCT_ACCESS_INTERFACES CPAI , V_PC_SUPPLIER_PRODUCT VP,CAPMAN_SUPPLIER_PROD_NAME_MAP CP WHERE PAS.PORT_SPEED_CHAR_ID in(" + PortSpeedCharID + ") AND CS.CASE_VALID_CD = 1 and  h.AVAIL_CD = ccp.PORT_SPEED_AVAIL_CD AND CS.ACCESS_SPEED_CHAR_ID = PAS.ACCESS_SPEED_CHAR_ID AND CS.ACCESS_SUPPLIER_CHAR_ID NOT IN (SELECT SUPPLIER_ID FROM CSU_CASE_SUPPLIER WHERE CASE_ID = "+CaseID+") AND CS.PRODUCT_CD = 25 AND CS.HUB_SITE_ID = "+HubSiteID+" AND CD.CASE_ID = CS.CASE_ID  AND CD.CASE_DETAIL_VALID_CD = 1 AND C.CHAR_ID = CS.ACCESS_SPEED_CHAR_ID AND D.CHAR_ID = CS.ACCESS_PRODUCT_TYPE_ID AND PAS.ACCESS_SPEED_CHAR_ID = CPAI.ACCESS_CHAR_ID AND E.CHAR_ID = CS.ACCESS_SUPPLIER_NAME_ID AND F.CHAR_ID = CS.ACCESS_SUPPLIER_CHAR_ID AND CCP.CASE_ID = "+CaseID+" AND CCP.PORT_SPEED_CHAR_ID = PAS.PORT_SPEED_CHAR_ID AND CCP.ACCESS_SPEED_CHAR_ID = CS.ACCESS_SPEED_CHAR_ID AND CCP.ACCESS_PRODUCT_TYPE_ID = CS.ACCESS_PRODUCT_TYPE_ID  AND CCP.ACCESS_SUPPLIER_NAME_ID = CS.ACCESS_SUPPLIER_NAME_ID AND CCP.ACCESS_SUPPLIER_CHAR_ID = CS.ACCESS_SUPPLIER_CHAR_ID  AND CCP.VALID_CD = 1 AND CS.ACCESS_SUPPLIER_NAME_ID IN ( SELECT PC_ACCESS_SUPPLIER_NAME_ID FROM V_PC_SUPPLIER_PRODUCT VT , CAPMAN_SUPPLIER_PROD_NAME_MAP CM WHERE VT.SUPPLIERPRODUCTID=CM.C_ACCESS_SUPPLIER_NAME_ID AND ( VT.ETHERNET_PHASE_ID = 1  OR EXISTS ( SELECT 'X' FROM CSU_PRODUCT_PHASE_ATTRIBUTE CA WHERE VT.ETHERNET_PHASE_ID =PHASE_ID AND PHASE_ID = 2  AND CA.PRODUCT_ID ="+ParentID+") OR VT.ETHERNET_PHASE_ID > 2)) AND VP.SUPPLIERPRODUCTID=CP.C_ACCESS_SUPPLIER_NAME_ID AND CP.PC_ACCESS_SUPPLIER_NAME_ID=CS.ACCESS_SUPPLIER_NAME_ID ORDER BY C.CHAR_NUM_VALUE ";
+
+            Sql = "SELECT DISTINCT PAS.ACCESS_SPEED_CHAR_ID,PAS.PORT_SPEED_CHAR_ID,C.CHAR_ACTUAL_VALUE,C.CHAR_UNIT_OF_MEASURE,C.CHAR_NUM_VALUE,CS.ACCESS_PRODUCT_TYPE_ID,D.CHAR_NAME AS TYPE,CS.ACCESS_SUPPLIER_NAME_ID,E.CHAR_NAME AS NAME,CS.ACCESS_SUPPLIER_CHAR_ID,F.CHAR_NAME AS SUPPLIER ,VP.ETHERNET_PHASE_ID,ccp.PORT_SPEED_AVAIL_CD,ccp.VALID_CD,H.AVAIL_DESC,(SELECT VALID_CD FROM CSU_PARENT_PORT_ACCESS_SPEEDS WHERE CASE_ID = " + OrgCaseID + " AND PORT_SPEED_CHAR_ID = PAS.PORT_SPEED_CHAR_ID AND ACCESS_SPEED_CHAR_ID = PAS.ACCESS_SPEED_CHAR_ID AND ACCESS_PRODUCT_TYPE_ID  = CS.ACCESS_PRODUCT_TYPE_ID AND ACCESS_SUPPLIER_NAME_ID = CS.ACCESS_SUPPLIER_NAME_ID AND ACCESS_SUPPLIER_CHAR_ID = CS.ACCESS_SUPPLIER_CHAR_ID) VALIDID,( SELECT DISTINCT VPM.PORT_SPEED_CHAR_ID FROM VALID_PARENT_MAPPINGS VPM,VALID_PARENT_MAP_INETERFACE VPMI  WHERE VPM.PRODUCT_CD = " + ProductID + " AND VPM.PORT_SPEED_CHAR_ID = PAS.PORT_SPEED_CHAR_ID AND VPM.ACCESS_SPEED_CHAR_ID  = PAS.ACCESS_SPEED_CHAR_ID AND VPM.ACCESS_TYPE_CHAR_ID   = CS.ACCESS_PRODUCT_TYPE_ID AND VPM.VALID_CD = 1 AND VPMI.PRODUCT_CD = VPM.PRODUCT_CD AND VPMI.VALID_CD = 1 AND VPMI.ACCESS_SPEED_CHAR_ID = VPM.ACCESS_SPEED_CHAR_ID) PORT_SPEED_CHAR_ID_NEW,( SELECT DISTINCT VPM.ACCESS_SPEED_CHAR_ID FROM VALID_PARENT_MAPPINGS VPM,VALID_PARENT_MAP_INETERFACE VPMI WHERE VPM.PRODUCT_CD = " + ProductID + " AND VPM.PORT_SPEED_CHAR_ID = PAS.PORT_SPEED_CHAR_ID AND VPM.ACCESS_SPEED_CHAR_ID  = PAS.ACCESS_SPEED_CHAR_ID AND VPM.ACCESS_TYPE_CHAR_ID   = CS.ACCESS_PRODUCT_TYPE_ID AND VPM.VALID_CD = 1 AND VPMI.PRODUCT_CD  = VPM.PRODUCT_CD AND VPMI.VALID_CD = 1 AND VPMI.ACCESS_SPEED_CHAR_ID = VPM.ACCESS_SPEED_CHAR_ID) ACCESS_SPEED_CHAR_ID_NEW,(SELECT DISTINCT VPM.ACCESS_TYPE_CHAR_ID FROM VALID_PARENT_MAPPINGS VPM,VALID_PARENT_MAP_INETERFACE VPMI WHERE VPM.PRODUCT_CD = " + ProductID + " AND VPM.PORT_SPEED_CHAR_ID    = PAS.PORT_SPEED_CHAR_ID AND VPM.ACCESS_SPEED_CHAR_ID  = PAS.ACCESS_SPEED_CHAR_ID AND VPM.ACCESS_TYPE_CHAR_ID   = CS.ACCESS_PRODUCT_TYPE_ID AND VPM.VALID_CD = 1 AND VPMI.PRODUCT_CD = VPM.PRODUCT_CD AND VPMI.VALID_CD = 1 AND VPMI.ACCESS_SPEED_CHAR_ID = VPM.ACCESS_SPEED_CHAR_ID) ACCESS_PRODUCT_TYPE_ID_NEW FROM PORT_TO_ACCESS_SPEEDS PAS,CSU_REF_VALID_CHAR C, CSU_REF_VALID_CHAR D, CSU_REF_VALID_CHAR E, CSU_CASES CS, CSU_CASE_DETAILS CD, CSU_CASE_PORT_ACCESS_SPEEDS CCP, CSU_REF_AVAILABILITY h, CSU_REF_VALID_CHAR F, CSU_PRODUCT_ACCESS_INTERFACES CPAI , V_PC_SUPPLIER_PRODUCT VP,CAPMAN_SUPPLIER_PROD_NAME_MAP CP WHERE PAS.PORT_SPEED_CHAR_ID       IN(" + PortSpeedCharID + ") AND CS.CASE_VALID_CD  = 1 AND h.AVAIL_CD                      = ccp.PORT_SPEED_AVAIL_CD AND CS.ACCESS_SPEED_CHAR_ID = PAS.ACCESS_SPEED_CHAR_ID AND CS.ACCESS_SUPPLIER_CHAR_ID NOT IN (SELECT SUPPLIER_ID FROM CSU_CASE_SUPPLIER WHERE CASE_ID = " + CaseID + " ) AND CS.PRODUCT_CD = 25 AND CS.HUB_SITE_ID = " + HubSiteID + " AND CD.CASE_ID = CS.CASE_ID AND CD.CASE_DETAIL_VALID_CD = 1 AND C.CHAR_ID = CS.ACCESS_SPEED_CHAR_ID AND D.CHAR_ID = CS.ACCESS_PRODUCT_TYPE_ID AND PAS.ACCESS_SPEED_CHAR_ID = CPAI.ACCESS_CHAR_ID AND E.CHAR_ID  = CS.ACCESS_SUPPLIER_NAME_ID AND F.CHAR_ID = CS.ACCESS_SUPPLIER_CHAR_ID AND CCP.CASE_ID = " + CaseID + " AND CCP.PORT_SPEED_CHAR_ID = PAS.PORT_SPEED_CHAR_ID AND CCP.ACCESS_SPEED_CHAR_ID = CS.ACCESS_SPEED_CHAR_ID AND CCP.ACCESS_PRODUCT_TYPE_ID  = CS.ACCESS_PRODUCT_TYPE_ID AND CCP.ACCESS_SUPPLIER_NAME_ID = CS.ACCESS_SUPPLIER_NAME_ID AND CCP.ACCESS_SUPPLIER_CHAR_ID = CS.ACCESS_SUPPLIER_CHAR_ID AND CCP.VALID_CD = 1 AND CS.ACCESS_SUPPLIER_NAME_ID IN (SELECT PC_ACCESS_SUPPLIER_NAME_ID FROM V_PC_SUPPLIER_PRODUCT VT ,CAPMAN_SUPPLIER_PROD_NAME_MAP CM WHERE VT.SUPPLIERPRODUCTID =CM.C_ACCESS_SUPPLIER_NAME_ID AND ( VT.ETHERNET_PHASE_ID = 1 OR EXISTS (SELECT 'X' FROM CSU_PRODUCT_PHASE_ATTRIBUTE CA WHERE VT.ETHERNET_PHASE_ID =PHASE_ID AND PHASE_ID = 2 AND CA.PRODUCT_ID =" + ParentID + " ) OR VT.ETHERNET_PHASE_ID > 2) ) AND VP.SUPPLIERPRODUCTID =CP.C_ACCESS_SUPPLIER_NAME_ID AND CP.PC_ACCESS_SUPPLIER_NAME_ID=CS.ACCESS_SUPPLIER_NAME_ID ";
+
+
+            if (Supplier != "")
+            {
+                Sql += " AND cs.access_supplier_char_id IN (" + Supplier + ")";
+            }
+
+            if (AccessType != "")
+            {
+                Sql += " AND cs.access_product_type_id IN (" + AccessType + ")";
+            }
+
+            if (SupplierProduct != "")
+            {
+                Sql += " AND cs.access_supplier_name_id IN (" + SupplierProduct + ")";
+            }
+
+            if (AccessSpeedIds != "")
+            {
+                Sql += " AND PAS.Access_Speed_Char_ID IN (" + AccessSpeedIds + ")";
+            }
+
+            Sql += "ORDER BY C.CHAR_NUM_VALUE";
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+
+        }
+
+        public DataSet GetPortInfo(int CaseID, int PortSpeedCharID, int AccessSpeedCharID, int AccessProductTypeID, int AccessSupplierNameID,int AccessSupplierCharID)
+        {
+            string Sql = "SELECT PORT_SPEED_AVAIL_CD, VALID_CD FROM CSU_PARENT_PORT_ACCESS_SPEEDS WHERE CASE_ID = " + CaseID + " AND PORT_SPEED_CHAR_ID = " + PortSpeedCharID + " AND ACCESS_SPEED_CHAR_ID = " + AccessSpeedCharID + " AND ACCESS_PRODUCT_TYPE_ID = " + AccessProductTypeID + " AND ACCESS_SUPPLIER_NAME_ID = " + AccessSupplierNameID + " AND ACCESS_SUPPLIER_CHAR_ID = " + AccessSupplierCharID;
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+        public DataSet GetEnableMapping(int ProductID, int PortSpeedCharID, int AccessSpeedCharID, int AccessTypeCharID)
+        {
+            string Sql = "SELECT DISTINCT VPM.PORT_SPEED_CHAR_ID, VPM.ACCESS_SPEED_CHAR_ID, VPM.ACCESS_TYPE_CHAR_ID FROM VALID_PARENT_MAPPINGS VPM, VALID_PARENT_MAP_INETERFACE VPMI WHERE VPM.PRODUCT_CD = " + ProductID + " AND VPM.PORT_SPEED_CHAR_ID = " + PortSpeedCharID + " AND VPM.ACCESS_SPEED_CHAR_ID = " + AccessSpeedCharID + " AND VPM.ACCESS_TYPE_CHAR_ID = " + AccessTypeCharID + " AND VPM.VALID_CD = 1 AND VPMI.PRODUCT_CD = VPM.PRODUCT_CD AND VPMI.VALID_CD = 1 AND VPMI.ACCESS_SPEED_CHAR_ID = VPM.ACCESS_SPEED_CHAR_ID";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+        public DataSet GetParentSpeedsCount(int CaseID)
+        {
+            string Sql = "select count(*) from csu_parent_port_access_speeds where case_id = " + CaseID;
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+        public DataSet ValidateParentPortSpeed(int ProductID)
+        {
+            string Sql = "select validate_parent_portspeed from csu_product where product_cd = " + ProductID;
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+
+        public DataSet GetCaseDetailsByFilter(string Supplier,string AccessType,string SupplierProduct,int PortSpeedCharID,int ProductID,int CaseID, int HubSiteID)
+        {
+            string Sql = "Select distinct pas.access_speed_char_id, c.char_actual_value, c.char_unit_of_measure, c.char_num_value,cs.access_supplier_char_id SupplierID, f.char_name as Supplier,cs.access_product_type_id TypeID, d.char_name as Type, cs.access_supplier_name_id NameID, e.char_name as Name ,vp.ethernet_phase_id From port_to_access_speeds pas, csu_ref_valid_char c, csu_ref_valid_char d, csu_ref_valid_char e, csu_cases cs,csu_ref_valid_char f ,V_PC_SUPPLIER_PRODUCT vp,CAPMAN_SUPPLIER_PROD_NAME_MAP cp,csu_product_access_interfaces cpai ,capman_pop_map cpm Where pas.port_speed_char_id = " + PortSpeedCharID + " AND cs.access_speed_char_id = pas.access_speed_char_id AND cs.access_product_type_id = pas.access_type_char_id AND pas.access_speed_char_id = cpai.access_char_id AND cpai.product_cd=" + ProductID + " AND cs.access_supplier_char_id NOT in (select supplier_id from csu_case_supplier where case_id = " + CaseID + ") AND cs.case_valid_cd = 1 AND cs.product_cd = 25 AND cs.access_supplier_name_id in ( select pc_access_supplier_name_id from v_pc_supplier_product vt ,capman_supplier_prod_name_map cm where vt.SUPPLIERPRODUCTID=cm.C_ACCESS_SUPPLIER_NAME_ID and ( vt.ethernet_phase_id = 1 OR EXISTS ( SELECT 'X' FROM csu_product_phase_attribute ca WHERE vt.ethernet_phase_id =phase_id AND phase_id = 2 AND ca.product_id =" + ProductID + " ) OR vt.ethernet_phase_id > 2)) and vp.SUPPLIERPRODUCTID=cp.C_ACCESS_SUPPLIER_NAME_ID and cp.PC_ACCESS_SUPPLIER_NAME_ID=cs.access_supplier_name_id AND cs.hub_site_id = " + HubSiteID + " And c.char_id = cs.access_speed_char_id And d.char_id = cs.access_product_type_id And e.char_id = cs.access_supplier_name_id And f.char_id = cs.access_supplier_char_id And cpm.pc_pop_id = cs.hub_site_id ";
+
+            Sql += "Order by c.char_num_value";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+
+        public DataSet GetPortSpeedCaseDetails(string SupplierIDs, string AccessTypeIDs, string SupplierProductIDs, string PortSpeedCharID, int ProductID, int CaseID, int HubSiteID, string AccessSpeedIds)
+        {
+            string Sql = "";
+
+            Sql = "Select distinct PAS.PORT_SPEED_CHAR_ID ,pas.access_speed_char_id, c.char_actual_value, c.char_unit_of_measure, c.char_num_value, f.char_name as supplier,cs.access_product_type_id typeid, d.char_name as type, cs.access_supplier_name_id nameid, e.char_name as name ,vp.ethernet_phase_id,(select distinct PORT_SPEED_AVAIL_CD from CSU_CASE_PORT_ACCESS_SPEEDS  where  PORT_SPEED_CHAR_ID = PAS.PORT_SPEED_CHAR_ID and ACCESS_SPEED_CHAR_ID = CS.ACCESS_SPEED_CHAR_ID AND ACCESS_PRODUCT_TYPE_ID = CS.ACCESS_PRODUCT_TYPE_ID and access_supplier_name_id = cs.access_supplier_name_id AND ACCESS_SUPPLIER_CHAR_ID = cs.access_supplier_char_id)  as PORT_SPEED_AVAIL_CD from port_to_access_speeds pas, csu_ref_valid_char c, csu_ref_valid_char d, csu_ref_valid_char e, csu_cases cs,csu_ref_valid_char f ,v_pc_supplier_product vp,capman_supplier_prod_name_map cp,csu_product_access_interfaces cpai ,capman_pop_map cpm where PAS.PORT_SPEED_CHAR_ID in (" + PortSpeedCharID + ") and CS.ACCESS_SPEED_CHAR_ID = PAS.ACCESS_SPEED_CHAR_ID and CS.ACCESS_PRODUCT_TYPE_ID = PAS.ACCESS_TYPE_CHAR_ID and PAS.ACCESS_SPEED_CHAR_ID = CPAI.ACCESS_CHAR_ID and CPAI.PRODUCT_CD="+ProductID+" and CS.ACCESS_SUPPLIER_CHAR_ID not in (select SUPPLIER_ID from CSU_CASE_SUPPLIER where CASE_ID = "+CaseID+") and CS.CASE_VALID_CD = 1 and CS.PRODUCT_CD = 25 and CS.ACCESS_SUPPLIER_NAME_ID in ( select PC_ACCESS_SUPPLIER_NAME_ID from V_PC_SUPPLIER_PRODUCT VT ,CAPMAN_SUPPLIER_PROD_NAME_MAP CM where VT.SUPPLIERPRODUCTID=CM.C_ACCESS_SUPPLIER_NAME_ID and ( VT.ETHERNET_PHASE_ID = 1 or exists ( select 'X' from CSU_PRODUCT_PHASE_ATTRIBUTE CA where VT.ETHERNET_PHASE_ID =PHASE_ID and PHASE_ID = 2 and CA.PRODUCT_ID ="+ProductID+" ) or VT.ETHERNET_PHASE_ID > 2)) and VP.SUPPLIERPRODUCTID=CP.C_ACCESS_SUPPLIER_NAME_ID and CP.PC_ACCESS_SUPPLIER_NAME_ID=CS.ACCESS_SUPPLIER_NAME_ID and CS.HUB_SITE_ID = "+HubSiteID+" and C.CHAR_ID = CS.ACCESS_SPEED_CHAR_ID and D.CHAR_ID = CS.ACCESS_PRODUCT_TYPE_ID and E.CHAR_ID = CS.ACCESS_SUPPLIER_NAME_ID and F.CHAR_ID = CS.ACCESS_SUPPLIER_CHAR_ID and CPM.PC_POP_ID = CS.HUB_SITE_ID";
+
+            if(SupplierIDs!="")
+            {
+                Sql += " AND cs.access_supplier_char_id IN (" + SupplierIDs + ")";
+            }
+            if (AccessTypeIDs != "")
+            {
+                Sql += " AND cs.access_product_type_id IN (" + AccessTypeIDs + ")";
+            }
+            if (SupplierProductIDs != "")
+            {
+                Sql += " AND cs.access_supplier_name_id IN (" + SupplierProductIDs + ")";
+            }
+
+            Sql += " ORDER BY C.CHAR_NUM_VALUE";
+
+            Sql = "Select distinct PAS.PORT_SPEED_CHAR_ID,pas.access_speed_char_id, c.char_actual_value, c.char_unit_of_measure, c.char_num_value,cs.access_supplier_char_id SupplierID, f.char_name as Supplier,cs.access_product_type_id TypeID, d.char_name as Type, cs.access_supplier_name_id NameID, e.char_name as Name ,vp.ethernet_phase_id,SPEED.PORT_SPEED_AVAIL_CD From port_to_access_speeds pas, csu_ref_valid_char c, csu_ref_valid_char d, csu_ref_valid_char e, csu_cases cs,csu_ref_valid_char f ,V_PC_SUPPLIER_PRODUCT vp,CAPMAN_SUPPLIER_PROD_NAME_MAP cp,csu_product_access_interfaces cpai ,capman_pop_map cpm,CSU_PARENT_PORT_ACCESS_SPEEDS SPEED  Where pas.port_speed_char_id IN (" + PortSpeedCharID + ") AND cs.access_speed_char_id = pas.access_speed_char_id AND cs.access_product_type_id = pas.access_type_char_id AND pas.access_speed_char_id = cpai.access_char_id AND cpai.product_cd=" + ProductID + " AND cs.access_supplier_char_id NOT in (select supplier_id from csu_case_supplier where case_id = " + CaseID + ") AND cs.case_valid_cd = 1 AND cs.product_cd = 25 AND cs.access_supplier_name_id in ( select pc_access_supplier_name_id from v_pc_supplier_product vt ,capman_supplier_prod_name_map cm where vt.SUPPLIERPRODUCTID=cm.C_ACCESS_SUPPLIER_NAME_ID and ( vt.ethernet_phase_id = 1 OR EXISTS ( SELECT 'X' FROM csu_product_phase_attribute ca WHERE vt.ethernet_phase_id =phase_id AND phase_id = 2 AND ca.product_id =" + ProductID + " ) OR vt.ethernet_phase_id > 2)) and vp.SUPPLIERPRODUCTID=cp.C_ACCESS_SUPPLIER_NAME_ID and cp.PC_ACCESS_SUPPLIER_NAME_ID=cs.access_supplier_name_id AND cs.hub_site_id = " + HubSiteID + " And c.char_id = cs.access_speed_char_id And d.char_id = cs.access_product_type_id And e.char_id = cs.access_supplier_name_id And f.char_id = cs.access_supplier_char_id And cpm.pc_pop_id = cs.hub_site_id and CS.ACCESS_SPEED_CHAR_ID = SPEED.ACCESS_SPEED_CHAR_ID and CS.ACCESS_SUPPLIER_CHAR_ID = SPEED.ACCESS_SUPPLIER_CHAR_ID AND CS.ACCESS_PRODUCT_TYPE_ID = SPEED.ACCESS_PRODUCT_TYPE_ID AND CS.ACCESS_SUPPLIER_NAME_ID   = SPEED.ACCESS_SUPPLIER_NAME_ID ";
+            if (SupplierIDs != "")
+            {
+                Sql += " AND cs.access_supplier_char_id IN (" + SupplierIDs + ")";
+            }
+            if (AccessTypeIDs != "")
+            {
+                Sql += " AND cs.access_product_type_id IN (" + AccessTypeIDs + ")";
+            }
+            if (SupplierProductIDs != "")
+            {
+                Sql += " AND cs.access_supplier_name_id IN (" + SupplierProductIDs + ")";
+            }
+            Sql += " Order by c.char_num_value";
+
+
+            Sql = "SELECT DISTINCT PAS.PORT_SPEED_CHAR_ID ,PAS.ACCESS_SPEED_CHAR_ID, C.CHAR_ACTUAL_VALUE, C.CHAR_UNIT_OF_MEASURE, C.CHAR_NUM_VALUE,cs.access_supplier_char_id SupplierID, F.CHAR_NAME AS SUPPLIER,CS.ACCESS_PRODUCT_TYPE_ID TYPEID, D.CHAR_NAME AS TYPE, CS.ACCESS_SUPPLIER_NAME_ID NAMEID, E.CHAR_NAME AS NAME ,VP.ETHERNET_PHASE_ID,";
+            Sql += " (SELECT  PORT_SPEED_AVAIL_CD from csu_case_port_access_speeds  WHERE  case_id=" + CaseID + " and PORT_SPEED_CHAR_ID = PAS.PORT_SPEED_CHAR_ID  AND ACCESS_SPEED_CHAR_ID = CS.ACCESS_SPEED_CHAR_ID AND ACCESS_PRODUCT_TYPE_ID = CS.ACCESS_PRODUCT_TYPE_ID AND ACCESS_SUPPLIER_NAME_ID = CS.ACCESS_SUPPLIER_NAME_ID ";
+            Sql += " and access_supplier_char_id = cs.access_supplier_char_id)  as port_speed_avail_cd ,(SELECT  valid_cd from csu_case_port_access_speeds  WHERE  case_id=" + CaseID + " and PORT_SPEED_CHAR_ID = PAS.PORT_SPEED_CHAR_ID AND ACCESS_SPEED_CHAR_ID = CS.ACCESS_SPEED_CHAR_ID  AND ACCESS_PRODUCT_TYPE_ID = CS.ACCESS_PRODUCT_TYPE_ID ";
+            Sql += " AND ACCESS_SUPPLIER_NAME_ID = CS.ACCESS_SUPPLIER_NAME_ID AND ACCESS_SUPPLIER_CHAR_ID = CS.ACCESS_SUPPLIER_CHAR_ID)  AS valid_cd FROM PORT_TO_ACCESS_SPEEDS PAS, CSU_REF_VALID_CHAR C, CSU_REF_VALID_CHAR D, CSU_REF_VALID_CHAR E, CSU_CASES CS,CSU_REF_VALID_CHAR F ,V_PC_SUPPLIER_PRODUCT VP,CAPMAN_SUPPLIER_PROD_NAME_MAP CP,CSU_PRODUCT_ACCESS_INTERFACES CPAI ,CAPMAN_POP_MAP CPM ";
+            Sql += " WHERE PAS.PORT_SPEED_CHAR_ID IN(" + PortSpeedCharID + " ) AND CS.ACCESS_SPEED_CHAR_ID = PAS.ACCESS_SPEED_CHAR_ID AND CS.ACCESS_PRODUCT_TYPE_ID = PAS.ACCESS_TYPE_CHAR_ID AND PAS.ACCESS_SPEED_CHAR_ID = CPAI.ACCESS_CHAR_ID AND CPAI.PRODUCT_CD=" + ProductID + " AND CS.ACCESS_SUPPLIER_CHAR_ID NOT IN (SELECT SUPPLIER_ID FROM CSU_CASE_SUPPLIER WHERE CASE_ID = " + CaseID + ") AND CS.CASE_VALID_CD = 1 AND CS.PRODUCT_CD = 25 AND CS.ACCESS_SUPPLIER_NAME_ID IN ( SELECT PC_ACCESS_SUPPLIER_NAME_ID FROM V_PC_SUPPLIER_PRODUCT VT ,CAPMAN_SUPPLIER_PROD_NAME_MAP CM WHERE VT.SUPPLIERPRODUCTID=CM.C_ACCESS_SUPPLIER_NAME_ID AND ( VT.ETHERNET_PHASE_ID = 1 OR EXISTS ( SELECT 'X' FROM CSU_PRODUCT_PHASE_ATTRIBUTE CA WHERE VT.ETHERNET_PHASE_ID =PHASE_ID AND PHASE_ID = 2 AND CA.PRODUCT_ID =" + ProductID + " ) OR VT.ETHERNET_PHASE_ID > 2)) AND VP.SUPPLIERPRODUCTID=CP.C_ACCESS_SUPPLIER_NAME_ID AND CP.PC_ACCESS_SUPPLIER_NAME_ID=CS.ACCESS_SUPPLIER_NAME_ID AND CS.HUB_SITE_ID = " + HubSiteID + " AND C.CHAR_ID = CS.ACCESS_SPEED_CHAR_ID AND D.CHAR_ID = CS.ACCESS_PRODUCT_TYPE_ID AND E.CHAR_ID = CS.ACCESS_SUPPLIER_NAME_ID AND F.CHAR_ID = CS.ACCESS_SUPPLIER_CHAR_ID AND CPM.PC_POP_ID = CS.HUB_SITE_ID ";
+            if (SupplierIDs != "")
+            {
+                Sql += " AND cs.access_supplier_char_id IN (" + SupplierIDs + ")";
+            }
+            if (AccessTypeIDs != "")
+            {
+                Sql += " AND cs.access_product_type_id IN (" + AccessTypeIDs + ")";
+            }
+            if (SupplierProductIDs != "")
+            {
+                Sql += " AND cs.access_supplier_name_id IN (" + SupplierProductIDs + ")";
+            }
+
+            if (AccessSpeedIds != "")
+            {
+                Sql += " AND PAS.Access_Speed_Char_ID IN (" + AccessSpeedIds + ")";
+            }
+            
+            Sql += " ORDER BY C.CHAR_NUM_VALUE";
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+
+        public bool GetiDSLFlag(string ProductCd, string SubProductCd, string Level)
+        {
+            string strQry = "";
+            bool iDSLFlag = false;
+            strQry = "Select COUNT(*) from cla_product_access_type where product_cd = " + ProductCd;
+            if (Level == "SUBPRODUCT" && string.IsNullOrEmpty(SubProductCd))
+            {
+                strQry += "and subproduct_cd = " + SubProductCd;
+            }
+            int count = Convert.ToInt32(OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry).Tables[0].Rows[0][0]);
+            if (count > 0)
+            {
+                iDSLFlag = true;
+            }
+            return iDSLFlag;
+        }
+
+        public DataSet GetCountryAccessCasesByRegion(string ProductCd, string Region, string CountryId)
+        {
+            string Sql = "Select a.case_id,a.country_id, a.case_avail_cd, (select AVAIL_DESC from csu_ref_availability where AVAIL_CD = a.case_avail_cd) as CaseAvailability,DECODE(case_valid_cd,1,'Valid','Invalid') ShowValid, region_name, country_name, case_avail_cd," +
+                            "(select User_name from CSU_USER where EMP_Id = a.created_emp_id) AS Created_user," +
+                        "TO_CHAR(a.created_dt,'DD-MON-YYYY HH24:MI') as created_dt," +
+                        "(select User_name from CSU_USER where EMP_Id = a.updated_emp_id) AS Updated_user," +
+                        "TO_CHAR(a.updated_dt,'DD-MON-YYYY HH24:MI') as updated_dt" +
+                        " from CLA_PRODUCT_CASES a, CSU_REGION b, CSU_COUNTRY c where a.product_cd = " + ProductCd + " And region_name = '" + Region + "' and a.region_id = b.region_id  and a.country_id = c.country_id  and a.country_id = " + CountryId + " order by country_name";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+        public int GetParentProduct(int ProductID)
+        {
+            string Sql = "select nvl(parent_product_cd,0) ParentProductID from csu_product where product_cd =" + ProductID;
+            DataSet dsParent = OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+            int ParentProductID = 0;
+
+            if (dsParent != null && dsParent.Tables.Count > 0 && dsParent.Tables[0].Rows.Count > 0)
+            {
+                ParentProductID = Convert.ToInt32(dsParent.Tables[0].Rows[0]["ParentProductID"].ToString());
+            }
+            return ParentProductID;
+        }
+
+        public DataSet GetCharTypeIDs(string strCharName)
+        {
+            string strSql = "select char_type_id from csu_ref_char_type where upper(char_type_name) in (" + strCharName + ")";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strSql);
+
+        }
+
+        public DataSet GetCharTypeValueCount(string CharTypeID)
+        {
+
+            string strSql = "select char_type_value_count from CSU_REF_CHAR_TYPE where char_type_id ='" + CharTypeID + "'";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strSql);
+        }
+
+        public DataSet GetRecordsCount(string TableName, string CaseID, string PortSpeedCharID, string AccessSpeedID, string ProductTypeID, string SupplierNameID, string AccessSupplierID)
+        {
+            string sqlCount = "Select valid_cd, port_speed_avail_cd from " + TableName;
+            sqlCount += " Where case_id = " + CaseID;
+            sqlCount += " And port_speed_char_id = " + PortSpeedCharID;
+            sqlCount += " And access_speed_char_id = " + AccessSpeedID;
+            sqlCount += " And access_product_type_id = " + ProductTypeID;
+            sqlCount += " And access_supplier_name_id = " + SupplierNameID;
+            sqlCount += " And access_supplier_char_id = " + AccessSupplierID;
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, sqlCount);
+        }
+        public DataSet GetCaseAvailability()
+        {
+            string Sql = "select avail_cd, avail_abbr, avail_desc from csu_ref_availability where avail_valid_cd =1";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+        public DataSet GetCities(int RegionID, int CountryID, string Filter, int PageNo, int PageSize, ref int Count)
+        {
+            string Sql = "SELECT * FROM ( SELECT CITY_ID, REGION_ID, COUNTRY_ID, STATE_PROVINCE_ID, CITY_NAME, ROW_NUMBER() OVER (ORDER BY CITY_NAME) R FROM CSU_CITY WHERE REGION_ID = " + RegionID + " AND CITY_ID <> 0 AND COUNTRY_ID = " + CountryID + " AND CITY_VALID_CD = 1 and upper(city_name) like '" + Filter + "%')";
+
+            Sql = "PRC_CITY_DETAILS";
+
+            OracleCommand cmd = new OracleCommand(Sql, con);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("PREGION_ID", OracleDbType.Int32).Value = RegionID;
+            cmd.Parameters.Add("PCOUNTRY_ID", OracleDbType.Int32).Value = CountryID;
+            cmd.Parameters.Add("Filter", OracleDbType.Varchar2).Value = Filter;
+            cmd.Parameters.Add("PAGENUMBER", OracleDbType.Int32).Value = PageNo;
+            cmd.Parameters.Add("ROWSPPAGE", OracleDbType.Int32).Value = PageSize;
+
+            cmd.Parameters.Add("PCITYDETAILS", OracleDbType.RefCursor, ParameterDirection.Output);
+            cmd.Parameters.Add("PCOUNT", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            DataSet ds = new DataSet();
+            OracleDataAdapter dad = new OracleDataAdapter(cmd);
+            dad.Fill(ds);
+            if (ds != null && ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0)
+            {
+                Count = Convert.ToInt32(ds.Tables[1].Rows[0][0].ToString());
+            }
+
+
+            //return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+            return ds;
+        }
+
+        public DataSet GetFirstCity(int RegionID, int CountryID)
+        {
+            string Sql = "SELECT  CITY_ID, CITY_NAME FROM CSU_CITY WHERE REGION_ID = " + RegionID + " AND COUNTRY_ID = " + CountryID + " AND CITY_VALID_CD = 1 AND ROWNUM=1 ORDER BY UPPER(CITY_NAME) ";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+        public DataSet GetStates(int RegionID, int CountryID)
+        {
+            string Sql = "Select state_province_id, country_id, region_id, state_province_name from CSU_STATE_PROVINCE where region_id = " + RegionID + " and country_id = " + CountryID + " and state_province_valid_cd = 1 and state_province_id <> 0 order by upper(state_province_name) ";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+        public int GetCaseID()
+        {
+
+            string Sql = "Select CSU_CASE_ID_S.NEXTVAL from dual";
+
+            DataSet ds = OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+            int CaseID = 0;
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                CaseID = Convert.ToInt32(ds.Tables[0].Rows[0][0].ToString());
+            }
+
+            return CaseID;
+        }
+
+        public DataSet GetProductCharacteristics(int ProductID)
+        {
+            string Sql = "select option_matrix_id, product_cd, a.char_type_id, a.char_id,  char_type_name, char_name,  char_actual_value,  char_lower_range,  char_upper_range,  char_unit_of_measure,  option_matrix_valid_cd  from csu_ref_product_opt_matrix a,  csu_ref_valid_char b,  csu_ref_char_type c where product_cd = " + ProductID + " and subproduct_cd is null ";
+            //Select Case strSubProductCd
+            //Case C_EMPTY_STRING, C_NEGATIVE_ONE,C_NULL
+            //    sql = sql & " and subproduct_cd is null "
+            //Case Else
+            //    Sql = Sql & " and subproduct_cd = " & strSubProductCd
+            //End Select
+            Sql += " and a.char_type_id = b.char_type_id and a.char_id = b.char_id and a.char_type_id = c.char_type_id and option_matrix_valid_cd = 1";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+        public int SaveCaseDetails(string strQry)
+        {
+            int result = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry);
+            return result;
+
+        }
+
+        public DataSet GetUpdatedDetails(int CaseID)
+        {
+            string Sql = "SELECT C.CREATED_EMP_ID,U.USER_NAME CreatedBy, TO_CHAR(C.CREATED_DT,'DD-MON-YYYY HH24:MI') CreateDate, C.UPDATED_EMP_ID, U1.USER_NAME UpdatedBy, TO_CHAR(C.UPDATED_DT,'DD-MON-YYYY HH24:MI') UpdatedDate  FROM CSU_CASES C LEFT JOIN CSU_USER U ON C.CREATED_EMP_ID=U.EMP_ID LEFT JOIN CSU_USER U1 ON C.UPDATED_EMP_ID=U1.EMP_ID WHERE C.CASE_ID =  " + CaseID;
+
+
+            DataSet ds = OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+            return ds;
+        }
+
+        public DataSet GetUpdatedCaseDetails(int CaseID)
+        {
+            string Sql = "SELECT  C.CREATED_EMP_ID,U.USER_NAME CreatedBy, TO_CHAR( C.CREATED_DT,'DD-MON-YYYY HH24:MI') CreateDate,  C.UPDATED_EMP_ID, U1.USER_NAME UpdatedBy, TO_CHAR( C.UPDATED_DT,'DD-MON-YYYY HH24:MI') UpdatedDate FROM CSU_CASE_DETAILS C LEFT JOIN CSU_USER U ON C.CREATED_EMP_ID=U.EMP_ID LEFT JOIN CSU_USER U1 ON C.UPDATED_EMP_ID=U1.EMP_ID WHERE C.CASE_ID = " + CaseID + " ORDER BY C.UPDATED_DT DESC";
+
+
+            DataSet ds = OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+            return ds;
+        }
+
+        public DataSet GetPopDetails(int RegionID, int CountryID, int CityID)
+        {
+            string Sql = "SELECT HUB_SITE_ID, HUB_SITE_NAME FROM CSU_HUB_SITE WHERE HUB_SITE_VALID_CD = 1 AND REGION_ID = " + RegionID + " AND COUNTRY_ID = " + CountryID + " AND CITY_ID = " + CityID + " AND HUB_SITE_ID <> 0 ORDER BY UPPER(HUB_SITE_NAME) ";
+
+
+            DataSet ds = OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+            return ds;
+        }
+
+        public DataSet GetSubProducts(int ProductID)
+        {
+            string Sql = "Select distinct a.mappedproduct_id as subproduct_cd ,b.product_name as subproduct_name from csu_product_sub_product a,csu_product b WHERE a.product_id = " + ProductID + " and a.mappedproduct_id = b.product_cd and product_cd not in(100,76) UNION Select subproduct_cd, subproduct_name from csu_ref_subproduct where product_cd = " + ProductID;
+            DataSet ds = OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+            return ds;
+        }
+
+
+        public DataSet GetSubProductsCaseDetails(int ProductID, int RegionID, int CountryID)
+        {
+            string Sql = "Select case_id,a.hub_site_id,a.country_id,a.city_id, DECODE(case_valid_cd,1,'VALID','INVALID') ShowValid, region_name || '-' || country_name x_name,support_resilient_pop,exception from CSU_CASES a, CSU_REGION b, CSU_COUNTRY c where a.product_cd = " + ProductID + " and a.PRODUCT_cd in ( 11, 14, 15, 16, 21, 25, 30, 32, 58, 62, 63, 67, 72, 79, 96, 97, 101, 102, 103, 104, 105, 108, 116, 117, 118, 119, 121, 122, 123, 124, 125, 126, 127, 128, 130, 131, 132, 129, 75, 76, 78, 82, 85, 120, 31, 98, 99, 134, 100, 106, 12 ) and a.subproduct_cd is Null and a.region_id = b.region_id and a.country_id = c.country_id and a.region_id = " + RegionID + " AND a.country_id=" + CountryID + " order by upper(x_name)";
+
+
+            DataSet ds = OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+            return ds;
+        }
+
+        public DataSet SetPortSpeedAvailablility(int CaseID,int CharID)
+        {
+            string Sql = "webcsuown.set_prtspeed_availability(" + CaseID  + "," + CharID + ")";
+
+            OracleParameter[] oraParam = new OracleParameter[2];
+
+
+            oraParam[0] = new OracleParameter("i_caseid", CaseID);
+            oraParam[1] = new OracleParameter("i_portspeedid", CharID);
+
+            //oraParam[1].Direction = ParameterDirection.Output;
+
+            DataSet ObjDS = OracleDataAccess.ExecuteDataset(con,
+                             CommandType.StoredProcedure,
+                             "webcsuown.set_prtspeed_availability", oraParam);
+
+            //DataSet ds = OracleDataAccess.ExecuteDataset(con, "webcsuown.set_prtspeed_availability", Sql);
+
+            return ObjDS;
+        }
+    }
+}

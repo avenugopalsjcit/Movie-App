@@ -1,0 +1,150 @@
+﻿<div ng-controller="AdminCPECaseDetailsCtrl">
+    <!--<div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">-->        
+        <a ng-click="EditCPECaseDetails(CaseId)" class="glyphicon glyphicon-backward" style="font-size:20px;"></a>
+    <h4>
+        Edit Case Details
+    </h4>
+    <!-- </div>
+    </div>-->
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="panel-body">
+                <div class="form-horizontal" style="width: 100%;">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label cus-text-left">
+                            City &nbsp;
+                        </label>
+                        <p class="col-sm-2 control-label" style="text-align: left">
+                            {{CityName}}
+                        </p>
+                        <p class="col-sm-2 control-label" style="text-align: left">
+                            <a ng-click="SearchCases()" style="color: Blue; text-decoration: underline;
+                                font-weight: bold;">Case List</a>
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label cus-text-left">
+                            Availability &nbsp;
+                        </label>
+                        <p class="col-sm-2 control-label" style="text-align: left">
+                            {{CaseAvailable}}
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label cus-text-left">
+                            Valid &nbsp;
+                        </label>
+                        <p class="col-sm-2 control-label" style="text-align: left">
+                            [{{CaseValidity}}]
+                        </p>
+                    </div>
+                    <div class="form-group" id="divDLSPackages">
+                        <label for="" class="col-sm-2 control-label cus-text-left">
+                           Date &nbsp;
+                        </label>
+                        <p class="col-sm-2 control-label" style="text-align: left">
+                           <!--{{Date}}-->26-FEB-2016
+                           </p>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="">
+                <div ng-show="CPECases != null && CPECases.data.length !=0">
+                   <!-- <div class="panel-heading Arrow">
+                        <h5 class="panel-title" ng-show="IsHybrid">
+                            HVPN Characteristics (Package Level)</h5>
+                        <h5 class="panel-title" ng-show="!IsHybrid">
+                            DSL Characteristics (Package Level)</h5>
+                    </div>-->
+                    <div class="panel-body">
+                        <table ng-table="CPECases" class="table table-striped" id="Table2">
+                        <tr class="ng-table-group" ng-repeat-start="group in $groups">
+          <td colspan="6">
+            <a href="" ng-click="group.$hideRows = !group.$hideRows" style="color:#23527C;text-decoration:none;">
+              <span class="glyphicon" ng-class="{ 'glyphicon-chevron-right': group.$hideRows, 'glyphicon-chevron-down': !group.$hideRows }"></span>
+              <strong>{{ group.value }}</strong>
+            </a>
+          </td>
+        </tr>
+                            <tr ng-hide="group.$hideRows" ng-repeat="popchr in group.data" ng-repeat-end>
+                                <td data-title="'Type'" filter="{ CharType: 'text'}" sortable="'CharType'"
+                                    class="Arrow">
+                                    {{ popchr.CharType}}
+                                </td>
+                                <td data-title="'Characteristic'" filter="{ Characteristic: 'text'}" sortable="'Characteristic'"
+                                    class="Arrow">
+                                    {{ popchr.Characteristic}}
+                                </td>
+                                <td data-title="'Port Speed Lead Time'" filter="{ Availability: 'text'}" sortable="'Availability'"
+                                    class="Arrow">
+                                  
+                                </td>
+                                <td data-title="'Availability ( PMF Mastered )'" filter="{ Availability: 'text'}" sortable="'Availability'"
+                                    class="Arrow">
+                                    {{ popchr.Availability}}
+                                </td>
+                                 <td data-title="'Value'" filter="{ CharacteristicValue: 'text'}" sortable="'CharacteristicValue'"
+                                    class="Arrow">
+                                    
+                                </td>
+                                <td data-title="'Valid ( PMF Mastered )'" filter="{ Validity: 'text'}" sortable="'Validity'" class="Arrow">
+                                    <input type="checkbox" name="chk" ng-model="HVPNProductCharacteristicModal[$index]" DISABLED/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>  
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="panel-body">
+                <div class="modal-footer">
+                    <div>
+                        <table style="width: 100%;">
+                            <tr>
+                                <th>
+                                    Created By
+                                </th>
+                                <th>
+                                    Created Date
+                                </th>
+                                <th>
+                                    Updated By
+                                </th>
+                                <th>
+                                    Updated Date
+                                </th>
+                            </tr>
+                            <tr style="text-align: left;">
+                                <td style="width: 25%">
+                                    {{CreatedBy}}
+                                </td>
+                                <td style="width: 25%">
+                                    {{CreatedDate}}
+                                </td>
+                                <td style="width: 25%">
+                                    {{UpdatedBy}}
+                                </td>
+                                <td style="width: 25%">
+                                    {{UpdatedDate}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <input type="button" class="btn btn-default btn-sm " value="Update" ng-click="Update()" DISABLED/>
+                    <input type="button" class="btn btn-default btn-sm" ng-click="ResetCaseDetails()" DISABLED
+                        value="Reset" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style type="text/css">
+.ng-table-group-selector
+{
+    float:right;
+    }
+</style>

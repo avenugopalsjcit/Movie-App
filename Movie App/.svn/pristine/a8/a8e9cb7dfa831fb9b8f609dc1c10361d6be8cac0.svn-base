@@ -1,0 +1,175 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL
+{
+    public class SLABuilderBAL
+    {
+        public static List<SLAFile> getProducts()
+        {
+            //return SLABuilderDAL.getProducts();
+            DataTable dt = SLABuilderDAL.getProducts();
+            List<SLAFile> lstSuppProd = new List<SLAFile>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                SLAFile objSuppProd = new SLAFile();
+                objSuppProd.product_id = Convert.ToInt32(dr["PRODUCT_CD"]);
+                objSuppProd.ProductName = Convert.ToString(dr["PRODUCT_NAME"]);
+                lstSuppProd.Add(objSuppProd);
+            }
+            return lstSuppProd;
+        }
+
+        //public static DataTable getDatabyFileType(int FiletypeId, int ProductId)
+        //{
+        //   // return SLABuilderDAL.getDatabyFileType(FiletypeId, ProductId);
+        //}
+
+
+        public static List<DataTable> sendPageLoadData()
+        {
+            return SLABuilderDAL.sendPageLoadData();
+        }
+
+        public static DataTable getSLAMasterDetails(int product_ID, string lstCountry, string ddlPartner, string lstResiliency, string ddlPrimary, string ddlSecondary)
+        {
+            return SLABuilderDAL.getSLAMasterDetails(product_ID, lstCountry, ddlPartner, lstResiliency, ddlPrimary, ddlSecondary);
+        }
+
+        public static DataTable getslabanddata()
+        {
+            return SLABuilderDAL.getSLABanddata();
+        }
+
+        public static List<DataTable> getMasterData()
+        {
+            return SLABuilderDAL.getMasterDetails();
+        }
+
+        //public static int SaveMasterData(List<SLAMasterData> MastersData)
+        //{
+        //    return SLABuilderDAL.SaveMasterData(MastersData);
+        //}
+
+        public static List<DataTable> getPLAMasterDetails(int id)
+        {
+            return SLABuilderDAL.getProductLevelSLAbyProdId(id);
+        }
+
+        public static List<DataTable> getProductLevelSLADetails(int Productid)
+        {
+            return SLABuilderDAL.getProductLevelSLADetails(Productid);
+        }
+
+
+        public static List<DataTable> getSLAaccessConfigByProdId(int id)
+        {
+            return SLABuilderDAL.getAccessTypeConfigById(id);
+        }
+
+
+        public static int SaveSLADetails(int productId, List<SLAConfigData> SLASaveDetailsJson)
+        {
+            return SLABuilderDAL.SaveSLADetails(productId, SLASaveDetailsJson);
+        }
+
+
+        public static List<DataTable> getCountriesData(int productId)
+        {
+            return SLABuilderDAL.getCountriesData(productId);
+        }
+
+
+        public static DataTable getCountriesDataByProductId(int productId)
+        {
+            return SLABuilderDAL.getCountriesDataByProductId(productId);
+        }
+
+        public static List<DataTable> PlatformConfigurationByID(int productId)
+        {
+            return SLABuilderDAL.PlatformConfiguration(productId);
+        }
+
+
+        public static int DeleteProductsBySLAId(string id, string ProductSLAIds, int ProductId, string AccessSLAIds)
+        {
+            return SLABuilderDAL.DeleteProductsBySLAId(id, ProductSLAIds, ProductId, AccessSLAIds);
+        }
+
+        public static int DeleteAccessConfiguration(int productId, List<AccessConfigData> configData)
+        {
+            return SLABuilderDAL.DeleteAccessConfiguration(productId, configData);
+        }
+
+        public static int saveAccessconfigData(int productId, List<AccessConfigData> configDatas)
+        {
+            return SLABuilderDAL.saveAccessconfigData(productId, configDatas);
+        }
+
+        public static DataTable accessTypeExceptions(int ProductId)
+        {
+            return SLABuilderDAL.AccessTypeExcepetions(ProductId);
+        }
+        public static int InsertAccessTypeExcepetions(int productId, List<AccessTypeException> accesstype)
+        {
+            return SLABuilderDAL.InsertAccessTypeExcepetions(productId, accesstype);
+        }
+
+        public static int insertcountrydetails(int productid, List<SCAdminDAL.Country> countriesList)
+        {
+            return SLABuilderDAL.insertcountrydetails(productid, countriesList);
+        }
+
+        public static int DeleteCountryDetailsByIds(int productId, List<SCAdminDAL.Country> CountryData)
+        {
+            return SLABuilderDAL.DeleteCountryDetailsByIds(productId, CountryData);
+        }
+
+
+        public static int InsertPlatform(int productId, List<SCAdminDAL.Platform> platformData)
+        {
+            return SLABuilderDAL.InsertPlatform(productId, platformData);
+        }
+
+
+        public static int DeletePlatformsDetailsByIds(int productId, List<Platform> PlatformsData)
+        {
+            return SLABuilderDAL.DeletePlatformsDetailsByIds(productId, PlatformsData);
+        }
+
+
+
+
+        public static int InsertSLAMasterData(string CountryName, List<SLAMasterData> masterdata)
+        {
+            return SLABuilderDAL.InsertSLAMasterData(CountryName, masterdata);
+        }
+
+        public static int UpdateMasterDetails(List<SLAMasterData> CurrentItem, List<SLAMasterData> UpdateItem)
+        {
+            return SLABuilderDAL.UpdateMasterDetails(CurrentItem, UpdateItem);
+        }
+
+        public static int DeleteMasterDetails(List<SLAMasterData> DeleteItem1)
+        {
+            return SLABuilderDAL.DeleteMasterDetails(DeleteItem1);
+        }
+
+
+        public static List<DataTable> getProductSLATable(int Productid)
+        {
+            return SLABuilderDAL.getProductSLATable(Productid);
+        }
+        public static DataTable getDataFromDB(int FiletypeId, int ProductId)
+        {
+            return SLABuilderDAL.getDataFromDB(FiletypeId, ProductId);
+        }
+        public static List<DataTable> AccessConfigData(int productID)
+        {
+            return SLABuilderDAL.AccessConfigData(productID);
+        }
+
+    }
+}

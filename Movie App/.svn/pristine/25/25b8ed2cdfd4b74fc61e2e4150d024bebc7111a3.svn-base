@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Configuration;
+using Oracle.DataAccess.Client;
+using System.Data;
+using System.Data.Common;
+
+
+namespace SCAdminDAL
+{
+    public class GetDataFromDB
+    {
+        private string ConnectionString = ConfigurationManager.AppSettings.Get("OraConnString");
+        private DataTable dt;
+        private OracleConnection oConn = null;
+        private OracleCommand cmdOra = null;
+        private OracleDataReader dr = null;
+        private OracleDataAdapter da = null;
+
+
+        public DataTable GetDataTable(string QueryString)
+        {
+            dt = new DataTable();
+            oConn = new OracleConnection(ConnectionString);
+            try
+            {
+
+                OracleCommand cmdOra = new OracleCommand(QueryString, oConn);
+                cmdOra.CommandType = CommandType.Text;
+                da = new OracleDataAdapter(cmdOra);
+                da.Fill(dt);
+                return dt;
+            }
+            catch (Exception ex) { throw ex; }
+            finally { }
+        }
+
+        public string GetSingleRowFromDB(string QueryString)
+        {
+            string Result = string.Empty;
+            oConn = new OracleConnection(ConnectionString);
+            try
+            {
+                OracleCommand cmdOra = new OracleCommand(QueryString, oConn);
+                cmdOra.CommandType = CommandType.Text;
+                oConn.Open();
+                Result = Convert.ToString(cmdOra.ExecuteScalar());
+                return Result;
+            }
+            catch (Exception ex) { throw ex; }
+            finally { oConn.Close(); }
+        }
+
+        public OracleConnection openConnection()
+        {
+            oConn = new OracleConnection(ConnectionString);
+            oConn.Open();
+            return oConn;
+        }
+
+
+        public OracleDataReader getDataReaderFromDB(OracleConnection con, string Query)
+        {
+            OracleDataReader reader;
+            try
+            {
+                cmdOra = new OracleCommand(Query, con);
+                reader = cmdOra.ExecuteReader();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return reader;
+        }
+
+
+      
+    }
+}

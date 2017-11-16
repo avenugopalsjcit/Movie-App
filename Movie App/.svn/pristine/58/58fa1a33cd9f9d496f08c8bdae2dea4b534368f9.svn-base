@@ -1,0 +1,791 @@
+﻿app.factory('AdminAddressGridFactory', function ($http) {
+
+    var AdminAddressGridFactory = {};
+
+    AdminAddressGridFactory.GetAdminAddressGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminAddress', {});
+
+    }
+
+    return AdminAddressGridFactory;
+});
+app.factory('AdminAddressProductFactory', function ($http) {
+
+    var AdminAddressProductFactory = {};
+
+    AdminAddressProductFactory.GetAdminAddressProduct = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminAddressProduct', {});
+
+    }
+
+    return AdminAddressProductFactory;
+});
+
+
+app.factory('AdminAddressRegionFactory', function ($http) {
+
+    var AdminAddressRegionFactory = {};
+
+    AdminAddressRegionFactory.GetAdminAddressRegion = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminAddressregion', {});
+
+    }
+
+    return AdminAddressRegionFactory;
+});
+
+app.factory('AdminAddresscountryFactory', function ($http) {
+
+    var AdminAddresscountryFactory = {};
+
+    AdminAddresscountryFactory.GetAdminAddresscountry = function (Areavalue) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminAddresscountry', { 'Areavalue': Areavalue });
+
+    }
+
+    return AdminAddresscountryFactory;
+});
+
+app.factory('AdminAddresscityFactory', function ($http) {
+
+    var AdminAddresscityFactory = {};
+
+    AdminAddresscityFactory.GetAdminAddresscity = function (countryvalue, Areavalue, alpha) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminAddressCity', { 'countryvalue': countryvalue, 'Areavalue': Areavalue, 'alpha': alpha });
+
+    }
+
+    return AdminAddresscityFactory;
+});
+app.factory('AdminAddressDetailsFactory', function ($http) {
+
+    var AdminAddressDetailsFactory = {};
+
+    AdminAddressDetailsFactory.GetAdminAddressDetails = function (Addressid) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminAddressDetails', { 'Addressid': Addressid });
+
+    }
+
+    return AdminAddressDetailsFactory;
+});
+
+app.factory('AddressInsertFactory', function ($http) {
+
+    var AddressInsertFactory = {};
+
+    AddressInsertFactory.GetAvailabilityInsert = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/InsertAdminAddress', { 'strAgentId': strAgentId, 'strCharId': strCharId,
+            'strCharTypeId': strCharTypeId, 'strAgentName': strAgentName,
+            'strSupportTransWeekDays': strSupportTransWeekDays, 'strSupportTransHours': strSupportTransHours,
+            'strSupportBusinessHours': strSupportBusinessHours, 'strSupportLanguages': strSupportLanguages,
+            'strSupportLanguages724': strSupportLanguages724, 'strAgentValidCd': strAgentValidCd, 'User_id': User_id,
+            'strAddressId': strAddressId, 'strAddressDesc': strAddressDesc, 'strRegionId': strRegionId, 'strCountryId': strCountryId,
+            'strCityId': strCityId, 'strStateProvinceId': strStateProvinceId, 'strTollFreeAccInCNo1': strTollFreeAccInCNo1, 'strTollFreeAccInCNo2': strTollFreeAccInCNo2,
+            'strTollFreeAccInCNo3': strTollFreeAccInCNo3, 'strDirDialAccNo1': strDirDialAccNo1, 'strDirDialAccNo2': strDirDialAccNo2, 'strDirDialAccNo3': strDirDialAccNo3,
+            'strFaxNo1': strFaxNo1, 'strFaxNo2': strFaxNo2, 'strFaxNo3': strFaxNo3, 'strAddressValidCd': strAddressValidCd
+          });
+
+    }
+
+    return AddressInsertFactory;
+});
+
+app.factory('AddressUpdateFactory', function ($http) {
+
+    var AddressUpdateFactory = {};
+
+    AddressUpdateFactory.GetAvailabilityUpdate = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/UpdateAdminAddress', { 'strAgentName': strAgentName, 'strSupportTransWeekDays': strSupportTransWeekDays,
+            'strSupportTransHours': strSupportTransHours, 'User_id': User_id, 'strSupportBusinessHours': strSupportBusinessHours,
+            'strSupportLanguages': strSupportLanguages, 'strSupportLanguages724': strSupportLanguages724, 'strAgentValidCd': strAgentValidCd,
+            'strAgentId': strAgentId,
+            'strAddressId': strAddressId, 'strAddressDesc': strAddressDesc, 'strRegionId': strRegionId, 'strCountryId': strCountryId,
+            'strCityId': strCityId, 'strStateProvinceId': strStateProvinceId, 'strTollFreeAccInCNo1': strTollFreeAccInCNo1, 'strTollFreeAccInCNo2': strTollFreeAccInCNo2,
+            'strTollFreeAccInCNo3': strTollFreeAccInCNo3, 'strDirDialAccNo1': strDirDialAccNo1, 'strDirDialAccNo2': strDirDialAccNo2, 'strDirDialAccNo3': strDirDialAccNo3,
+            'strFaxNo1': strFaxNo1, 'strFaxNo2': strFaxNo2, 'strFaxNo3': strFaxNo3, 'strAddressValidCd': strAddressValidCd
+          });
+
+    }
+
+    return AddressUpdateFactory;
+});
+
+
+app.factory('AddressDeleteFactory', function ($http) {
+
+    var AddressDeleteFactory = {};
+
+    AddressDeleteFactory.GetAvailabilityDelete = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/AdminAddressDelete', { 'strAddressId': strAddressId, 'strAgentId': strAgentId, 'Role': Role });
+
+    }
+
+    return AddressDeleteFactory;
+});
+
+app.factory('AvailabilityPopupGrid', function ($http) {
+
+    var AvailabilityPopupGrid = {};
+
+    AvailabilityPopupGrid.GetAvailabilityPopup = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/PopupGridAdminAvail', { 'AvailValidCd': AvailValidCd });
+
+    }
+
+    return AvailabilityPopupGrid;
+});
+
+app.factory('AddressMaxVal', function ($http) {
+
+    var AddressMaxVal = {};
+
+    AddressMaxVal.GetAddressMaxval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxAddressCD', {});
+
+    }
+
+    return AddressMaxVal;
+});
+
+app.factory('AgentMaxVal', function ($http) {
+
+    var AgentMaxVal = {};
+
+    AgentMaxVal.GetAgentMaxval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxAgentCD', {});
+
+    }
+
+    return AgentMaxVal;
+});
+app.factory('AddressChartype', function ($http) {
+
+    var AddressChartype = {};
+
+    AddressChartype.GetChartypeMaxval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxChartypeCD', { 'strCharId': strCharId });
+
+    }
+
+    return AddressChartype;
+});
+
+app.controller('AdminAddressCtrl', ['$scope', 'AdminAddressGridFactory', 'NgTableParams', 'AdminAddressDetailsFactory', 'AddressInsertFactory', 'AddressUpdateFactory', 'AddressDeleteFactory', 'AvailabilityPopupGrid', 'AdminAddressProductFactory', 'AdminAddressRegionFactory', 'AdminAddresscountryFactory', 'AdminAddresscityFactory', 'AddressMaxVal', 'AgentMaxVal', 'AddressChartype', function ($scope, AdminAddressGridFactory, NgTableParams, AdminAddressDetailsFactory, AddressInsertFactory, AddressUpdateFactory, AddressDeleteFactory, AvailabilityPopupGrid, AdminAddressProductFactory, AdminAddressRegionFactory, AdminAddresscountryFactory, AdminAddresscityFactory, AddressMaxVal, AgentMaxVal, AddressChartype) {
+
+    flag = 1;
+    $scope.changealpha = function () {
+        $scope.alpha = $scope.Alpha;
+        AdminAddresscityFactory.GetAdminAddresscity($scope.countryvalue, $scope.Areavalue, $scope.alpha).success(function (data) {
+            $scope.cityLst = data.d;
+            $("#ddlcity").select2({});
+            if ($scope.cityLst.length == 0) {
+                $('#divcity .select2-chosen').html("---Select---");
+            }
+            else {
+                $('#divcity .select2-chosen').html(data.d[0].CityName);
+            }
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+    $scope.GetRegions = function () {
+
+
+
+        $scope.flag = 0;
+        $scope.Areavalue = $scope.regionname;
+        AdminAddresscountryFactory.GetAdminAddresscountry($scope.Areavalue).success(function (data) {
+            $scope.countryLst = data.d;
+            $("#ddlcountry").select2({});
+            $('#divcountry .select2-chosen').html("---Select---");
+            $scope.countryvalue = data.d[0].Countryid
+
+            $("#alphaid").select2({});
+            $('#divalpha .select2-chosen').html("A");
+            //$scope.countryvalue = data.d[0].Countryid
+            $scope.alpha = "A";
+            AdminAddresscityFactory.GetAdminAddresscity($scope.countryvalue, $scope.Areavalue, $scope.alpha).success(function (data) {
+                $scope.cityLst = data.d;
+                $("#ddlcity").select2({});
+                $('#divcity .select2-chosen').html("---Select---");
+                $scope.flag = 1;
+                $(".pageLoaderOverlay").hide();
+            });
+        });
+        //        });
+
+
+        var product = $('#divprod .select2-chosen')[0].innerHTML;
+        var region = $('#divregion .select2-chosen')[0].innerHTML;
+        var country = $('#divcountry .select2-chosen')[0].innerHTML;
+        var city = $('#divcity .select2-chosen')[0].innerHTML;
+        if ($scope.Days == "" || angular.isUndefined($scope.Days) || angular.isUndefined($scope.Hours) ||
+        angular.isUndefined($scope.Languages1) || $scope.Hours == "" || $scope.Languages1 == ""
+        || product == "--- Select ---" || region == "---Select---" || country == "---Select---" ||
+         city == "---Select---" || $scope.Languages2 == "" || angular.isUndefined($scope.Languages2) ||
+         $scope.Address == "" || angular.isUndefined($scope.Address) ||
+          $scope.Toll1 == "" || angular.isUndefined($scope.Toll1) ||
+          $scope.Toll2 == "" || angular.isUndefined($scope.Toll2) ||
+          $scope.Toll3 == "" || angular.isUndefined($scope.Toll3) ||
+          $scope.Dial1 == "" || angular.isUndefined($scope.Dial1) ||
+          $scope.Dial2 == "" || angular.isUndefined($scope.Dial2) ||
+          $scope.Dial3 == "" || angular.isUndefined($scope.Dial3) ||
+           $scope.Fax1 == "" || angular.isUndefined($scope.Fax1) ||
+           $scope.Fax2 == "" || angular.isUndefined($scope.Fax2) || $scope.Fax3 == "" || angular.isUndefined($scope.Fax3)) {
+            $("#submitbtn").prop('disabled', true);
+        }
+        else {
+
+            $("#submitbtn").prop('disabled', false);
+        }
+    }
+    $scope.citychange = function () {
+
+        var product = $('#divprod .select2-chosen')[0].innerHTML;
+        var region = $('#divregion .select2-chosen')[0].innerHTML;
+        var country = $('#divcountry .select2-chosen')[0].innerHTML;
+        var city = $('#divcity .select2-chosen')[0].innerHTML;
+        if ($scope.Days == "" || angular.isUndefined($scope.Days) || angular.isUndefined($scope.Hours) ||
+        angular.isUndefined($scope.Languages1) || $scope.Hours == "" || $scope.Languages1 == ""
+        || product == "--- Select ---" || region == "---Select---" || country == "---Select---" ||
+         city == "---Select---" || $scope.Languages2 == "" || angular.isUndefined($scope.Languages2) ||
+         $scope.Address == "" || angular.isUndefined($scope.Address) ||
+          $scope.Toll1 == "" || angular.isUndefined($scope.Toll1) ||
+          $scope.Toll2 == "" || angular.isUndefined($scope.Toll2) ||
+          $scope.Toll3 == "" || angular.isUndefined($scope.Toll3) ||
+          $scope.Dial1 == "" || angular.isUndefined($scope.Dial1) ||
+          $scope.Dial2 == "" || angular.isUndefined($scope.Dial2) ||
+          $scope.Dial3 == "" || angular.isUndefined($scope.Dial3) ||
+           $scope.Fax1 == "" || angular.isUndefined($scope.Fax1) ||
+           $scope.Fax2 == "" || angular.isUndefined($scope.Fax2) || $scope.Fax3 == "" || angular.isUndefined($scope.Fax3)) {
+            $("#submitbtn").prop('disabled', true);
+        }
+        else {
+
+            $("#submitbtn").prop('disabled', false);
+        }
+    }
+
+    $scope.prodchange = function () {
+
+        if ($scope.Reset == 0) {
+            var product = $('#divprod .select2-chosen')[0].innerHTML;
+            var region = $('#divregion .select2-chosen')[0].innerHTML;
+            var country = $('#divcountry .select2-chosen')[0].innerHTML;
+            var city = $('#divcity .select2-chosen')[0].innerHTML;
+        }
+        if ($scope.Days == "" || angular.isUndefined($scope.Days) || angular.isUndefined($scope.Hours) ||
+        angular.isUndefined($scope.Languages1) || $scope.Hours == "" || $scope.Languages1 == ""
+        || product == "--- Select ---" || region == "---Select---" || country == "---Select---" ||
+         city == "---Select---" || $scope.Languages2 == "" || angular.isUndefined($scope.Languages2) ||
+         $scope.Address == "" || angular.isUndefined($scope.Address) ||
+          $scope.Toll1 == "" || angular.isUndefined($scope.Toll1) ||
+          $scope.Toll2 == "" || angular.isUndefined($scope.Toll2) ||
+          $scope.Toll3 == "" || angular.isUndefined($scope.Toll3) ||
+          $scope.Dial1 == "" || angular.isUndefined($scope.Dial1) ||
+          $scope.Dial2 == "" || angular.isUndefined($scope.Dial2) ||
+          $scope.Dial3 == "" || angular.isUndefined($scope.Dial3) ||
+           $scope.Fax1 == "" || angular.isUndefined($scope.Fax1) ||
+           $scope.Fax2 == "" || angular.isUndefined($scope.Fax2) || $scope.Fax3 == "" || angular.isUndefined($scope.Fax3)) {
+            $("#submitbtn").prop('disabled', true);
+            $("#updatebtn").prop('disabled', true);
+        }
+        else {
+
+            $("#submitbtn").prop('disabled', false);
+            $("#updatebtn").prop('disabled', false);
+        }
+    }
+    $scope.GetCountry = function () {
+
+        //if ($scope.flag == 1) {
+        $scope.countryvalue = $scope.countryname;
+        $("#alphaid").select2({});
+        $('#divalpha .select2-chosen').html("A");
+        //$scope.countryvalue = data.d[0].Countryid
+        $scope.alpha = "A";
+        AdminAddresscityFactory.GetAdminAddresscity($scope.countryvalue, $scope.Areavalue, $scope.alpha).success(function (data) {
+            $scope.cityLst = data.d;
+            $("#ddlcity").select2({});
+            $('#divcity .select2-chosen').html("---Select---");
+
+            $(".pageLoaderOverlay").hide();
+        });
+        //        });
+        // }
+        //        else {
+        //            $scope.flag = 1;
+        //        }
+        var product = $('#divprod .select2-chosen')[0].innerHTML;
+        var region = $('#divregion .select2-chosen')[0].innerHTML;
+        var country = $('#divcountry .select2-chosen')[0].innerHTML;
+        var city = $('#divcity .select2-chosen')[0].innerHTML;
+        if ($scope.Days == "" || angular.isUndefined($scope.Days) || angular.isUndefined($scope.Hours) ||
+        angular.isUndefined($scope.Languages1) || $scope.Hours == "" || $scope.Languages1 == ""
+        || product == "--- Select ---" || region == "---Select---" || country == "---Select---" ||
+         city == "---Select---" || $scope.Languages2 == "" || angular.isUndefined($scope.Languages2) ||
+         $scope.Address == "" || angular.isUndefined($scope.Address) ||
+          $scope.Toll1 == "" || angular.isUndefined($scope.Toll1) ||
+          $scope.Toll2 == "" || angular.isUndefined($scope.Toll2) ||
+          $scope.Toll3 == "" || angular.isUndefined($scope.Toll3) ||
+          $scope.Dial1 == "" || angular.isUndefined($scope.Dial1) ||
+          $scope.Dial2 == "" || angular.isUndefined($scope.Dial2) ||
+          $scope.Dial3 == "" || angular.isUndefined($scope.Dial3) ||
+           $scope.Fax1 == "" || angular.isUndefined($scope.Fax1) ||
+           $scope.Fax2 == "" || angular.isUndefined($scope.Fax2) || $scope.Fax3 == "" || angular.isUndefined($scope.Fax3)) {
+            $("#submitbtn").prop('disabled', true);
+        }
+        else {
+
+            $("#submitbtn").prop('disabled', false);
+        }
+    }
+
+
+
+
+
+
+
+
+
+    AdminAddressGridFactory.GetAdminAddressGrid().success(function (data) {
+        $scope.flag = 1;
+        //$scope.CurrentDate = new Date();
+
+        $scope.AddressGrid = data;
+
+
+
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+            //            $timeout(function () {
+            //                $('.ng-talbe-pager').hide();
+            //            }, 3000);
+        }
+    });
+
+
+    var availAbbr, availDesc, Areavalue, availValid, AddressId = "";
+
+    $scope.EditRecord = function (category) {
+
+        $scope.Reset = 1;
+
+        $scope.AddressId = category.Addressid;
+        AdminAddressDetailsFactory.GetAdminAddressDetails($scope.AddressId).success(function (data) {
+
+            $scope.flag = 0;
+
+            $scope.editdata = data.d;
+            AdminAddressRegionFactory.GetAdminAddressRegion().success(function (data) {
+                $scope.regionLst = data.d;
+                $.each($scope.regionLst, function (index, element) {
+                    if ($scope.editdata.addlst[0].Regionid == element.regionid) {
+                        $scope.RegionName = $scope.regionLst[index].regionname;
+                        $scope.updateRegionid = $scope.regionLst[index].regionid;
+                        $("#ddlregion").select2({});
+                        $('#divregion .select2-chosen').html($scope.RegionName);
+                    }
+                });
+                $scope.Areavalue = $scope.editdata.addlst[0].Regionid;
+                AdminAddresscountryFactory.GetAdminAddresscountry($scope.Areavalue).success(function (data) {
+                    $scope.countryLst = data.d;
+                    $.each($scope.countryLst, function (index, element) {
+                        if ($scope.editdata.addlst[0].Countryid == element.Countryid) {
+                            $scope.Countryname = $scope.countryLst[index].countryname;
+                            $scope.updatecountryid = $scope.countryLst[index].Countryid;
+                            $("#ddlcountry").select2({});
+                            $('#divcountry .select2-chosen').html($scope.Countryname);
+                        }
+                    });
+                    var str = $scope.editdata.ctlst[0].CityName;
+                    str = str.charAt(0).toUpperCase();
+                    $scope.countryvalue = $scope.editdata.addlst[0].Countryid;
+                    $("#alphaid").select2({});
+                    $('#divalpha .select2-chosen').html(str);
+                    //$scope.countryvalue = data.d[0].Countryid
+                    $scope.alpha = str;
+                    //$scope.alpha = $scope.Alpha;
+                    $scope.flag = 1;
+                    AdminAddresscityFactory.GetAdminAddresscity($scope.countryvalue, $scope.Areavalue, $scope.alpha).success(function (data) {
+                        $scope.cityLst = data.d;
+                        $.each($scope.cityLst, function (index, element) {
+                            if ($scope.editdata.addlst[0].cityid == element.Cityid) {
+                                $scope.Cityname = $scope.cityLst[index].CityName;
+                                $scope.updatecityid = $scope.cityLst[index].Cityid;
+                                $("#ddlcity").select2({});
+                                $('#divcity .select2-chosen').html($scope.editdata.ctlst[0].CityName);
+                                $(".pageLoaderOverlay").hide();
+                            }
+                        });
+
+
+
+
+
+
+
+                    });
+
+                });
+            });
+
+
+
+
+            $scope.Days = $scope.editdata.daylst[0].SupportDays;
+            $scope.ProductName = $scope.editdata.prodLst[0].Char_Name;
+            $scope.Hours = $scope.editdata.daylst[0].SupportTransHours;
+            $scope.Businesshours = $scope.editdata.daylst[0].SupportBusinessHours;
+            $scope.Languages1 = $scope.editdata.daylst[0].Languages;
+            $scope.Languages2 = $scope.editdata.daylst[0].Languages2;
+            $scope.Address = $scope.editdata.addlst[0].AddressDescription;
+            $scope.Toll1 = $scope.editdata.addlst[0].TollFreeAccNo;
+            $scope.Toll2 = $scope.editdata.addlst[0].TollFreeAccNo1;
+            $scope.Toll3 = $scope.editdata.addlst[0].TollFreeAccNo2;
+            $scope.Dial1 = $scope.editdata.addlst[0].DirDialAccNo;
+            $scope.Dial2 = $scope.editdata.addlst[0].DirDialAccNo1;
+            $scope.Dial3 = $scope.editdata.addlst[0].DirDialAccNo2;
+            $scope.Fax1 = $scope.editdata.addlst[0].FaxNo;
+            $scope.Fax2 = $scope.editdata.addlst[0].FaxNo1;
+            $scope.Fax3 = $scope.editdata.addlst[0].FaxNo2;
+            $scope.Valid = $scope.editdata.addlst[0].AddressValidCd;
+            $scope.AgentName = $scope.editdata.daylst[0].AgentName;
+            $scope.Agentvalidcd = $scope.editdata.daylst[0].Agentvalidcd;
+            $scope.stateprovinceid = $scope.editdata.addlst[0].stateprovinceid;
+            $scope.Agentid = $scope.editdata.addlst[0].Agentid;
+
+        });
+    }
+
+
+
+    $scope.addNewTask = function () {
+        $scope.AvailabilityAbbr = $scope.Description = $scope.Valid = "";
+        $scope.Reset = 0;
+        $scope.Days = "";
+        $scope.ProductName = "";
+        $scope.Hours = "";
+        $scope.Languages1 = "";
+        $scope.Languages2 = "";
+        $scope.Address = "";
+        $scope.Toll1 = "";
+        $scope.Toll2 = "";
+        $scope.Toll3 = "";
+        $scope.Dial1 = "";
+        $scope.Dial2 = "";
+        $scope.Dial3 = "";
+        $scope.Fax1 = "";
+        $scope.Fax2 = "";
+        $scope.Fax3 = "";
+        $scope.Valid = "";
+        AdminAddressRegionFactory.GetAdminAddressRegion().success(function (data) {
+            $scope.regionLst = data.d;
+            $("#ddlregion").select2({});
+            $('#divregion .select2-chosen').html("---Select---");
+            $scope.Areavalue = data.d[0].regionid;
+            AdminAddresscountryFactory.GetAdminAddresscountry($scope.Areavalue).success(function (data) {
+                $scope.countryLst = data.d;
+                $("#ddlcountry").select2({});
+                $('#divcountry .select2-chosen').html("---Select---");
+                $scope.countryvalue = data.d[0].Countryid
+                $("#alphaid").select2({});
+                $('#divalpha .select2-chosen').html("A");
+                //$scope.countryvalue = data.d[0].Countryid
+                $scope.alpha = "A";
+                AdminAddresscityFactory.GetAdminAddresscity($scope.countryvalue, $scope.Areavalue, $scope.alpha).success(function (data) {
+                    $scope.cityLst = data.d;
+                    $("#ddlcity").select2({});
+                    $('#divcity .select2-chosen').html("---Select---");
+
+                    AdminAddressProductFactory.GetAdminAddressProduct().success(function (data) {
+                        $scope.products = data.d;
+                        $("#ddlprod").select2({});
+                        $('#divprod .select2-chosen').html("---Select---");
+                        $(".pageLoaderOverlay").hide();
+                    });
+                });
+            });
+        });
+    }
+
+
+    var Days, ProductName, Hours, Languages1, Languages2, Address, Toll1, Toll2, Toll3, Dial1, Dial2, Dial3, Fax1, Fax2, Fax3, Valid = "";
+    $scope.ResetRecord = function () {
+        $.each($scope.regionLst, function (index, element) {
+            if ($scope.editdata.addlst[0].Regionid == element.regionid) {
+                $scope.RegionName = $scope.regionLst[index].regionname;
+                $scope.Areavalue = $scope.regionLst[index].regionid;
+                $("#ddlregion").select2({});
+                $('#divregion .select2-chosen').html($scope.RegionName);
+            }
+        });
+
+        AdminAddresscountryFactory.GetAdminAddresscountry($scope.Areavalue).success(function (data) {
+            $scope.countryLst = data.d;
+            $.each($scope.countryLst, function (index, element) {
+                if ($scope.editdata.addlst[0].Countryid == element.Countryid) {
+                    $scope.Countryname = $scope.countryLst[index].countryname;
+                    $scope.countryvalue = $scope.countryLst[index].Countryid
+                    $("#ddlcountry").select2({});
+                    $('#divcountry .select2-chosen').html($scope.Countryname);
+                }
+            });
+        });
+
+        var str = $scope.editdata.ctlst[0].CityName;
+        str = str.charAt(0).toUpperCase();
+        $scope.countryvalue = $scope.editdata.addlst[0].Countryid;
+        $("#alphaid").select2({});
+        $('#divalpha .select2-chosen').html(str);
+        $scope.alpha = str;
+        AdminAddresscityFactory.GetAdminAddresscity($scope.countryvalue, $scope.Areavalue, $scope.alpha).success(function (data) {
+            $scope.cityLst = data.d;
+            $.each($scope.cityLst, function (index, element) {
+                if ($scope.editdata.addlst[0].cityid == element.Cityid) {
+                    $scope.Cityname = $scope.cityLst[index].CityName;
+                    $("#ddlcity").select2({});
+                    $('#divcity .select2-chosen').html($scope.editdata.ctlst[0].CityName);
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        });
+        $scope.Days = $scope.editdata.daylst[0].SupportDays;
+        $scope.ProductName = $scope.editdata.prodLst[0].Char_Name;
+        $scope.Hours = $scope.editdata.daylst[0].SupportTransHours;
+        $scope.Languages1 = $scope.editdata.daylst[0].Languages;
+        $scope.Languages2 = $scope.editdata.daylst[0].Languages2;
+        $scope.Address = $scope.editdata.addlst[0].AddressDescription;
+        $scope.Toll1 = $scope.editdata.addlst[0].TollFreeAccNo;
+        $scope.Toll2 = $scope.editdata.addlst[0].TollFreeAccNo1;
+        $scope.Toll3 = $scope.editdata.addlst[0].TollFreeAccNo2;
+        $scope.Dial1 = $scope.editdata.addlst[0].DirDialAccNo;
+        $scope.Dial2 = $scope.editdata.addlst[0].DirDialAccNo1;
+        $scope.Dial3 = $scope.editdata.addlst[0].DirDialAccNo2;
+        $scope.Fax1 = $scope.editdata.addlst[0].FaxNo;
+        $scope.Fax2 = $scope.editdata.addlst[0].FaxNo1;
+        $scope.Fax3 = $scope.editdata.addlst[0].FaxNo2;
+        $scope.Valid = $scope.editdata.addlst[0].AddressValidCd;
+
+    }
+
+
+
+    $scope.CreateRecord = function (regionname, countryname, CharName, CityName) {
+        // debugger;
+
+
+        strCharId = $scope.CharName;
+
+
+        strAgentName = "";
+        strSupportTransWeekDays = $scope.Days;
+        strSupportTransHours = $scope.Hours;
+        strSupportBusinessHours = "";
+        strSupportLanguages = $scope.Languages1;
+        strSupportLanguages724 = $scope.Languages2;
+        strAgentValidCd = true;
+        User_id = $scope.User_Id;
+
+        strAddressDesc = $scope.Address;
+        strRegionId = $scope.regionname;
+        strCountryId = $scope.countryname;
+        strCityId = $scope.CityName;
+        strStateProvinceId = "";
+        strTollFreeAccInCNo1 = $scope.Toll1;
+        strTollFreeAccInCNo2 = $scope.Toll2;
+        strTollFreeAccInCNo3 = $scope.Toll3;
+        strDirDialAccNo1 = $scope.Dial1;
+        strDirDialAccNo2 = $scope.Dial2;
+        strDirDialAccNo3 = $scope.Dial3;
+        strFaxNo1 = $scope.Fax1;
+        strFaxNo2 = $scope.Fax2;
+
+        strFaxNo3 = $scope.Fax3;
+        if ($scope.Valid == true) {
+            strAddressValidCd = true;
+        }
+        else {
+            strAddressValidCd = false;
+        }
+        AddressMaxVal.GetAddressMaxval().success(function (data) {
+            var max = data.d;
+            strAddressId = data.d + 1;
+            AgentMaxVal.GetAgentMaxval().success(function (data) {
+                strAgentId = data.d + 1;
+                AddressChartype.GetChartypeMaxval().success(function (data) {
+                    strCharTypeId = data.d;
+                    AddressInsertFactory.GetAvailabilityInsert().success(function (data) {
+
+
+
+
+                        AdminAddressGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                        });
+
+
+
+                    });
+                });
+            });
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+
+    $scope.UpdateRecord = function () {
+        strAgentName = $scope.AgentName;
+        strSupportTransWeekDays = $scope.Days;
+        strSupportTransHours = $scope.Hours;
+
+        strSupportBusinessHours = "";
+        strSupportLanguages = $scope.Languages1;
+        strSupportLanguages724 = $scope.Languages2;
+        strAgentValidCd = $scope.Agentvalidcd;
+        strAgentId = $scope.Agentid;
+        strAddressId = $scope.AddressId;
+        strAddressDesc = $scope.Address;
+        strRegionId = $scope.updateRegionid;
+        strCountryId = $scope.updatecountryid;
+        strCityId = $scope.updatecityid;
+        strStateProvinceId = $scope.stateprovinceid;
+        strTollFreeAccInCNo1 = $scope.Toll1;
+        strTollFreeAccInCNo2 = $scope.Toll2;
+        strTollFreeAccInCNo3 = $scope.Toll3;
+        strDirDialAccNo1 = $scope.Dial1;
+        strDirDialAccNo2 = $scope.Dial2;
+        strDirDialAccNo3 = $scope.Dial3;
+        strFaxNo1 = $scope.Fax1;
+        strFaxNo2 = $scope.Fax2;
+
+        strFaxNo3 = $scope.Fax3;
+        strAddressValidCd = $scope.Valid;
+        User_id = $scope.User_Id;
+        if ($('#inputValid')[0].checked == true) {
+            strAvailValidCd = true;
+        }
+        else {
+            strAvailValidCd = false;
+        }
+        // strAvailValidCd = $scope.Valid;
+
+        AddressUpdateFactory.GetAvailabilityUpdate().success(function (data) {
+            AdminAddressGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                $(".pageLoaderOverlay").hide();
+            });
+        });
+
+    }
+
+
+    $scope.DeleteRecord = function (category) {
+        strAddressId = category.Addressid;
+        strAgentId = category.Agentid;
+        Role = $scope.AccessLevel;
+
+
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Address ?",
+            callback: function (result) {
+                if (result) {
+                    AddressDeleteFactory.GetAvailabilityDelete().success(function (data) {
+                        AdminAddressGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                        });
+                    });
+
+                }
+            }
+        });
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+} ]);
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

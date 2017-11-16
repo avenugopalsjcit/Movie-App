@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL
+{
+    public class UpdateAnnouncementsBAL
+    {
+        private UpdateAnnouncementsDAL objSRD = new UpdateAnnouncementsDAL();
+
+
+        public List<AnnouncementsGrid> GetGridAnnouncementsDetails()
+        {
+
+
+            List<AnnouncementsGrid> lstOrg = new List<AnnouncementsGrid>();
+            DataTable dtGridDistributor = objSRD.GetGridAnnouncementsDetails();
+
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AnnouncementsGrid objOrg = new AnnouncementsGrid();
+                objOrg.annid = Convert.ToInt32(dr["ANN_ID"]);
+                objOrg.anndate = Convert.ToString(dr["display_ann_date"]);
+                objOrg.annenddate = Convert.ToString(dr["display_ann_end_date"]);
+                objOrg.title = Convert.ToString(dr["title"]);
+                objOrg.announcement = Convert.ToString(dr["announcement"]);
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+        public int SaveDeleteItems(string annid)
+        {
+
+            List<SaveDelete> lstSD = new List<SaveDelete>();
+
+            int SDDatatable = objSRD.GetProdDetails(annid);
+
+            return SDDatatable;
+
+        }
+
+        public int AddAnnouncementsDetails(string anndate, string annenddate,string anncreateddate, string title, string announcement)
+        {
+            int AnnTable = objSRD.AddNewAnnouncement(anndate, annenddate, anncreateddate,title, announcement);
+
+            return AnnTable;
+
+        }
+
+
+        public int UpdateAnnouncementsDetails(string anndate, string annenddate, string anncreateddate, string title, string announcement,string annid)
+        {
+            int AnnTable = objSRD.UpdateNewAnnouncement(anndate, annenddate, anncreateddate, title, announcement,annid);
+
+            return AnnTable;
+
+        }
+
+
+      
+
+      
+
+    }
+}

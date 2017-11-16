@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+
+namespace SCAdminBAL
+{
+    public class CpeSupplierReportBAL
+    {
+        CpeSupplierReportDAL objCpeSupplierReportDAL = new CpeSupplierReportDAL();
+
+
+        public List<CPESupplierReport> GetAllCpeSupplierReport()
+        {
+            List<CPESupplierReport> SupplierReportList = new List<CPESupplierReport>();
+            try
+            {
+                DataTable dtBindSuppliers = objCpeSupplierReportDAL.BindAllSupplierReport();
+                foreach (DataRow dr in dtBindSuppliers.Rows)
+                {
+                    CPESupplierReport objBindSupplier = new CPESupplierReport();
+                    objBindSupplier.countryName = Convert.ToString(dr["COUNTRY_NAME"]);
+                    objBindSupplier.manufacturerName = Convert.ToString(dr["MANUFACTURER_NAME"]);
+                    objBindSupplier.supplier = Convert.ToString(dr["SUPP_NAME"]);
+                    objBindSupplier.productName = Convert.ToString(dr["PRODUCT_NAME"]);
+                    objBindSupplier.SupplierType = Convert.ToString(dr["SUPPLIER_TYPE"]);
+                    objBindSupplier.CountryAvailability = Convert.ToString(dr["COUNTRY_AVAILABILITY_DESC"]);
+
+                  
+                    
+                    objBindSupplier.MaintenanceOptions = Convert.ToString(dr["MAINT_OPT"]);
+                    if (objBindSupplier.MaintenanceOptions == "1")
+                    {
+                        objBindSupplier.MaintenanceOptions = "Available";
+                    };
+                    if (objBindSupplier.MaintenanceOptions == "0")
+                    {
+                        objBindSupplier.MaintenanceOptions = "Not Available";
+                    };
+
+
+
+                    objBindSupplier.CPELeadTime = Convert.ToString(dr["CPE_LEAD_TIME"]);
+                    objBindSupplier.CPELeadTimeStatus = Convert.ToString(dr["CPE_LEAD_TIME_STATUS"]);
+
+
+                    objBindSupplier.CountrySupplierValidity = Convert.ToString(dr["COUNTRY_SUPPLIER_VALIDITY"]);
+                    if (objBindSupplier.CountrySupplierValidity == "1")
+                    {
+                        objBindSupplier.CountrySupplierValidity = "Valid";
+                    };
+                    if (objBindSupplier.CountrySupplierValidity == "2")
+                    {
+                        objBindSupplier.CountrySupplierValidity = "Invalid";
+                    };
+
+
+                    objBindSupplier.EndofContractDate = Convert.ToString(dr["EOC_DATE"]);
+                    objBindSupplier.EndofMigrationDate = Convert.ToString(dr["EOM_DATE"]);
+                    objBindSupplier.CPECeaseLeadTime = Convert.ToString(dr["CPE_CEASE_LEADTIME"]);
+                    objBindSupplier.CPECeaseLeadTimeStatus = Convert.ToString(dr["CPE_CEASE_LEADTIME_STATUS"]);
+                    objBindSupplier.color = Convert.ToString(dr["eom_passed"]);
+                    SupplierReportList.Add(objBindSupplier);
+                }
+            }
+            catch (Exception ex) { throw ex; }
+            return SupplierReportList;
+        }
+
+    }
+}

@@ -1,0 +1,114 @@
+﻿        
+            <div class="container"  ng-controller="AdminDistributorCompaniesCtrl" >
+                <div class="row text-left Arrow ">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h3>
+                            Distributor / Companies
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-sm-12 col-md-12 col-sm-12 col-lg-12">
+                    <div class="form-horizontal">
+                  
+                        <div class="form-group">
+                            <input type="radio" class="col-sm-1"  id="DistId"  ng-model="level" value="1"  ng-click="Distchange()" />
+                            <label class="col-sm-2" for="Distributors">
+                                Distributors</label>
+                            <input type="radio" class="col-sm-1" id="CompanyId"  ng-model="level" value="2" ng-click="Compchange()" />
+                            <label class="col-sm-2" for="Company">
+                                Company</label>
+                        </div>
+                        <div class="form-group">
+                           <label class="control-label col-sm-3 cus-text-left" for="" >
+                             &nbsp;  </label>
+                            <div class="col-sm-3" style="margin-left:-120px">
+                                <select id="UnitofMeasure" multiple size="7" ng-model="DistComp"  ng-change="update()"
+                                        ng-options="ps.Id as ps.Name for ps in Distributor"
+                                        class="form-control" id="DistList" required>
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </select>
+                            </div>
+                            <!--<div>
+                                        <p  color: Red" ng-show="UnitofMeasureform.UnitofMeasure.$invalid && !UnitofMeasureform.UnitofMeasure.$pristine"
+                                            class="help-block">
+                                            Please Enter Unit of Measure.</p>
+                                    </div>-->
+                        </div>
+
+                          <div class="form-group"  >
+                            <label class="control-label col-sm-3 cus-text-left" for="DistributorName" >
+                              Distributor Name  </label>
+                               
+                            <div class="col-sm-3" style="margin-left:-120px">
+                            <input     ng-model="Name"  readonly="readonly"
+
+                                        class="form-control LabelNormal" id="DistList" required/>
+                                       
+
+                                  
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-show="hidevalue == 1">
+                            <label class="control-label col-sm-3 cus-text-left"  for="ShortName" >
+                                Short Name  </label>
+                            <div  class="col-sm-3" style="margin-left:-120px">
+                                   <input id="ShortNameID"   ng-model="Short"  readonly="readonly"
+                                       
+                                        class="form-control LabelNormal"  required />
+                                       
+                                    
+                                     
+                            </div>
+                        </div>
+
+                          <div class="form-group">
+                            <label class="control-label col-sm-3 cus-text-left"  for="Created" >
+                                Created </label>
+                            <div  class="col-sm-3" style="margin-left:-120px">
+                                 <input id="CreatedId"   ng-model="Created" readonly="readonly"
+                                       
+                                        class="form-control LabelNormal"  required />
+                                       
+                                   
+                                     
+                            </div>
+                        </div>
+
+                           <div class="form-group" >
+                            <label class="control-label col-sm-3 cus-text-left" for="Updated"  >
+                                Updated  </label>
+                            <div  class="col-sm-3" style="margin-left:-120px">
+                                 <input id="UpdatedID"   ng-model="Updated"  readonly="readonly"
+                                       
+                                        class="form-control LabelNormal"  required />
+                                       
+                                    
+                                     
+                            </div>
+                        </div>
+                           <div class="form-group" >
+                            <label class="control-label col-sm-3 cus-text-left" for="Valid"  >
+                                Valid  </label>
+                            <div  class="col-sm-2" style="margin-left:-120px" >
+                                 <input type="checkbox" ng-model="valid" disabled="disabled"   readonly="readonly"/>
+                            </div>
+                        </div>
+                         <div class="form-group">
+                            
+                              <p class="red col-sm-12"><span class="color-black">Note : </span>Select either Distributors or Companies and then the specific Distributor/Company.</p>
+                        </div>
+                        </div>
+              
+         
+      
+                        </div>
+                         </div>
+                       
+                  </div>     
+                        </div>
+                        
+                          <div class="pageLoaderOverlay">
+    </div>

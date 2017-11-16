@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+using System.Configuration;
+namespace SCAdminBAL
+{
+    public class UploadFileHistoryBAL
+    {
+
+        private UploadFileHistoryDAL objUploadFileHistoryDAL = new UploadFileHistoryDAL();
+
+        public List<FileHistory> GetFileHistoryRecords()
+        {
+           
+            List<FileHistory> lstfileRecords = new List<FileHistory>();
+            try
+            {
+                DataTable  dtfilehistory = objUploadFileHistoryDAL.GetFileHistoryRecords();
+
+                foreach (DataRow dr in dtfilehistory.Rows)
+                {
+                    FileHistory filehistory = new FileHistory();
+                    filehistory.Title = Convert.ToString(dr["Title"]);
+                    filehistory.ApprovalID = Convert.ToInt32(dr["App_Id"]);
+                    filehistory.Originator = Convert.ToString(dr["Originator"]);
+                    filehistory.CreatedDate = Convert.ToString(dr["Created_Dt"]);
+                    filehistory.FileName = Convert.ToString(dr["Upload_client_filename"]);
+                    filehistory.Uploadserverpath = (dr["Upload_server_path"].ToString().Contains("/prodcat22/") ? ConfigurationManager.AppSettings["ApplLink"] + dr["Upload_server_path"].ToString() : dr["Upload_server_path"].ToString());
+                    filehistory.serverPath = ConfigurationManager.AppSettings["ApplLink"].ToString();
+                    filehistory.Attachment = Convert.ToString(dr["attachment"]);
+                    lstfileRecords.Add(filehistory);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstfileRecords;
+        }
+
+        public int fileUpload(HttpPostedFile file, string title,string Userid)
+        {
+            int result = objUploadFileHistoryDAL.fileUpload(file, title, Userid);
+
+            return result;
+        }
+
+        public int DeleteFileRecord(int ApprovalID)
+        {
+            int status = 0;
+            try
+            {
+                 status = objUploadFileHistoryDAL.DeleteFileRecord(ApprovalID);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return status;
+        }
+    }
+}
+
+

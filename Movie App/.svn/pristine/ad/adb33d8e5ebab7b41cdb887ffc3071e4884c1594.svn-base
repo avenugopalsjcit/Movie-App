@@ -1,0 +1,263 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Text;
+using System.IO;
+using System.Web.Services;
+using System.Data;
+using System.Reflection;
+using SCAdminBAL;
+using SCAdminBAL.MCU;
+
+namespace SCAdmin
+{
+    public partial class GetTreeContent : System.Web.UI.Page
+    {
+        public MCUSession MCUSessionData
+        {
+            get
+            {
+                if (Session["MCUSession"] == null)
+                {
+                    MCUSession _MCUSession = new MCUSession();
+                    Session["MCUSession"] = _MCUSession;
+                }
+                return (MCUSession)Session["MCUSession"];
+            }
+            set
+            {
+                Session["MCUSession"] = value;
+            }
+        }
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        [WebMethod]
+        public static TreeContents GetRegionTree(int productCd, int subProductCd, string parent,
+            string selectionstate, string key, string type, string strChecked)
+        {
+
+            //  new GetTreeContent().GetContents(productCd, subProductCd, parent, selectionstate, key, type, strChecked);
+            return new GetTreeContent().GetContents(productCd, subProductCd, parent, selectionstate, key, type, strChecked); ;
+        }
+
+        private TreeContents GetContents(int ProductCd, int SubProductCd, string parent, string selectionstate,
+            string key, string type, string strChecked)
+        {
+            //int ProductCd = int.Parse(Request.QueryString["productcd"]);
+            //int SubProductCd = int.Parse(Request.QueryString["subproductcd"]);
+            // String parent = Request.QueryString["parent"];
+            string seletedState = "1";
+            if (!string.IsNullOrEmpty(selectionstate))
+                seletedState = selectionstate;
+            //seletedState = Request.QueryString["selectionstate"];
+
+            // String key = Request.QueryString["q"];
+            //String type = Request.QueryString["t"];
+            // String strChecked = Request.QueryString["chk"];
+            Boolean strCheck;
+            FileStream oStream = null;
+            Cases oCasesCheck = new Cases();
+            StringBuilder strFormat = new StringBuilder();
+
+            if (strChecked == "1")
+            {
+                strCheck = true;
+            }
+            else
+            {
+                strCheck = false;
+            }
+
+            DataSet dsData = new DataSet();
+            //Retrieve data from the database
+            Cases oCases = new Cases();
+
+            dsData = oCases.GetRegionData(ProductCd, SubProductCd, Convert.ToInt32(seletedState));
+
+            TreeContents objTree = bindTreeContent(dsData);
+            return objTree;
+        }
+
+        private TreeContents bindTreeContent(DataSet dsData)
+        {
+            int count = 0;
+            TreeContents objTree = new TreeContents();
+            try
+            {
+                objTree.lstRegion = new List<MCURegion>();
+
+                DataView dvRegionInfo = dsData.Tables[0].DefaultView;
+                DataView dvCountryInfo = dsData.Tables[1].DefaultView;
+                DataView dvCapman = dsData.Tables[3].DefaultView;
+                // DataView dvCountry = dsData.Tables[1].DefaultView;
+                DataView dvCity = dsData.Tables[5].DefaultView;
+                DataView dvState = dsData.Tables[4].DefaultView;
+                dvState.Sort = "state_province_name Asc";
+                DataView dvHubsite = dsData.Tables[2].DefaultView;
+                dvHubsite.Sort = "Hub_Site_Name Asc";
+                dvCity.Sort = "city_name Asc";
+                DataTable dtCity = dvCity.ToTable();
+                DataTable dtState = dvState.ToTable();
+                DataTable dtHubsite = dvHubsite.ToTable();
+
+
+                foreach (DataRow dr in dsData.Tables[0].Rows)
+                {
+                    MCURegion objReg = new MCURegion();
+                    objReg.RegionID = Convert.ToString(dr["region_id"]);
+                    objReg.RegionName = Convert.ToString(dr["region_name"]);
+                    objReg.parentID = Convert.ToString(dr["parentid"]);
+                    objTree.lstRegion.Add(objReg);
+
+                }
+
+                objTree.lstCountry = new List<MCUCountry>();
+                foreach (DataRow dr in dsData.Tables[1].Rows)
+                {
+                    if (Convert.ToString(dr["parentid"]) != "0" || Convert.ToString(dr["parentid"]) == "-1")
+                    {
+
+                        MCUCountry objCountry = new MCUCountry();
+                        objCountry.CountryID = Convert.ToString(dr["country_id"]);
+                        objCountry.CountryName = Convert.ToString(dr["country_name"]);
+                        objCountry.statProvinceFlag = Convert.ToString(dr["state_province_flag"]);
+                        objCountry.Type = Convert.ToString(dr["TYPE"]);
+                        objCountry.parentID = Convert.ToString(dr["parentid"]);
+                        objTree.lstCountry.Add(objCountry);
+                    }
+
+                }
+                objTree.lstCity = new List<MCUCity>();
+                foreach (DataRow dr in dtCity.Rows)
+                {
+                    MCUCity objCity = new MCUCity();
+                    // objCity.RegionID = Convert.ToString(dr["region_id"]);
+                    objCity.CountryID = Convert.ToString(dr["country_id"]);
+                    objCity.CityID = Convert.ToString(dr["city_id"]);
+                    objCity.CityName = Convert.ToString(dr["city_name"]);
+                    objCity.Type = Convert.ToString(dr["TYPE"]);
+                    objCity.parentID = Convert.ToString(dr["parentid"]);
+                    objCity.statProvinceFlag = Convert.ToString(dr["state_province_flag"]);
+                    objTree.lstCity.Add(objCity);
+                }
+                objTree.lstState = new List<MCUState>();
+                foreach (DataRow dr in dtState.Rows)
+                {
+                    MCUState objState = new MCUState();
+                    // objCity.RegionID = Convert.ToString(dr["region_id"]);
+                    objState.stateID = Convert.ToString(dr["state_province_id"]);
+                    objState.stateName = Convert.ToString(dr["state_province_name"]);
+                    objState.statProvinceFlag = Convert.ToString(dr["state_province_flag"]);
+                    objState.Type = Convert.ToString(dr["TYPE"]);
+                    objState.parentID = Convert.ToString(dr["parentid"]);
+                    objTree.lstState.Add(objState);
+                }
+
+                objTree.lstPoP = new List<MCUPoP>();
+                foreach (DataRow dr in dtHubsite.Rows)
+                {
+
+                    MCUPoP objPoP = new MCUPoP();
+                    objPoP.RegionID = Convert.ToString(dr["region_id"]);
+                    objPoP.PoPID = Convert.ToString(dr["hub_site_id"]);
+                    objPoP.PoPName = Convert.ToString(dr["hub_site_name"]);
+                    objPoP.Type = Convert.ToString(dr["TYPE"]);
+                    objPoP.parentID = Convert.ToString(dr["parentid"]);
+                    objPoP.caseID = Convert.ToString(dr["caseid"]);
+                    objPoP.hasCase = Convert.ToString(dr["hascase"]);
+                    objPoP.caseValidCd = Convert.ToString(dr["casevalidcd"]);
+                    objPoP.CountryID = Convert.ToString(dr["country_id"]);
+                    objPoP.stateID = Convert.ToString(dr["state_province_id"]);
+                    objPoP.CityID = Convert.ToString(dr["city_id"]);
+                    objPoP.popType = Convert.ToString(dr["POP_TYPE"]);
+
+                    //dvRegionInfo.RowFilter = "region_id=" + objPoP.RegionID;
+                    //dvCountryInfo.RowFilter = "country_id=" + objPoP.CountryID;
+                    //dvState.RowFilter = "state_province_id=" + objPoP.stateID;
+                    //dvCity.RowFilter = "city_id=" + objPoP.CityID;
+                    //dvCapman.RowFilter = "case_id=" + objPoP.caseID;
+
+                    //if (checkRowinDataView(dvRegionInfo))
+                    //    objPoP.RegionName = dvRegionInfo[0]["region_name"].ToString();
+                    //if (checkRowinDataView(dvCountryInfo))
+                    //    objPoP.CountryName = dvCountryInfo[0]["country_name"].ToString();
+                    //if (checkRowinDataView(dvState))
+                    //    objPoP.StateName = dvState[0]["state_province_name"].ToString();
+                    //if (checkRowinDataView(dvCity))
+                    //    objPoP.CityName = dvCity[0]["city_name"].ToString();
+                    //if (checkRowinDataView(dvCapman))
+                    //    objPoP.PlatformName = dvCapman[0]["capman_platform_name"].ToString();
+                    objTree.lstPoP.Add(objPoP);
+                }
+
+                objTree.lstPlatform = new List<MCUCapmanPlatform>();
+                foreach (DataRow dr in dsData.Tables[3].Rows)
+                {
+                    MCUCapmanPlatform objPlatform = new MCUCapmanPlatform();
+                    objPlatform.capmanPlatformID = Convert.ToString(dr["capman_platform_id"]);
+                    objPlatform.capmanPlatformName = Convert.ToString(dr["capman_platform_name"]);
+                    objPlatform.caseID = Convert.ToString(dr["case_id"]);
+                    objTree.lstPlatform.Add(objPlatform);
+                }
+            }
+            catch (Exception ex) { throw ex; }
+            return objTree;
+        }
+
+        private bool checkRowinDataView(DataView dv)
+        {
+            if (dv.Count > 0) { return true; }
+            return false;
+        }
+
+
+        [WebMethod]
+        public static string GetHVPNTreeContents(int ProductCd, int SubProductCd, string type, int selectionstate, int key)
+        {
+            return new GetTreeContent().GetHVPNTree(ProductCd, SubProductCd, type, selectionstate, key);
+        }
+
+        private string GetHVPNTree(int ProductCd, int SubProductCd, string type, int selectionstate, int key)
+        {
+            Cases oCases = new Cases();
+            string result = string.Empty;
+            switch (type)
+            {
+                case "Region":
+                    result = oCases.GetRegionDatahvpn(MCUSessionData, selectionstate);
+                    break;
+                case "gpop":
+                    //below condition is to clear session data when new case type will be selected from radio button
+                    if (MCUSessionData.prevStateSelection != selectionstate)
+                    {
+                        MCUSessionData.dtPoPs = null;
+                        MCUSessionData.prevStateSelection = selectionstate;
+                    }
+                    result = oCases.GetGpophvpn(MCUSessionData, key, selectionstate);
+                    break;
+            }
+            return result;
+        }
+
+
+        [WebMethod]
+        public static string GetCountryTreeContent()
+        {
+            return new GetTreeContent().GetCountryTree();
+
+        }
+
+        private string GetCountryTree()
+        {
+            Cases oCases = new Cases();
+            return oCases.GetCountryRegionData(MCUSessionData.ProductCd, MCUSessionData.SubProductCd);
+        }
+    }
+}

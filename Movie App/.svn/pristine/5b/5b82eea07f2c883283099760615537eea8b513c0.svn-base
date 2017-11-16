@@ -1,0 +1,88 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using SCAdminBAL;
+using System.Data;
+using System.Web;
+using System.Web.Security;
+using System.Web.Services;
+using System.Web.Script.Services;
+using System.Text;
+using System.Web.UI.WebControls.WebParts;
+using System.IO;
+//using Excel = Microsoft.Office.Interop.Excel;
+//using ExcelAutoFormat = Microsoft.Office.Interop.Excel.XlRangeAutoFormat;
+using SCAdminDAL;
+using Newtonsoft.Json;
+
+
+
+
+namespace SCAdmin
+{
+
+
+    public partial class SLABuilder : System.Web.UI.Page
+    {
+
+
+         [WebMethod]
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            
+
+
+
+
+        }
+
+
+
+
+        [WebMethod]
+        public static List<SLAFile> getProducts()
+        {
+            return SLABuilderBAL.getProducts();
+        }
+
+        [WebMethod]
+        public static void downloadFilebyFiletype(int fileTypeId, int productId)
+        {
+            SLABuilder sb = new SLABuilder();
+        }
+
+
+
+
+
+        [WebMethod]
+        public static string FetchCountries()
+        {
+            SCAdminBAL.ReportsBAL report = new SCAdminBAL.ReportsBAL();
+
+            DataTable FetchCountreis = new DataTable();
+
+            var data = new
+            {
+                FetchCountreis = report.FetchCountries()
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+}

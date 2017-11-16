@@ -1,0 +1,138 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL
+{
+    // public SCAdminDAL.ProductDefinationDAL pDefinations;
+    public class ProductDefinationBAL
+    {
+        #region Servicetypes
+        public static DataTable getSeviceTypes()
+        {
+            return SCAdminDAL.ProductDefinationDAL.getSeviceTypes();
+        }
+
+        public static int InsertSeviceTypes(string Userid, Servicetype service, int UpdateId = 0, int InsertId = 0)
+        {
+            return SCAdminDAL.ProductDefinationDAL.InsertSeviceTypes(Userid,service, UpdateId, InsertId );
+        }
+
+        public static string DeleteServiceType(int Id)
+        {
+            return SCAdminDAL.ProductDefinationDAL.DeleteServiceType(Id);
+        }
+        #endregion
+        
+        public static DataTable getCharTypes()
+        {
+            return SCAdminDAL.ProductDefinationDAL.getCharTypes();
+        }
+
+        public static int InsertCharTypes(string Userid, Chartype service, int UpdateId = 0, int InsertId = 0)
+        {
+            return SCAdminDAL.ProductDefinationDAL.InsertCharTypes(Userid, service, UpdateId, InsertId);
+        }
+
+        public static string DeleteCharType(int Id)
+        {
+            return SCAdminDAL.ProductDefinationDAL.DeleteCharType(Id);
+        }
+
+
+        #region Product
+        public static DataSet getProducts()
+        {
+            return SCAdminDAL.ProductDefinationDAL.getProducts();
+        }
+
+        public static string AddProduct(Products product)
+        {
+            return SCAdminDAL.ProductDefinationDAL.AddProduct(product);
+        }
+
+        public static DataSet getProductsList(int productID)
+        {
+            SCAdminDAL.ProductDefinationDAL objGetProductsList = new SCAdminDAL.ProductDefinationDAL();
+            return objGetProductsList.getProductsList(productID);
+        }
+
+        public static DataSet InsertProductAccessInterfaces(List<AccessMappedInterfaces> MappedInterfaces)
+        {
+           // ProductDefinationDAL objMappedInterfaces = new SCAdminDAL.ProductDefinationDAL();
+            return ProductDefinationDAL.InsertProductAccessInterfaces(MappedInterfaces);
+        }
+
+
+        public static DataTable GetPoPCharctersticsforProduct(int ProductID)
+        {
+            return ProductDefinationDAL.GetPoPCharctersticsforProduct(ProductID);
+        }
+
+
+
+        public static string UpdatePoPCharcterstic(List<SCAdminDAL.PoPCharcterstic> pops,
+            int ProductID, int UpdateEmpId)
+        {
+            return ProductDefinationDAL.UpdatePoPCharcterstic(pops,ProductID,UpdateEmpId);
+        }
+
+
+        public static DataTable GetValidMappingforProduct(int ProductID)
+        {
+            return ProductDefinationDAL.GetValidMappingforProduct(ProductID);
+        }
+
+        public static DataTable GetAccessMappingforProduct(int ProductID)
+        {
+            return ProductDefinationDAL.GetAccessMappingforProduct(ProductID);
+        }
+
+         public static string UpdatePortSpeedsMapping(List<SCAdminDAL.PortSpeedMapping> PortSpeeds, 
+             int ProductID, int UpdateEmpId)
+        {
+            return ProductDefinationDAL.UpdatePortSpeedsMapping(PortSpeeds,ProductID,  UpdateEmpId);
+
+        }
+
+         public static string UpdateAccessSpeedsMapping(List<SCAdminDAL.AccessSpeedMapping> AccessSpeeds,
+           int ProductID, int UpdateEmpId)
+         {
+             return ProductDefinationDAL.UpdateAccessSpeedsMapping(AccessSpeeds, ProductID, UpdateEmpId);
+         }
+
+         public static string UpdateProducts(List<Products> Products1, int[] CapmanRecords,List<SCAdminDAL.csu_product_phase_attribute> phase_attribute,int ProductId)
+         {
+             return ProductDefinationDAL.UpdateProducts(Products1, CapmanRecords, phase_attribute,ProductId);
+         }
+
+
+
+         public static DataSet GetFlexPorts(int ProductID)
+         {
+             return SCAdminDAL.ProductDefinationDAL.GetFlexPorts(ProductID);
+         }
+
+         public static string AddFlexPort(csu_flexiport_availability Flexport,string CharId)
+         {
+             return SCAdminDAL.ProductDefinationDAL.AddFlexPort(Flexport, CharId);
+         }
+
+         public static string DeleteFlexPort(List<csu_flexiport_availability> Flexport)
+         {
+             return SCAdminDAL.ProductDefinationDAL.DeleteFlexPort(Flexport);
+         }
+
+
+
+         public static DataSet GetUnbundledNNI(int ProductID,int CountryID, int SupplierID)
+         {
+             return SCAdminDAL.ProductDefinationDAL.GetUnbundledNNI(ProductID, CountryID, SupplierID);
+         }
+
+
+        #endregion
+
+    }
+}

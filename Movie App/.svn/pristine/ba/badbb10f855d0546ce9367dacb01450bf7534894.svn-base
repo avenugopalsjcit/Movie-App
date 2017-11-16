@@ -1,0 +1,265 @@
+﻿<div ng-controller="AddCaseCntrl">
+<div class="row text-left">
+    <div class="form-group col-sm-12">      
+        <h3 class="col-sm-6" style="margin-left:-17px">  
+                Add Case Reference
+             </h3>
+
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-3">
+                <a style="font-weight: bold; color: Blue;text-decoration: underline" ng-click="ShowCaseList()">
+                  << Case List</a>
+            </div>
+       
+
+    </div>
+    </div>
+    
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label for=" Product" class="col-sm-2 control-label cus-text-left">
+                Product</label>
+            <label for="ProductName" class="col-sm-3 control-label cus-text-left" style="font-weight: normal;">
+                {{ProductName}}</label>
+        </div>
+        <div class="form-group" ng-show="isRegion==1">
+            <label for=" Region" class="col-sm-2 control-label cus-text-left">
+                Region &nbsp;<span class="red">*</span> </label>
+            <div class="col-sm-3"  id="divRegion">
+                <!--<a data-target="#divShowRegions" data-toggle="modal" ng-click="GetRegions()" style="font-weight: bold;text-decoration: underline; color: Blue">{{RegionName}}</a>-->
+                <select id="ddlRegion" ng-model="modRegion" ng-change="GetCountryDetails()" ng-options="Reg.RegionID as Reg.RegionName for Reg in Regiondata"  style="width:90%">
+                    <option value="">--- Select Region ---</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" ng-show="isCountry==1">
+            <label for=" Product" class="col-sm-2 control-label cus-text-left">
+                Country &nbsp;<span class="red">*</span> </label>
+            <div class="col-sm-3" id="divCountry">
+               <!-- <a data-target="#divShowCountries" data-toggle="modal" ng-click="GetCountries()"
+                    style="font-weight: bold; text-decoration: underline; color: Blue">{{CountryName}}</a>-->
+
+                <select id="ddlCountryDet" ng-model="modCountry" ng-change="GetStateDetails()" ng-options="Cntry.CountryID as Cntry.CountryName for Cntry in CountryData"
+                 style="width:90%">
+                <option value="">--- Select Country ---</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" ng-show="isState==1">
+            <label for=" State" class="col-sm-2 control-label cus-text-left">
+                State &nbsp;<span class="red">*</span> </label>
+            
+            <div class="col-sm-3 cus-text-left" id="divState">
+                <!--<a data-target="#divState" data-toggle="modal" ng-click="GetStates()">{{StateName}}</a>-->
+                <select id="ddlState" ng-model="modState" ng-options="State.StateID as State.StateName for State in StateData" style="width:90%">
+                    <option value="">--- Select State ---</option>
+                </select>
+            </div>
+
+
+        </div>
+        <div class="form-group" ng-show="isCity==1">
+            <label for=" Product" class="col-sm-2 control-label cus-text-left">
+                City &nbsp;<span class="red">*</span> </label>
+            <div class="col-sm-3">
+                <a data-target="#divShowCities" data-toggle="modal" ng-click="GetCities()" style="font-weight: bold;
+                    color: Blue; text-decoration: underline">{{CityName}}</a>
+                
+
+            </div>
+        </div>
+        <div class="form-group" ng-show="isHubSite==1">
+            <label for=" HubSite" class="col-sm-2 control-label cus-text-left">
+                Hub Site &nbsp;<span class="red">*</span> </label>
+                <div id="ValidateHubSite" style="display: none;" class="col-sm-3"><label style="color: red;">Please Select Hub Site</label></div>
+            <label for="HubSiteName" class="col-sm-3 control-label cus-text-left">
+                {{HubSite}}</label>
+            
+
+        </div>
+        <div class="form-group">
+            <label for=" Availability" class="col-sm-2 control-label cus-text-left">
+                Availability &nbsp;<span class="red">*</span> </label>
+           <div class="col-sm-3 " id="divAvailability">
+                <select id="lstBoxAvailability" ng-model="ddlAvailability" ng-options="avail.AvailID as avail.AvailDesc for avail in AvailDescData" style="width:90%">
+                </select>
+            </div>
+            <label for=" Date" class="col-sm-2 control-label cus-text-left">
+                Date</label>
+            <div class="col-sm-3" style="margin-left: -120px">
+                <input type="text" name="inputDate" id="inputDate" ng-model="CaseDate" class="datepicker"
+                    style="height: 26px;" disabled="disabled" />
+                <button class="btn btn-sm btn-default" id="btndate">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for=" Valid" class="col-sm-2 control-label cus-text-left">
+                Valid</label>
+            <div class="col-sm-3 ">
+                <input type="checkbox" checked="checked" ng-model="CaseValid" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for=" " class="col-sm-2 control-label cus-text-left">
+                &nbsp;</label>
+            <div class="col-sm-3 ">
+                <input type="button" class="btn btn-primary" value="Submit" ng-click="SaveCaseDetails()" />
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="divShowRegions" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+         <div class="vertical-alignment-helper">
+             <div class="modal-dialog vertical-align-center">
+                 <div class="modal-content" style="width: 700px">
+                     <div class="modal-header">
+                         <button class="close" type="button" data-dismiss="modal">
+                             <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                         </button>
+                         <h3 class="modal-title Arrow">
+                             Please select Region</h3>
+                     </div>
+                     <div class="container">
+                         <div class="modal-body">
+                            
+                             <div class="form-group col-md-10" ng-repeat="Reg in Regiondata">
+                                 
+                                 <div class="col-md-3">
+                                     <a ng-click="SelectRegion(Reg)" style="font-weight: bold;
+                    color: Blue; text-decoration: underline">{{Reg.RegionName}}</a>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="modal-footer">
+                         <button class="btn btn-primary" type="button" data-dismiss="modal">
+                             Close</button>
+                     </div>
+                 </div>
+             </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="divShowCountries" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+         <div class="vertical-alignment-helper">
+        <div class="modal-dialog vertical-align-center">
+            <div class="modal-content" >
+                <div class="modal-header" >
+                    <button class="close" type="button" data-dismiss="modal" >
+                        <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                    </button>
+                    <h3 class="modal-title Arrow">
+                        Please select Country
+                    </h3>
+                </div>
+                <div class="container">
+                    <div class="modal-body">
+                        <div class="form-group col-md-12" ng-repeat="country in CountryData">
+                            <div class="col-md-8">
+                                <a ng-click="SelectCountry(country)" style="font-weight: bold; color: Blue; text-decoration: underline">
+                                    {{country.CountryName}}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                         <button class="btn btn-primary" type="button" data-dismiss="modal">
+                             Close</button>
+                     </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    
+    <div tabindex="-1" class="modal fade in modalalign" id="divShowCities" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h3 class="modal-title Arrow">
+                            Please select City
+                        </h3>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-horizontal">
+                                <div class="form-group col-md-12">
+                                    <div class="col-sm-3">
+                                        <select id="Select1" ng-model="Filter" ng-change="GetCities(true)" class="form-control">
+                                            <option value="A">A</option>
+                                            <option value="B">B</option>
+                                            <option value="C">C</option>
+                                            <option value="D">D</option>
+                                            <option value="E">E</option>
+                                            <option value="F">F</option>
+                                            <option value="G">G</option>
+                                            <option value="H">H</option>
+                                            <option value="I">I</option>
+                                            <option value="J">J</option>
+                                            <option value="K">K</option>
+                                            <option value="L">L</option>
+                                            <option value="M">M</option>
+                                            <option value="N">N</option>
+                                            <option value="O">O</option>
+                                            <option value="P">P</option>
+                                            <option value="Q">Q</option>
+                                            <option value="R">R</option>
+                                            <option value="S">S</option>
+                                            <option value="T">T</option>
+                                            <option value="U">U</option>
+                                            <option value="V">V</option>
+                                            <option value="W">W</option>
+                                            <option value="X">X</option>
+                                            <option value="Y">Y</option>
+                                            <option value="Z">Z</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2"><input type="text" ng-model="CitySearchText" /></div>
+                                    <label class="col-sm-3">&nbsp;</label>
+                                    <div class="col-sm-3"><input type="button" ng-click="SearchCity()" value="Search" /></div>
+                                </div>
+                                <div class="form-group col-md-12" id="City1">
+                                    <label id="lblPageStatus" ng-model="PageStatus" for="pagesize" class="col-sm-3">
+                                        Page {{PageNo}} of {{PageCount}}
+                                    </label>
+                                    <div class="col-sm-8 text-right">
+                                        <a href="" ng-click="PrevParent()" style="font-weight: bold;  text-decoration: underline">
+                                            Prev</a>&nbsp; <a href="" ng-click="NextParent()" style="font-weight: bold; 
+                                                text-decoration: underline">Next</a>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12" ng-repeat="city in CityData">
+                                    <div class="col-md-6">
+                                        <a ng-click="SelectCity(city)" style="font-weight: bold; text-decoration: underline">
+                                            {{city.CityName}}</a>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12" id="City2">
+                                    <label for="" class="col-sm-3">
+                                        &nbsp;</label>
+                                    <div class="col-sm-8 text-right">
+                                        <a href="" ng-click="PrevParent()" style="font-weight: bold;  text-decoration: underline">
+                                            Prev</a>&nbsp; <a href="" ng-click="NextParent()" style="font-weight: bold; 
+                                                text-decoration: underline">Next</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+</div>

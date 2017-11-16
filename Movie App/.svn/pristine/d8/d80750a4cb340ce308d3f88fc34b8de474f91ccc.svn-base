@@ -1,0 +1,43 @@
+﻿<style type="text/css">
+    li
+    {
+        list-style-type: none;
+    }
+</style>
+<div ng-controller="Controllers.SLABuilderFileCtrl" class="container">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                Download SLA
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-xs-12 col-lg-12">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label cus-text-left">
+                        Product &nbsp;<span style="color: Red">*</span></label>
+                    <div class="col-sm-3" style="margin-left: -50px">
+                        <select id="DDL_Product" name="DDL_Product" style="width: 20em;">
+                            <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;--</option>
+                            <option value="75">&nbsp;&nbsp;BT iVPN</option>
+                        </select>
+                        <span id="prodspan" style="display: none; color: Red">&nbsp;&nbsp;Please Select Product</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label cus-text-left">
+                        SLA Data &nbsp; <span style="color: Red">*</span></label>
+                    <div class="col-sm-5" style="margin-left: -50px">
+                        <li ng-repeat="item in Filetypes"><a ng-click="SelectedItemFiletype($index)" style="text-decoration: underline"
+                            data-toggle="tooltip" title="Click to export">{{item}}</a></li>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <iframe id="csvDownloadFrame" style="display: none;"></iframe>
+    <div id="Go1" class="pageLoaderOverlay">
+    </div>
+</div>

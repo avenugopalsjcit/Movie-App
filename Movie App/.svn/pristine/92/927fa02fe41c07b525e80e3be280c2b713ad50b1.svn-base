@@ -1,0 +1,42 @@
+﻿app.AccessSuppHVPN = function ($scope) {
+    if ($scope.modAccSpeed != undefined) {
+        $scope.savedAccSpeedID = getStringArray($scope.AccessSuppCharList, 'AccessId');
+        $scope.modAccSpeed.forEach(function (item) {
+            if ($scope.savedAccSpeedID.indexOf(item.ACCESSID) == -1) {
+
+                $scope.ValidPortAccessCombo = $.grep($scope.AccessSpeedSupp[1], function (e) {
+                    if (e.ACCESS_SPEED_CHAR_ID == item.ACCESSID &&
+                e.ACCESS_SUPPLIER_CHAR_ID == item.SUPPLIERID &&
+                e.ACCESS_PRODUCT_TYPE_ID == item.TYPEID &&
+                e.ACCESS_SUPPLIER_NAME_ID == item.NAMEID) {
+                        return e;
+                    }
+                });
+                //binding Accessspeed object
+                var AccessSuppChar = {};
+                AccessSuppChar.PortAvailability = $scope.modportavail.AVAIL_CD;
+                AccessSuppChar.PortAvailabilityName = $scope.modportavail.AVAIL_DESC;
+                AccessSuppChar.validPort = $scope.modvalidport.id;
+                AccessSuppChar.ValidPortName = $scope.modvalidport.text;
+                AccessSuppChar.LeadTime = $scope.modportspeedleadtime;
+                AccessSuppChar.AccessId = item.ACCESSID;
+                AccessSuppChar.AccessName = item.ACCESSNAME;
+                AccessSuppChar.AccessValue = item.ACCESSNUMVAL;
+                AccessSuppChar.SupplierId = item.SUPPLIERID;
+                AccessSuppChar.SupplierName = item.SUPPLIERNAME;
+                AccessSuppChar.AccessTypeId = item.TYPEID;
+                AccessSuppChar.AccessTypeName = item.TYPENAME;
+                AccessSuppChar.SupplierNameId = item.NAMEID;
+                AccessSuppChar.SupplierNameName = item.NAMENAME;
+                AccessSuppChar.AccessActualValue = item.ACCESSACTUALVAL;
+                AccessSuppChar.UOM = item.ACCESSUOM;
+                AccessSuppChar.ValidCombos = [];
+                $scope.ValidPortAccessCombo.forEach(function (item) {
+                    AccessSuppChar.ValidCombos.push({ PortSpeed: item.PORT_SPEED_CHAR_ID, Pop: item.GPOP_INTERCONNECT });
+                });
+                // AccessSuppChar.portSpeedList = $scope.modportspeed;
+                $scope.AccessSuppCharList.push(AccessSuppChar);
+            }
+        });
+    }
+}

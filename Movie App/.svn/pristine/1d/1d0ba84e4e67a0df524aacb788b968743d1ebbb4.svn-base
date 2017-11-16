@@ -1,0 +1,249 @@
+﻿    <div ng-controller="EditPoPLevelCaseCtrl" class="container">
+    
+        
+       
+
+        <div class="form-group col-sm-12">      
+        <h3 class="col-sm-6" style="margin-left:-17px">  
+                Edit Case Details
+             </h3>
+
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-3">
+                <a style="font-weight: bold; color: Blue;text-decoration: underline" ng-click="ShowCaseList()">
+                    Case List</a>
+            </div>
+       
+
+    </div>
+
+       
+        
+        <div class="row text-left">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="form-horizontal" style="margin-left:-90px">
+                    <div class="form-group" ng-show="ProdName!=''">
+                        <label for="product" class="col-sm-2 control-label">
+                            Product</label>
+                        <div class="col-sm-4 cus-text-left">
+                            <label for="ProdName" class="col-sm-4 control-label cus-text-left">
+                                 {{ProdName}}</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" ng-show="RegionName!=''">
+                        <label for="Region" class="col-sm-2 control-label">
+                            Region</label>
+                        <div class="col-sm-4 cus-text-left">
+                            <label for="RegName" class="col-sm-4 control-label cus-text-left">
+                               {{RegName}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="CountName!='' && CountName!=null">
+                        <label for="Country" class="col-sm-2 control-label">
+                            Country</label>
+                        <div class="col-sm-4 cus-text-left">
+                            <label for="CountryName" class="col-sm-4 control-label cus-text-left">
+                                {{CountName}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="StateProvinceName!='' && StateProvinceName!=null">
+                        <label for=" State/Prov" class="col-sm-2 control-label">
+                            State/Prov</label>
+                        <div class="col-sm-4 cus-text-left">
+                            <label for="StateProvinceName" class="col-sm-4 control-label cus-text-left">
+                                {{StateProvinceName}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="CityName!=''">
+                        <label for=" City" class="col-sm-2 control-label">
+                            City</label>
+                        <div class="col-sm-4 cus-text-left">
+                            <label for="CityName" class="col-sm-4 control-label cus-text-left">
+                                {{CityName}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="POPName!=''">
+                        <label for=" POP" class="col-sm-2 control-label">
+                            Pop</label>
+                        <div class="col-sm-6 cus-text-left">
+                            <label for="POPName" class="col-sm-6 control-label cus-text-left">
+                                {{POPName}}</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" >
+                        <label for="Availability" class="col-sm-2 control-label">
+                            Availability</label>
+                        <div class="col-sm-4 cus-text-left">
+                            <label for="Availability1" class="col-sm-4 control-label cus-text-left">
+                               {{Availability}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="Valid" class="col-sm-2 control-label">
+                            Valid</label>
+                        <div class="col-sm-4 cus-text-left">
+                            <label for="ProdName" class="col-sm-4 control-label cus-text-left">
+                                {{ValidStatus}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="POPColour!=''">
+                        <label for=" PoP Colour" class="col-sm-2 control-label">
+                            PoP Colour</label>
+                        <div class="col-sm-4 cus-text-left">
+                            <label for="POPColour" class="col-sm-4 control-label cus-text-left">
+                                {{POPColour}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="POPCode!=''">
+                        <label for=" PoP Colour" class="col-sm-2 control-label">
+                             PoP Code</label>
+                        <div class="col-sm-4 cus-text-left">
+                            <label for="POPColour" class="col-sm-4 control-label cus-text-left">
+                                 {{POPCode}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="NetworkName!=''">
+                        <label for=" NetworkName" class="col-sm-2 control-label">
+                            Network Name</label>
+                        <div class="col-sm-4 cus-text-left">
+                            <label for="POPColour" class="col-sm-4 control-label cus-text-left">
+                                {{NetworkName}}</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div  class="panel panel-primary">
+                    <div class="panel-heading Arrow">
+                        <h3 class="panel-title">
+                            PoP Characteristics</h3>
+                    </div>
+                    
+                        <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                            <tr ng-repeat="popchr in POPCharacteristicsData">
+                                <td width="40%" class="Arrow">
+                                    {{ popchr.CharName}}
+                                </td>
+                                <td width="60%" class="Arrow">
+                                    {{ popchr.CharValue}}
+                                </td>
+                            </tr>
+                        </table>
+                    
+                </div>
+                <div class="form-horizontal" style="margin-left:-90px">
+                    <div class="form-group">
+                        <label for=" CharTypeName" class="col-sm-2 control-label">
+                            {{CharTypeName}}</label>
+                        <div class="col-sm-3">
+                            <select ng-show="isMultiple==0" id="ddlCaseChar" ng-model="CaseChar" ng-options="cc.OptionMatrixId as cc.CharName for cc in CaseCharData"
+                                class="form-control">
+                            </select>
+                            <select ng-show="isMultiple==1" id="lstCaseChar" multiple="multiple" ng-model="CaseChar"
+                                ng-options="cc.OptionMatrixId as cc.CharName for cc in CaseCharData" class="form-control">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>
+                            Type
+                        </th>
+                        <th>
+                            Characteristic
+                        </th>
+                        <th>
+                            Port Speed Lead Time
+                        </th>
+                        <th>
+                            Availability
+                        </th>
+                        <th>
+                            Value
+                        </th>
+                        <th>
+                            Valid
+                        </th>
+                    </tr>
+                    <tr ng-repeat="CaseDet in CaseCharDetails" ng-show="CaseDet.Type!='' && CaseDet.Type!=null">
+                        <td>
+                            {{CaseDet.Type}} 
+                           
+                        </td>
+                        <td>
+                            {{CaseDet.Characteristic}}
+                            <select multiple="multiple" ng-show="CaseDet.ShowData=='-1'" size="5" width="100px"
+                                id="Select2" ng-model="lstAccessTypeData" class="form-control" ng-options="Acc.ID as Acc.Type for Acc in AccessTypeList">
+                                
+                            </select>
+                        </td>
+                        <td>
+                        
+                            <span ng-show="CaseDet.CharTypeId!=28">{{CaseDet.PortSpeedLeadTime}}</span>
+                            <input type="text" ng-show="CaseDet.CharTypeId==28 && CaseDet.Type!='  '" ng-model="txtPortSpeedLeadTime[$index-1]" />
+                            <select multiple="multiple" ng-show="CaseDet.ShowData=='-1'" size="5" width="10px"  ng-options="Supp.ID as Supp.Name for Supp in SuppliersList"
+                                id="Select1" ng-model="lstSupplierData" class="form-control">
+                                
+                            </select>
+                        </td>
+                        <td>
+                            
+                            <select id="ddlCaseAvailablity{{$index}}" ng-show="CaseDet.ShowData!='-1' && CaseDet.ShowData!='-2' && CaseAvailability[$index-1]!=null && CaseAvailability[$index-1]!=0" ng-model="CaseAvailability[$index-1]"
+                                ng-options="avail.AvailID as avail.AvailDesc for avail in CaseAvailDescData"
+                                class="form-control">
+                            </select>
+
+                            <select multiple="multiple" ng-show="CaseDet.ShowData=='-1'" size="5" width="10px"
+                                id="ddlSupplierProductName" ng-model="lstSupplierProductNameData" class="form-control" ng-options="SuppProd.ID as SuppProd.SupplierProdName for SuppProd in SupplierProductNameList">
+                                
+                            </select>
+                        </td>
+                        <td align="center">
+                            <input ng-show="CaseDet.ShowData=='-1'" type="button" value="Go" ng-click="GetDataByFilters(lstAccessTypeData,lstSupplierData,lstSupplierProductNameData)" />
+                            
+                             <input ng-show="CaseDet.ShowData=='-1'" type="button" value="Show All" ng-click="ShowAll()" />
+                             
+                            <textarea ng-show="CaseDet.CharTypeId!=28 && CaseDet.CharTypeId!=0 && CaseDet.CharTypeValueCount!=0" id="txtValue{{$index}}" ng-show="CaseDet.CaseValue!='' && CaseDet.CaseValue!=null && CaseDet.showData!='-1'"
+                                ng-model="CaseValue[$index-1]">{{CaseDet.CaseValue}}</textarea>
+                            <span ng-show="CaseDet.CharTypeId==28">{{CaseDet.CaseStaticValue}}</span>
+                        </td>
+                        <td>
+                            <input ng-show="CaseDet.ShowData!='-1' && CaseDet.ShowData!='-2'" id="chkValide{{$index}}" type="checkbox"
+                                ng-model="CaseValidVal[$index-1]" ng-checked="CaseDet.CaseValid==1" />
+                        </td>
+                    </tr>
+                </table>
+
+                <table border="1"  class="table table-bordered" ng-show="ParentProductID>0">
+                    <tr>
+                        <td colspan="4">Parent Port Speed Mappings</td>
+                    </tr>
+                    <tr ng-repeat="PSpeed in ParentSpeed" >
+                        <td valign="top">{{PSpeed.PortSpeed}} </td>
+                        <td valign="top">{{PSpeed.UnitOfMesure}} </td>
+               
+                        <td><table width="100%" border="1">
+                            <tr ng-repeat="mapping in PSpeed.lsMapping">
+                                <td>{{mapping.Availablity}}</td>
+                                <td>{{mapping.Mapping}}</td>
+                                <td><input type="checkbox" ng-checked="mapping.isChecked==1" ng-disabled="mapping.isDisabled==1" value="mapping.Valid" </td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                </table>
+                <table>
+                    <tr>
+                        <td><input type="button" value="Update" ng-click="UpdateCaseDetails()" /> </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+        
+        
+  </div>
+
+<div class="pageLoaderOverlay">
+</div>

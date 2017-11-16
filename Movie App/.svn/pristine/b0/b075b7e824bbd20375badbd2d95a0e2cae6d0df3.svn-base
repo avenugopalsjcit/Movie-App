@@ -1,0 +1,281 @@
+﻿<style>
+    
+    .container
+    {  
+        padding-right: 15px !important;
+   
+    padding-right: 15px  !important;
+    padding-left: 0px  !important;
+    margin-right: auto  !important;
+    margin-left: auto  !important;
+}
+
+  
+</style>
+<div ng-controller="Controllers.StandardReportsNewCtrl">
+
+    <div class="row" style="padding-left: 10px">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+           
+                <div class=" Arrow">
+                <h3  class="Arrow">Standard Report</h3>
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                           
+                        </div>
+                    </div>
+                     
+                   <div class="form-group">
+                              <div class="row ">
+                               <div class="col-md-12">
+                            <div  class="alert alert-danger Arrow"  id="divReportemptyMsg" style="display:none;margin-left:18px;">
+                       No Report(s) present.
+                   </div>
+                    </div>
+                     </div>
+                     </div>
+                      <div class="col-md-5 Arrow pull-left" id="divAddButton">
+                      <button ng-click="OpenAddNewReportpopup()" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-plus" title="Add Report"></span>
+                        </button>
+                   </div>
+                 <div class="form-group" id="DivReports" style="display:none;">
+                        <div class=" col-md-12">
+                    <div ng-show="ProductReportData.data.length!=0"  >
+                        <table ng-table="ProductReportTable" class="table table-striped table-bordered " show-filter="true">
+                            <tr ng-repeat="report in $data" id="reportData{{$index}}">
+                                <td title="'Product'" sortable="'ProductName'" class="Arrow" filter="{ 'ProductName': 'text' }">
+                                  {{report.ProductName}}
+                                  <!-- <u><a href="#" ng-click="OpenEditReportPopUp(report.ProductId,'',report.ReportCD,report.reportDescription,report.reportLocLevelCD,report.reportPathDesc,report.reportValidCD,report.reportAbbr,'Report','','',modProduct)">{{report.reportDescription}}</a></u>-->
+                                </td>
+                                 <td title="'Sub Product'"  sortable="'SubProductName'"  class="Arrow" filter="{ 'SubProductName': 'text' }">
+                                  {{report.SubProductName}}
+                                </td>
+                                 <td title="'Report Description'"  sortable="'reportDescription'"  class="Arrow" filter="{ 'reportDescription': 'text' }">
+                                  {{report.reportDescription}}
+                                </td>
+                                 <td title="'Abbreviation'"  sortable="'reportAbbr'"  class="Arrow" filter="{ 'reportAbbr': 'text' }">
+                                  {{report.reportAbbr}}
+                                </td>
+                                <td title="'Valid'"  class="Arrow" >
+                               <!--  // {{report.reportValidCD}}-->
+                                  <input type="checkbox" checked="true" ng-model="report.reportValidCD" ng-disabled="true"/>
+                                </td>
+                                <td data-title="'Actions'"  class="Arrow">
+                                 <span  class="editReportclass"> <button class="btn btn-default btn-sm" ng-click="EditReport('reportData'+$index,report.reportDescription,report.reportAbbr,report.reportValidCD)" title="Edit"><span class="glyphicon glyphicon-pencil"></span></button></span>
+                                  <span style="display:none;" class="editbuttonclass"><button class="btn btn-primary btn-sm"  title="Save" ng-click="OpenEditReportPopUp('reportData'+$index,report.ProductId,report.ProductName,report.ReportCD,report.reportDescription,report.reportLocLevelCD,report.reportPathDesc,report.reportValidCD,report.reportAbbr,report.SubProductId,report.SubProductName)"><span class="glyphicon glyphicon-ok"></span></button></span>
+                                <span  class="deletebuttonclass"><button class="btn btn-danger btn-sm" ng-click="DeleteReport('reportData'+$index,report.ReportCD,report.reportDescription)" title="Delete"><span class="glyphicon glyphicon-trash"></span></button></span>
+                                 <span style="display:none;" class="cancelbuttonclass"> <button class="btn btn-default btn-sm" ng-click="CancelRecord('reportData'+$index,report.reportDescription,report.reportAbbr,report.reportValidCD)" title="Cancel">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button></span>
+                             
+                                <label style="display:none;">{{report.ReportCD}}</label>
+                                 <label style="display:none;">{{report.ProductId}}</label>
+                                  <label style="display:none;">{{report.SubProductId}}</label>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                    </div>
+                    </div>
+                   
+                   
+                  </div>
+          
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in md modalalign" id="addNewReportModal" role="dialog" aria-hidden="true"
+        aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title Arrow" id="H1">
+                            Add Report </h4>
+                    </div>
+                  <div class="container">
+                        <div class="modal-body">
+                         <form class="form-horizontal" name="userForm1" ng-submit="submitForm()" novalidate>
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-4 pull-left Arrow" style="text-align:left;" for="inputDescription">
+                                    Product<span style="color:Red">&nbsp;*</span></label>
+                                <div class="col-md-8 Arrow" style="margin-top:4px;">
+                                  <!--  {{ProductName}}-->
+                                     <select id="modProduct" ng-model="modProduct" ng-change="GetProductDetails(modProduct)" ng-options="item.ProductId as item.ProductName for item in lstProductReportsDetails"   required  style="width:100%;" >
+                                                <option value="">-- Select Product--</option>
+                                    
+                            </select>
+                                <div id="DivProductError" style="display:none;">
+                                        <p  class="help-block"
+                                            style="color: Red">
+                                            Select Product</p>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                             <div class="form-group col-md-12">
+                                <label class="control-label col-md-4 pull-left Arrow" style="text-align:left;" for="inputDescription">
+                                   Sub Product</label>
+                                <div class="col-md-8 Arrow" style="margin-top:4px;">
+                                  <!--  {{ProductName}}-->
+                                     <select id="modSubProduct" ng-model="modSubProduct"  ng-options="item.SubProductId as item.SubProductName for item in lstsubProductlist" style="width:100%;" >
+                                                <option value="">-- Select Sub Product--</option>
+                            </select>
+                                </div>
+                                
+                            </div>
+                            <div style="display:none;">
+                             <label class="control-label col-md-4 pull-left Arrow" style="text-align:left;" for="inputDescription">
+                                    {{SubProductID))</label>
+                            </div>
+                             <div class="form-group col-md-12" style="display:none;" id="divFeatureID1">
+                                <label class="control-label col-md-4 pull-left Arrow" style="text-align:left;" for="inputDescription">
+                                    Feature</label>
+                                <div class="col-md-5" style="margin-top:4px;">
+                                      {{SubProductname}}
+                                </div>
+                            </div>
+                           <!-- ng-class="{ 'has-error' : userForm1.inputtitle.$invalid && !userForm1.inputtitle.$pristine }"-->
+                             <div class="control-group form-group col-md-12" >
+                                <label class="control-label col-md-4 pull-left"  for="inputtitle" style="text-align:left;">
+                                    Description<span style="color:Red">&nbsp;*</span></label>
+                                <div class="col-md-8">
+                                    <textarea class="form-control" name="inputtitle" type="text" value="" ng-model="ProdDescription" maxlength="200"  style="margin-top:9px;"  ng-keyup="keyupevt()"  required>
+                                    </textarea>
+                                     <!--<div  id="DivDescError">
+                                        <p ng-show="userForm1.inputtitle.$invalid && !userForm1.inputtitle.$pristine" class="help-block"
+                                            style="color: Red">
+                                            Please enter Description.</p>
+                                    </div>-->
+                                     <div id="DivDescriptionError" style="display:none;">
+                                        <p  class="help-block"
+                                            style="color: Red">
+                                            Enter Description.</p>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-4 pull-left" for="inputDescription" style="text-align:left;">
+                                    Abbreviation</label>
+                                <div class="col-md-8">
+                                    <input   class="form-control" type="text" value="" ng-model="Abbreviation" style="
+                                    height: 30px; margin-top:9px;" maxlength="9" ng-trim="false" ng-change="Abbreviation = Abbreviation.split(' ').join('')"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12" >
+                                <label class="control-label col-md-4 pull-left" for="inputDescription" style="text-align:left;">
+                                    Valid</label>
+                                <div class="col-md-5">
+                                    <input type="checkbox" checked="true" ng-model="ValidCheck" />
+                                </div>
+                            </div>
+                             </form>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button id="btn_save" class="btn btn-sm btn-primary btn-sm" value="Save" type="button"  ng-click="AddNewReport(modProduct,modSubProduct)">Save</button>
+                        <button class="btn btn-sm btn-primary btn-sm" type="button" value="Reset"   ng-click="ResetReport(modProduct,modSubProduct)"  >Reset </button><!--ng-click="ResetReport(modProduct,modSubProduct)"-->
+                       <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div tabindex="-1" class="modal fade in md modalalign" id="editReportModal" role="dialog" aria-hidden="true"
+        aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title Arrow" id="H2">
+                            Report Details / Reference </h4>
+                    </div>
+                  <div class="container">
+                    <form class="form-horizontal" name="userForm" ng-submit="submitForm()" novalidate>
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-4 pull-left Arrow" for="inputDescription" style="text-align:left;">
+                                   Product</label>
+                                <div class="col-md-5 Arrow " style="margin-top:4px;">
+                                    {{ProductName}}
+                                </div>                                
+                            </div>
+                             <div style="display:none;">
+                             <label class="control-label col-md-4 pull-left Arrow" style="text-align:left;" for="inputDescription">
+                                    {{SubProductID}}</label>
+
+ <label class="control-label col-md-4 pull-left Arrow" style="text-align:left;" for="inputDescription">
+                                    {{ReportId}}</label>
+                            </div>
+                             <div class="form-group col-md-12" style="display:none;" id="divFeatureID">
+                                <label class="control-label col-md-4 pull-left Arrow" style="text-align:left;" for="inputDescription">
+                                    Feature</label>
+                                <div class="col-md-5" style="margin-top:4px;">
+                                      {{SubProductname}}
+                                </div>
+                            </div>
+                           <div class="control-group form-group col-md-12" ng-class="{ 'has-error' : userForm.Editinputtitle.$invalid && !userForm.Editinputtitle.$pristine }">
+                                <label class="control-label col-md-4 pull-left" for="inputDescription" style="text-align:left;">
+                                    Description <span style="color:Red">&nbsp;*</span></label>
+                                <div class="col-md-7">
+                                    <textarea class="form-control" ng-keyup="keyupevt()"  name="Editinputtitle" type="text" ng-model="ReportDesc"  maxlength="200" style="margin-top:9px;" required>{{ReportDesc}}
+                                    </textarea>
+                                    <div id="DivDescError1">
+                                        <p ng-show="userForm.Editinputtitle.$invalid && !userForm.Editinputtitle.$pristine" class="help-block"
+                                            style="color: Red">
+                                            Please Enter Description.</p>
+                                    </div>
+                                    <div id="DivDescriptionError1" style="display:none;">
+                                        <p  class="help-block"
+                                            style="color: Red">
+                                            Please enter Description.</p>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-4 pull-left" for="inputDescription" style="text-align:left;">
+                                    Abbreviation <br />(Don't use spaces)</label>
+                                <div class="col-md-5">
+                                    <input class="form-control" type="text" ng-value="reportAbbr" ng-model="reportAbbr" style="width: 250px;
+                                    height: 30px; margin-top:9px;" maxlength="9" ng-trim="false" ng-change="reportAbbr = reportAbbr.split(' ').join('')" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-4 pull-left" for="inputDescription" style="text-align:left;">
+                                    Valid</label>
+                                <div class="col-md-5">
+                                    <input type="checkbox"  ng-model="reportValidCD" ng-checked="" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-primary btn-sm" value="Update" type="button"  ng-click="updateReport({{ReportId}})">Update</button>
+                        <button class="btn btn-sm btn-primary btn-sm" type="button" value="Reset" ng-click="ResetReport()">Reset </button>
+                        <button class="btn btn-sm btn-primary btn-sm" type="button" value="Delete" ng-click="DeleteReport({{ReportId}})">Delete </button>
+                       <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pageLoaderOverlay">
+</div>
+
+
+

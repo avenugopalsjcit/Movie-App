@@ -1,0 +1,82 @@
+﻿<div class="panel panel-primary mcu-panel">
+    <div class="panel-heading mcu-panel-heading-height">
+        <div class="panel-title">
+            Characteristic type
+        </div>
+    </div>
+    <div class="panel-body small-padding-panel">
+        <select style="width: 100%" multiple size="9" ng-model="modSelectedchar" ng-options="option.CHAR_TYPE_NAME for option in lstCharecteristics track by option.CHAR_TYPE_ID">
+        </select>
+        <span>
+            <button ng-click="captureselectedchar()">
+                Add</button>
+            <button>
+                Reset</button>
+        </span>
+    </div>
+</div>
+<div class="panel panel-primary mcu-panel">
+    <div class="panel-heading mcu-panel-heading-height">
+        <div class="panel-title">
+            Characteristics
+        </div>
+    </div>
+    <div class="panel-body small-padding-panel  overflowScroll" style="height: 160px">
+        <div id="addCharecteristics" ng-if="showAccessSupplier"></div>
+        <div ng-if="showParentPortSpeed"></div>
+        
+        <table class="table table-bordered table-striped" width="100%">
+            <tr class="Freezing" style="top: 0px">
+                <th class="lbltxt">
+                    Change
+                </th>
+                <th class="lbltxt">
+                    Characteristic
+                </th>
+                <th class="lbltxt">
+                    Valid
+                </th>
+                <th class="lbltxt">
+                    Availability
+                </th>
+                <th class="lbltxt">
+                    Change Value
+                </th>
+                <th class="lbltxt">
+                    Value
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <input type="checkbox">
+                </td>
+                <td class="lbltxt">
+                    Ethernet
+                </td>
+                <td>
+                    <input type="checkbox">
+                </td>
+                <td>
+                    <select class="lbltxt">
+                        <option selected value="1">Available</option>
+                        <option value="2">Not Available</option>
+                        <option value="3">Individual Case Basis</option>
+                        <option value="4">Planned</option>
+                        <option value="11">Limited</option>
+                        <option value="12">Requires Access Site Survey</option>
+                        <option value="13">Restricted</option>
+                        <option value="14">Network Capacity Check</option>
+                        <option value="15">Temporarily Unavailable</option>
+                        <option value="16">Access Supplier Limitation</option>
+                        <option value="17">Watch</option>
+                        <option value="23">Enhanced UK Capacity Check</option>
+                    </select>
+                </td>
+                <td>
+                </td>
+                <td class="lbltxt">
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

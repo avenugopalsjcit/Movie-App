@@ -1,0 +1,81 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace SCAdminDAL
+{
+    class ProductDefinations
+    {
+
+    }
+
+    public class Servicetype
+    {
+
+        public string CreatedBy { get; set; }
+        //  public string CreatedDate { get; set; }
+        public string UpdatedBy { get; set; }
+        //  public string UpdatedDate { get; set; }
+
+        public string ServicetypeDesc { get; set; }
+        public int Valid { get; set; }
+        public int SERVICE_TYPE_CD { get; set; }
+
+    }
+
+    public class Chartype
+    {
+
+        public string CreatedBy { get; set; }
+        //  public string CreatedDate { get; set; }
+        public string UpdatedBy { get; set; }
+        //  public string UpdatedDate { get; set; }
+
+        public string ChartypeDesc { get; set; }
+        public int Valid { get; set; }
+        public int CHAR_TYPE_ID { get; set; }
+
+
+    }
+
+
+    public class Products
+    {
+        public int PRODUCT_TYPE { get; set; }
+        public int COUNTRY_CD { get; set; }
+        public int SERVICE_TYPE_CD { get; set; }
+        public int PRODUCT_LOC_LEVEL_CD { get; set; }
+
+        public string PRODUCT_ABBR { get; set; }
+        public int PRODUCT_CD { get; set; }
+        public string PRODUCT_NAME { get; set; }
+
+        public int PARENT_PRODUCT_CD { get; set; }
+        public int[] capman_platform_id { get; set; } 
+
+        public int ALIAS_ID { get; set; }
+        public int PRODUCT_VALID_CD { get; set; }
+        public int DISPLAY_LEAD_TIME { get; set; }
+        public int ACCESS_METHOD_REQUIRED { get; set; }
+        public int EFM_REQUIRED { get; set; }
+
+        public string CREATED_EMP_ID { get; set; }
+        public DateTime CREATED_DT { get; set; }
+        public string UPDATED_EMP_ID { get; set; }
+        public DateTime UPDATED_DT { get; set; }
+        public string INTERFACE_UPDATE_DT { get; set; }
+        public DateTime INTERFACE_UPDATED_BY { get; set; }
+
+        //Not using for inserting the product
+        public string USE_CPE_PRODUCT { get; set; }
+        public string VALIDATE_PARENT_PORTSPEED { get; set; }
+        public string DISPLAY_MPLS_PRODUCT { get; set; }
+        public int FLEXIPORT { get; set; }
+        public int UNBUNDLEDSERVICE { get; set; }
+        public int PLAT_RESIL_MAP { get; set; }
+        public int IS_SUPP_GRP_ENFORCED { get; set; }
+
+
+    }
+}

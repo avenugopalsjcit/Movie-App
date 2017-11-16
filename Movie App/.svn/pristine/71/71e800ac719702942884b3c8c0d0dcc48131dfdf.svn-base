@@ -1,0 +1,140 @@
+﻿
+    <div >
+        
+            <div id="divAnnouncements"  ng-controller="CallerAccessSupplierCtrl" >
+         
+               <div >
+                       
+                        <div id="Div6">
+                         
+                         <div class="row text-left Arrow ">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                               Caller Access/Supplier
+                            </h3>
+                        </div>  
+                    </div>
+                        <div class="col-md-12"  >
+                       <!-- <button class="btn btn-default btn-sm pull-right" id="Addbtn" data-toggle="modal" data-target="#basicModal" ng-click="addNewTask()" >Add Availability</button>-->
+                         </div>
+                        
+                            
+
+                              <table ng-table="usersTable" id="tblAvailability"  class="table table-striped Arrow">
+                                <tr ng-repeat="category in $data">
+                                       <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                                        <td data-title="' OptionMatric CharName'"  sortable="'CharName'" class="Arrow">
+                                            {{category.CharName}}
+                                        </td>
+                                        <td data-title="' Edit'">
+                                        <button class="btn btn-default btn-sm" id="Editbtn" data-toggle="modal" ng-click="EditRecord(category)" data-target="#basicModal" ><span class="glyphicon glyphicon-pencil"></span></button>
+                                        </td>
+                                        <td data-title="' Delete'">
+                                        <button value="Delete" class="btn btn-sm btn-danger" id="AnnouncementId" class="chkAnnounmence" > <span class="glyphicon glyphicon-trash"></span></button></span>
+                                    </td>
+                                        
+                                    </tr>
+                                   
+                                </table>
+                            
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+
+               
+
+               
+            <!--   <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true" style="background: transparent; box-shadow: none;   border-style: none;  display: block; width: 900px;  margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;" >-->
+              <div class="modal fade" id="basicModal" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                                               Edit Caller Access Type/Supplier Reference</h4>
+                    </div>
+                   
+                    <div class="modal-body">
+                        <form class="form-horizontal">
+                        
+                       
+
+                       <table >
+                                <tr ng-repeat="category in usersTable1">
+                                         <td class="Arrow">
+                                           <div class="col-sm-3">
+                                                <select id="'{{category.CharActualValue}}'"  ng-model="CaseAvailability[$index]" ng-options="Avail.AvailCD as Avail.AvailDesc for Avail in Avalability" 
+                                                    style="width:20em">
+                                                   
+                                                </select>
+                                            </div>
+                                        </td>
+                                     <td >
+                                            {{category.CharName}} {{category.CharActualValue}}
+                                        </td> 
+                                        
+                                    
+                                        
+                                    </tr>
+                                   
+                                </table>
+                       
+                        </form>
+                    </div>
+                    <div>
+                    
+                    
+                    </div>
+                    <div class="modal-footer" style="background-color:none">
+                   
+                        <button type="button" id="Resetbtn" ng-show="Reset==1" class="btn btn-default"  ng-click="ResetRecord()">
+                            Reset</button>
+                        
+                             <button type="button" class="btn btn-primary"  data-dismiss="modal" ng-click="closemodal()" >
+                            Close</button>
+                        <button type="button" class="btn btn-primary"  data-dismiss="modal" >
+                            Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+               
+
+               </div>
+               
+            </div>
+            
+       
+        
+        
+        
+    </div>
+    
+  
+    
+    <div class="pageLoaderOverlay">
+    </div>
+    
+    <div>
+        
+    
+   
+       
+
+  
+
+    </div>
+
+ 
+    
+    
+
+

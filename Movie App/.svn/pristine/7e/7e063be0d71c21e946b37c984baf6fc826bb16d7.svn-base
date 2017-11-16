@@ -1,0 +1,184 @@
+﻿app.controller("CapmanAccessReportCtrl", function ($scope, $http, $sce, CapmanAccessReport, NgTableParams, JSONToCSVConvertor) {
+    $(".pageLoaderOverlay").show();
+    $scope.AccessReportData = false;
+    $scope.NoSupplierData = false;
+    $scope.NoCapmanAccessData = false;
+    $scope.HideSupplierData = false;
+    $scope.HideAccessSpeedData = false;
+    $scope.HideInterfaceData = false;
+    $scope.NoInterfaceData = false;
+    $scope.showAccessExportDiv = false;
+    $scope.NoSuplierAcessData = false;
+    $scope.NoSpeedAcessData = false;
+    $scope.ShowGoAccessButtons = false;
+    $scope.NoCountryData = false;
+    $scope.productid = 25;
+    $scope.modCountryType = [];
+    $scope.modSupplierType = [];
+    $scope.modAccessSpeed = [];
+    $scope.modDisplayInterface = [];
+    $scope.ExportCapmanReportData = [];
+
+    CapmanAccessReport.FetchCountriesByProduct($scope.productid).success(function (data) {
+
+        var result = [];
+        $scope.CountriesType = data.d;
+        $(".pageLoaderOverlay").hide();
+    });
+
+    $scope.GetCountries = function () {
+        $scope.AccessReportData = false;
+        $scope.NoSupplierData = false;
+        $scope.NoCapmanAccessData = false;
+        $scope.HideSupplierData = true;
+        $scope.HideAccessSpeedData = false;
+        $scope.HideInterfaceData = false;
+        $scope.NoInterfaceData = false;
+        $scope.ShowGoAccessButtons = false;
+        $scope.NoSuplierAcessData = false;
+        $scope.NoSpeedAcessData = false;
+        $scope.NoCountryData = false;
+        $scope.modSupplierType = "";
+        $scope.modAccessSpeed = "";
+        $scope.modDisplayInterface = "";
+        if ($scope.modCountryType != null) {
+
+            $(".pageLoaderOverlay").hide();
+            CapmanAccessReport.FetchAccessSuppliers($scope.modCountryType).success(function (data) {
+                var result = [];
+                var aaa = data.d;
+                var defaultval = { SupplierId: -1, SupplierName: 'All' };
+                aaa.splice(0, 0, defaultval);
+                $scope.SuppliersType = data.d;
+            });
+        }
+        else {
+            $scope.NoCountryData = true;
+            $scope.HideSupplierData = false;
+            $scope.showAccessExportDiv = false;
+        }
+
+    }
+
+    $scope.GetSuppliers = function () {
+        $(".pageLoaderOverlay").hide();
+        $scope.AccessReportData = false;
+        $scope.NoCapmanAccessData = false;
+        $scope.NoSupplierData = false;
+        $scope.HideSupplierData = true;
+        $scope.HideAccessSpeedData = true;
+        $scope.HideInterfaceData = false;
+        $scope.NoInterfaceData = false;
+        $scope.NoSuplierAcessData = false;
+        $scope.NoSpeedAcessData = false;
+        $scope.ShowGoAccessButtons = false;
+        $scope.showAccessExportDiv = false;
+        $scope.modAccessSpeed = "";
+        $scope.modDisplayInterface = "";
+        if ($scope.modSupplierType == undefined || $scope.modSupplierType == "") {
+            $scope.NoSuplierAcessData = true;
+            $scope.HideAccessSpeedData = false;
+        }
+        else {
+            $scope.HideAccessSpeedData = true;
+        }
+        CapmanAccessReport.FetchAccessSpeeds($scope.modCountryType, $scope.modSupplierType).success(function (data) {
+            var result = [];
+            var aaa = data.d;
+            var defaultval = { AccessSpeedId: -1, AccessSpeedValue: 'All' };
+            aaa.splice(0, 0, defaultval);
+            $scope.AccessSpeedType = aaa;
+        });
+    }
+
+    $scope.GetAccessSpeed = function () {
+        $scope.AccessReportData = false;
+        $scope.NoCapmanAccessData = false;
+        $scope.NoSupplierData = false;
+        $scope.HideSupplierData = true;
+        $scope.HideAccessSpeedData = true;
+        $scope.HideInterfaceData = true;
+        $scope.NoInterfaceData = false;
+        $scope.NoSuplierAcessData = false;
+        $scope.NoSpeedAcessData = false;
+        $scope.showAccessExportDiv = false;
+        $scope.ShowGoAccessButtons = false;
+        $scope.modDisplayInterface = "";
+        if ($scope.modAccessSpeed == undefined || $scope.modAccessSpeed == "") {
+            $scope.NoSpeedAcessData = true;
+            $scope.HideInterfaceData = false;
+        }
+        else {
+            $scope.HideInterfaceData = true;
+        }
+        $(".pageLoaderOverlay").hide();
+        CapmanAccessReport.FetchInterfaceTypes($scope.modCountryType, $scope.modSupplierType, $scope.modAccessSpeed).success(function (data) {
+            var result = [];
+            var aaa = data.d;
+            var defaultval = { InterfaceId: -1, InterfaceType: 'All' };
+            aaa.splice(0, 0, defaultval);
+            $scope.DisplayInterfaceType = aaa;
+        });
+
+    }
+
+    $scope.GetDisplayInterface = function () {
+        $(".pageLoaderOverlay").hide();
+        $scope.showAccessExportDiv = false;
+        if ($scope.modDisplayInterface == undefined || $scope.modDisplayInterface == "") {
+            $scope.NoInterfaceData = true;
+            $scope.ShowGoAccessButtons = false;
+            $scope.AccessReportData = false;
+        }
+        else {
+            $scope.NoInterfaceData = false;
+            $scope.ShowGoAccessButtons = true;
+        }
+    }
+
+    $scope.GetAccessRecords = function () {
+        $(".pageLoaderOverlay").show();
+        if ($scope.modDisplayInterface == undefined || $scope.modDisplayInterface == "") {
+            $scope.NoInterfaceData = true;
+            $scope.AccessReportData = false;
+        }
+        if ($scope.modSupplierType.length > 0 && $scope.modAccessSpeed.length > 0 && $scope.modDisplayInterface.length > 0) {
+            $scope.NoSupplierData = false;
+            CapmanAccessReport.GetAccessReportData($scope.modCountryType, $scope.modSupplierType, $scope.modAccessSpeed, $scope.modDisplayInterface).success(function (data) {
+                if (data.d.length > 0) {
+                    $scope.AccessReportData = true;
+                    $scope.NoCapmanAccessData = false;
+                    $scope.NoInterfaceData = false;
+                    $scope.NoSuplierAcessData = false;
+                    $scope.NoSpeedAcessData = false;
+                    var result = [];
+                    $scope.ExportCapmanReportData = [];
+                    data.d.forEach(function (item) {
+                        $scope.ExportCapmanReportData.push({ 'Country': item.Country, 'City - PoP': item.CityPop.replace(/,/g, ";"), 'Supplier': item.Supplier, 'Speeds': item.Speed.replace(/<font color='green'>/g, "").replace(/font>/g, "").replace(/</g, "").replace("/", ""), 'Display Interfaces': item.DisplayInterface, 'Support': item.Support, 'Resiliency': item.Resiliency });
+                    });
+                    $scope.AccessReportTable = new NgTableParams({}, { 'dataset': data.d });
+                    $scope.showAccessExportDiv = true;
+                    $(".pageLoaderOverlay").hide();
+                }
+                else {
+                    $scope.NoCapmanAccessData = true;
+                    $scope.AccessReportData = false;
+                    $scope.showAccessExportDiv = false;
+                }
+
+            });
+        }
+        else {
+            $(".pageLoaderOverlay").hide();
+        }
+    }
+
+    $scope.ExportCapmanReport = function () {
+        JSONToCSVConvertor.ConvertJSONToCSV($scope.ExportCapmanReportData, true, "CapmanAccessReport", "csvDownloadFrame");
+    }
+
+    $scope.to_trusted = function (val) {
+
+        return $sce.trustAsHtml(val);
+    };
+});

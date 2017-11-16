@@ -1,0 +1,204 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+  public  class AdminCallerAccessSupplierDAL
+    {
+
+
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        public DataTable GetGridAdminCallerAccessSupplier()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();  
+
+            string str = string.Empty;
+           
+              
+
+                str = @"  SELECT option_matrix_id,  char_name
+                            FROM csu_ref_product_opt_matrix a,
+                              csu_ref_char_type b,
+                              csu_ref_valid_char c
+                            WHERE a.product_cd  = 15
+                            AND a.subproduct_cd = 8
+                            AND a.char_type_id  = 24
+                            AND a.char_type_id  = b.char_type_id
+                            AND b.char_type_id  = c.char_type_id
+                            AND a.char_id       = c.char_id
+                            ORDER BY char_name";
+            
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+
+        public DataTable GetGridAdminCallerAccessSupplierDropdown()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+
+            str = @"  select avail_cd, avail_abbr, avail_desc from csu_ref_availability order by upper(avail_desc)";
+
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public DataTable GetGridAdminCallerAccessSupplierCharids(string depOptMatrixId)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+
+            str = @"  Select char_type_id, char_id from csu_ref_product_opt_matrix where option_matrix_id=" + depOptMatrixId;
+
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public DataTable GetGridAdminCallerAccessSupplierMatrix()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+
+            str = @"  select option_matrix_id, char_name,a.char_id,product_cd,subproduct_cd,a.char_type_id, char_actual_value from 
+                    csu_ref_product_opt_matrix a , csu_ref_char_type b, csu_ref_valid_char c 
+                    where a.product_cd = 15 and a.subproduct_cd = 8 and a.char_type_id = 40 and
+                    a.char_type_id = b.char_type_id and b.char_type_id = c.char_type_id and a.char_id = c.char_id 
+                    and a.option_matrix_valid_cd = 1 order by char_name";
+
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+        public DataTable SetDropdownAdminCallerAccessSupplierMatrix(string depOptMatrixId)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+
+            str = @"  select depend_id, depend_product_cd, depend_valid_cd,char_type_id,
+                    depend_subproduct_cd,  depend_char_type_id, 
+	                 depend_char_id,    depend_option_matrix_id, 
+                     product_cd, subproduct_cd, 
+	                  char_id, char_opt_matrix_id, 
+                      avail_cd from csu_ref_char_depend  
+                       where depend_product_cd = 15
+	                    and depend_subproduct_cd = 8
+                        and depend_option_matrix_id = " + depOptMatrixId +
+                       " and depend_valid_cd = 1 order by 2,3,4,5 ";
+
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public int AdminCallerSupplierInsert(string depend_ID, string depend_OptionmatrixID, string depend_productCD, string depend_subproductCD, string depend_chartypeID,
+                                            string depend_charID, string availCD, string charOptionMatrixID, string productCD, string subproductCD, 
+                                            string charTypeID, string charID, string dependvalidCD, string User_id)
+        {
+
+            int status=0;
+            string[] availCDs = availCD.Split(',');
+            string[] charOptionMatrixIDs = charOptionMatrixID.Split(',');
+            string[] charIDs = charID.Split(',');
+               oConn.Open();
+             int  dependID = Convert.ToInt32(depend_ID);
+            for (int i = 0; i < availCDs.Length-1; i++)
+            {
+                
+                string str = @" insert into csu_ref_char_depend 
+	                     ( 
+	                     depend_id, 
+	                     depend_option_matrix_id, 
+	                     depend_product_cd, 
+	                     depend_subproduct_cd, 
+	                     depend_char_type_id, 
+	                     depend_char_id, 
+	                     avail_cd, 
+	                     char_opt_matrix_id, 
+	                     product_cd, 
+	                     subproduct_cd,
+	                     char_type_id, 
+	                     char_id, 
+	                     depend_valid_cd, 
+	                     created_emp_id, 
+	                     created_dt, 
+	                     updated_emp_id, 
+	                     updated_dt 
+	                     ) 
+	                     VALUES 
+	 
+                        (" + dependID + "," + depend_OptionmatrixID + " ," + depend_productCD + "," +
+                               depend_subproductCD + "," + depend_chartypeID + "," + depend_charID + "," + availCDs[i]
+                               + "," + charOptionMatrixIDs[i] + ",'" + productCD + "','" + subproductCD + "'," + charTypeID
+                               + "," + charIDs[i] + "," + dependvalidCD + ",'" + User_id + "',sysdate, '" + User_id + "',sysdate)";
+
+
+
+                OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+                 status = cmd.ExecuteNonQuery();
+                 dependID = dependID + 1;
+            }
+            oConn.Close();
+            return status;
+        }
+
+        public int AdminCallerSupplierDelete(string ProductCD, string SubproductCD, string OptionmatrixID)
+        {
+
+            string str = @" delete from 
+                 csu_ref_char_depend 
+                where depend_product_cd = "+ProductCD +" and depend_subproduct_cd ="+ SubproductCD+" and depend_option_matrix_id =  " + OptionmatrixID;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+
+
+        public int MaxCallerSupplierCD()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"Select max(depend_id) from  csu_ref_char_depend ";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str));
+        }
+
+
+
+    }
+}

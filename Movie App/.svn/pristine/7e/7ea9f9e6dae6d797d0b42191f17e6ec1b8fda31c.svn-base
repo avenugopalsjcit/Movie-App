@@ -1,0 +1,271 @@
+﻿<div>
+    <div id="divAnnouncements" ng-controller="AdminAddressCtrl">
+        <div class="panel panel-primary col-md-12">
+            <div id="Div6">
+                <div class="row text-center">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p class="Arrow">
+                            <h4>
+                                Admin Address View</h4>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <button class="btn btn-default btn-sm pull-right" id="Addbtn" data-toggle="modal"
+                        data-target="#basicModal" ng-click="addNewTask()">
+                        Add Address Reference</button>
+                </div>
+                <table ng-table="usersTable" id="tblAvailability" class="table table-striped Arrow">
+                    <tr ng-repeat="category in $data">
+                        <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                        <td data-title="' Address Name'" sortable="'AddressDescription'" class="Arrow">
+                            {{category.AddressDescription}}
+                        </td>
+                        <td data-title="' Edit'">
+                            <button class="btn btn-default btn-sm" id="Editbtn" data-toggle="modal" ng-click="EditRecord(category)"
+                                data-target="#basicModal">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                        </td>
+                        <td data-title="' Delete'">
+                            <button value="Delete" class="btn btn-sm btn-danger" id="AnnouncementId" class="chkAnnounmence">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+            </div>
+        </div>
+        <!--<div class="modal fade" id="EditModalPopUpModal"   tabindex="-1" role="dialog" aria-labelledby="EditModalPopUpModal" aria-hidden="true" style="background: transparent none repeat scroll 0% 0%; box-shadow: none; border-width: medium medium medium 0px; border-style: none; border-color: -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; border-image: none; display: block; width: 900px; margin-left: -430px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="H1">
+                            Edit New Announcement</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal">
+                        <div class="control-group" style="margin-left: -88px;">
+                            <label class="control-label" for="inputDate">
+                                Start Date</label>
+                            <div class="controls" style="margin-left: 199px;">
+                                <input type="text" id="Text1" ng-model="Editannstartdate" placeholder="Start Date" style="width: 150px;
+                                    height: 26px;"><br />
+                            </div>
+                        </div>
+                        <div class="control-group" style="margin-left: -88px;">
+                            <label class="control-label" for="inputDate" class="dp" style="padding-top: 0px;
+                                margin-left: -5px;">
+                                End Date</label>
+                            <div class="controls" style="margin-left: 200px; height: 20px;">
+                                <input type="text" id="Text2" class="dp" ng-model="Editannenddate" placeholder="End Date"
+                                    style="width: 150px; height: 27px;"><br />
+                            </div>
+                        </div>
+                        <div class="control-group" style="margin-left: -90px;">
+                            <label class="control-label" for="inputtitle" style="padding-top: 0px; margin-left: -36px;">
+                                Title</label>
+                            <div class="controls" style="margin-right: 0px; margin-left: 203px;">
+                                <input type="text" id="Text3" ng-model="Edittitle" placeholder="Title" style="width: 300px;
+                                    height: 28px;">
+                            </div>
+                        </div>
+                        <div class="control-group" style="margin-left: -75px;">
+                            <label class="control-label" for="inputDescription" style="border-right-width: 0px;
+                                margin-right: 10px; padding-top: 0px; margin-left: 18px; padding-right: 0px;
+                                padding-left: 0px;">
+                                Announcement</label>
+                            <div class="controls" style="margin-left: 0px;">
+                                <textarea id="Textarea1" ng-model="Editannouncement" placeholder="Description" style="width: 470px;
+                                    height: 80px;"></textarea>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            Close</button>
+                        <button type="button" class="btn btn-primary" ng-click="addNewTask()">
+                            Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>-->
+        <!--   <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true" style="background: transparent; box-shadow: none;   border-style: none;  display: block; width: 900px;  margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;" >-->
+        <div class="modal fade" id="basicModal" role="dialog">
+            <div class="modal-dialog" style="height: 350px; width: 300px">
+                <div class="vertical-alignment-helper">
+                    <div class="modal-dialog vertical-align-center">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">
+                                    Add To Agent/Address Reference
+                                </h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label for="" class="col-sm-2 control-label">
+                                            Region &nbsp; <span style="color: Red">*</span>
+                                        </label>
+                                        <div class="col-sm-2">
+                                            <select id="ddlProduct" ng-change="GetRegions()" ng-model="Product" ng-options="prod.regionid as prod.regionname for prod in regionLst"
+                                                class="form-control">
+                                                <option value="">--- Select ---</option>
+                                            </select>
+                                        </div>
+                                        <label class="col-sm-2 control-label" for="inputtitle">
+                                            Country</label>
+                                        <div class="col-sm-2">
+                                            <select id="Select1" ng-change="GetRegions()" ng-model="Product" ng-options="prod.Countryid as prod.countryname for prod in countryLst"
+                                                class="form-control">
+                                                <option value="">--- Select ---</option>
+                                            </select>
+                                        </div>
+                                        <label class="col-sm-2 control-label" for="inputtitle">
+                                            City</label>
+                                        <div class="col-sm-2">
+                                           <!-- <select id="Select2" ng-change="GetRegions()" ng-model="Product" ng-options="prod.Cityid as prod.CityName for prod in cityLst"
+                                                class="form-control">
+                                                <option value="">--- Select ---</option>
+                                            </select>-->
+                                         <!--  <input auto-complete ui-items="names" ng-model="selected">-->
+
+                                        </div>
+                                        <div ng-show="Product>0" class="col-sm-3">
+                                            <!--<a ng-click="SetDefaultValues()" href="#/AddNewCase">Add Case</a>-->
+                                            <!--<a ng-show="iDSLFlag" style="color:Blue;font-weight:bold;">Country Access</a>-->
+                                        </div>
+                                    </div>
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputtitle" style="text-align:left">
+                                                Name</label>
+                                            <div class="col-sm-2">
+                                                <select id="Select3" ng-change="GetRegions()" ng-model="Product" ng-options="prod.ProductID as prod.ProductName for prod in productdata"
+                                                    class="form-control">
+                                                    <option value="">--- Select ---</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputtitle" style="text-align:left">
+                                                Week Days</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" id="inputtitle" ng-model="AvailabilityAbbr" placeholder="Abbrevation">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                                Week Hours</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" id="inputDescription" ng-model="Description" placeholder="Description">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                                Languages</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" id="Text1" ng-model="Languages" placeholder="Description">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                                Language 7/24</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" id="Text2" ng-model="Languages" placeholder="Description">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                                Language 7/24</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" id="Text3" ng-model="Languages" placeholder="Description">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="width:auto">
+                                                (Max 255 characters are allowed in Address)</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                            Toll Free #</label>
+                                        <div class="col-sm-2">
+                                            <input type="text" id="Text4" ng-model="Languages" placeholder="Description" style="width:80px">
+                                        </div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div class="col-sm-2">
+                                            <input type="text" id="Text7" ng-model="Languages" placeholder="Description" style="width:80px">
+                                        </div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div class="col-sm-2">
+                                            <input type="text" id="Text8" ng-model="Languages" placeholder="Description" style="width:80px">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                            Direct Dial #</label>
+                                        <div class="col-sm-2">
+                                            <input type="text" id="Text5" ng-model="Languages" placeholder="Description" style="width:80px">
+                                        </div>
+                                            &nbsp;&nbsp;
+                                        <div class="col-sm-2">
+                                            <input type="text" id="Text9" ng-model="Languages" placeholder="Description" style="width:80px">
+                                        </div>
+                                             &nbsp;&nbsp;
+                                        <div class="col-sm-2">
+                                            <input type="text" id="Text10" ng-model="Languages" placeholder="Description" style="width:80px">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                            Fax #</label>
+                                        <div class="col-sm-2">
+                                            <input type="text" id="Text6" ng-model="Languages" placeholder="Description" style="width:80px">
+                                        </div> &nbsp;&nbsp;
+                                         <div class="col-sm-2">
+                                            <input type="text" id="Text11" ng-model="Languages" placeholder="Description" style="width:80px">
+                                        </div> &nbsp;&nbsp;
+                                         <div class="col-sm-2">
+                                            <input type="text" id="Text12" ng-model="Languages" placeholder="Description" style="width:80px">
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="inputDescription">
+                                            Valid</label>
+                                        <div class="controls">
+                                            <input type="checkbox" id="inputValid" ng-model="Valid" placeholder="Valid">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="background-color: none">
+                                    <button type="button" id="Resetbtn" ng-show="Reset==1" class="btn btn-default" ng-click="ResetRecord()">
+                                        Reset</button>
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="closemodal()">
+                                        Close</button>
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">
+                                        Submit</button>
+                                </div>
+                            </div>
+                            <div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+</div>

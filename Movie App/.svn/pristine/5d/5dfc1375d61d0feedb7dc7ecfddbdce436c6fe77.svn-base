@@ -1,0 +1,243 @@
+﻿<div ng-controller="Controllers.UsersDataCtrl">
+
+    <div >
+       <!-- <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#prodCaseDet1">-->
+        <div  data-target="#prodCaseDet1">
+            <h4 class="panel-title">
+                User Status
+            </h4>
+          <!--  <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>-->
+        </div>
+        <!--<div id="prodCaseDet1" class="panel-collapse collapse">-->
+        <div id="prodCaseDet1">
+         <div class="panel-body">
+
+         <!--<b class="Arrow">User Status Description : </b><input type="text" id="NewUserStatus" />-->
+             <div class="row" style="padding-left:20px">
+                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+                     <div class="form-horizontal">
+                         <div class="form-group">
+                             <input type="text" id="NewUserStatus" placeholder="Add User Status" style="height:30px" />
+                             <button class="btn btn-default btn-sm" ng-click="CreateRecord('NewUserStatus',1,'UserStatusError')">
+                                 <span class="glyphicon glyphicon-plus"></span>
+                             </button>
+                             <br />
+                             <span style="display: none; color: Red;" id="UserStatusError" class="Arrow">Please enter User
+                                 Status</span>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+                     
+           <table cellpadding="0" cellspacing="0" class="table table-bordered" id="UserStatustbl"> 
+                        <tr>
+                            <th class="Arrow">
+                             User Status    
+                            </th>
+                             <th class="Arrow">
+                             Created By
+                             </th>
+                             <th class="Arrow">
+                             Created Date
+                             </th>
+                             <th class="Arrow">
+                             Updated By
+                             </th>
+                             <th class="Arrow">
+                             Updated Date
+                             </th>
+                            <th class="Arrow"></th>
+                                                      
+                        </tr>
+                        <tr ng-repeat="x in UserStatus" id="UserStatus{{$index}}">
+                            <td class="Arrow">
+                                {{ x.UserStatusDesc }}                                
+                            </td>   
+                            <td class="Arrow">
+                                {{ x.CreatedBy }}
+                            </td>   
+                            <td class="Arrow">
+                                {{ x.CreatedDate }}
+                            </td>   
+                            <td class="Arrow">
+                                {{ x.UpdatedBy }}
+                            </td>   
+                            <td class="Arrow">
+                                {{ x.UpdatedDate }}
+                            </td>    
+                             <td>          
+          <span>
+            <button class="btn btn-default btn-sm" ng-click="EditRecord('UserStatus'+$index)"><span class="glyphicon glyphicon-pencil"></span></button>
+            <button class="btn btn-danger btn-sm" ng-click="DeleteRecord('UserStatus'+$index,x.UserStatusId,1)"><span class="glyphicon glyphicon-trash"></span></button>     </span>    
+            <span style="display:none;"><button class="btn btn-primary btn-sm" ng-click="UpdateRecord('UserStatus'+$index,x.UserStatusId,1)"><span class="glyphicon glyphicon-ok"></span></button>
+           <button class="btn btn-default btn-sm" ng-click="CancelUpdate('UserStatus'+$index,x.UserStatusDesc)"><span class="glyphicon glyphicon-remove"></span></button></span>
+          </td>                       
+                        </tr>
+                    </table>
+                    </div>
+        </div>
+    </div>
+
+     <div>
+      <!--  <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#prodCaseDet2">-->
+        <div  data-target="#prodCaseDet2">
+            <h4 class="panel-title">
+                User Category
+            </h4>
+           <!-- <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>-->
+        </div>
+      <!--  <div id="prodCaseDet2" class="panel-collapse collapse">-->
+        <div id="prodCaseDet2">
+               <div class="panel-body">
+            <!--  <b class="Arrow">User Category Description : </b><input type="text" id="NewUserCategory" />-->
+                   <div class="row" style="padding-left: 20px">
+                       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+                           <div class="form-horizontal">
+                               <div class="form-group">
+                                   <input type="text" id="NewUserCategory" placeholder="Add User Category" style="height: 30px" />
+                                   <button class="btn btn-default btn-sm" ng-click="CreateRecord('NewUserCategory',2,'UserCatError')">
+                                       <span class="glyphicon glyphicon-plus"></span>
+                                   </button>
+                                   <br />
+                                   <span style="display: none; color: Red;" id="UserCatError" class="Arrow">Please enter
+                                       User Category</span>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+
+
+
+           <table cellpadding="0" cellspacing="0" class="table table-bordered" id="UserCategorytbl">
+                        <tr>
+                            <th class="Arrow">
+                            User Category
+                            </th>
+                             <th class="Arrow">
+                             Created By
+                             </th>
+                             <th class="Arrow">
+                             Created Date
+                             </th>
+                             <th class="Arrow">
+                             Updated By
+                             </th>
+                             <th class="Arrow">
+                             Updated Date
+                             </th>
+                            <th class="Arrow"></th>
+                                                      
+                        </tr>
+                        <tr ng-repeat="x in UserCategory" id="UserCategory{{$index}}">
+                            <td class="Arrow">
+                                {{ x.UserCategoryDesc }}
+                            </td>    
+                             <td class="Arrow">
+                                {{ x.CreatedBy }}
+                            </td>   
+                            <td class="Arrow">
+                                {{ x.CreatedDate }}
+                            </td>   
+                            <td class="Arrow">
+                                {{ x.UpdatedBy }}
+                            </td>   
+                            <td class="Arrow">
+                                {{ x.UpdatedDate }}
+                            </td>    
+                             <td>          
+          <span>
+            <button class="btn btn-default btn-sm" ng-click="EditRecord('UserCategory'+$index)"><span class="glyphicon glyphicon-pencil"></span></button>
+            <button class="btn btn-danger btn-sm" ng-click="DeleteRecord('UserCategory'+$index,x.UserCategoryId,2,x.UserCategoryDesc)"><span class="glyphicon glyphicon-trash"></span></button>     </span>    
+            <span style="display:none;"><button class="btn btn-primary btn-sm" ng-click="UpdateRecord('UserCategory'+$index,x.UserCategoryId,2)"><span class="glyphicon glyphicon-ok"></span></button>
+           <button class="btn btn-default btn-sm" ng-click="CancelUpdate('UserCategory'+$index,x.UserCategoryDesc)"><span class="glyphicon glyphicon-remove"></span></button></span>
+          </td>                       
+                        </tr>
+                    </table>
+                    </div>
+        </div>
+    </div>
+
+     <div>
+       <!-- <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#prodCaseDet3">-->
+        <div data-target="#prodCaseDet3">
+            <h4 class="panel-title">
+                Product Owner Status
+            </h4>
+           <!-- <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>-->
+        </div>
+       <!-- <div id="prodCaseDet3" class="panel-collapse collapse">-->
+        <div id="prodCaseDet3">
+             <div class="panel-body">
+           <!-- <b class="Arrow">Product Owner Status Description : </b><input type="text" id="NewProductOwnerStatus" />-->
+
+                 <div class="row" style="padding-left: 20px">
+                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+                         <div class="form-horizontal">
+                             <div class="form-group">
+                                 <input type="text" id="NewProductOwnerStatus" placeholder="Add Product Owner Status"
+                                     style="height: 30px" />
+                                 <button class="btn btn-default btn-sm" ng-click="CreateRecord('NewProductOwnerStatus',3,'ProdOwnerStatError')">
+                                     <span class="glyphicon glyphicon-plus"></span>
+                                 </button>
+                                 <br />
+                                 <span style="display: none; color: Red;" id="ProdOwnerStatError" class="Arrow">Please
+                                     enter Product Owner Status</span>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+           <table cellpadding="0" cellspacing="0" class="table table-bordered" id="ProductOwnerStatustbl">
+                        <tr>
+                            <th class="Arrow">
+                             Product Owner Status
+                            </th>
+                             <th class="Arrow">
+                             Created By
+                             </th>
+                             <th class="Arrow">
+                             Created Date
+                             </th>
+                             <th class="Arrow">
+                             Updated By
+                             </th>
+                             <th class="Arrow">
+                             Updated Date
+                             </th>
+                            <th class="Arrow"></th>
+                                                      
+                        </tr>
+                        <tr ng-repeat="x in ProductOwnerStatus" id="ProductOwnerStatus{{$index}}">
+                            <td class="Arrow">
+                                {{ x.ProductOwnerStatusDesc }}
+                            </td>    
+                             <td class="Arrow">
+                                {{ x.CreatedBy }}
+                            </td>   
+                            <td class="Arrow">
+                                {{ x.CreatedDate }}
+                            </td>   
+                            <td class="Arrow">
+                                {{ x.UpdatedBy }}
+                            </td>   
+                            <td class="Arrow">
+                                {{ x.UpdatedDate }}
+                            </td>    
+                             <td>          
+          <span>
+            <button class="btn btn-default btn-sm" ng-click="EditRecord('ProductOwnerStatus'+$index)"><span class="glyphicon glyphicon-pencil"></span></button>
+            <button class="btn btn-danger btn-sm" ng-click="DeleteRecord('ProductOwnerStatus'+$index,x.ProductOwnerStatusId,3)"><span class="glyphicon glyphicon-trash"></span></button>     </span>    
+            <span style="display:none;"><button class="btn btn-primary btn-sm" ng-click="UpdateRecord('ProductOwnerStatus'+$index,x.ProductOwnerStatusId,3)"><span class="glyphicon glyphicon-ok"></span></button>
+           <button class="btn btn-default btn-sm" ng-click="CancelUpdate('ProductOwnerStatus'+$index,x.ProductOwnerStatusDesc)"><span class="glyphicon glyphicon-remove"></span></button></span>
+          </td>                       
+                        </tr>
+                    </table>
+                    </div>
+        </div>
+    </div>
+
+    </div>
+   
+    
+<div class="pageLoaderOverlay">
+</div>
+

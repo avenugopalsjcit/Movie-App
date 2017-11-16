@@ -1,0 +1,22 @@
+﻿app.controller("CaseDetailAuditReportCtrl", function ($scope, $http, $stateParams, NgTableParams, CaseDetailAuditReport) {
+    $(".pageLoaderOverlay").show();
+    $scope.CaseId = $stateParams.CaseId;
+    $scope.modServiceType = $stateParams.modServiceType;
+    $scope.modProduct = $stateParams.modProduct;
+    $scope.CountryName = $stateParams.CountryName;
+
+    CaseDetailAuditReport.GetCaseDetailsAuditReport($stateParams.CaseId).success(function (data) {
+        $scope.CaseDetailAuditData = new NgTableParams({}, { 'dataset': data.d });
+        $(".pageLoaderOverlay").hide();
+    });
+});
+
+app.factory('CaseDetailAuditReport', function ($http) {
+
+    var CaseDetailAuditReport = {};
+    CaseDetailAuditReport.GetCaseDetailsAuditReport = function (caseID) {    
+        return $http.post('Reports.aspx/GetCaseDetailsAuditReport', { caseID: caseID });
+    }
+
+    return CaseDetailAuditReport;
+});

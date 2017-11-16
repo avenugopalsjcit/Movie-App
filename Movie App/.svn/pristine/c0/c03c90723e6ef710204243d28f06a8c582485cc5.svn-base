@@ -1,0 +1,481 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+
+
+
+namespace SCAdminDAL
+{
+   public  class SupplierRestrictionDAL
+    {
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+    
+        
+        public DataTable GetLstDistributorDetails(string Category)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            string str=string.Empty;
+            if (Category == "Distributor")
+            {
+                 str = @"SELECT VBC_DIST_ID,
+                        DIST_NAME
+                        FROM CSU_DISTRIBUTOR
+                        WHERE VBC_DIST_ID > 0
+                        AND dist_valid_cd =1
+                        ORDER BY lower(DIST_NAME) ";
+            } else
+            if (Category == "BTGFR")
+            {
+
+
+                str = @"SELECT BTGFR_ID,DESCRIPTION From CSU_BTGFR                         Where  BTGFR > '0' AND ORG_GFR_FLAG = 'GFR'                         AND VALID_CD = 1 Order by 
+                        lower(DESCRIPTION) ";
+            }
+            else if(Category == "ORGANIZATION")
+            {
+
+
+                str = @"SELECT BTGFR_ID,DESCRIPTION
+                        From CSU_BTGFR Where  BTGFR > '0' AND ORG_GFR_FLAG = 'ORG' AND
+                        VALID_CD = 1 Order by lower(DESCRIPTION) ";
+            }
+            OracleCommand cmdOrg = new OracleCommand(str.ToString(), oConn);
+           
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+
+        }
+
+        public  DataTable GetLstCountryDetails()
+        {
+             GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+             OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+            string str = @"SELECT COUNTRY_ID,
+                             COUNTRY_NAME
+                             FROM CSU_COUNTRY
+                            ORDER BY lower(COUNTRY_NAME) ";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+
+          
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+
+        }
+
+        public  DataTable GetLstSupplierDetails()
+        {
+             GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+             OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            string str = @"SELECT DISTINCT char_name AS supplier_name,
+                        supplier_map.c_supplier_id
+                        FROM csu_ref_valid_char crvc,
+                        capman_access_cases_map cacm,
+                        capman_supplier_map supplier_map,
+                        capman_pop_map cpm,
+                        csu_hub_site chs
+                        WHERE char_type_id              = 505
+                        AND cacm.c_supplier_id          = supplier_map.c_supplier_id
+                        AND supplier_map.pc_supplier_id = crvc.char_id
+                        AND cacm.c_pop_id               = cpm.c_pop_id
+                        AND cpm.pc_pop_id               = chs.hub_site_id
+                        ORDER BY lower(supplier_name) 
+                         ";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+
+           
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+
+        }
+
+
+
+
+
+        public  DataTable GetGridDistributorDetails(string Category)
+        {
+             GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+             OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            string str=string.Empty;
+            if (Category == "Distributor")
+            {
+                str = @"SELECT a.distributorid,
+                            a.countryid,
+                            a.supplierid,
+                            b.dist_name,
+                             e.country_name,
+                            d.char_name AS supplier_name
+                            FROM csu_restrictions a,
+                            csu_distributor b,
+                             capman_supplier_map c,
+                             CSU_REF_VALID_CHAR d,
+                            csu_country e
+                            WHERE a.distributorid = b.vbc_dist_id
+                            AND a.countryid       = e.country_id
+                            AND a.supplierid      = c.c_supplier_id
+                            AND c.pc_supplier_id  = d.char_id order by lower(b.dist_name),lower(e.country_name),lower(d.char_name)";
+            }
+            else if (Category == "BTGFR")
+            {
+
+                str = @"SELECT a.btgfr,
+                        a.country_id,
+                         a.supplier_id,
+                         b.description,
+                         e.country_name,
+                         d.char_name As Supplier_name
+                        FROM csu_btgfr_restrictions a,
+                         csu_btgfr b,
+                         capman_supplier_map c,
+                         csu_ref_valid_char d,
+                        csu_country e
+                        WHERE a.btgfr        = b.btgfr_id
+                        AND b.ORG_GFR_FLAG   = 'GFR'
+                        AND b.VALID_CD       = 1
+                        AND a.country_id     = e.country_id
+                        AND a.supplier_id    = c.c_supplier_id
+                        AND c.pc_supplier_id = d.char_id order by lower(b.description),lower(e.country_name),lower(d.char_name)";
+            }
+            else if (Category == "ORGANIZATION")
+            {
+
+
+                str = @"SELECT a.btgfr,a.country_id,a.supplier_id, b.description,e.country_name,d.char_name AS supplier_name FROM csu_btgfr_restrictions a,csu_btgfr b, 
+                            capman_supplier_map c,csu_ref_valid_char d,
+                            csu_country e WHERE a.btgfr = b.btgfr_id AND b.ORG_GFR_FLAG = 'ORG' AND b.VALID_CD = 1
+                           AND a.country_id = e.country_id AND a.supplier_id = c.c_supplier_id AND c.pc_supplier_id = d.char_id order by lower(b.description),lower(e.country_name),lower(d.char_name)";
+            }
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+
+           
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+
+        }
+
+       
+
+
+        public  int GetProdDetails(string operation,string organization,string country,string supplier,string xml,string tab)
+        {//INSERTRESTRICTION
+            string[]  BGFRlst = organization.Split(',').ToArray();
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+          string[] county = country.Split(',').ToArray();
+          string[] supp = supplier.Split(',').ToArray();
+            string str= string.Empty;
+          int count = 0;
+          int status = 0;
+          oConn.Open();
+          if (operation == "Save")
+          {
+
+              //   for (int i = 0; i < BGFRlst.Length; i++)
+              //      {
+              //          if (county.Length <= supp.Length)
+              //          {
+              //              for (int j = 0; j < county.Length; j++)
+              //              {
+              //                  for (int k = 0; k < supp.Length; k++)
+              //                  {
+              //                      str = @"Select Count(*) From CSU_BTGFR_RESTRICTIONS  Where BTGFR =" + BGFRlst[i] + " And COUNTRY_ID=" + county[j] + " And SUPPLIER_ID = " + supp[k];
+
+              //                      OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+
+              //                      object result = cmd1.ExecuteScalar();
+
+
+              //                      if (!Convert.ToBoolean(result))
+              //                      {
+              //                          str = @"INSERT INTO CSU_BTGFR_RESTRICTIONS ( BTGFR, COUNTRY_ID, SUPPLIER_ID ) VALUES (" + BGFRlst[i] + "," + county[j] + " ," + supp[k] + ")";
+              //                          OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+              //                          status = cmd.ExecuteNonQuery();
+              //                          count = count + 1;
+              //                      }
+              //                  }
+              //              }
+
+              //          }
+              //         else
+              //          {
+              //              for (int k = 0; k < supp.Length; k++)
+              //              {
+
+              //                  for (int j = 0; j < county.Length; j++)
+              //                  {
+              //                      str = @"Select Count(*) From CSU_BTGFR_RESTRICTIONS  Where BTGFR =" + BGFRlst[i] + " And COUNTRY_ID=" + county[j] + " And SUPPLIER_ID = " + supp[k];
+
+              //                      OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+
+              //                      object result = cmd1.ExecuteScalar();
+
+
+              //                      if (!Convert.ToBoolean(result))
+              //                      {
+              //                          str = @"INSERT INTO CSU_BTGFR_RESTRICTIONS ( BTGFR, COUNTRY_ID, SUPPLIER_ID ) VALUES (" + BGFRlst[i] + "," + county[j] + " ," + supp[k] + ")";
+              //                          OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+              //                          status = cmd.ExecuteNonQuery();
+              //                          count = count + 1;
+              //                      }
+              //                  }
+              //              }
+
+
+              //          }
+
+              //      }
+
+
+              //  }
+
+              //OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+              //oConn.Open();
+              OracleCommand cmd = new OracleCommand("INSERTRESTRICTION", oConn);
+              cmd.CommandType = CommandType.StoredProcedure;
+
+              cmd.Parameters.Add("pv_xml", OracleDbType.XmlType).Value = xml; //3465;// phub_site_id;
+              cmd.Parameters.Add("tab", OracleDbType.Varchar2).Value = tab;
+              cmd.Parameters.Add("CUR_STATUS", OracleDbType.Int32, ParameterDirection.Output);
+              cmd.ExecuteNonQuery();
+              count = Convert.ToInt32(cmd.Parameters["CUR_STATUS"].Value);
+              // int count1 = Convert.ToInt32(count); 
+              //DataSet dsgeneral = new DataSet();
+              //dad = new OracleDataAdapter(cmd);
+              //dsgeneral = new DataSet();
+              //dad.Fill(dsgeneral);
+              return count;
+
+          }
+            
+          else if (operation == "Delete")
+            {
+                if (operation == "Delete")
+                {
+                    for (int i = 0; i < BGFRlst.Length; i++)
+                    {
+                        str = @"Delete From CSU_BTGFR_RESTRICTIONS Where BTGFR =" + BGFRlst[i] + "  and COUNTRY_ID =" + county[i] + " and SUPPLIER_ID =" + supp[i];
+                        OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+                        status = cmd.ExecuteNonQuery();
+                        count = count + 1;
+
+                    }
+                }
+            }
+
+           
+           oConn.Close();
+         
+           return count;
+        }
+
+
+        public int PostLstBGFROrgDetails(string xml,string tab)
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            oConn.Open();
+            OracleCommand cmd = new OracleCommand("INSERTRESTRICTION", oConn);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("pv_xml", OracleDbType.XmlType).Value = xml; //3465;// phub_site_id;
+            cmd.Parameters.Add("tab", OracleDbType.Varchar2).Value = tab;
+            cmd.Parameters.Add("CUR_STATUS", OracleDbType.Int32, ParameterDirection.Output);
+            cmd.ExecuteNonQuery();
+            int count = Convert.ToInt32(cmd.Parameters["CUR_STATUS"].Value);
+           // int count1 = Convert.ToInt32(count); 
+            //DataSet dsgeneral = new DataSet();
+            //dad = new OracleDataAdapter(cmd);
+            //dsgeneral = new DataSet();
+            //dad.Fill(dsgeneral);
+            return count;
+
+          //  OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            
+          //string[]  BGFRlst = BGFR.Split(',').ToArray();
+          //string[] county = country.Split(',').ToArray();
+          //string[] supp = supplier.Split(',').ToArray();
+          //string str= string.Empty;
+          //int count = 0;
+          //int status = 0;
+          //oConn.Open();
+          //if (tab == "BTGFR")
+          //{
+          //    if (operation == "Save")
+          //    {
+               
+          //        for (int i = 0; i < BGFRlst.Length; i++)
+          //        {
+          //            if (county.Length <= supp.Length)
+          //            {
+          //                for (int j = 0; j < county.Length; j++)
+          //                {
+          //                    for (int k = 0; k < supp.Length; k++)
+          //                    {
+          //                        str = @"Select Count(*) From CSU_BTGFR_RESTRICTIONS  Where BTGFR =" + BGFRlst[i] + " And COUNTRY_ID=" + county[j] + " And SUPPLIER_ID = " + supp[k];
+                                 
+          //                        OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+                                
+          //                        object result = cmd1.ExecuteScalar();
+                                
+
+          //                        if (!Convert.ToBoolean(result))
+          //                        {
+          //                            str = @"INSERT INTO CSU_BTGFR_RESTRICTIONS ( BTGFR, COUNTRY_ID, SUPPLIER_ID ) VALUES (" + BGFRlst[i] + "," + county[j] + " ," + supp[k] + ")";
+          //                            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+          //                            status = cmd.ExecuteNonQuery();
+          //                            count = count + 1;
+          //                        }
+          //                    }
+          //                }
+                         
+          //            }
+          //            else
+          //            {
+          //                for (int k = 0; k < supp.Length; k++)
+          //                {
+
+          //                    for (int j = 0; j < county.Length; j++)
+          //                    {
+          //                        str = @"Select Count(*) From CSU_BTGFR_RESTRICTIONS  Where BTGFR =" + BGFRlst[i] + " And COUNTRY_ID=" + county[j] + " And SUPPLIER_ID = " + supp[k];
+                                  
+          //                        OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+                                
+          //                        object result = cmd1.ExecuteScalar();
+                                
+
+          //                        if (!Convert.ToBoolean(result))
+          //                        {
+          //                            str = @"INSERT INTO CSU_BTGFR_RESTRICTIONS ( BTGFR, COUNTRY_ID, SUPPLIER_ID ) VALUES (" + BGFRlst[i] + "," + county[j] + " ," + supp[k] + ")";
+          //                            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+          //                            status = cmd.ExecuteNonQuery();
+          //                            count = count + 1;
+          //                        }
+          //                    }
+          //                }
+                         
+          //            }
+
+          //        }
+                 
+          //    }
+          //}
+          //else
+          //{
+          //    if (operation == "Save")
+          //    {
+          //        for (int i = 0; i < BGFRlst.Length; i++)
+          //        {
+          //            if (county.Length <= supp.Length)
+          //            {
+          //                for (int j = 0; j < county.Length; j++)
+          //                {
+          //                    for (int k = 0; k < supp.Length; k++)
+          //                    {
+                                  
+          //                        str = @"Select Count(*) From CSU_RESTRICTIONS  Where DISTRIBUTORID = " + BGFRlst[i] + " And COUNTRYID= " + county[j] + " And SUPPLIERID = " + supp[k];
+                                  
+          //                        OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+                               
+          //                        object result = cmd1.ExecuteScalar();
+                              
+
+          //                        if (!Convert.ToBoolean(result))
+          //                        {
+          //                            str = @"INSERT INTO CSU_RESTRICTIONS ( DISTRIBUTORID, COUNTRYID, SUPPLIERID ) VALUES (" + BGFRlst[i] + "," + county[j] + " ," + supp[k] + ")";
+          //                            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+          //                            status = cmd.ExecuteNonQuery();
+          //                            count = count + 1;
+          //                        }
+          //                    }
+          //                }
+                         
+          //            }
+          //            else
+          //            {
+          //                for (int k = 0; k < supp.Length; k++)
+          //                {
+          //                    for (int j = 0; j < county.Length; j++)
+          //                    {
+          //                        str = @"Select Count(*) From CSU_RESTRICTIONS  Where DISTRIBUTORID =" + BGFRlst[i] + " And COUNTRYID= " + county[j] + " And SUPPLIERID = " + supp[k];
+
+          //                        OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+                               
+          //                        object result = cmd1.ExecuteScalar();
+                               
+
+          //                        if (!Convert.ToBoolean(result))
+          //                        {
+          //                            str = @"INSERT INTO CSU_RESTRICTIONS ( DISTRIBUTORID, COUNTRYID, SUPPLIERID ) VALUES (" + BGFRlst[i] + "," + county[j] + " ," + supp[k] + ")";
+          //                            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+          //                            status = cmd.ExecuteNonQuery();
+          //                            count = count + 1;
+          //                        }
+          //                    }
+          //                }
+                         
+          //            }
+
+          //        }
+          //    }
+             
+          //}
+
+         
+          //oConn.Close();
+         
+            // return count;
+        }
+
+        public int deleteLstBGFROrgDetails(string operation,string Items_delete,string Items_country,string Items_supplier,string tab)
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            oConn.Open();
+            string str=string.Empty;
+            string[] BGFRlst = Items_delete.Split(',').ToArray();
+            string[] county = Items_country.Split(',').ToArray();
+            string[] supp = Items_supplier.Split(',').ToArray();
+            int count = 0;
+            int status = 0;
+            if (tab == "BTGFR")
+            {
+                if (operation == "Delete")
+                {
+                    for (int i = 0; i < BGFRlst.Length; i++)
+                    {
+                        str = @"Delete From CSU_BTGFR_RESTRICTIONS Where BTGFR =" + BGFRlst[i] + "  and COUNTRY_ID =" + county[i] + " and SUPPLIER_ID =" + supp[i];
+                        OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+                        status = cmd.ExecuteNonQuery();
+                        count = count + 1;
+                    }
+                }
+            }
+            else
+            {
+                if (operation == "Delete")
+                {
+                    for (int i = 0; i < BGFRlst.Length; i++)
+                    {
+                        str = @"Delete From CSU_RESTRICTIONS Where distributorid =" + BGFRlst[i] + "  and COUNTRYID =" + county[i] + " and SUPPLIERID =" + supp[i];
+                        OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+                        status = cmd.ExecuteNonQuery();
+                        count = count + 1;
+                    }
+                }
+            }
+         
+            oConn.Close();
+            
+            return count;
+        }
+    }
+}

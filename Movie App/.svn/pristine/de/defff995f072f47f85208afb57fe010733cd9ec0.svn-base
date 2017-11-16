@@ -1,0 +1,32 @@
+﻿
+(function (ng, app) {
+
+    app.controller('Controllers.CharactericsticTypeCtrl', function ($scope, NgTableParams) {
+        var self = this;
+        var data2 = [{ Name: "	7 x 24 Access Circuit Restoration	" },
+{ Name: "	A/B End Sales	" },
+{ Name: "	Access	" },
+{ Name: "	Access Connector Type	" },
+{ Name: "	Access Display Interface	" },
+{ Name: "	Access Framing Type	" },
+{ Name: "	Access Interface	" },
+{ Name: "	Access Method	" },
+{ Name: "	Access Model	" },
+{ Name: "	ACCESS MODEL BASELINE	" },
+{ Name: "	Access Number	" },
+{ Name: "	Access Provider	" },
+{ Name: "	Access Provider Service Name	" },
+{ Name: "	Access Restriction	" },
+{ Name: "	Access Speed	" },
+{ Name: "	Access Speed (D/U)	" },
+{ Name: "	Access Supplier	" }
+];
+
+        self.tableParams = new NgTableParams({},
+         {
+             dataset: data2
+         });
+    })
+
+
+} (angular, app));

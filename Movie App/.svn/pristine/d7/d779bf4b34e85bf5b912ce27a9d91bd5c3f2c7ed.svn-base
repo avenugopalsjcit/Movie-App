@@ -1,0 +1,1853 @@
+﻿<style>
+    .clsddlProducttype
+    {
+        width: 250px;
+    }
+    
+    
+    .formproduct > tbody > tr > td
+    {
+        padding: 0px 34px 14px 3px !important;
+    }
+    
+    
+    
+    .formproduct > tbody > tr > td:nth-child(3n+3)
+    {
+        /*color: #ccc;*/
+        margin-left: 35px !important;
+        position: absolute;
+    }
+    
+    
+    .formproduct > tbody > tr > td:nth-child(4n+4)
+    {
+        /*color: #ccc;*/
+        margin-left: 27em !important;
+        position: absolute;
+    }
+    
+    #Mapping_Interfaces > tbody > tr > td > select
+    {
+        width: 40em;
+        margin-bottom:2px;
+        padding-top:0px;
+        height:14em;
+    }
+    table > thead > tr > th
+    {
+        text-align: center;
+        cursor:default;
+    }
+    
+    
+    
+    
+</style>
+<div tabindex="-1" class="modal fade in modalalign" id="addNewProductModal" role="dialog"
+    aria-hidden="true" aria-labelledby="myModalLabel">
+    <div class="vertical-alignment-helper">
+        <div class="modal-dialog vertical-align-center" style="width: 75%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        Add New Product Reference
+                    </h4>
+                </div>
+                <div class="container">
+                    <div class="modal-body">
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Product Type&nbsp;<span style="color: Red">*</span></label>
+                            <div class="col-md-5">
+                                <select class="clsddlProducttype" name="lstProductType">
+                                    <option selected value="0">International</option>
+                                    <option value="1">National</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label  col-md-5">
+                                Country is only required for National Products.</label>
+                            <div class="col-md-5">
+                                <select class="clsddlProducttype" name="lstCountryId">
+                                    <option selected value="0">Afghanistan</option>
+                                    <option value="248">Afghanistan</option>
+                                    <option value="621">Aland Islands</option>
+                                    <option value="249">Albania</option>
+                                    <option value="250">Algeria</option>
+                                    <option value="108">American Samoa</option>
+                                    <option value="251">Andorra</option>
+                                    <option value="252">Angola</option>
+                                    <option value="253">Anguilla</option>
+                                    <option value="441">Antarctica</option>
+                                    <option value="243">Antigua and Barbuda</option>
+                                    <option value="71">Argentina</option>
+                                    <option value="255">Armenia</option>
+                                    <option value="256">Aruba</option>
+                                    <option value="2">Australia</option>
+                                    <option value="27">Austria</option>
+                                    <option value="3">Azerbaijan</option>
+                                    <option value="103">Bahamas</option>
+                                    <option value="4">Bahrain</option>
+                                    <option value="257">Bangladesh</option>
+                                    <option value="247">Barbados</option>
+                                    <option value="258">Belarus</option>
+                                    <option value="28">Belgium</option>
+                                    <option value="259">Belize</option>
+                                    <option value="260">Benin</option>
+                                    <option value="73">Bermuda</option>
+                                    <option value="261">Bhutan</option>
+                                    <option value="262">Bolivia</option>
+                                    <option value="741">Bonaire, Sint Eustatius And Saba</option>
+                                    <option value="263">Bosnia and Herzegovina</option>
+                                    <option value="264">Botswana</option>
+                                    <option value="265">Bouvet Island</option>
+                                    <option value="74">Brazil</option>
+                                    <option value="641">British Indian Ocean Territory</option>
+                                    <option value="267">Brunei Darussalam</option>
+                                    <option value="268">Bulgaria</option>
+                                    <option value="269">Burkina Faso</option>
+                                    <option value="270">Burundi</option>
+                                    <option value="271">Cambodia</option>
+                                    <option value="272">Cameroon</option>
+                                    <option value="88">Canada</option>
+                                    <option value="273">Cape Verde</option>
+                                    <option value="121">Cayman Islands</option>
+                                    <option value="274">Central African Republic</option>
+                                    <option value="275">Chad</option>
+                                    <option value="76">Chile</option>
+                                    <option value="6">China</option>
+                                    <option value="276">Christmas Island</option>
+                                    <option value="277">Cocos (Keeling) Islands</option>
+                                    <option value="77">Colombia</option>
+                                    <option value="278">Comoros</option>
+                                    <option value="279">Congo</option>
+                                    <option value="401">Congo, The Democratic Republic of The</option>
+                                    <option value="280">Cook Islands</option>
+                                    <option value="78">Costa Rica</option>
+                                    <option value="442">Cote d'Ivoire</option>
+                                    <option value="281">Croatia</option>
+                                    <option value="282">Cuba</option>
+                                    <option value="742">Curacao</option>
+                                    <option value="245">Cyprus</option>
+                                    <option value="32">Czech Republic</option>
+                                    <option value="33">Denmark</option>
+                                    <option value="283">Djibouti</option>
+                                    <option value="284">Dominica</option>
+                                    <option value="80">Dominican Republic</option>
+                                    <option value="286">Ecuador</option>
+                                    <option value="287">Egypt</option>
+                                    <option value="104">El Salvador</option>
+                                    <option value="288">Equatorial Guinea</option>
+                                    <option value="289">Eritrea</option>
+                                    <option value="34">Estonia</option>
+                                    <option value="290">Ethiopia</option>
+                                    <option value="291">Falkland Islands (Malvinas)</option>
+                                    <option value="292">Faroe Islands</option>
+                                    <option value="293">Fiji</option>
+                                    <option value="35">Finland</option>
+                                    <option value="36">France</option>
+                                    <option value="296">French Guiana</option>
+                                    <option value="297">French Polynesia</option>
+                                    <option value="443">French Southern Territories</option>
+                                    <option value="299">Gabon</option>
+                                    <option value="300">Gambia</option>
+                                    <option value="301">Georgia</option>
+                                    <option value="37">Germany</option>
+                                    <option value="302">Ghana</option>
+                                    <option value="38">Gibraltar</option>
+                                    <option value="39">Greece</option>
+                                    <option value="303">Greenland</option>
+                                    <option value="304">Grenada</option>
+                                    <option value="305">Guadeloupe</option>
+                                    <option value="8">Guam</option>
+                                    <option value="306">Guatemala</option>
+                                    <option value="622">Guernsey</option>
+                                    <option value="307">Guinea</option>
+                                    <option value="308">Guinea-Bissau</option>
+                                    <option value="309">Guyana</option>
+                                    <option value="310">Haiti</option>
+                                    <option value="311">Heard Island and McDonald Islands</option>
+                                    <option value="208">Holy See (Vatican City State)</option>
+                                    <option value="105">Honduras</option>
+                                    <option value="9">Hong Kong</option>
+                                    <option value="40">Hungary</option>
+                                    <option value="312">Iceland</option>
+                                    <option value="10">India</option>
+                                    <option value="11">Indonesia</option>
+                                    <option value="313">Iran, Islamic Republic of</option>
+                                    <option value="314">Iraq</option>
+                                    <option value="141">Ireland</option>
+                                    <option value="623">Isle of Man</option>
+                                    <option value="12">Israel</option>
+                                    <option value="42">Italy</option>
+                                    <option value="81">Jamaica</option>
+                                    <option value="13">Japan</option>
+                                    <option value="624">Jersey</option>
+                                    <option value="315">Jordan</option>
+                                    <option value="316">Kazakhstan</option>
+                                    <option value="14">Kenya</option>
+                                    <option value="317">Kiribati</option>
+                                    <option value="318">Korea, Democratic People's Republic of</option>
+                                    <option value="15">Korea, Republic of</option>
+                                    <option value="319">Kuwait</option>
+                                    <option value="320">Kyrgyzstan</option>
+                                    <option value="461">Lao People's Democratic Republic</option>
+                                    <option value="321">Latvia</option>
+                                    <option value="16">Lebanon</option>
+                                    <option value="322">Lesotho</option>
+                                    <option value="323">Liberia</option>
+                                    <option value="324">Libya</option>
+                                    <option value="204">Liechtenstein</option>
+                                    <option value="325">Lithuania</option>
+                                    <option value="44">Luxembourg</option>
+                                    <option value="326">Macao</option>
+                                    <option value="294">Macedonia</option>
+                                    <option value="327">Madagascar</option>
+                                    <option value="328">Malawi</option>
+                                    <option value="17">Malaysia</option>
+                                    <option value="329">Maldives</option>
+                                    <option value="330">Mali</option>
+                                    <option value="331">Malta</option>
+                                    <option value="332">Marshall Islands</option>
+                                    <option value="333">Martinique</option>
+                                    <option value="334">Mauritania</option>
+                                    <option value="335">Mauritius</option>
+                                    <option value="336">Mayotte</option>
+                                    <option value="82">Mexico</option>
+                                    <option value="337">Micronesia, Federated States of</option>
+                                    <option value="338">Moldova, Republic of</option>
+                                    <option value="206">Monaco</option>
+                                    <option value="339">Mongolia</option>
+                                    <option value="662">Montenegro</option>
+                                    <option value="340">Montserrat</option>
+                                    <option value="341">Morocco</option>
+                                    <option value="342">Mozambique</option>
+                                    <option value="343">Myanmar</option>
+                                    <option value="344">Namibia</option>
+                                    <option value="345">Nauru</option>
+                                    <option value="346">Nepal</option>
+                                    <option value="46">Netherlands</option>
+                                    <option value="70">Netherlands Antilles</option>
+                                    <option value="347">New Caledonia</option>
+                                    <option value="18">New Zealand</option>
+                                    <option value="221">Nicaragua</option>
+                                    <option value="348">Niger</option>
+                                    <option value="349">Nigeria</option>
+                                    <option value="350">Niue</option>
+                                    <option value="351">Norfolk Island</option>
+                                    <option value="205">Northern Mariana Islands</option>
+                                    <option value="47">Norway</option>
+                                    <option value="161">Oman</option>
+                                    <option value="353">Pakistan</option>
+                                    <option value="354">Palau</option>
+                                    <option value="625">Palestine, State Of</option>
+                                    <option value="84">Panama</option>
+                                    <option value="355">Papua New Guinea</option>
+                                    <option value="356">Paraguay</option>
+                                    <option value="357">Peru</option>
+                                    <option value="20">Philippines</option>
+                                    <option value="358">Pitcairn</option>
+                                    <option value="50">Poland</option>
+                                    <option value="58">Portugal</option>
+                                    <option value="106">Puerto Rico</option>
+                                    <option value="359">Qatar</option>
+                                    <option value="681">Reunion</option>
+                                    <option value="59">Romania</option>
+                                    <option value="60">Russian Federation</option>
+                                    <option value="361">Rwanda</option>
+                                    <option value="743">Saint Barthelemy</option>
+                                    <option value="362">Saint Helena</option>
+                                    <option value="363">Saint Kitts and Nevis</option>
+                                    <option value="364">Saint Lucia</option>
+                                    <option value="744">Saint Martin (French Part)</option>
+                                    <option value="365">Saint Pierre and Miquelon</option>
+                                    <option value="375">Saint Vincent and the Grenadines</option>
+                                    <option value="366">Samoa</option>
+                                    <option value="207">San Marino</option>
+                                    <option value="374">Sao Tome and Principe</option>
+                                    <option value="367">Saudi Arabia</option>
+                                    <option value="368">Senegal</option>
+                                    <option value="661">Serbia</option>
+                                    <option value="369">Seychelles</option>
+                                    <option value="370">Sierra Leone</option>
+                                    <option value="21">Singapore</option>
+                                    <option value="745">Sint Maarten (Dutch Part)</option>
+                                    <option value="62">Slovakia</option>
+                                    <option value="371">Slovenia</option>
+                                    <option value="372">Solomon Islands</option>
+                                    <option value="373">Somalia</option>
+                                    <option value="107">South Africa</option>
+                                    <option value="376">South Georgia &amp; South Sandwich Islands</option>
+                                    <option value="841">South Sudan</option>
+                                    <option value="63">Spain</option>
+                                    <option value="23">Sri Lanka</option>
+                                    <option value="377">Sudan</option>
+                                    <option value="378">Suriname</option>
+                                    <option value="379">Svalbard and Jan Mayen</option>
+                                    <option value="380">Swaziland</option>
+                                    <option value="64">Sweden</option>
+                                    <option value="65">Switzerland</option>
+                                    <option value="381">Syrian Arab Republic</option>
+                                    <option value="24">Taiwan</option>
+                                    <option value="382">Tajikistan</option>
+                                    <option value="383">Tanzania, United Republic of</option>
+                                    <option value="25">Thailand</option>
+                                    <option value="285">Timor-Leste</option>
+                                    <option value="384">Togo</option>
+                                    <option value="385">Tokelau</option>
+                                    <option value="386">Tonga</option>
+                                    <option value="242">Trinidad and Tobago</option>
+                                    <option value="387">Tunisia</option>
+                                    <option value="26">Turkey</option>
+                                    <option value="388">Turkmenistan</option>
+                                    <option value="389">Turks and Caicos Islands</option>
+                                    <option value="390">Tuvalu</option>
+                                    <option value="392">Uganda</option>
+                                    <option value="393">Ukraine</option>
+                                    <option value="246">United Arab Emirates</option>
+                                    <option value="67">United Kingdom</option>
+                                    <option value="89">United States</option>
+                                    <option value="701">United States Minor Outlying Islands</option>
+                                    <option value="241">Uruguay</option>
+                                    <option value="394">Uzbekistan</option>
+                                    <option value="395">Vanuatu</option>
+                                    <option value="87">Venezuela</option>
+                                    <option value="101">Viet Nam</option>
+                                    <option value="396">Virgin Islands, British</option>
+                                    <option value="102">Virgin Islands, U.S.</option>
+                                    <option value="397">Wallis and Futuna</option>
+                                    <option value="398">Western Sahara</option>
+                                    <option value="399">Yemen</option>
+                                    <option value="402">Zambia</option>
+                                    <option value="403">Zimbabwe</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Service Type&nbsp;<span style="color: Red">*</span></label>
+                            <div class="col-md-5">
+                                <select class="clsddlProducttype" name="lstServiceType">
+                                    <option selected value="5">BT Bandwidth Services<option value="6">BT Ethernet Services<option
+                                        value="3">BT IP Services<option value="2">BT Managed Data Services<option value="1">
+                                            BT Managed Voice Services<option value="4">Other Services</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Location Level</label>
+                            <div class="col-md-5">
+                                <select class="clsddlProducttype" name="lstProductLevel">
+                                    <option selected value="3">City<option value="2">Country<option value="4">POP<option
+                                        value="1">Region</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Abbreviation (Don't use spaces)</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Name</label>
+                            <div class="col-md-7">
+                                <textarea cols="45" name="txtProductName" value="" style="width: 22em;"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Parent Product</label>
+                            <div class="col-md-7">
+                                <select id="SELECT2" class="clsddlProducttype" name="lstParentProductId">
+                                    <option selected value="0">&nbsp;</option>
+                                    <option value="25">Access</option>
+                                    <option value="128">Assure Managed Devices</option>
+                                    <option value="58">BT Bandwidth Services</option>
+                                    <option value="62">BT Business Voice Select</option>
+                                    <option value="31">BT Business Voice VoicePort</option>
+                                    <option value="98">BT CCS Direct</option>
+                                    <option value="63">BT CPE</option>
+                                    <option value="15">BT Contact Centre Service</option>
+                                    <option value="100">BT Etherflow Global</option>
+                                    <option value="78">BT Finance Extranet</option>
+                                    <option value="101">BT GS Portfolio Database</option>
+                                    <option value="16">BT Generic Voice Information</option>
+                                    <option value="32">BT IP Sec</option>
+                                    <option value="11">BT Internet Access</option>
+                                    <option value="108">BT Internet Connect Global</option>
+                                    <option value="72">BT LAN SAN Extension Service</option>
+                                    <option value="76">BT MPLS</option>
+                                    <option value="126">BT Media and Broadcast</option>
+                                    <option value="30">BT MessageScan</option>
+                                    <option value="102">BT MobileXpress Mobile IPsec VPN</option>
+                                    <option value="106">BT One Voice Ethernet</option>
+                                    <option value="79">BT Onevoice</option>
+                                    <option value="120">BT Onevoice MPLS</option>
+                                    <option value="99">BT Onevoice TDM</option>
+                                    <option value="75">BT iVPN</option>
+                                    <option value="122">Connect Acceleration</option>
+                                    <option value="125">Connect Intelligence</option>
+                                    <option value="105">Connect Optimisation</option>
+                                    <option value="96">DSL-HVPN Access</option>
+                                    <option value="121">Etherflow Capability</option>
+                                    <option value="123">IP Connect Web-VPN</option>
+                                    <option value="124">Internet Connect Reach</option>
+                                    <option value="130">MCU Test City Level Product</option>
+                                    <option value="131">MCU Test Region Product</option>
+                                    <option value="21">MPLS Capability</option>
+                                    <option value="127">Radianz Ethernet</option>
+                                    <option value="85">Special Bid</option>
+                                    <option value="129">Special Bid ICG</option>
+                                    <option value="97">TDM Voice</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Capman Platform</label>
+                            <div class="col-md-5">
+                                <select id="lstCapmanPlatformId" class="clsddlProducttype" multiple name="lstCapmanPlatformId">
+                                    ATM - Infonet
+                                    <option selected value="21">ATM - Infonet</option>
+                                    <option value="13">ATM - domestic</option>
+                                    <option value="1">ATM - harmonized</option>
+                                    <option value="0">Bandwidth</option>
+                                    <option value="-13">Bandwidth - Radianz</option>
+                                    <option value="30">Etherflow - harmonized</option>
+                                    <option value="31">Etherflow - national</option>
+                                    <option value="-38">Ethernet CFN</option>
+                                    <option value="22">Frame Relay - Infonet</option>
+                                    <option value="14">Frame Relay - domestic</option>
+                                    <option value="2">Frame Relay - harmonized</option>
+                                    <option value="23">IP Internet Access - Infonet</option>
+                                    <option value="15">IP Internet Access - domestic</option>
+                                    <option value="8">IP Internet Access - harmonized</option>
+                                    <option value="470008">IP Internet Access - harmonized-BT Italy</option>
+                                    <option value="208660008">IP Internet Access - harmonized-BTnet</option>
+                                    <option value="5470008">IP Internet Access - harmonized-CenturyLink</option>
+                                    <option value="6560008">IP Internet Access - harmonized-Level 3 LATAM</option>
+                                    <option value="207850008">IP Internet Access - harmonized-Telstra</option>
+                                    <option value="100">LAN Services</option>
+                                    <option value="17">MPLS - Infonet</option>
+                                    <option value="18">MPLS - UK iVPN</option>
+                                    <option value="16">MPLS - domestic</option>
+                                    <option value="3">MPLS - harmonized</option>
+                                    <option value="32">Media &amp; Broadcast</option>
+                                    <option value="33">Platform - MSE</option>
+                                    <option value="34">Radianz Ethernet</option>
+                                    <option value="103">SAN FC Services</option>
+                                    <option value="24">Voice - Infonet</option>
+                                    <option value="19">Voice - domestic</option>
+                                    <option value="12">Voice - harmonized</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Alias Id</label>
+                            <div class="col-md-5">
+                                <select name="lstProductAliasId" class="clsddlProducttype">
+                                    Access
+                                    <option selected value="0">None</option>
+                                    <option value="25">Access</option>
+                                    <option value="128">Assure Managed Devices</option>
+                                    <option value="58">BT Bandwidth Services</option>
+                                    <option value="62">BT Business Voice Select</option>
+                                    <option value="31">BT Business Voice VoicePort</option>
+                                    <option value="98">BT CCS Direct</option>
+                                    <option value="63">BT CPE</option>
+                                    <option value="15">BT Contact Centre Service</option>
+                                    <option value="100">BT Etherflow Global</option>
+                                    <option value="78">BT Finance Extranet</option>
+                                    <option value="101">BT GS Portfolio Database</option>
+                                    <option value="16">BT Generic Voice Information</option>
+                                    <option value="32">BT IP Sec</option>
+                                    <option value="11">BT Internet Access</option>
+                                    <option value="108">BT Internet Connect Global</option>
+                                    <option value="72">BT LAN SAN Extension Service</option>
+                                    <option value="76">BT MPLS</option>
+                                    <option value="126">BT Media and Broadcast</option>
+                                    <option value="30">BT MessageScan</option>
+                                    <option value="102">BT MobileXpress Mobile IPsec VPN</option>
+                                    <option value="106">BT One Voice Ethernet</option>
+                                    <option value="79">BT Onevoice</option>
+                                    <option value="120">BT Onevoice MPLS</option>
+                                    <option value="99">BT Onevoice TDM</option>
+                                    <option value="75">BT iVPN</option>
+                                    <option value="122">Connect Acceleration</option>
+                                    <option value="125">Connect Intelligence</option>
+                                    <option value="105">Connect Optimisation</option>
+                                    <option value="96">DSL-HVPN Access</option>
+                                    <option value="121">Etherflow Capability</option>
+                                    <option value="123">IP Connect Web-VPN</option>
+                                    <option value="124">Internet Connect Reach</option>
+                                    <option value="130">MCU Test City Level Product</option>
+                                    <option value="131">MCU Test Region Product</option>
+                                    <option value="21">MPLS Capability</option>
+                                    <option value="127">Radianz Ethernet</option>
+                                    <option value="85">Special Bid</option>
+                                    <option value="129">Special Bid ICG</option>
+                                    <option value="97">TDM Voice</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Valid</label>
+                            <div class="col-md-7">
+                                <input type="checkbox" />
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Display Lead Time</label>
+                            <div class="col-md-7">
+                                <input type="checkbox" />
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                Access Method Required
+                            </label>
+                            <div class="col-md-7">
+                                <input type="checkbox" />
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="inputDescription" class="control-label col-md-5">
+                                EFM Valid
+                            </label>
+                            <div class="col-md-7">
+                                <input type="checkbox" />
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="form-horizontal" style="padding-left: 3%">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" class="btn btn-sm btn-primary" value="Save" />
+                    <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                    <button class="btn btn-default" type="button" data-dismiss="modal">
+                        Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div ng-controller="productCtrl">
+    <div class="form-horizontal">
+        <div class="container" style="margin-left: 0px">
+            <h3>
+                <span style="cursor: default">Product</span></h3>
+        </div>
+    </div>
+  
+    <br />
+    <table class="formproduct" style="margin-left: 16px">
+        <tbody>
+            <tr>
+                <td>
+                    <label>Product</label>
+                </td>
+                <td>
+                    <select class="clsddlProducttype" style="width: 250px">
+                        <option selected="selected">AC VPN ENCORE </option>
+                        <option>Access </option>
+                        <option>Assure Managed Devices </option>
+                        <option>BT Bandwidth Services </option>
+                        <option>BT Business Voice Select </option>
+                        <option>BT Business Voice VoicePort </option>
+                        <option>BT CCS Direct </option>
+                        <option>BT Contact Centre Service </option>
+                        <option>BT CPE </option>
+                        <option>BT Etherflow Global </option>
+                        <option>BT Finance Extranet </option>
+                        <option>BT Generic Voice Information </option>
+                        <option>BT GS Portfolio Database </option>
+                        <option>BT Internet Access </option>
+                        <option>BT Internet Connect Global </option>
+                        <option>BT IP Sec </option>
+                        <option>BT iVPN </option>
+                        <option>BT LAN SAN Extension Service </option>
+                        <option>BT Managed Firewall </option>
+                        <option>BT Media and Broadcast </option>
+                        <option>BT MessageScan </option>
+                        <option>BT MFS </option>
+                        <option>BT MobileXpress Mobile IPsec VPN </option>
+                        <option>BT MPLS </option>
+                        <option>BT One Voice Ethernet </option>
+                        <option>BT Onevoice </option>
+                        <option>BT Onevoice MPLS </option>
+                        <option>BT Onevoice TDM </option>
+                        <option>BT WAS </option>
+                        <option>Conferencing </option>
+                        <option>Connect Acceleration </option>
+                        <option>Connect Intelligence </option>
+                        <option>Connect Optimisation </option>
+                        <option>Customer Service </option>
+                        <option>DSL-HVPN Access </option>
+                        <option>Etherflow Capability </option>
+                        <option>Internet Connect Reach </option>
+                        <option>IP Connect Web-VPN </option>
+                        <option>MCU Test City Level Product </option>
+                        <option>MCU Test Region Product </option>
+                        <option>Mobile Access </option>
+                        <option>MobileXpress </option>
+                        <option>MPLS Capability </option>
+                        <option>Radianz Ethernet </option>
+                        <option>Special Bid </option>
+                        <option>Special Bid ICG </option>
+                        <option>Switched Access RSA </option>
+                        <option>TDM Voice </option>
+                    </select>
+                </td>
+                <td>
+                </td>
+                <td>
+                    <a data-target="#addNewProductModal" data-toggle="modal" class="btn btn-primary btn-sm">
+                        Add Product</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="productId">
+                        Product Type</label>
+                </td>
+                <td>
+                    <select class="clsddlProducttype">
+                        <option selected="selected" value="International ">International </option>
+                        <option value="National ">National </option>
+                        <option value="Assure Managed Devices ">Assure Managed Devices </option>
+                        <option value="BT Bandwidth Services ">BT Bandwidth Services </option>
+                    </select>
+                </td>
+                <td class="">
+                    <label class="control-label" for="CountryId">
+                        Country is required for all National Products</label>
+                </td>
+                <td>
+                    <select name="lstCountryId" class="clsddlProducttype">
+                        <option value="0" selected="">&nbsp;</option>
+                        <option value="248">Afghanistan</option>
+                        <option value="621">Aland Islands</option>
+                        <option value="249">Albania</option>
+                        <option value="250">Algeria</option>
+                        <option value="108">American Samoa</option>
+                        <option value="251">Andorra</option>
+                        <option value="252">Angola</option>
+                        <option value="253">Anguilla</option>
+                        <option value="441">Antarctica</option>
+                        <option value="243">Antigua and Barbuda</option>
+                        <option value="71">Argentina</option>
+                        <option value="255">Armenia</option>
+                        <option value="256">Aruba</option>
+                        <option value="2">Australia</option>
+                        <option value="27">Austria</option>
+                        <option value="3">Azerbaijan</option>
+                        <option value="103">Bahamas</option>
+                        <option value="4">Bahrain</option>
+                        <option value="257">Bangladesh</option>
+                        <option value="247">Barbados</option>
+                        <option value="258">Belarus</option>
+                        <option value="28">Belgium</option>
+                        <option value="259">Belize</option>
+                        <option value="260">Benin</option>
+                        <option value="73">Bermuda</option>
+                        <option value="261">Bhutan</option>
+                        <option value="262">Bolivia</option>
+                        <option value="741">Bonaire, Sint Eustatius And Saba</option>
+                        <option value="263">Bosnia and Herzegovina</option>
+                        <option value="264">Botswana</option>
+                        <option value="265">Bouvet Island</option>
+                        <option value="74">Brazil</option>
+                        <option value="641">British Indian Ocean Territory</option>
+                        <option value="267">Brunei Darussalam</option>
+                        <option value="268">Bulgaria</option>
+                        <option value="269">Burkina Faso</option>
+                        <option value="270">Burundi</option>
+                        <option value="271">Cambodia</option>
+                        <option value="272">Cameroon</option>
+                        <option value="88">Canada</option>
+                        <option value="273">Cape Verde</option>
+                        <option value="121">Cayman Islands</option>
+                        <option value="274">Central African Republic</option>
+                        <option value="275">Chad</option>
+                        <option value="76">Chile</option>
+                        <option value="6">China</option>
+                        <option value="276">Christmas Island</option>
+                        <option value="277">Cocos (Keeling) Islands</option>
+                        <option value="77">Colombia</option>
+                        <option value="278">Comoros</option>
+                        <option value="279">Congo</option>
+                        <option value="401">Congo, The Democratic Republic of The</option>
+                        <option value="280">Cook Islands</option>
+                        <option value="78">Costa Rica</option>
+                        <option value="442">Cote d'Ivoire</option>
+                        <option value="281">Croatia</option>
+                        <option value="282">Cuba</option>
+                        <option value="742">Curacao</option>
+                        <option value="245">Cyprus</option>
+                        <option value="32">Czech Republic</option>
+                        <option value="33">Denmark</option>
+                        <option value="283">Djibouti</option>
+                        <option value="284">Dominica</option>
+                        <option value="80">Dominican Republic</option>
+                        <option value="286">Ecuador</option>
+                        <option value="287">Egypt</option>
+                        <option value="104">El Salvador</option>
+                        <option value="288">Equatorial Guinea</option>
+                        <option value="289">Eritrea</option>
+                        <option value="34">Estonia</option>
+                        <option value="290">Ethiopia</option>
+                        <option value="291">Falkland Islands (Malvinas)</option>
+                        <option value="292">Faroe Islands</option>
+                        <option value="293">Fiji</option>
+                        <option value="35">Finland</option>
+                        <option value="36">France</option>
+                        <option value="296">French Guiana</option>
+                        <option value="297">French Polynesia</option>
+                        <option value="443">French Southern Territories</option>
+                        <option value="299">Gabon</option>
+                        <option value="300">Gambia</option>
+                        <option value="301">Georgia</option>
+                        <option value="37">Germany</option>
+                        <option value="302">Ghana</option>
+                        <option value="38">Gibraltar</option>
+                        <option value="39">Greece</option>
+                        <option value="303">Greenland</option>
+                        <option value="304">Grenada</option>
+                        <option value="305">Guadeloupe</option>
+                        <option value="8">Guam</option>
+                        <option value="306">Guatemala</option>
+                        <option value="622">Guernsey</option>
+                        <option value="307">Guinea</option>
+                        <option value="308">Guinea-Bissau</option>
+                        <option value="309">Guyana</option>
+                        <option value="310">Haiti</option>
+                        <option value="311">Heard Island and McDonald Islands</option>
+                        <option value="208">Holy See (Vatican City State)</option>
+                        <option value="105">Honduras</option>
+                        <option value="9">Hong Kong</option>
+                        <option value="40">Hungary</option>
+                        <option value="312">Iceland</option>
+                        <option value="10">India</option>
+                        <option value="11">Indonesia</option>
+                        <option value="313">Iran, Islamic Republic of</option>
+                        <option value="314">Iraq</option>
+                        <option value="141">Ireland</option>
+                        <option value="623">Isle of Man</option>
+                        <option value="12">Israel</option>
+                        <option value="42">Italy</option>
+                        <option value="81">Jamaica</option>
+                        <option value="13">Japan</option>
+                        <option value="624">Jersey</option>
+                        <option value="315">Jordan</option>
+                        <option value="316">Kazakhstan</option>
+                        <option value="14">Kenya</option>
+                        <option value="317">Kiribati</option>
+                        <option value="318">Korea, Democratic People's Republic of</option>
+                        <option value="15">Korea, Republic of</option>
+                        <option value="319">Kuwait</option>
+                        <option value="320">Kyrgyzstan</option>
+                        <option value="461">Lao People's Democratic Republic</option>
+                        <option value="321">Latvia</option>
+                        <option value="16">Lebanon</option>
+                        <option value="322">Lesotho</option>
+                        <option value="323">Liberia</option>
+                        <option value="324">Libya</option>
+                        <option value="204">Liechtenstein</option>
+                        <option value="325">Lithuania</option>
+                        <option value="44">Luxembourg</option>
+                        <option value="326">Macao</option>
+                        <option value="294">Macedonia</option>
+                        <option value="327">Madagascar</option>
+                        <option value="328">Malawi</option>
+                        <option value="17">Malaysia</option>
+                        <option value="329">Maldives</option>
+                        <option value="330">Mali</option>
+                        <option value="331">Malta</option>
+                        <option value="332">Marshall Islands</option>
+                        <option value="333">Martinique</option>
+                        <option value="334">Mauritania</option>
+                        <option value="335">Mauritius</option>
+                        <option value="336">Mayotte</option>
+                        <option value="82">Mexico</option>
+                        <option value="337">Micronesia, Federated States of</option>
+                        <option value="338">Moldova, Republic of</option>
+                        <option value="206">Monaco</option>
+                        <option value="339">Mongolia</option>
+                        <option value="662">Montenegro</option>
+                        <option value="340">Montserrat</option>
+                        <option value="341">Morocco</option>
+                        <option value="342">Mozambique</option>
+                        <option value="343">Myanmar</option>
+                        <option value="344">Namibia</option>
+                        <option value="345">Nauru</option>
+                        <option value="346">Nepal</option>
+                        <option value="46">Netherlands</option>
+                        <option value="70">Netherlands Antilles</option>
+                        <option value="347">New Caledonia</option>
+                        <option value="18">New Zealand</option>
+                        <option value="221">Nicaragua</option>
+                        <option value="348">Niger</option>
+                        <option value="349">Nigeria</option>
+                        <option value="350">Niue</option>
+                        <option value="351">Norfolk Island</option>
+                        <option value="205">Northern Mariana Islands</option>
+                        <option value="47">Norway</option>
+                        <option value="161">Oman</option>
+                        <option value="353">Pakistan</option>
+                        <option value="354">Palau</option>
+                        <option value="625">Palestine, State Of</option>
+                        <option value="84">Panama</option>
+                        <option value="355">Papua New Guinea</option>
+                        <option value="356">Paraguay</option>
+                        <option value="357">Peru</option>
+                        <option value="20">Philippines</option>
+                        <option value="358">Pitcairn</option>
+                        <option value="50">Poland</option>
+                        <option value="58">Portugal</option>
+                        <option value="106">Puerto Rico</option>
+                        <option value="359">Qatar</option>
+                        <option value="681">Reunion</option>
+                        <option value="59">Romania</option>
+                        <option value="60">Russian Federation</option>
+                        <option value="361">Rwanda</option>
+                        <option value="743">Saint Barthelemy</option>
+                        <option value="362">Saint Helena</option>
+                        <option value="363">Saint Kitts and Nevis</option>
+                        <option value="364">Saint Lucia</option>
+                        <option value="744">Saint Martin (French Part)</option>
+                        <option value="365">Saint Pierre and Miquelon</option>
+                        <option value="375">Saint Vincent and the Grenadines</option>
+                        <option value="366">Samoa</option>
+                        <option value="207">San Marino</option>
+                        <option value="374">Sao Tome and Principe</option>
+                        <option value="367">Saudi Arabia</option>
+                        <option value="368">Senegal</option>
+                        <option value="661">Serbia</option>
+                        <option value="369">Seychelles</option>
+                        <option value="370">Sierra Leone</option>
+                        <option value="21">Singapore</option>
+                        <option value="745">Sint Maarten (Dutch Part)</option>
+                        <option value="62">Slovakia</option>
+                        <option value="371">Slovenia</option>
+                        <option value="372">Solomon Islands</option>
+                        <option value="373">Somalia</option>
+                        <option value="107">South Africa</option>
+                        <option value="376">South Georgia &amp; South Sandwich Islands</option>
+                        <option value="841">South Sudan</option>
+                        <option value="63">Spain</option>
+                        <option value="23">Sri Lanka</option>
+                        <option value="377">Sudan</option>
+                        <option value="378">Suriname</option>
+                        <option value="379">Svalbard and Jan Mayen</option>
+                        <option value="380">Swaziland</option>
+                        <option value="64">Sweden</option>
+                        <option value="65">Switzerland</option>
+                        <option value="381">Syrian Arab Republic</option>
+                        <option value="24">Taiwan</option>
+                        <option value="382">Tajikistan</option>
+                        <option value="383">Tanzania, United Republic of</option>
+                        <option value="25">Thailand</option>
+                        <option value="285">Timor-Leste</option>
+                        <option value="384">Togo</option>
+                        <option value="385">Tokelau</option>
+                        <option value="386">Tonga</option>
+                        <option value="242">Trinidad and Tobago</option>
+                        <option value="387">Tunisia</option>
+                        <option value="26">Turkey</option>
+                        <option value="388">Turkmenistan</option>
+                        <option value="389">Turks and Caicos Islands</option>
+                        <option value="390">Tuvalu</option>
+                        <option value="392">Uganda</option>
+                        <option value="393">Ukraine</option>
+                        <option value="246">United Arab Emirates</option>
+                        <option value="67">United Kingdom</option>
+                        <option value="89">United States</option>
+                        <option value="701">United States Minor Outlying Islands</option>
+                        <option value="241">Uruguay</option>
+                        <option value="394">Uzbekistan</option>
+                        <option value="395">Vanuatu</option>
+                        <option value="87">Venezuela</option>
+                        <option value="101">Viet Nam</option>
+                        <option value="396">Virgin Islands, British</option>
+                        <option value="102">Virgin Islands, U.S.</option>
+                        <option value="397">Wallis and Futuna</option>
+                        <option value="398">Western Sahara</option>
+                        <option value="399">Yemen</option>
+                        <option value="402">Zambia</option>
+                        <option value="403">Zimbabwe</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="PartnerId">
+                        Service Type&nbsp;<span style="color: Red">*</span></label>
+                </td>
+                <td>
+                    <select name="lstServiceType" class="clsddlProducttype">
+                        <option selected value="5">BT Bandwidth Services<option value="6">BT Ethernet Services<option
+                            value="3">BT IP Services<option value="2">BT Managed Data Services<option value="1">
+                                BT Managed Voice Services<option value="4">Other Services</option>
+                    </select>
+                </td>
+                <td>
+                    <label class="control-label" for="ResiliencyId">
+                        Product Level&nbsp;<span style="color: Red">*</span>
+                    </label>
+                </td>
+                <td>
+                    <select name="lstProductLevel" class="clsddlProducttype">
+                        <option value="3">City<option value="2">Country<option selected value="4">POP<option
+                            value="1">Region</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="PrimaryAccessId">
+                        Abbreviation&nbsp;<span style="color: Red">*</span>
+                    </label>
+                </td>
+                <td>
+                    <input title="Don’t use spaces" class="form-control" maxlength="10" size="15" value="PRLN"
+                        name="txtProductAbbr">
+                </td>
+                <td>
+                    <label class="control-label" for="SecondaryAccessId">
+                        Product Name&nbsp;<span style="color: Red">*</span>
+                    </label>
+                </td>
+                <td>
+                    <input class="form-control" style="width: 23em" name="txtProductName" value="BT Bandwidth Services"></input>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="PrimaryAccessId">
+                        Parent Product
+                    </label>
+                </td>
+                <td>
+                    <select id="lstParentProductId" name="lstParentProductId" class="clsddlProducttype">
+                        <option selected value="0">&nbsp;</option>
+                        <option value="25">Access</option>
+                        <option value="128">Assure Managed Devices</option>
+                        <option value="58">BT Bandwidth Services</option>
+                        <option value="62">BT Business Voice Select</option>
+                        <option value="31">BT Business Voice VoicePort</option>
+                        <option value="98">BT CCS Direct</option>
+                        <option value="63">BT CPE</option>
+                        <option value="15">BT Contact Centre Service</option>
+                        <option value="100">BT Etherflow Global</option>
+                        <option value="78">BT Finance Extranet</option>
+                        <option value="101">BT GS Portfolio Database</option>
+                        <option value="16">BT Generic Voice Information</option>
+                        <option value="32">BT IP Sec</option>
+                        <option value="11">BT Internet Access</option>
+                        <option value="108">BT Internet Connect Global</option>
+                        <option value="72">BT LAN SAN Extension Service</option>
+                        <option value="76">BT MPLS</option>
+                        <option value="126">BT Media and Broadcast</option>
+                        <option value="30">BT MessageScan</option>
+                        <option value="102">BT MobileXpress Mobile IPsec VPN</option>
+                        <option value="106">BT One Voice Ethernet</option>
+                        <option value="79">BT Onevoice</option>
+                        <option value="120">BT Onevoice MPLS</option>
+                        <option value="99">BT Onevoice TDM</option>
+                        <option value="75">BT iVPN</option>
+                        <option value="122">Connect Acceleration</option>
+                        <option value="125">Connect Intelligence</option>
+                        <option value="105">Connect Optimisation</option>
+                        <option value="96">DSL-HVPN Access</option>
+                        <option value="121">Etherflow Capability</option>
+                        <option value="123">IP Connect Web-VPN</option>
+                        <option value="124">Internet Connect Reach</option>
+                        <option value="130">MCU Test City Level Product</option>
+                        <option value="131">MCU Test Region Product</option>
+                        <option value="21">MPLS Capability</option>
+                        <option value="127">Radianz Ethernet</option>
+                        <option value="85">Special Bid</option>
+                        <option value="129">Special Bid ICG</option>
+                        <option value="97">TDM Voice</option>
+                    </select>
+                </td>
+                <td>
+                    <label class="control-label" for="SecondaryAccessId">
+                        Capman Platform(s)
+                    </label>
+                </td>
+                <td>
+                    <select multiple name="lstCapmanPlatformId" class="clsddlProducttype">
+                        <option value="21">ATM - Infonet</option>
+                        <option value="13">ATM - domestic</option>
+                        <option value="1">ATM - harmonized</option>
+                        <option selected value="0">Bandwidth</option>
+                        <option value="-13">Bandwidth - Radianz</option>
+                        <option value="30">Etherflow - harmonized</option>
+                        <option value="31">Etherflow - national</option>
+                        <option value="-38">Ethernet CFN</option>
+                        <option value="22">Frame Relay - Infonet</option>
+                        <option value="14">Frame Relay - domestic</option>
+                        <option value="2">Frame Relay - harmonized</option>
+                        <option value="23">IP Internet Access - Infonet</option>
+                        <option value="15">IP Internet Access - domestic</option>
+                        <option value="8">IP Internet Access - harmonized</option>
+                        <option value="470008">IP Internet Access - harmonized-BT Italy</option>
+                        <option value="208660008">IP Internet Access - harmonized-BTnet</option>
+                        <option value="5470008">IP Internet Access - harmonized-CenturyLink</option>
+                        <option value="6560008">IP Internet Access - harmonized-Level 3 LATAM</option>
+                        <option value="207850008">IP Internet Access - harmonized-Telstra</option>
+                        <option value="100">LAN Services</option>
+                        <option value="17">MPLS - Infonet</option>
+                        <option value="18">MPLS - UK iVPN</option>
+                        <option value="16">MPLS - domestic</option>
+                        <option value="3">MPLS - harmonized</option>
+                        <option value="32">Media &amp; Broadcast</option>
+                        <option value="33">Platform - MSE</option>
+                        <option value="34">Radianz Ethernet</option>
+                        <option value="103">SAN FC Services</option>
+                        <option value="24">Voice - Infonet</option>
+                        <option value="19">Voice - domestic</option>
+                        <option value="12">Voice - harmonized</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="PrimaryAccessId">
+                        Alias ID
+                    </label>
+                </td>
+                <td>
+                    <select name="lstProductAliasId" class="clsddlProducttype">
+                        <option value="0">None</option>
+                        <option value="25">Access</option>
+                        <option value="128">Assure Managed Devices</option>
+                        <option selected value="58">BT Bandwidth Services</option>
+                        <option value="62">BT Business Voice Select</option>
+                        <option value="31">BT Business Voice VoicePort</option>
+                        <option value="98">BT CCS Direct</option>
+                        <option value="63">BT CPE</option>
+                        <option value="15">BT Contact Centre Service</option>
+                        <option value="100">BT Etherflow Global</option>
+                        <option value="78">BT Finance Extranet</option>
+                        <option value="101">BT GS Portfolio Database</option>
+                        <option value="16">BT Generic Voice Information</option>
+                        <option value="32">BT IP Sec</option>
+                        <option value="11">BT Internet Access</option>
+                        <option value="108">BT Internet Connect Global</option>
+                        <option value="72">BT LAN SAN Extension Service</option>
+                        <option value="76">BT MPLS</option>
+                        <option value="126">BT Media and Broadcast</option>
+                        <option value="30">BT MessageScan</option>
+                        <option value="102">BT MobileXpress Mobile IPsec VPN</option>
+                        <option value="106">BT One Voice Ethernet</option>
+                        <option value="79">BT Onevoice</option>
+                        <option value="120">BT Onevoice MPLS</option>
+                        <option value="99">BT Onevoice TDM</option>
+                        <option value="75">BT iVPN</option>
+                        <option value="122">Connect Acceleration</option>
+                        <option value="125">Connect Intelligence</option>
+                        <option value="105">Connect Optimisation</option>
+                        <option value="96">DSL-HVPN Access</option>
+                        <option value="121">Etherflow Capability</option>
+                        <option value="123">IP Connect Web-VPN</option>
+                        <option value="124">Internet Connect Reach</option>
+                        <option value="130">MCU Test City Level Product</option>
+                        <option value="131">MCU Test Region Product</option>
+                        <option value="21">MPLS Capability</option>
+                        <option value="127">Radianz Ethernet</option>
+                        <option value="85">Special Bid</option>
+                        <option value="129">Special Bid ICG</option>
+                        <option value="97">TDM Voice</option>
+                    </select>
+                </td>
+                <td>
+                    <label class="control-label" for="SecondaryAccessId">
+                        Valid
+                    </label>
+                </td>
+                <td style="padding: 1em">
+                    <input checked type="checkbox" value="" name="chkProductValidCd">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="SecondaryAccessId">
+                        Enable Product</label>
+                </td>
+                <td style="padding-left: 3em">
+                    <input id="chkUseCPEFlag" type="checkbox" value="" name="chkUseCPEFlag">
+                </td>
+                <td style="padding-left: 6em">
+                    <label class="control-label" for="PrimaryAccessId">
+                        Parent Port Speed are Valid
+                    </label>
+                </td>
+                <td style="padding: 1em">
+                    <input id="Checkbox2" type="checkbox" value="" name="chkUseCPEFlag">&nbsp;&nbsp;(This
+                    product does not have a parent product)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="SecondaryAccessId">
+                        Enable PoP Characteristics</label>
+                </td>
+                <td style="padding-left: 3em">
+                    <input id="Checkbox1" type="checkbox" value="" name="chkUseCPEFlag">
+                </td>
+                <td style="padding-left: 6em">
+                    <label class="control-label" for="PrimaryAccessId">
+                        Enable for End-Users
+                    </label>
+                </td>
+                <td style="padding: 1em">
+                    <input id="Checkbox3" type="checkbox" value="" name="chkUseCPEFlag">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="SecondaryAccessId">
+                        Enable Lead Time</label>
+                </td>
+                <td>
+                    <input id="Checkbox4" type="checkbox" value="" name="chkUseCPEFlag">
+                </td>
+                <td>
+                    <label class="control-label" for="PrimaryAccessId">
+                        Enforce Access Method
+                    </label>
+                </td>
+                <td>
+                    <input id="Checkbox5" type="checkbox" value="" name="chkUseCPEFlag">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="SecondaryAccessId">
+                        Enable EFM
+                    </label>
+                </td>
+                <td style="padding-left: 3em">
+                    <input id="Checkbox6" type="checkbox" value="" name="chkUseCPEFlag">
+                </td>
+                <td style="padding-left: 10em">
+                    <label class="control-label" for="PrimaryAccessId">
+                        Ethernet Phase Attribute(s)
+                    </label>
+                </td>
+                <td>
+                    <select id="AvailablePhaseAttributes" class="clsddlProducttype" multiple name="AvailablePhaseAttributes">
+                        <option value="23">1a</option>
+                        <option value="41">1aGe</option>
+                        <option value="24">2b</option>
+                        <option value="25">2bE</option>
+                        <option value="42">2bGe</option>
+                        <option value="26">BTIA</option>
+                        <option value="22">EUKA</option>
+                        <option value="27">NNI</option>
+                        <option value="1">None</option>
+                        <option value="2">UK 21C</option>
+                        <option value="21">UK WES</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="SecondaryAccessId">
+                        Enable FlexiPort</label>
+                </td>
+                <td style="padding-left: 3em">
+                    <input id="Checkbox8" type="checkbox" value="" name="chkUseCPEFlag">
+                </td>
+                <td style="padding-left: 10em">
+                    <label class="control-label" for="PrimaryAccessId">
+                        Enable Platform-Resiliency Mapping
+                    </label>
+                </td>
+                <td style="padding: 1em">
+                    <input id="Checkbox9" type="checkbox" value="" name="chkUseCPEFlag">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <table>
+        <thead>
+            <tr>
+                <!-- Added by Akshita for Access-Interface CR -->
+                <th>
+                    Access Speed(s)
+                </th>
+                <th>
+                    Available Interface(s)
+                </th>
+                <th>
+                </th>
+                <th>
+                    Preferred Interface(s)
+                </th>
+                <th>
+                </th>
+                <th>
+                    Optional Interface(s)
+                </th>
+                <!--Addition ends-->
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select id="allAccessSpeeds" class="appSubNav" multiple size="9" name="allAccessSpeeds" style="width:174px">
+                        <option value="155321">0Mbps</option>
+                        <option value="158355">1Kbps</option>
+                        <option value="173284">1.5Kbps</option>
+                        <option value="147017">1.8Kbps</option>
+                        <option value="8319">5Kbps</option>
+                        <option value="5508">16Kbps</option>
+                        <option value="147020">25Kbps</option>
+                        <option value="5509">32Kbps</option>
+                        <option value="147015">54Kbps</option>
+                        <option value="44">56Kbps</option>
+                        <option value="47">64Kbps</option>
+                        <option value="147009">99Kbps</option>
+                        <option value="48">128Kbps</option>
+                        <option value="14179">144Kbps</option>
+                        <option value="147021">160Kbps</option>
+                        <option value="49">192Kbps</option>
+                        <option value="147024">247Kbps</option>
+                        <option value="50">256Kbps</option>
+                        <option value="14188">272Kbps</option>
+                        <option value="22060">300Kbps</option>
+                        <option value="14189">320Kbps</option>
+                        <option value="52">384Kbps</option>
+                        <option value="22069">400Kbps</option>
+                        <option value="137292">448Kbps</option>
+                        <option value="166943">0.5Mbps</option>
+                        <option value="55">512Kbps</option>
+                        <option value="14190">576Kbps</option>
+                        <option value="57">640Kbps</option>
+                        <option value="147010">700Kbps</option>
+                        <option value="137294">704Kbps</option>
+                        <option value="147018">756Kbps</option>
+                        <option value="59">768Kbps</option>
+                        <option value="147006">786Kbps</option>
+                        <option value="22066">800Kbps</option>
+                        <option value="173282">864Kbps</option>
+                        <option value="147028">869Kbps</option>
+                        <option value="147007">896Kbps</option>
+                        <option value="173283">900Kbps</option>
+                        <option value="23272">1Mbps</option>
+                        <option value="166944">1000Kbps</option>
+                        <option value="63">1024Kbps</option>
+                        <option value="166952">1.1Mbps</option>
+                        <option value="14184">1100Kbps</option>
+                        <option value="14180">1131Kbps</option>
+                        <option value="14186">1152Kbps</option>
+                        <option value="173285">1190Kbps</option>
+                        <option value="23270">1.2Mbps</option>
+                        <option value="14176">1216Kbps</option>
+                        <option value="14181">1280Kbps</option>
+                        <option value="23271">1.5Mbps</option>
+                        <option value="173286">1500Kbps</option>
+                        <option value="6221">1536 (T1)Kbps</option>
+                        <option value="71">1536Kbps</option>
+                        <option value="53971">1544 (T1)Kbps</option>
+                        <option value="173288">1574Kbps</option>
+                        <option value="147011">1.7Mbps</option>
+                        <option value="173287">1750Kbps</option>
+                        <option value="69435">1.8Mbps</option>
+                        <option value="5740">1920 (E1)Kbps</option>
+                        <option value="78">1984 (E1)Kbps</option>
+                        <option value="189389">2000Kbps</option>
+                        <option value="3158">2Mbps</option>
+                        <option value="4861">2048 (E1)Kbps</option>
+                        <option value="166950">2048Kbps</option>
+                        <option value="14192">2200Kbps</option>
+                        <option value="14177">2261Kbps</option>
+                        <option value="55418">2.3Mbps</option>
+                        <option value="66867">2304Kbps</option>
+                        <option value="14193">2312Kbps</option>
+                        <option value="120967">2464Kbps</option>
+                        <option value="23267">2.5Mbps</option>
+                        <option value="189388">2.7Mbps</option>
+                        <option value="166948">3000Kbps</option>
+                        <option value="22061">3Mbps</option>
+                        <option value="14178">3Kbps</option>
+                        <option value="14185">3008Kbps</option>
+                        <option value="182097">3072Kbps</option>
+                        <option value="7146">1536 (2 x T1)Kbps</option>
+                        <option value="5477">3.1 (T1C)Kbps</option>
+                        <option value="166953">3.1Mbps</option>
+                        <option value="182099">3500Kbps</option>
+                        <option value="23268">3.5Mbps</option>
+                        <option value="23265">3.6Mbps</option>
+                        <option value="7147">1920 (2 x E1)Kbps</option>
+                        <option value="7132">1984 (2 x E1)Kbps</option>
+                        <option value="166949">4000Kbps</option>
+                        <option value="4862">4Mbps</option>
+                        <option value="14182">4096Kbps</option>
+                        <option value="7140">2048 (2 x E1)Kbps</option>
+                        <option value="20264">4400Kbps</option>
+                        <option value="31900">4.5Mbps</option>
+                        <option value="55420">4.6Mbps</option>
+                        <option value="7131">1536 (3 x T1)Kbps</option>
+                        <option value="120964">4608Kbps</option>
+                        <option value="182098">5000Kbps</option>
+                        <option value="22068">5Mbps</option>
+                        <option value="18084">5Kbps</option>
+                        <option value="120966">5120Kbps</option>
+                        <option value="137293">5.6Mbps</option>
+                        <option value="147027">5.7Mbps</option>
+                        <option value="7143">1920 (3 x E1)Kbps</option>
+                        <option value="173289">5.8Mbps</option>
+                        <option value="7150">1984 (3 x E1)Kbps</option>
+                        <option value="166941">6000Kbps</option>
+                        <option value="4863">6Mbps</option>
+                        <option value="17068">6016Kbps</option>
+                        <option value="14191">6144Kbps</option>
+                        <option value="7137">1536 (4 x T1)Kbps</option>
+                        <option value="7135">2048 (3 x E1)Kbps</option>
+                        <option value="22062">7Mbps</option>
+                        <option value="91463">7168Kbps</option>
+                        <option value="23269">7.2Mbps</option>
+                        <option value="147872">7296Kbps</option>
+                        <option value="147022">7.3Mbps</option>
+                        <option value="23266">7.5Mbps</option>
+                        <option value="55416">7.6Mbps</option>
+                        <option value="7149">1920 (4 x E1)Kbps</option>
+                        <option value="7139">1536 (5 x T1)Kbps</option>
+                        <option value="7134">1984 (4 x E1)Kbps</option>
+                        <option value="4864">8Mbps</option>
+                        <option value="166947">8000Kbps</option>
+                        <option value="7141">2048 (4 x E1)Kbps</option>
+                        <option value="14183">8192Kbps</option>
+                        <option value="63380">8.5Mbps</option>
+                        <option value="39310">9Mbps</option>
+                        <option value="7142">1536 (6 x T1)Kbps</option>
+                        <option value="14187">9216Kbps</option>
+                        <option value="7144">1920 (5 x E1)Kbps</option>
+                        <option value="7133">1984 (5 x E1)Kbps</option>
+                        <option value="4407">10Mbps</option>
+                        <option value="147870">10000Kbps</option>
+                        <option value="7136">2048 (5 x E1)Kbps</option>
+                        <option value="55417">10.5Mbps</option>
+                        <option value="119467">1536 (7 x T1)Kbps</option>
+                        <option value="107986">11Mbps</option>
+                        <option value="147019">11.4Mbps</option>
+                        <option value="7145">1920 (6 x E1)Kbps</option>
+                        <option value="7148">1984 (6 x E1)Kbps</option>
+                        <option value="22070">12Mbps</option>
+                        <option value="119466">1536 (8 x T1)Kbps</option>
+                        <option value="7138">2048 (6 x E1)Kbps</option>
+                        <option value="69434">13Mbps</option>
+                        <option value="39309">14Mbps</option>
+                        <option value="32380">14.4Mbps</option>
+                        <option value="32381">14.5Mbps</option>
+                        <option value="22064">15Mbps</option>
+                        <option value="189391">16000Kbps</option>
+                        <option value="22071">16Mbps</option>
+                        <option value="166945">17Mbps</option>
+                        <option value="147025">17.1Mbps</option>
+                        <option value="120965">17728Kbps</option>
+                        <option value="22063">18Mbps</option>
+                        <option value="147012">18.5Mbps</option>
+                        <option value="68377">19Mbps</option>
+                        <option value="8318">20Mbps</option>
+                        <option value="147871">20000Kbps</option>
+                        <option value="56830">21.6Mbps</option>
+                        <option value="39308">22Mbps</option>
+                        <option value="147026">22.8Mbps</option>
+                        <option value="155323">23Mbps</option>
+                        <option value="22072">24Mbps</option>
+                        <option value="189390">24000Kbps</option>
+                        <option value="22065">25Mbps</option>
+                        <option value="22067">256Mbps</option>
+                        <option value="55419">26Mbps</option>
+                        <option value="182096">30000Kbps</option>
+                        <option value="8321">30Mbps</option>
+                        <option value="82839">32Mbps</option>
+                        <option value="127328">33Mbps</option>
+                        <option value="68379">34Mbps</option>
+                        <option value="45">34 (E3)Mbps</option>
+                        <option value="26961">35Mbps</option>
+                        <option value="47020">36Mbps</option>
+                        <option value="8322">40Mbps</option>
+                        <option value="26965">45Mbps</option>
+                        <option value="48081">46Mbps</option>
+                        <option value="1810">45 (T3)Mbps</option>
+                        <option value="48082">47Mbps</option>
+                        <option value="86660">48Mbps</option>
+                        <option value="4865">50Mbps</option>
+                        <option value="155322">51Mbps</option>
+                        <option value="5478">52 (OC-1)Mbps</option>
+                        <option value="147016">55Mbps</option>
+                        <option value="22073">60Mbps</option>
+                        <option value="147013">65Mbps</option>
+                        <option value="47019">66Mbps</option>
+                        <option value="8701">34 (E3) (2 x E3)Mbps</option>
+                        <option value="135341">68Mbps</option>
+                        <option value="8316">70Mbps</option>
+                        <option value="26962">75Mbps</option>
+                        <option value="26964">80Mbps</option>
+                        <option value="147008">82Mbps</option>
+                        <option value="8901">45 (T3) (2 x T3)Mbps</option>
+                        <option value="26966">90Mbps</option>
+                        <option value="4408">100Mbps</option>
+                        <option value="189387">100000Kbps</option>
+                        <option value="158360">101Mbps</option>
+                        <option value="189386">115Mbps</option>
+                        <option value="70762">120Mbps</option>
+                        <option value="166942">130Mbps</option>
+                        <option value="135342">136Mbps</option>
+                        <option value="5476">140Mbps</option>
+                        <option value="4866">150Mbps</option>
+                        <option value="1741">155 (STM-1)Mbps</option>
+                        <option value="7341">155Mbps</option>
+                        <option value="6365">155 (OC-3)Mbps</option>
+                        <option value="147014">160Mbps</option>
+                        <option value="158361">170Mbps</option>
+                        <option value="158359">180Mbps</option>
+                        <option value="8317">200Mbps</option>
+                        <option value="158356">240Mbps</option>
+                        <option value="26970">250Mbps</option>
+                        <option value="158358">270Mbps</option>
+                        <option value="5479">274Mbps</option>
+                        <option value="4867">300Mbps</option>
+                        <option value="147023">320Mbps</option>
+                        <option value="189385">325Mbps</option>
+                        <option value="158357">330Mbps</option>
+                        <option value="26969">350Mbps</option>
+                        <option value="8320">400Mbps</option>
+                        <option value="26971">450Mbps</option>
+                        <option value="8323">500Mbps</option>
+                        <option value="166946">512Mbps</option>
+                        <option value="135343">560Mbps</option>
+                        <option value="4868">600Mbps</option>
+                        <option value="6203">622 (STM-4)Mbps</option>
+                        <option value="6202">622 (OC-12)Mbps</option>
+                        <option value="6201">622Mbps</option>
+                        <option value="26967">700Mbps</option>
+                        <option value="135344">750Mbps</option>
+                        <option value="26963">800Mbps</option>
+                        <option value="26968">900Mbps</option>
+                        <option value="5480">1Gbps</option>
+                        <option value="166951">1000Mbps</option>
+                        <option value="5475">1.25Gbps</option>
+                        <option value="180277">1.5Gbps</option>
+                        <option value="68378">1500Mbps</option>
+                        <option value="57914">2Gbps</option>
+                        <option value="166954">2.5Gbps</option>
+                        <option value="6042">2.5 (STM-16)Gbps</option>
+                        <option value="5473">2.5 (OC-48)Gbps</option>
+                        <option value="57919">3Gbps</option>
+                        <option value="57917">4Gbps</option>
+                        <option value="57912">5Gbps</option>
+                        <option value="57918">6Gbps</option>
+                        <option value="57915">7Gbps</option>
+                        <option value="57916">8Gbps</option>
+                        <option value="57913">9Gbps</option>
+                        <option value="37487">10Gbps</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="AvailableInterfaces" class="appSubNav" multiple size="9" name="AvailableInterfaces">
+                        <option value="59970">1000Base-BX10 // None (Clear) // LC (SFP)</option>
+                        <option value="53969">1000Base-BX10 // None (Clear) // SC series</option>
+                        <option value="69180">1000Base-BX40 &amp; 1000Base-BX40 // None (Clear) // LC (SFP)</option>
+                        <option value="59969">1000Base-BX40 // None (Clear) // LC (SFP)</option>
+                        <option value="53968">1000Base-BX40 // None (Clear) // SC series</option>
+                        <option value="124669">1000Base-EX // None (Clear) // LC (SFP)</option>
+                        <option value="6126">1000Base-LX // None (Clear) // FC/PC</option>
+                        <option value="6125">1000Base-LX // None (Clear) // LC (SFP)</option>
+                        <option value="6133">1000Base-LX // None (Clear) // SC series</option>
+                        <option value="177045">1000Base-LX // RBE // LC (SFP)</option>
+                        <option value="6132">1000Base-SX // None (Clear) // FC/PC</option>
+                        <option value="6128">1000Base-SX // None (Clear) // LC (SFP)</option>
+                        <option value="6127">1000Base-SX // None (Clear) // SC series</option>
+                        <option value="5723">1000Base-T // None (Clear) // RJ45</option>
+                        <option value="5724">1000Base-T // None (Clear) // SC series</option>
+                        <option value="22057">1000Base-T // RBE // RJ45</option>
+                        <option value="59971">1000Base-ZX80 // None (Clear) // LC (SFP)</option>
+                        <option value="53966">1000Base-ZX80 // None (Clear) // SC series</option>
+                        <option value="6130">100Base-FX // None (Clear) // FC/PC</option>
+                        <option value="6131">100Base-FX // None (Clear) // LC (SFP)</option>
+                        <option value="6129">100Base-FX // None (Clear) // SC series</option>
+                        <option value="182095">100Base-T // IPoE // RJ45</option>
+                        <option value="5725">100Base-T // None (Clear) // RJ45</option>
+                        <option value="98062">100Base-T // None (Clear) // SC series</option>
+                        <option value="180886">100Base-T // PPPoA // RJ45</option>
+                        <option value="189364">100Base-T // PPPoE // RJ45</option>
+                        <option value="22058">100Base-T // RBE // RJ45</option>
+                        <option value="147867">10Base-T // IPoE // RJ11</option>
+                        <option value="5726">10Base-T // None (Clear) // RJ45</option>
+                        <option value="98061">10Base-T // None (Clear) // SC series</option>
+                        <option value="14170">10Base-T // PPPoE // RJ45</option>
+                        <option value="14175">10Base-T // RBE // RJ45</option>
+                        <option value="37485">10GBase-ER // None (Clear) // FC/PC</option>
+                        <option value="37481">10GBase-ER // None (Clear) // LC (SFP)</option>
+                        <option value="37478">10GBase-ER // None (Clear) // LC (XFP)</option>
+                        <option value="37475">10GBase-ER // None (Clear) // SC series</option>
+                        <option value="37484">10GBase-LR // None (Clear) // FC/PC</option>
+                        <option value="37473">10GBase-LR // None (Clear) // LC (SFP)</option>
+                        <option value="37477">10GBase-LR // None (Clear) // LC (XFP)</option>
+                        <option value="37476">10GBase-LR // None (Clear) // SC series</option>
+                        <option value="37474">10GBase-SR // None (Clear) // FC/PC</option>
+                        <option value="37482">10GBase-SR // None (Clear) // LC (SFP)</option>
+                        <option value="37483">10GBase-SR // None (Clear) // LC (XFP)</option>
+                        <option value="37479">10GBase-SR // None (Clear) // SC series</option>
+                        <option value="37480">10GBase-T // None (Clear) // RJ45</option>
+                        <option value="53970">ANSI T1.403 // None (Clear) // BNC</option>
+                        <option value="53967">ANSI T1.403 // None (Clear) // RJ48</option>
+                        <option value="5282">ANSI T1.403 // T1 ESF framing // BNC</option>
+                        <option value="5283">ANSI T1.403 // T1 ESF framing // RJ45</option>
+                        <option value="5284">ANSI T1.403 // T1 ESF framing // RJ48</option>
+                        <option value="14169">DSL wires only // AAL5SNAP // RJ11</option>
+                        <option value="147868">DSL wires only // IPoE // RJ11</option>
+                        <option value="14171">DSL wires only // PPPoA // RJ11</option>
+                        <option value="14168">DSL wires only // PPPoA // RJ45</option>
+                        <option value="189365">DSL wires only // PPPoE // ADSL o PSTN</option>
+                        <option value="14172">DSL wires only // PPPoE // RJ11</option>
+                        <option value="14167">DSL wires only // PPPoE // RJ45</option>
+                        <option value="14173">DSL wires only // PPPoEoA // RJ11</option>
+                        <option value="17066">DSL wires only // PPPoEoA // RJ45</option>
+                        <option value="14174">DSL wires only // RBE // RJ11</option>
+                        <option value="5288">ET Interface // not specified // RJ45</option>
+                        <option value="5287">FE Interface // not specified // RJ45</option>
+                        <option value="5289">G.703 - 120 Ohm // G.704 // RJ45</option>
+                        <option value="5290">G.703 - 120 Ohm // G.704 // RJ48</option>
+                        <option value="5291">G.703 - 120 Ohm // G.704 // Twisted Pair</option>
+                        <option value="15065">G.703 - 120 Ohm // None (Clear) // RJ11</option>
+                        <option value="5727">G.703 - 120 Ohm // None (Clear) // RJ45</option>
+                        <option value="5728">G.703 - 120 Ohm // None (Clear) // RJ48</option>
+                        <option value="5292">G.703 - 120 Ohms // not specified // RJ45</option>
+                        <option value="5293">G.703 - 120 Ohms // not specified // RJ48</option>
+                        <option value="10426">G.703 - 75 Ohm // E3 G751 framing // BNC</option>
+                        <option value="10427">G.703 - 75 Ohm // E3 G751 framing // DIN 1.6/5.6 (Buschell)</option>
+                        <option value="11323">G.703 - 75 Ohm // E3 G751 framing // SMB</option>
+                        <option value="5294">G.703 - 75 Ohm // G.704 // BNC</option>
+                        <option value="5295">G.703 - 75 Ohm // G.704 // BT Type 43</option>
+                        <option value="7323">G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option value="5729">G.703 - 75 Ohm // None (Clear) // BNC</option>
+                        <option value="5730">G.703 - 75 Ohm // None (Clear) // BT Type 43</option>
+                        <option value="7322">G.703 - 75 Ohm // None (Clear) // DIN 1.6/5.6 (Buschell)</option>
+                        <option value="15064">G.703 - 75 Ohm // None (Clear) // RJ11</option>
+                        <option value="11322">G.703 - 75 Ohm // None (Clear) // SMB</option>
+                        <option value="10425">G.703 - 75 Ohm // T3 CBIT framing // BNC</option>
+                        <option value="10429">G.703 - 75 Ohm // T3 CBIT framing // DIN 1.6/5.6 (Buschell)</option>
+                        <option value="10428">G.703 - 75 Ohm // T3 M13 framing // BNC</option>
+                        <option value="10424">G.703 - 75 Ohm // T3 M13 framing // DIN 1.6/5.6 (Buschell)</option>
+                        <option value="5296">G.703 - 75 Ohm // not specified // BNC</option>
+                        <option value="5297">G.703 - 75 Ohm // not specified // BT Type 43</option>
+                        <option value="5733">G.957 SMF/IR (Optical) // None (Clear) // FC/PC</option>
+                        <option value="5731">G.957 SMF/IR (Optical) // None (Clear) // SC series</option>
+                        <option value="5732">G.957 SMF/IR (Optical) // None (Clear) // SC/APC</option>
+                        <option value="5300">G.957 SMF/IR (Optical) // not specified // FC/PC</option>
+                        <option value="5298">G.957 SMF/IR (Optical) // not specified // SC series</option>
+                        <option value="5299">G.957 SMF/IR (Optical) // not specified // SC/APC</option>
+                        <option value="5285">GE Interface // not specified // RJ45</option>
+                        <option value="5286">GE Interface // not specified // SC series</option>
+                        <option value="11578">Site Survey // Site Survey // Site Survey</option>
+                        <option value="5734">Twisted Pair // None (Clear) // not specified</option>
+                        <option value="5301">Twisted Pair // not specified // not specified</option>
+                        <option value="5735">V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option value="5302">V.35 // not specified // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option value="5736">X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option value="5303">X.21 // not specified // Sub-D-Connector (15 pin)</option>
+                        <option value="5737">X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option value="5304">X.24 // not specified // Sub-D-Connector (15 pin)</option>
+                        <option value="5738">not specified // None (Clear) // not specified</option>
+                        <option value="5305">not specified // not specified // not specified</option>
+                        <option value="8306">test 1 // PPPoE // test 3</option>
+                    </select>
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-sm"><span>Assign &gt;&gt;</span></a><br>
+                    <a class="btn btn-primary btn-sm"><span>&lt;&lt; De-Assign</span></a><br>
+                </td>
+                <td>
+                    <select id="PreferredInterfaces" class="appSubNav" multiple size="9" name="PreferredInterfaces" style="width:200px">
+                        <option>No Preferred Interfaces</option>
+                    </select>
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-sm"><span>Assign &gt;&gt;</span></a><br>
+                    <a class="btn btn-primary btn-sm"><span>&lt;&lt; De-Assign</span></a><br>
+                </td>
+                <td>
+                    <select id="OptionalInterfaces" class="appSubNav" multiple size="9" name="OptionalInterfaces" style="width:200px">
+                        <option>No Optional Interfaces</option>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div align="center" class="form-group col-md-12" style="margin-left: -3em">
+        <input class="btn btn-primary" type="button" value="Update" />&nbsp;&nbsp;
+        <input class="btn btn-primary" type="button" value="Reset" />
+    </div>
+    <table id="Mapping_Interfaces" align="left" border="1">
+        <thead>
+            <tr>
+                <th class="bodyTextBold" style="padding: 9px">
+                    <label>
+                        Select</label>
+                </th>
+                <th class="bodyTextBold" width="100" align="center">
+                    <label>
+                        Access Speed</label>
+                </th>
+                <th class="bodyTextBold" width="400" align="center">
+                    <label>
+                        Preferred Interfaces</label>
+                </th>
+                <th class="bodyTextBold" width="400" align="center">
+                    <label>
+                        Optional Interfaces</label>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <input onclick="AccessChecked(47);" type="checkbox" value="notchecked" name="47">
+                </td>
+                <td id="selectaccess" class="appSubNav" align="center">
+                    64Kbps
+                </td>
+                <td>
+                    <select id="select1" class="appSubNav" size="9" name="select1">
+                        <option>G.703 - 120 Ohm // G.704 // RJ45</option>
+                        <option selected>G.703 - 120 Ohm // G.704 // RJ48</option>
+                        <option>G.703 - 75 Ohm // G.704 // BNC</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>G.703 - 75 Ohm // G.704 // BNC</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>G.703 - 75 Ohm // G.704 // BNC</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="select3" class="appSubNav" size="9" multiple name="select3">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input onclick="AccessChecked(48);" type="checkbox" value="notchecked" name="48">
+                </td>
+                <td id="selectaccess" class="appSubNav" align="center">
+                    128Kbps
+                </td>
+                <td>
+                    <select id="select1" class="appSubNav" size="9" name="select1">
+                        <option>G.703 - 120 Ohm // G.704 // RJ45</option>
+                        <option>G.703 - 120 Ohm // G.704 // RJ48</option>
+                        <option>G.703 - 75 Ohm // G.704 // BNC</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="select3" class="appSubNav" size="9" multiple name="select3">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input onclick="AccessChecked(50);" type="checkbox" value="notchecked" name="50">
+                </td>
+                <td id="selectaccess" class="appSubNav" align="center">
+                    256Kbps
+                </td>
+                <td>
+                    <select id="select1" class="appSubNav" size="9" name="select1">
+                        <option>G.703 - 120 Ohm // G.704 // RJ45</option>
+                        <option>G.703 - 120 Ohm // G.704 // RJ48</option>
+                        <option>G.703 - 75 Ohm // G.704 // BNC</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="select3" class="appSubNav" size="9" multiple name="select3">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input onclick="AccessChecked(52);" type="checkbox" value="notchecked" name="52">
+                </td>
+                <td id="selectaccess" class="appSubNav" align="center">
+                    384Kbps
+                </td>
+                <td>
+                    <select id="select1" class="appSubNav" size="9" name="select1">
+                        <option>G.703 - 120 Ohm // G.704 // RJ45</option>
+                        <option>G.703 - 120 Ohm // G.704 // RJ48</option>
+                        <option>G.703 - 75 Ohm // G.704 // BNC</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>G.703 - 75 Ohm // G.704 // BNC</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>G.703 - 75 Ohm // G.704 // BNC</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="select3" class="appSubNav" size="9" multiple name="select3">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input onclick="AccessChecked(55);" type="checkbox" value="notchecked" name="55">
+                </td>
+                <td id="selectaccess" class="appSubNav" align="center">
+                    512Kbps
+                </td>
+                <td>
+                    <select id="select1" class="appSubNav" size="9" name="select1">
+                        <option>G.703 - 120 Ohm // G.704 // RJ45</option>
+                        <option>G.703 - 120 Ohm // G.704 // RJ48</option>
+                        <option>G.703 - 75 Ohm // G.704 // BNC</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>G.703 - 75 Ohm // G.704 // DIN 1.6/5.6 (Buschell)</option>
+                        <option>V.35 // None (Clear) // Winchester/MRAC/M34/34-way (V.35)</option>
+                        <option>X.21 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                        <option>X.24 // None (Clear) // Sub-D-Connector (15 pin)</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="select3" class="appSubNav" size="9" multiple name="select3">
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <div class="container">
+    </div>
+    <br />
+    <div align="center" class="form-group col-md-12" style="margin-left: -3em">
+        <input class="btn btn-primary" type="button" value="Update" />&nbsp;&nbsp;
+        <input class="btn btn-primary" type="button" value="Reset" />&nbsp;&nbsp;
+        <input class="btn btn-primary" type="button" value="Delete" />&nbsp;&nbsp;
+    </div>
+    <br />
+    <br />
+    <br />
+    <hr />
+    <table width="100%" border="0">
+        <tbody>
+            <tr>
+                <td class="bodyText">
+                    Created by
+                </td>
+                <td class="bodyText">
+                    Created Date
+                </td>
+                <td class="bodyText">
+                    Updated by
+                </td>
+                <td class="bodyText">
+                    Date Last Updated
+                </td>
+                <td class="bodyText">
+                    Interface updated by
+                </td>
+                <td class="bodyText">
+                    Interface updated on
+                </td>
+            </tr>
+            <tr>
+                <td class="bodyText">
+                    Ammann, Larry
+                </td>
+                <td class="bodyText">
+                    31-JUL-2003 06:55:53 &nbsp;GMT
+                </td>
+                <td class="bodyText">
+                    &nbsp;Awdry,Charles
+                </td>
+                <td class="bodyText">
+                    19-MAY-2014 10:33:59 &nbsp;GMT
+                </td>
+                <td class="bodyText">
+                    Awdry,Charles
+                </td>
+                <td class="bodyText">
+                    21-NOV-2013 13:11:04 &nbsp;GMT
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="container">
+    </div>
+</div>

@@ -1,0 +1,64 @@
+﻿//var app = angular.module("cpeLeadTimeModule", ['ui.bootstrap', 'ngRoute', 'ngResource']);
+
+app.factory('CPESupplier', function ($http) {
+    // debugger;
+    var CPESupplier = {};
+    CPESupplier.GetSuppliersData = function () {
+        return $http.post('CpeLeadTime.aspx/GetSuppliersData', {});
+    },
+
+    CPESupplier.BindSupplierData = function (supplierName) {
+        return $http.post('CpeLeadTime.aspx/BindSupplierData', { 'strSupplier': supplierName });
+    }
+
+    return CPESupplier;
+
+});
+
+app.controller("CpeLeadTime", function ($scope, $http, CPESupplier, $timeout) {
+    // debugger;
+    $(".pageLoaderOverlay").show();
+    //$scope.modsupplier = {};
+
+    CPESupplier.GetSuppliersData().success(function (data, status, headers, config) {
+        $scope.CpeSupplierData = data.d;
+        $scope.form = { modsupplier: $scope.CpeSupplierData[0].supplierId };
+
+        $scope.GetSuppliers(parseInt($scope.form.modsupplier));
+        $(".pageLoaderOverlay").hide();
+    })
+    .error(function (error) {
+        console.log("Problem occured while loading Supplier Data; " + error);
+        $(".pageLoaderOverlay").hide();
+    });
+
+
+    $scope.GetSuppliers = function (modsupplier) {
+        //debugger;
+        CPESupplier.BindSupplierData(modsupplier).success(function (data) {
+            var result = [];
+            $scope.bindSupplier = [];
+
+            for (var i = 0; i < data.d.length; i++) {
+                result.push({ countryname: data.d[i].countryName,
+                    manufacturerName: data.d[i].manufacturerName,
+                    cpeAvailability: data.d[i].cpeAvailability,
+                    leadTime: data.d[i].leadTime,
+                    leadTimeStatus: data.d[i].leadTimeStatus,
+                    endOfContractDate: data.d[i].endOfContractDate,
+                    endOfMigrationDate: data.d[i].endOfMigrationDate,
+                    cpeCeaseLeadTime: data.d[i].cpeCeaseLeadTime,
+                    cpeCeaseLeadTimeStatus: data.d[i].cpeCeaseLeadTimeStatus
+                });
+
+            }
+            $scope.bindSupplier = result;
+            //  alert(json.stringify($scope.cpesupplierdata));
+
+        })
+    .error(function (error) {
+        alert("Problem occured while loading Supplier Data; " + error);
+    });
+    }
+
+});

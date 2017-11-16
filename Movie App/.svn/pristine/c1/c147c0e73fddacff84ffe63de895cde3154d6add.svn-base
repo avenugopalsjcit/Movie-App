@@ -1,0 +1,361 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <div class="container">
+     <div class="row text-left Arrow" >
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                                Access Availability
+                            </h3>
+                        </div>
+                    </div>
+        <ul class="nav nav-tabs" >
+            <li class="active"><a data-toggle="tab" data-target="#divAccessReport">Access
+                Report</a> </li>
+            <li><a data-toggle="tab" class="Show_HVPN clickable1" data-target="#divProductReport">
+                Product Report</a> </li>
+        </ul>
+        <div class="tab-content clearfix ">
+            <div id="divAccessReport" class="tab-pane active">
+                <div ng-controller="CapmanAccessReportCtrl" class="container">
+                    
+                    <div class="row" style="padding-left: 10px">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="panel-body">
+                                <!--<h4 style="text-align:left">Notes Audit Information</h4>-->
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" for="" style="font-size: 11px;text-align:left;">
+                                            Country<span style="color:Red;"> *</span>
+                                        </label>
+                                        <div class="col-sm-3" id="countryAccessDiv">
+                                            <select id="Select1" ng-model="modCountryType" ng-change="GetCountries()" ng-options="item.CountryId as item.CountryName for item in CountriesType"  style="width: 90%;margin-left: -55px;">
+                                                <option value="">-- Please Select --</option>
+                                            </select>
+                                            <br />
+                                            <div ng-show="NoCountryData" role="alert" style="text-align:left;margin-left:-55px;" >
+                                               <p style="color:Red">Please select Country.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-show="HideSupplierData" class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" for="" style="font-size: 11px;text-align:left;">
+                                            Supplier(s)<span style="color:Red;"> *</span>
+                                        </label>
+                                        <div class="col-sm-3">
+                                            <select multiple  id="MultiSelect" ng-model="modSupplierType" ng-change="GetSuppliers()"
+                                                ng-options="item.SupplierId as item.SupplierName for item in SuppliersType" class="js-example-basic-single"  style="max-width:205px;margin-left: -55px;">
+                                                <!--<option value="">All</option>-->
+                                            </select>
+                                            <br />
+                                            <div ng-show="NoSuplierAcessData" role="alert" style="margin-left: -55px;">
+                                               <p style="color:Red">Please select any Supplier.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-show="HideAccessSpeedData" class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" for="" style="font-size: 11px;text-align:left;">
+                                            Access Speed(s)<span style="color:Red;"> *</span>
+                                        </label>
+                                        <div class="col-sm-3">
+                                            <select multiple id="Select3" ng-model="modAccessSpeed" ng-change="GetAccessSpeed()"
+                                                ng-options="item.AccessSpeedId as item.AccessSpeedValue for item in AccessSpeedType"
+                                                class="js-example-basic-single"  style="max-width:205px;margin-left: -55px;">
+                                                <!--<option value="">All</option>-->
+                                            </select>
+                                            <br />
+                                             <div ng-show="NoSpeedAcessData" role="alert" style="margin-left: -55px;">
+                                               <p style="color:Red">Please select any Access Speed.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-show="HideInterfaceData" class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" for="" style="font-size: 11px;text-align:left;">
+                                            Display Interface(s)<span style="color:Red;"> *</span>
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <select multiple id="Select4" ng-model="modDisplayInterface" ng-change="GetDisplayInterface()"
+                                                ng-options="item.InterfaceId as item.InterfaceType for item in DisplayInterfaceType"
+                                                class="js-example-basic-single"  style="max-width:250px;margin-left: -55px;">
+                                                <!--<option value="">All</option>-->
+                                            </select>
+                                            <br />
+                                             <div ng-show="NoInterfaceData" role="alert" style="margin-left: -55px;">
+                                            <p style="color:Red">Please select any Display Interface.</p>
+                                        </div>
+                                        </div>
+                                        
+                                        
+                                    </div>
+                                </div>
+
+              
+                                         <div class="col-sm-3" ng-show="ShowGoAccessButtons" style="margin-left:155px;">
+                                            <input type="button" value="Go" ng-click="GetAccessRecords()" class="" style="margin-left:-48px;"/>
+                                        </div>
+                                         <div class="col-sm-3" ng-show="showAccessExportDiv" style="padding-left: 0px;margin-left:-205px; ">
+                                         <input type="button" value="Download To Excel" ng-click="ExportCapmanReport()" class="" style="font-size:12px;position:relative;margin-left:-30px;" />
+                                        </div>
+                                <br /><br /><br />
+                                <div ng-show="AccessReportData">
+                                    <table ng-table="AccessReportTable" class="table table-striped table-bordered no-pager">
+                                        <tr ng-repeat="accessReport in $data">
+                                            <!--<td title="'Country'" class="Arrow">
+                                                {{accessReport.Country}}
+                                            </td>-->
+                                            <td title="'City - PoP'" filter="{ CityPop: 'text'}" sortable="'CityPop'">
+                                                {{accessReport.CityPop}}
+                                            </td>
+                                             <td title="'Supplier'" filter="{ Supplier: 'text'}" sortable="'Supplier'">
+                                                        {{accessReport.Supplier}}
+                                                    </td>
+                                            <td title="'Speeds'" filter="{ Speed: 'text'}" sortable="'Speed'">
+                                            <span ng-bind-html="to_trusted(accessReport.Speed)"></span>
+                                            </td>
+                                            <td title="'Display Interfaces'" filter="{ DisplayInterface: 'text'}" sortable="'DisplayInterface'">
+                                                {{accessReport.DisplayInterface}}
+                                            </td>
+                                            <td title="'Support'" filter="{ Support: 'text'}" sortable="'Support'">
+                                                {{accessReport.Support}}
+                                            </td>
+                                            <td title="'Resiliency'" filter="{ Resiliency: 'text'}" sortable="'Resiliency'">
+                                                {{accessReport.Resiliency}}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                     <p>
+                                                <span style="color: Green">Green -</span> Currently defined as valid
+                                            </p>
+                                            <p>
+                                                <span style="color: Red">Red -</span> Currently defined as invalid
+                                            </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="NoSupplierData" class="alert alert-danger Arrow" role="alert">
+                            Please select any Supplier value from dropdown.
+                        </div>
+                        <div ng-show="NoCapmanAccessData" class="alert alert-danger Arrow" role="alert">
+                            No Capman Access Report present.
+                        </div>
+                        
+                        <div class="pageLoaderOverlay">
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div id="divProductReport" class="tab-pane">
+                <div ng-controller="CapmanReportCtrl" class="container">
+                  
+                            <div class="row" style="padding-left: 10px">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <div class="panel-body">
+                                        <!--<h4 style="text-align:left">Notes Audit Information</h4>-->
+                                        <div class="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="" style="font-size: 11px;text-align:left;">
+                                                    Product<span style="color:Red;"> *</span>
+                                                </label>
+                                                <div class="col-sm-3" id="productDiv">
+                                                    <select id="Select5" ng-model="modProductType" ng-change="GetProducts()" ng-options="item.ProductId as item.ProductName for item in ProductsType"
+                                                       style="width: 90%;margin-left: -55px;">
+                                                        <option value="">-- Please Select --</option>
+                                                    </select>
+                                                    <br />
+                                                    <div ng-show="NoProductData" role="alert" style="text-align:left;margin-left: -55px;">
+                                                        <p style="color:Red">Please select Product.</p>
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                        <div ng-show="NoSubProductData" class="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="" style="font-size: 11px;text-align:left;">
+                                                    Sub Product<span style="color:Red;"> *</span>
+                                                </label>
+                                                <div class="col-sm-3" id="subProductDiv">
+                                                    <select id="Select6" ng-model="modSubProductType" ng-change="GetSubProducts()" ng-options="item.SubProductId as item.SubProductName for item in SubProductsType"
+                                                       style="width: 90%;margin-left: -55px;">
+                                                        <option value="">-- Please Select --</option>
+                                                    </select>
+                                                    <br />
+                                                    <div ng-show="HideSubProductData" role="alert" style="text-align:left;margin-left: -55px;">
+                                                        <p style="color:Red">Please select Sub Product.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div ng-show="showCountry" class="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="" style="font-size: 11px;text-align:left;">
+                                                    Country<span style="color:Red;"> *</span>
+                                                </label>
+                                                <div class="col-sm-3" id="countryDiv">
+                                                    <select id="Select2" ng-model="modCountryType" ng-change="GetCountries()" ng-options="item.CountryId as item.CountryName for item in CountriesType"
+                                                       style="width: 90%;margin-left: -55px;">
+                                                        <option value="">-- Please Select --</option>
+                                                    </select>
+                                                     <br />
+                                                    <div ng-show="NoCountryDataInProdReport" role="alert" style="text-align:left;margin-left: -55px;">
+                                                        <p style="color:Red">Please select Country.</p>
+                                                    </div>
+                                                    <div ng-show="showExport" class="col-sm-3" style="margin-left: -55px;" >
+                                                 <input type="button" value="Download To Excel" ng-click="ExportCapmanProductReport()" class="inputPosition btn btn-primary" style="font-size:12px;margin-left: -12px;" /> <br />
+                                           </div>
+                                                </div>
+                                                 
+                                            </div>
+                                           
+                                        </div>
+                                       
+                                        <div ng-show="SupplierData" class="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="" style="font-size: 11px;text-align:left;">
+                                                    Supplier(s)<span style="color:Red;"> *</span>
+                                                </label>
+                                                <div class="col-sm-3">
+                                                    <select multiple id="Select5" ng-model="modSupplierType" ng-change="GetSuppliers()"
+                                                        ng-options="item.SupplierId as item.SupplierName for item in SuppliersType" class="js-example-basic-single"  style="max-width:205px;margin-left: -55px;">
+                                                        <!--<option value="">All</option>-->
+                                                    </select>
+                                                    <br />
+                                                     <div ng-show="NoSuplierProductData" role="alert" style="margin-left: -55px;">
+                                                          <p style="color:Red">Please select any Supplier.</p>
+                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div ng-show="AccessSpeedData" class="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="" style="font-size: 11px;text-align:left;">
+                                                    Access Speed(s)<span style="color:Red;"> *</span>
+                                                </label>
+                                                <div class="col-sm-3">
+                                                    <select multiple id="Select6" ng-model="modAccessSpeed" ng-change="GetAccessSpeed()"
+                                                        ng-options="item.AccessSpeedId as item.AccessSpeedValue for item in AccessSpeedType"
+                                                        class="js-example-basic-single"  style="max-width:205px;margin-left: -55px;">
+                                                        <!--<option value="">All</option>-->
+                                                    </select>
+                                                    <br />
+                                                     <div ng-show="NoSpeedProductData" role="alert" style="margin-left: -55px;">
+                                                         <p style="color:Red">Please select any Access Speed.</p>
+                                                      </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div ng-show="DisplayInterfaceData" class="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="" style="font-size: 11px;text-align:left;">
+                                                    Display Interface(s)<span style="color:Red;"> *</span>
+                                                </label>
+                                                <div class="col-sm-4">
+                                                    <select multiple id="Select7" ng-model="modDisplayInterface" ng-change="GetDisplayInterface()"
+                                                        ng-options="item.InterfaceId as item.InterfaceType for item in DisplayInterfaceType"
+                                                        class="js-example-basic-single"  style="max-width:250px;margin-left: -55px;">
+                                                        <!--<option value="">All</option>-->
+                                                    </select>
+                                                    <br />
+                                             <div ng-show="NoInterfaceData" role="alert" style="margin-left: -55px;">
+                                            <p style="color:Red">Please select any Display Interface.</p>
+                                        </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3" ng-show="ShowGoAccessButtons" style="margin-left:155px;">
+                                            <input type="button" value="Go" ng-click="GetRecords()" class="" style="margin-left:-48px;"/>
+                                        </div>
+                                         <div class="col-sm-3" ng-show="showExportDiv" style="padding-left: 0px;margin-left:-205px; ">
+                                         <input type="button" value="Download To Excel" ng-click="ExportCapmanProductReport()" class="btn btn-primary" style="font-size:12px;position:relative;margin-left:-30px;" />
+                                        </div>
+                                <br /><br /><br />
+                                        <div ng-show="ReportData">
+                                            <table ng-table="ReportTable" class="table table-striped table-bordered no-pager">
+                                                <tr ng-repeat="Report in $data">
+                                                   <!-- <td title="'Country'"  class="Arrow">
+                                                        {{Report.Country}}
+                                                    </td>-->
+                                                    <td title="'City - PoP'" filter="{ CityPop: 'text'}" sortable="'CityPop'">
+                                                        {{Report.CityPop}}
+                                                    </td>
+                                                    <td title="'Supplier'" filter="{ Supplier: 'text'}" sortable="'Supplier'">
+                                                        {{Report.Supplier}}
+                                                    </td>
+                                                    <td title="'Speeds'" filter="{ Speed: 'text'}" sortable="'Speed'">
+                                                    <span ng-bind-html="to_trusted(Report.Speed)"></span>
+                                                    </td>
+                                                    <td title="'Display Interfaces'" filter="{ DisplayInterface: 'text'}" sortable="'DisplayInterface'">
+                                                        {{Report.DisplayInterface}}
+                                                    </td>
+                                                    <td title="'Support'" filter="{ Support: 'text'}" sortable="'Support'">
+                                                        {{Report.Support}}
+                                                    </td>
+                                                    <td title="'Resiliency'" filter="{ Resiliency: 'text'}" sortable="'Resiliency'">
+                                                        {{Report.Resiliency}}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <p>
+                                                <span style="color: Green">Green -</span> Currently defined as valid
+                                            </p>
+                                            <p>
+                                                <span style="color: Red">Red -</span> Currently defined as invalid
+                                            </p>
+                                        </div>
+                                        <div ng-show="POPData">
+                                            <table ng-table="POPTable" class="table table-striped table-bordered no-pager">
+                                                <tr ng-repeat="POPReport in $data">
+                                                    <!--<td title="'Country'" class="Arrow">
+                                                        {{POPReport.Country}}
+                                                    </td>-->
+                                                    <td title="'City - PoP'" filter="{ CityPop: 'text'}" sortable="'CityPop'">
+                                                        <span ng-bind-html="to_trusted(POPReport.CityPop)"></span>
+                                                    </td>
+                                                    <td title="'Access Speeds'" filter="{ Speed: 'text'}" sortable="'Speed'">
+                                                        <span ng-bind-html="to_trusted(POPReport.Speed)"></span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <p>
+                                                <span style="color: Green">Green -</span> Access Speed valid and successfully mapped
+                                                to at least one port speed
+                                            </p>
+                                            <p>
+                                                Black - Access Speed valid but not yet successfully mapped to Port speed
+                                            </p>
+                                        </div>
+                                        <div ng-show="NoReportData" class="alert alert-danger Arrow" role="alert">
+                                            No records found.
+                                        </div>
+                                        <div ng-show="NoCountryData" class="alert alert-danger Arrow" role="alert">
+                                            Please select any country from country dropdown.
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <div ng-show="NoCapmanReport" class="alert alert-danger Arrow" role="alert">
+                                    No Capman Report present for this set of combination.
+                                </div>
+                                <div class="pageLoaderOverlay">
+                                </div>
+                            </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <iframe id="csvDownloadFrame" style="display: none;"></iframe>
+    <div class="pageLoaderOverlay">
+    </div>
+</body>
+</html>

@@ -1,0 +1,1148 @@
+﻿
+namespace SCAdminBAL
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Data;
+    using SCAdminDAL;   
+
+
+    public class ProductMappingBAL
+    {
+        ProductMappingDAL objProductMappingDAL = new ProductMappingDAL();
+
+
+        public lstProductMappingData FetchProductMappingDetails(string TabName, string ProductID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetProductMappingDetails(TabName, ProductID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+          
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetProductMappingDetails(TabName, ProductID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.ProductID = Convert.ToString(dr["Product_CD"]);
+                objProductMapping.ProductName = Convert.ToString(dr["Product_Name"]);
+
+                if (TabName == "Distributor")
+                {
+                    objProductMapping.DistributorShortName = Convert.ToString(dr["SHORT"]);
+                    objProductMapping.DistributorName = Convert.ToString(dr["DIST_NAME"]);
+
+                }
+                if (TabName == "BTGFR")
+                {
+                    objProductMapping.BTGFRName = Convert.ToString(dr["Description"]);
+                }
+
+                        List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                        objProductMapping.lstProducts = pao;
+
+
+
+                        lstDistributor.Add(objProductMapping);
+
+
+
+                        lstBtgfr.Add(objProductMapping);
+
+
+                        lstOrg.Add(objProductMapping);
+           
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+        public lstProductMappingData FetchProductMappingBasedOnBTGFR(string TabName, string BTGFRID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetProductMappingBasedOnBTGFR(TabName, BTGFRID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetProductMappingBasedOnBTGFR(TabName, BTGFRID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.ProductID = Convert.ToString(dr["Product_CD"]);
+                
+     
+                if (TabName == "BTGFR")
+                {
+                    objProductMapping.ProductName = Convert.ToString(dr["Product_Name"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+        public lstProductMappingData FetchUnassignProductbasedonbtgfr(string TabName, string BTGFRID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetUnassignProductbasedonbtgfr(TabName, BTGFRID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetUnassignProductbasedonbtgfr(TabName, BTGFRID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.ProductID = Convert.ToString(dr["Product_CD"]);
+                
+     
+                if (TabName == "BTGFR")
+                {
+                    objProductMapping.ProductName = Convert.ToString(dr["Product_Name"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+
+        public lstProductMappingData FetchUnassignProductbasedonorg(string TabName, string ORGID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetUnassignProductbasedonorg(TabName, ORGID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetUnassignProductbasedonorg(TabName, ORGID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.ProductID = Convert.ToString(dr["Product_CD"]);
+
+
+                if (TabName == "ORG")
+                {
+                    objProductMapping.ProductName = Convert.ToString(dr["Product_Name"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+        public lstProductMappingData FetchAssignProductbasedonorg(string TabName, string ORGID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetAssignProductbasedonorg(TabName, ORGID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetAssignProductbasedonorg(TabName, ORGID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.ProductID = Convert.ToString(dr["Product_CD"]);
+
+
+                if (TabName == "ORG")
+                {
+                    objProductMapping.ProductName = Convert.ToString(dr["Product_Name"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+        
+
+        public lstProductMappingData FetchassignProductbasedonbtgfr(string TabName, string BTGFRID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetassignProductbasedonbtgfr(TabName, BTGFRID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetassignProductbasedonbtgfr(TabName, BTGFRID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.ProductID = Convert.ToString(dr["Product_CD"]);
+
+
+                if (TabName == "BTGFR")
+                {
+                    objProductMapping.ProductName = Convert.ToString(dr["Product_Name"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+        public lstProductMappingData FetchUnassignbtfgrbasedonproduct(string TabName, string ProductID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetUnassignbtfgrbasedonproduct(TabName, ProductID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetUnassignbtfgrbasedonproduct(TabName, ProductID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+               
+                
+     
+                if (TabName == "BTGFR")
+                {
+                    objProductMapping.BTGFRName = Convert.ToString(dr["Description"]);
+                    objProductMapping.BTGFRID = Convert.ToString(dr["BTGFR_ID"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+
+        public lstProductMappingData FetchUnassignorgbasedonproduct(string TabName, string ProductID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetUnassignorgbasedonproduct(TabName, ProductID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetUnassignorgbasedonproduct(TabName, ProductID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+               
+                
+     
+                if (TabName == "ORG")
+                {
+                    objProductMapping.OrganisationName = Convert.ToString(dr["NAME"]);
+                    objProductMapping.OrganisationID = Convert.ToString(dr["ID"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+
+
+        public lstProductMappingData FetchAssignorgbasedonproduct(string TabName, string ProductID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetAssignorgbasedonproduct(TabName, ProductID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetAssignorgbasedonproduct(TabName, ProductID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+               
+                
+     
+                if (TabName == "ORG")
+                {
+                    objProductMapping.OrganisationName = Convert.ToString(dr["DESCRIPTION"]);
+                    objProductMapping.OrganisationID = Convert.ToString(dr["BTGFR"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+        
+
+        public lstProductMappingData FetchUnassigndistributorbasedonproduct(string TabName, string ProductID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetUnassigndistributorbasedonproduct(TabName, ProductID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetUnassigndistributorbasedonproduct(TabName, ProductID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+               
+                
+     
+                if (TabName == "Distributor")
+                {
+                    objProductMapping.DistributorName = Convert.ToString(dr["NAME"]);
+                    objProductMapping.DistributorShortName = Convert.ToString(dr["SHORT"]);
+                    objProductMapping.DistributorID = Convert.ToString(dr["ID"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+
+        public lstProductMappingData FetchAssigndistributorbasedonproduct(string TabName, string ProductID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetAssigndistributorbasedonproduct(TabName, ProductID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetAssigndistributorbasedonproduct(TabName, ProductID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+               
+                
+     
+                if (TabName == "Distributor")
+                {
+                    objProductMapping.DistributorShortName = Convert.ToString(dr["SHORT"]);
+                    objProductMapping.DistributorName = Convert.ToString(dr["DIST_NAME"]) + " (" + objProductMapping.DistributorShortName+" )";
+                    
+                    objProductMapping.DistributorID = Convert.ToString(dr["DIST_ID"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+        
+        public lstProductMappingData FetchAssignbtfgrbasedonproduct(string TabName, string ProductID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetAssignbtfgrbasedonproduct(TabName, ProductID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetAssignbtfgrbasedonproduct(TabName, ProductID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                
+                
+     
+                if (TabName == "BTGFR")
+                {
+                    objProductMapping.BTGFRName = Convert.ToString(dr["Description"]);
+                    objProductMapping.BTGFRID = Convert.ToString(dr["BTGFR_ID"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+
+        public lstProductMappingData FetchUnassignProductbasedondistributor(string TabName, string DistributorID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetUnassignProductbasedondistributor(TabName, DistributorID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetUnassignProductbasedondistributor(TabName, DistributorID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.ProductID = Convert.ToString(dr["Product_CD"]);
+
+
+                if (TabName == "Distributor")
+                {
+                    objProductMapping.ProductName = Convert.ToString(dr["Product_Name"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+        public lstProductMappingData FetchAssignProductbasedondistributor(string TabName, string DistributorID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetAssignProductbasedondistributor(TabName, DistributorID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetAssignProductbasedondistributor(TabName, DistributorID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.ProductID = Convert.ToString(dr["Product_CD"]);
+
+
+                if (TabName == "Distributor")
+                {
+                    objProductMapping.ProductName = Convert.ToString(dr["Product_Name"]);
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+        
+        public lstProductMappingData FetchDistributorsBasedOnProductdd(string TabName, string ProductID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetDistributorsBasedOnProductdd(TabName, ProductID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetDistributorsBasedOnProductdd(TabName, ProductID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+
+
+
+                if (TabName == "Distributor")
+                {
+                    objProductMapping.DistributorShortName = Convert.ToString(dr["SHORT"]);
+                    objProductMapping.DistributorName = Convert.ToString(dr["DIST_NAME"]);
+
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+        public lstProductMappingData FetchOrgBasedOnProductdd(string TabName, string ProductID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetOrgBasedOnProductdd(TabName, ProductID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetOrgBasedOnProductdd(TabName, ProductID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+
+
+
+                if (TabName == "ORG")
+                {
+                    objProductMapping.OrganisationName = Convert.ToString(dr["DESCRIPTION"]);
+                    objProductMapping.OrganisationID = Convert.ToString(dr["BTGFR_ID"]);
+
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+        public lstProductMappingData FetchProductsBasedOnDistributordd(string TabName, string DistributorID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetProductsBasedOnDistributordd(TabName, DistributorID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetProductsBasedOnDistributordd(TabName, DistributorID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+
+
+
+                if (TabName == "Distributor")
+                {
+                    objProductMapping.ProductID = Convert.ToString(dr["PRODUCT_CD"]);
+                    objProductMapping.ProductName = Convert.ToString(dr["PRODUCT_NAME"]);
+
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+
+        public lstProductMappingData FetchProductsBasedOnORGdd(string TabName, string ORGID)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.GetProductsBasedOnORGdd(TabName, ORGID);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+            string EmpIds = "";
+
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objProductMappingDAL.GetProductsBasedOnORGdd(TabName, ORGID);
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+
+
+
+                if (TabName == "ORG")
+                {
+                    objProductMapping.ProductID = Convert.ToString(dr["PRODUCT_CD"]);
+                    objProductMapping.ProductName = Convert.ToString(dr["PRODUCT_NAME"]);
+
+                }
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+                lstDistributor.Add(objProductMapping);
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+                lstOrg.Add(objProductMapping);
+
+
+            }
+            lstData.DistributorData = lstDistributor;
+            lstData.BtgfrData = lstBtgfr;
+            lstData.OrgData = lstOrg;
+            return lstData;
+
+        }
+        
+
+        public lstProductMappingData ProductNamesdd(string TabName)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.ProductNamesdd(TabName);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+          
+
+        
+          
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.ProductID = Convert.ToString(dr["Product_CD"]);
+                objProductMapping.ProductName = Convert.ToString(dr["Product_Name"]);
+
+           
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+               
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+
+
+            }
+          
+            lstData.BtgfrData = lstBtgfr;
+        
+            return lstData;
+
+        }
+
+        public lstProductMappingData DistributorsNamesdd(string TabName)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.DistributorsNamesdd(TabName);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+
+
+
+
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.DistributorID = Convert.ToString(dr["DIST_ID"]);
+                objProductMapping.DistributorName = Convert.ToString(dr["DIST_NAME"]);
+
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+
+
+            }
+
+            lstData.BtgfrData = lstBtgfr;
+
+            return lstData;
+
+        }
+
+        public lstProductMappingData OrganisationNamesdd(string TabName)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.OrganisationNamesdd(TabName);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+
+
+
+
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.OrganisationName = Convert.ToString(dr["DESCRIPTION"]);
+                objProductMapping.OrganisationID = Convert.ToString(dr["BTGFR_ID"]);
+
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+
+
+            }
+
+            lstData.BtgfrData = lstBtgfr;
+
+            return lstData;
+
+        }
+        
+        public lstProductMappingData BTGFRNamesdd(string TabName)
+        {
+
+            DataSet dsProductMapping = objProductMappingDAL.BTGFRNamesdd(TabName);
+            List<ProductMappingData> lstDistributor = new List<ProductMappingData>();
+            List<ProductMappingData> lstBtgfr = new List<ProductMappingData>();
+            List<ProductMappingData> lstOrg = new List<ProductMappingData>();
+            lstProductMappingData lstData = new lstProductMappingData();
+
+
+
+
+
+            foreach (DataRow dr in dsProductMapping.Tables[0].Rows)
+            {
+                ProductMappingData objProductMapping = new ProductMappingData();
+                objProductMapping.BTGFRName = Convert.ToString(dr["Description"]);
+                objProductMapping.BTGFRID = Convert.ToString(dr["BTGFR_ID"]);
+           
+
+                List<ProductMappingOwner> pao = new List<ProductMappingOwner>();
+                objProductMapping.lstProducts = pao;
+
+
+
+
+
+
+
+                lstBtgfr.Add(objProductMapping);
+
+
+
+
+            }
+
+            lstData.BtgfrData = lstBtgfr;
+
+            return lstData;
+
+        }
+
+
+        public List<MapUnitofMeasure> GetDropdownMapUOMDetails(string CharTypeId)
+        {
+            List<MapUnitofMeasure> lstOrg = new List<MapUnitofMeasure>();
+            DataTable dtGridDistributor = objProductMappingDAL.GetDropDownMapUOMDetails(CharTypeId);
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                MapUnitofMeasure objOrg = new MapUnitofMeasure();
+
+                objOrg.UOMName = Convert.ToString(dr["PRODUCT_NAME"]);
+
+                objOrg.UOMId = Convert.ToInt32(dr["PRODUCT_CD"]);
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+
+        public int SaveBTGFRMapping(int ProductdID, string MapList, string User_id)
+        {
+            int count;
+            count = objProductMappingDAL.SaveBTGFRMapping(ProductdID, MapList, User_id);
+            return count;
+        }
+
+
+        public int SaveORGMapping(int ProductdID, string MapList, string User_id)
+        {
+            int count;
+            count = objProductMappingDAL.SaveORGMapping(ProductdID, MapList, User_id);
+            return count;
+        }
+
+        
+        public int SaveBTGFRMapping_ProductBasedOnBTGFR(int BTGFRID, string MapList, string User_id)
+        {
+            int count;
+            count = objProductMappingDAL.SaveBTGFRMapping_ProductBasedOnBTGFR(BTGFRID, MapList, User_id);
+            return count;
+        }
+
+        public int SaveORGMapping_ProductBasedOnORG(int ORGID, string MapList, string User_id)
+        {
+            int count;
+            count = objProductMappingDAL.SaveORGMapping_ProductBasedOnORG(ORGID, MapList, User_id);
+            return count;
+        }
+
+        public int SaveDistributorProductMapping(int ProductdID, string MapList, string User_id)
+        {
+            int count;
+            count = objProductMappingDAL.SaveDistributorProductMapping(ProductdID, MapList, User_id);
+            return count;
+        }
+
+        public int SaveDistributorProductMapping_ProductBasedOnDistributor(int DistributorID, string MapList, string User_id)
+        {
+            int count;
+            count = objProductMappingDAL.SaveDistributorProductMapping_ProductBasedOnDistributor(DistributorID, MapList, User_id);
+            return count;
+        }
+        
+        
+    }
+}

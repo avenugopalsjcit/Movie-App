@@ -1,0 +1,49 @@
+﻿app.controller("AdminCPECaseDetailsCtrl", function ($scope, $timeout, $http, $rootScope, $location, $stateParams, NgTableParams, CPECaseDetailsFactory, CaseAvailabilityFactory) {
+    $(".pageLoaderOverlay").show();
+    $scope.CityName = $stateParams.CityName;
+    $scope.CaseId = $stateParams.CaseId;
+    $scope.CaseAvailable = $stateParams.CaseAvailable;
+
+    if ($stateParams.CaseValidity) {
+        $scope.CaseValidity = 'Y';
+    } else {
+        $scope.CaseValidity = 'N';
+    }
+    $scope.Data = [
+   { Product: 'BT Internet Access', CharType: 'CPE Maintenance Options', Characteristic: '4+1 * 5 Option 1', Availability: 'Available', IsValid: true },
+   { Product: 'BT Internet Access', CharType: 'CPE Maintenance Options', Characteristic: '4+1* 7 Option 2', Availability: 'Available', IsValid: true },   
+   { Product: 'BT IP Sec', CharType: 'CPE Maintenance Options', Characteristic: '4+1 * 5 Option 1', Availability: 'Available', IsValid: true },
+   { Product: 'BT IP Sec', CharType: 'CPE Maintenance Options', Characteristic: '4+1* 7 Option 2', Availability: 'Available', IsValid: true },
+      { Product: 'BT LAN SAN Extension Service', CharType: 'CPE Maintenance Options', Characteristic: '4+1 * 5 Option 1', Availability: 'Available', IsValid: true },
+   { Product: 'BT LAN SAN Extension Service', CharType: 'CPE Maintenance Options', Characteristic: '4+1* 7 Option 2', Availability: 'Available', IsValid: true },   
+   { Product: 'BT iVPN', CharType: 'CPE Maintenance Options', Characteristic: '4+1 * 5 Option 1', Availability: 'Available', IsValid: true },
+   { Product: 'BT iVPN', CharType: 'CPE Maintenance Options', Characteristic: '4+1* 7 Option 2', Availability: 'Available', IsValid: true },
+   { Product: 'BT MPLS', CharType: 'CPE Maintenance Options', Characteristic: '4+1 * 5 Option 1', Availability: 'Available', IsValid: true },
+   { Product: 'BT MPLS', CharType: 'CPE Maintenance Options', Characteristic: '4+1* 7 Option 2', Availability: 'Available', IsValid: true }   
+   ];
+   
+
+
+    HVPNProductCharacteristicModal = [true, true, true, true, true, true, true, true, true, true];
+    $scope.CPECases = new NgTableParams({
+        // initial grouping
+        group:
+        {
+            Product: "desc"
+        }
+    }, { counts: [], 'dataset': $scope.Data, groupOptions: {
+        isExpanded: false
+    }
+    });
+
+    $scope.CreatedBy = 'PMF Admin';
+    $scope.CreatedDate = '08-FEB-2015 07:11';
+    $scope.UpdatedBy = 'PMF Admin';
+    $scope.UpdatedDate = '08-FEB-2015 15:11';
+    $(".pageLoaderOverlay").hide();
+    $scope.EditCPECaseDetails = function (CaseID) {        
+        $location.path('/CaseDefinition/AdminCPECase').search({ 'CaseId': CaseID });
+
+    }
+
+});

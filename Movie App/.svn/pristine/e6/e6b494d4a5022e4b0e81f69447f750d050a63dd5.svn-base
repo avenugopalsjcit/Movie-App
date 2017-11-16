@@ -1,0 +1,141 @@
+﻿<style>
+  lable
+  {
+      font-size:12px;
+  }
+</style>
+<div ng-controller="Controllers.PoPTypeMappingCtrl" style="margin-left:5px">
+    <div>
+        <h2 style="cursor:default">
+            Edit Pop Type Mappings 
+        </h2>
+    </div>
+    <table style="margin-left:6px" id="mainTable" width="100%" align="center">
+        <tbody>
+            <tr>
+                <td style="font-size: 10pt; font-family: Arial" width="40%">
+                    <table id="PopTypetbl">
+                        <tbody>
+                            <tr>
+                                <td style="font-size: 10pt; font-family: Arial" height="100">
+                                    <br />
+                                    <h4 style="font-size: 10pt; font-family: Arial" align="center">
+                                        <b>PoP Type</b></h4>
+                                    <select id="Pops" style="height: 560px; width: 346px; margin-right: 4em;" multiple>
+                                        <option>sample</option>
+                                    </select>
+                                </td>
+                                <td style="font-size: 10pt; font-family: Arial" colspan="30">
+                                </td>
+                                <td>
+                                    <table id="3Pops">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <h4 style="font-size: 10pt; font-family: Arial" align="center">
+                                                        <b>GPOP</b></h4>
+                                                    <table>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="padding-right: 3em;">
+                                                                    <a class="btn btn-primary btn-sm"><span>Assign &gt;&gt;</span></a><br>
+                                                                    <a class="btn btn-primary btn-sm"><span>&lt;&lt; De-Assign</span></a><br>
+                                                                </td>
+                                                                <td style="font-size: 10pt; font-family: Arial" colspan="15">
+                                                                </td>
+                                                                <td>
+                                                                    <select id="GPOP" style="height: 150px; width: 346px" multiple>
+                                                                        <option>Access Method-GPOP</option>
+                                                                        <option>Access Method-MPLS GPOP</option>
+                                                                        <option>Access Method-MSE GPOP</option>
+                                                                        <option>Access Method-NNI POP</option>
+                                                                        <option>Access Method-UK Ethernet POP</option>
+                                                                        <option>Access Method-UK VPNPOP</option>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-size: 10pt; font-family: Arial">
+                                                    <h4 style="font-size: 10pt; font-family: Arial" align="center">
+                                                        <b>APOP</b></h4>
+                                                    <table>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="padding-right: 3em;">
+                                                                    <a class="btn btn-primary btn-sm"><span>Assign &gt;&gt;</span></a><br />
+                                                                    <a class="btn btn-primary btn-sm"><span>&lt;&lt; De-Assign</span></a><br />
+                                                                </td>
+                                                                <td colspan="15">
+                                                                </td>
+                                                                <td>
+                                                                    <select id="APOP" style=" height: 150px; font-family: Arial; width: 346px"
+                                                                        multiple>
+                                                                        <option>Access Method-APOP</option>
+                                                                        <option>Access Method-EPOP</option>
+                                                                        <option>Access Method-UK Ethernet LTAP></option>
+                                                                        <option>Access Method-VPOP</option>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <h4 style="font-size: 10pt; font-family: Arial" align="center">
+                                                        <b>LLPOP</b></h4>
+                                                    <table>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="padding-right: 3em;">
+                                                                    <a class="btn btn-primary btn-sm"><span>Assign &gt;&gt;</span></a><br>
+                                                                    <a class="btn btn-primary btn-sm"><span>&lt;&lt; De-Assign</span></a><br>
+                                                                </td>
+                                                                <td style="font-size: 10pt; font-family: Arial" colspan="15">
+                                                                </td>
+                                                                <td>
+                                                                    <select id="LLPOP" style="height: 185px; width: 346px" multiple>
+                                                                        <option>Access Method-HVPN </option>
+                                                                        <option>Access Method-LCDS </option>
+                                                                        <option>Access Method-LLPoP </option>
+                                                                        <option>Access Method-VSAT</option>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table style="font-size: 10pt; margin-top: 2em; border: 1;">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    * Administrators can select multiple values from the Pop Type Box and assign it
+                                    to either APOP, GPOP or LLPOP using the Assign &gt;&gt; button
+                                    <br>
+                                    * Administrators can select multiple values either from APOP,GPOP or LLPOP and click
+                                    on &lt;&lt; deassign, to unassign a Pop Type
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

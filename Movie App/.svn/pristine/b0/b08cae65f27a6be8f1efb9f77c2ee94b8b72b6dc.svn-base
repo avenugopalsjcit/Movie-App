@@ -1,0 +1,2723 @@
+﻿using System;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Text.RegularExpressions;
+
+
+
+namespace SCAdminDAL
+{
+    public class Reports
+    {
+        OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        private StringBuilder strQuery = new StringBuilder();
+        private GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+        OracleDataAdapter dad;
+
+       
+      
+
+        //Monthly Usage Report
+        public DataTable GetMonthlyUsageReport(string criteria)
+        {
+                
+                strQuery.Clear();
+                string flag = string.Empty;
+                if (criteria != null)
+                {
+                    if (criteria == "1")
+                    {
+                        strQuery.Append("SELECT   TO_CHAR (big_date, 'MM-YYYY') AS bigdt, ");
+                        strQuery.Append(" COUNT (*) AS inum FROM csu_big_bro");
+                        strQuery.Append(" WHERE TO_CHAR (big_date, 'YYYY') >= TO_CHAR (SYSDATE, 'YYYY') GROUP BY TO_CHAR (big_date, 'MM-YYYY')");
+                        strQuery.Append(" ORDER BY TO_CHAR (big_date, 'MM-YYYY') ASC");
+                    }
+
+                    else if (criteria == "2")
+                    {
+                        strQuery.Append("SELECT   TO_CHAR (cbb.big_date, 'MM-YYYY') AS bigdt, ");
+                        strQuery.Append(" COUNT (*) AS inum, cd.dist_name AS description,cp.product_name ");
+                        strQuery.Append(" FROM csu_big_bro cbb, csu_distributor cd, csu_product cp WHERE cbb.dist_id <> 0 ");
+                        strQuery.Append(" AND cd.vbc_dist_id = cbb.dist_id AND cbb.prod_cd = cp.product_cd ");
+                        strQuery.Append(" AND TO_CHAR (cbb.big_date, 'YYYY') >= TO_CHAR (SYSDATE, 'YYYY') ");
+                        strQuery.Append(" GROUP BY TO_CHAR (cbb.big_date, 'MM-YYYY'),cd.dist_name,cp.product_name ");
+                        strQuery.Append(" ORDER BY TO_CHAR (cbb.big_date, 'MM-YYYY') ASC,UPPER (cd.dist_name) ASC,UPPER (cp.product_name) ASC");
+                    }
+                    else if ((criteria == "3") || (criteria == "4"))
+                    {
+
+                        flag = criteria == "3" ? "GFR" : "ORG";
+
+                        strQuery.Append("SELECT TO_CHAR (cbb.big_date, 'MM-YYYY') AS bigdt, COUNT (*) AS inum, cbr.description, product_name ");
+                        strQuery.Append(" FROM csu_big_bro cbb, csu_btgfr cbr, csu_product cp ");
+                        strQuery.Append(" WHERE cbr.valid_cd = 1 AND cbb.prod_cd = cp.product_cd AND UPPER (cbb.channel_access) = '" + flag + "' ");
+                        strQuery.Append(" AND UPPER (org_gfr_flag) = '" + flag + "' AND cbb.channel_access = cbr.org_gfr_flag ");
+                        strQuery.Append(" AND cbb.dist_id = cbr.btgfr_id  AND TO_CHAR (cbb.big_date, 'YYYY') >= TO_CHAR (SYSDATE, 'YYYY')");
+                        strQuery.Append(" GROUP BY TO_CHAR (cbb.big_date, 'MM-YYYY'), cbr.description,cp.product_name ");
+                        strQuery.Append(" ORDER BY TO_CHAR (cbb.big_date, 'MM-YYYY') ASC,cbr.description ASC,UPPER (cp.product_name) ASC");
+                    }
+                    else if (criteria == "5")
+                    {
+                        strQuery.Append("SELECT   bigdt, COUNT (*) AS inum, dist_name AS description, product_name");
+                        strQuery.Append(" FROM (SELECT TO_CHAR (cbb.big_date, 'MM-YYYY') AS bigdt, cd.dist_name,cp.product_name");
+                        strQuery.Append(" FROM csu_big_bro cbb, csu_distributor cd, csu_product cp");
+                        strQuery.Append(" WHERE cbb.dist_id <> 0 AND cd.vbc_dist_id = cbb.dist_id AND cbb.prod_cd = cp.product_cd");
+                        strQuery.Append(" AND TO_CHAR (cbb.big_date, 'YYYY') >= TO_CHAR (SYSDATE, 'YYYY') UNION ALL ");
+                        strQuery.Append(" SELECT TO_CHAR (cbb.big_date, 'MM-YYYY') AS bigdt, cbr.description,");
+                        strQuery.Append(" product_name FROM csu_big_bro cbb, csu_btgfr cbr, csu_product cp");
+                        strQuery.Append(" WHERE cbr.valid_cd = 1 AND cbb.prod_cd = cp.product_cd");
+                        strQuery.Append(" AND cbb.channel_access IN ('GFR', 'ORG') AND org_gfr_flag IN ('GFR', 'ORG')");
+                        strQuery.Append(" AND cbb.channel_access = cbr.org_gfr_flag AND cbb.dist_id = cbr.btgfr_id");
+                        strQuery.Append(" AND TO_CHAR (cbb.big_date, 'YYYY') >= TO_CHAR (SYSDATE, 'YYYY')) a   ");
+                        strQuery.Append(" GROUP BY bigdt, dist_name, product_name ORDER BY bigdt  ASC, dist_name ASC, product_name ASC");
+                    }
+                    return objGetDataFromDB.GetDataTable(strQuery.ToString());
+                }
+                return null;
+                
+        }
+
+        public List<string> GetWeeklyStartAndEndDates()
+        {
+            strQuery.Clear();
+            StringBuilder optionValues = new StringBuilder();
+            string WeekStartEndDates= string.Empty;
+            string startName = string.Empty;
+            string endName = string.Empty;
+            List<string> options = new List<string>();
+            string[] monthArray = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+            strQuery.Append("SELECT max(HIT_DATE) as HIT_DATE FROM CSU_TRAFFIC");
+            DataTable dtMaxDate = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            DateTime startDate = DateTime.Today;
+            if (dtMaxDate != null && dtMaxDate.Rows.Count > 0)
+            {
+                startDate = Convert.ToDateTime(dtMaxDate.Rows[0]["HIT_DATE"].ToString());
+            }
+
+            strQuery.Clear();
+            strQuery.Append("SELECT min(HIT_DATE) as HIT_DATE FROM CSU_TRAFFIC");
+            DataTable dtMinDate = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            DateTime lastDate = DateTime.Today;
+            if (dtMinDate != null && dtMinDate.Rows.Count > 0)
+            {
+                lastDate = Convert.ToDateTime(dtMinDate.Rows[0]["HIT_DATE"].ToString());
+            }
+            do
+            {
+                string startTemp = startDate.Day < 10 ? Convert.ToString("0" + startDate.Day) : Convert.ToString(startDate.Day);
+                string startMonth = Convert.ToString(startDate.Month);
+                string startYear = Convert.ToString(startDate.Year).Substring(2);
+                for (int i = 1; i <= 12; i++)
+                {
+                    if (Convert.ToInt32(startMonth) == i)
+                    {
+                        startName= monthArray[i-1];
+                    }
+                }
+                int temp = Convert.ToInt32(startDate.Day) - 6;
+
+
+                DateTime endDate = startDate.Subtract(TimeSpan.FromDays(6));
+                string endTemp = endDate.Day < 10 ? Convert.ToString("0" + endDate.Day) : Convert.ToString(endDate.Day);
+                string endMonth = Convert.ToString(endDate.Month);
+                string endYear = Convert.ToString(endDate.Year).Substring(2);
+                for (int i = 1; i <= 12; i++)
+                {
+                    if (Convert.ToInt32(endMonth) == i)
+                    {
+                        endName = monthArray[i-1];
+                    }
+                }
+                optionValues.Append(endTemp);
+                optionValues.Append("-");
+                optionValues.Append(endName);
+                optionValues.Append("-");
+                optionValues.Append(endYear);
+                optionValues.Append(" - ");
+                optionValues.Append(startTemp);
+                optionValues.Append("-");
+                optionValues.Append(startName);
+                optionValues.Append("-");
+                optionValues.Append(startYear);
+                options.Add(optionValues.ToString());
+                optionValues.Clear();
+                startDate = startDate.Subtract(TimeSpan.FromDays(7));
+            }
+            while (startDate > lastDate);
+
+            return options;
+        }
+
+        public DataTable GetWeeklyUsageReport(string weeklyReport)
+        {
+            if (weeklyReport != null)
+            {
+                string[] date = null;
+                date = Regex.Split(weeklyReport, " - ");
+                DateTime endDate = Convert.ToDateTime(date[1]);
+                DateTime startDate = Convert.ToDateTime(date[0]);
+                strQuery.Clear();
+                strQuery.Append("SELECT to_char(HIT_DATE,'DD-MON-YY') as HIT_DATE,HIT_COUNT FROM CSU_TRAFFIC WHERE ");
+                strQuery.Append(" HIT_DATE >= to_date('" + startDate.ToString("dd/MM/yyyy") + "','DD/MM/YYYY')");
+                strQuery.Append(" AND HIT_DATE <= to_date('" + endDate.ToString("dd/MM/yyyy") + "','DD/MM/YYYY')");
+                strQuery.Append(" order by hit_date ASC");
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            }
+            return null;
+        }
+
+        //Get Countries List for CAPMAN Access Report
+        public DataTable GetCountries()
+        {
+            strQuery.Clear();
+
+             strQuery.Append(" select distinct chs.country_id, cc.country_name");
+             strQuery.Append(" from capman_access_cases_map cacm, capman_pop_map cpm, csu_hub_site chs, csu_country cc");
+             strQuery.Append(" where acm.c_pop_id = cpm.c_pop_id and cpm.pc_pop_id = chs.hub_site_id and cc.country_id = chs.country_id and country_valid_cd = 1");
+             strQuery.Append(" ORDER BY UPPER(cc.country_name)");
+
+            
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+        }
+
+        //Get Suppliers List for CAPMAN Access Report
+        public DataTable GetSuppliers()
+        {
+            strQuery.Clear();
+
+             strQuery.Append(" select distinct char_id as access_supplier_char_id,");
+             strQuery.Append(" char_name as supplier_name");
+            strQuery.Append(" from csu_ref_valid_char crvc, capman_access_cases_map cacm, capman_supplier_map supplier_map, capman_pop_map cpm, csu_hub_site chs");
+            strQuery.Append(" where char_type_id = 505 ");
+            strQuery.Append(" and cacm.c_supplier_id = supplier_map.c_supplier_id and supplier_map.pc_supplier_id = crvc.char_id");
+            strQuery.Append(" and cacm.c_pop_id = cpm.c_pop_id and cpm.pc_pop_id = chs.hub_site_id ORDER BY UPPER(supplier_name)");
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+        }
+
+
+        //Get Access Speed for CAPMAN Access Report
+        public DataTable GetAccessSpeed()
+        {
+            strQuery.Clear();
+
+            strQuery.Append(" select distinct crvc2.CHAR_ID, crvc2.char_name, crvc2.char_actual_value, crvc2.char_num_value, crvc2.char_unit_of_measure");
+            strQuery.Append(" from csu_ref_valid_char crvc, csu_ref_valid_char crvc2, capman_access_cases_map cacm, capman_supplier_map supplier_map,");
+            strQuery.Append(" capman_pop_map cpm, csu_hub_site chs, capman_access_speed_map casm, csu_cases");
+            strQuery.Append(" where  cacm.c_supplier_id = supplier_map.c_supplier_id and supplier_map.pc_supplier_id = crvc.char_id");
+            strQuery.Append(" and cacm.c_pop_id = cpm.c_pop_id and cpm.pc_pop_id = chs.hub_site_id");
+            strQuery.Append(" and casm.c_speed_id = cacm.c_speed_id");
+            strQuery.Append(" and crvc2.char_id = casm.pc_speed_id"); 
+            strQuery.Append(" and csu_cases.hub_site_id = cpm.pc_pop_id");
+            strQuery.Append(" and csu_cases.product_cd = 25");
+            strQuery.Append(" and csu_cases.access_speed_char_id = casm.pc_speed_id");
+            strQuery.Append(" and csu_cases.access_supplier_char_id = supplier_map.pc_supplier_id");
+            strQuery.Append(" order by char_num_value");
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        //Get Display Interface for CAPMAN Access Report
+
+        public DataTable GetDisplayInterface()
+        {
+
+            strQuery.Clear();
+
+            strQuery.Append(" select distinct d_interface.char_id as d_interface_id, d_interface.char_name as d_interface_name");
+
+            strQuery.Append(" from csu_ref_valid_char crvc, csu_ref_valid_char crvc2, capman_access_cases_int_map cacim, capman_supplier_map supplier_map,");
+            strQuery.Append(" capman_access_speed_map casm,");
+            strQuery.Append(" capman_pop_map cpm, csu_hub_site chs");
+
+            strQuery.Append(" ,capman_d_interface_map d_interface_map, csu_cases");
+            strQuery.Append(" ,csu_ref_valid_char d_interface");
+
+            strQuery.Append(" where cacim.c_supplier_id = supplier_map.c_supplier_id and supplier_map.pc_supplier_id = crvc.char_id"); 
+            strQuery.Append(" and cacim.c_pop_id = cpm.c_pop_id and cpm.pc_pop_id = chs.hub_site_id"); 
+            strQuery.Append(" and casm.c_speed_id = cacim.c_speed_id"); 
+            strQuery.Append(" and crvc2.char_id = casm.pc_speed_id");
+
+
+            strQuery.Append(" and d_interface_map.c_interface_id = cacim.c_interface_id");
+            strQuery.Append(" and d_interface_map.c_framing_id = cacim.c_framing_id");
+            strQuery.Append(" and d_interface_map.c_connector_id = cacim.c_connector_id"); 
+            strQuery.Append(" and d_interface_map.pc_d_interface_id = d_interface.char_id"); 
+
+            strQuery.Append(" and csu_cases.hub_site_id = cpm.pc_pop_id"); 
+            strQuery.Append(" and csu_cases.product_cd = 25"); 
+            strQuery.Append(" and csu_cases.access_speed_char_id = casm.pc_speed_id");
+            strQuery.Append(" and csu_cases.access_supplier_char_id = supplier_map.pc_supplier_id");
+            strQuery.Append(" order by d_interface_name;");
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        //Fetch Countries for Access Supplier Report
+
+        public DataTable GetCountriesForAccessSuppRpt()
+        {
+            strQuery.Append(" select distinct A.country_name, A.country_id");
+            strQuery.Append(" from csu_country A, csu_cases B, csu_ref_subproduct C"); 
+            strQuery.Append(" where A.country_id = B.country_id");  
+            strQuery.Append(" and B.product_cd = 15"); 
+            strQuery.Append(" and B.subproduct_cd = C.subproduct_Cd"); 
+            strQuery.Append(" and Upper(C.subproduct_name) = 'CCS ORIGINATIONS'"); 
+            strQuery.Append(" and Case_Avail_Cd in (1  , 3)"); 
+            strQuery.Append(" and Case_Valid_Cd = 1");
+            strQuery.Append(" ORDER BY country_Name");
+
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        #region Notes Audit Report, Case Audit Report, Batch Case Audit Report
+        public DataTable FetchProdAndSubProd()
+        {
+
+           strQuery.Clear();
+           strQuery.Append(" Select distinct a.Product_cd, Product_name, Service_Type_desc,Product_Abbr from csu_product a,");
+           strQuery.Append(" csu_ref_service_type b where a.service_type_cd = b.service_Type_cd AND product_valid_Cd = 1 ORDER BY b.service_type_desc");
+
+           return objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+        }
+
+        public DataTable FetchServiceTypeAndProducts(string Report)
+        {
+
+            strQuery.Clear();
+            switch (Report)
+            {
+               case "Notes": strQuery.Append("  Select distinct a.Product_cd, Product_name, Service_Type_desc,Product_Abbr from csu_product a," +
+                                " csu_ref_service_type b where a.service_type_cd = b.service_Type_cd AND product_valid_Cd = 1 " +
+                                //" and a.Product_cd in (Select distinct(product_cd) from csu_notes)" +
+                                " ORDER BY b.service_type_desc");
+                              break;
+               case "Case": strQuery.Append("  Select distinct a.Product_cd, Product_name, Service_Type_desc,Product_Abbr from csu_product a," +
+                               " csu_ref_service_type b where a.service_type_cd = b.service_Type_cd AND product_valid_Cd = 1 " +
+                               //" and a.Product_cd in (Select distinct(product_cd) from csu_cases)" +
+                               " ORDER BY b.service_type_desc");
+                              break;
+               default: strQuery.Append(" Select distinct a.Product_cd, Product_name, Service_Type_desc,Product_Abbr from csu_product a,");
+                              strQuery.Append(" csu_ref_service_type b where a.service_type_cd = b.service_Type_cd AND product_valid_Cd = 1 ORDER BY b.service_type_desc");
+                              break;
+           }
+                
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+        }       
+         #endregion
+
+        #region Case Audit REport
+        public DataTable FetchCaseAuditReport(string productCode)
+        {
+            strQuery.Clear();
+            if (productCode == "58")
+            {
+                strQuery.Append(" Select distinct a.Case_id, b.country_name,c.city_name, d.hub_site_Name, (select User_name from CSU_USER where EMP_Id = a.created_emp_id) as Created_user,");
+                strQuery.Append(" to_char(a.created_dt,'DD-MON-YYYY HH24:MI'),(select User_name from CSU_USER where EMP_Id = a.updated_emp_id) as Updated_user,to_char(a.updated_dt,'DD-MON-YYYY HH24:MI'),");
+                strQuery.Append(" a.case_valid_cd ,g.char_actual_value, g.char_unit_of_measure, g.char_num_value ,h.char_name, i.subproduct_abbr from csu_cases a,");
+                strQuery.Append(" csu_country b,csu_city c, csu_hub_site d, csu_ref_valid_char g, csu_ref_valid_char h,");
+                strQuery.Append(" csu_ref_subproduct i where a.country_id = b.country_id AND a.city_id = c.city_id(+) AND a.hub_site_id = d.hub_site_id(+)");
+                strQuery.Append(" AND g.char_id(+) = a.access_speed_char_id AND");
+                strQuery.Append(" h.char_id(+) = a.access_supplier_char_id AND i.subproduct_cd(+) = a.subproduct_cd AND a.product_cd = '" + productCode + "'");
+                strQuery.Append(" ORDER BY b.country_name ASC, c.city_name ASC");
+            }
+
+            else
+            {
+                strQuery.Append(" SELECT DISTINCT a.Case_id,");
+                strQuery.Append(" b.country_name,");
+                strQuery.Append(" c.city_name,"); 
+                strQuery.Append(" d.hub_site_Name,");
+                strQuery.Append(" (select User_name from CSU_USER where EMP_Id = a.created_emp_id) AS Created_user,");
+                strQuery.Append(" TO_CHAR(a.created_dt,'DD-MON-YYYY HH24:MI') as created_dt,");
+                strQuery.Append(" (select User_name from CSU_USER where EMP_Id = a.updated_emp_id) AS Updated_user,");
+                strQuery.Append(" TO_CHAR(a.updated_dt,'DD-MON-YYYY HH24:MI') as updated_dt,");
+                strQuery.Append(" a.case_valid_cd");
+                strQuery.Append(" FROM csu_cases a,");
+                strQuery.Append(" csu_country b,");
+                strQuery.Append(" csu_city c,");
+                strQuery.Append(" csu_hub_site d");                
+                strQuery.Append(" WHERE a.country_id   = b.country_id");
+                strQuery.Append(" AND a.city_id        = c.city_id(+)");
+                strQuery.Append(" AND a.hub_site_id    = d.hub_site_id(+)");                
+                strQuery.Append(" AND a.product_cd ='" + productCode + "'");
+                strQuery.Append(" ORDER BY b.country_name ASC, c.city_name ASC");
+            }
+
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable FetchCaseDetailAuditReport(string caseID)
+        {
+            strQuery.Clear();
+            strQuery.Append(" SELECT b.char_type_name, ");
+            strQuery.Append(" c.char_name, ");
+            strQuery.Append(" (select User_name from CSU_USER where EMP_Id = a.created_emp_id) AS Created_user, ");
+            strQuery.Append(" TO_CHAR(a.created_dt,'DD-MON-YYYY HH24:MI') as created_dt, ");
+            strQuery.Append(" (select User_name from CSU_USER where EMP_Id = a.updated_emp_id) AS Updated_user, ");
+            strQuery.Append(" TO_CHAR(a.updated_dt,'DD-MON-YYYY HH24:MI') as updated_dt, ");
+            strQuery.Append(" a.case_detail_valid_Cd ");
+            strQuery.Append(" FROM csu_case_details a, ");
+            strQuery.Append(" csu_ref_char_type b, ");
+            strQuery.Append(" csu_ref_valid_char c ");            
+            strQuery.Append(" WHERE a.char_id  = c.char_id ");
+            strQuery.Append(" AND a.char_type_id   = b.char_type_id");            
+            strQuery.Append(" AND a.case_id       = '" + caseID + "'");
+            strQuery.Append(" ORDER BY 1,2 ");
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        #endregion
+
+
+        #region Notes Audit Report
+
+        public DataTable GetNotesAuditReport(int productCode)
+        {
+            strQuery.Clear();
+            strQuery.Append(" Select Note_id, Note_Title,");
+            strQuery.Append(" (select User_name from CSU_USER where EMP_Id = a.Created_emp_id) as CraetedBy,to_char(a.created_dt,'DD-MON-YYYY HH24:MI') as CreatedDate,");
+            strQuery.Append(" (select User_name from CSU_USER where EMP_Id = a.Updated_emp_id) as UpdatedBy,to_char(a.updated_dt,'DD-MON-YYYY HH24:MI') as UpdatedDate from ");
+            strQuery.Append(" csu_notes a");
+            strQuery.Append(" where product_cd = '" + productCode + "'");            
+            strQuery.Append(" AND RowNum <= 10000 ");
+            strQuery.Append(" ORDER BY a.Updated_dt DESC ");
+
+              return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+
+         #endregion
+
+        #region Supplier Access Report
+
+        public DataTable FetchCountries()
+        {
+            strQuery.Clear();
+
+            
+           strQuery.Append(" SELECT DISTINCT A.country_name,");
+           strQuery.Append("  A.country_id");
+           strQuery.Append(" FROM csu_country A,");
+           strQuery.Append("  csu_cases B,");
+           strQuery.Append("  csu_ref_subproduct C");
+           strQuery.Append(" WHERE A.country_id           = B.country_id");
+           strQuery.Append("  AND B.product_cd             = 15");
+           strQuery.Append(" AND B.subproduct_cd          = C.subproduct_Cd");
+           strQuery.Append(" AND Upper(C.subproduct_name) = 'CCS ORIGINATIONS'");
+           strQuery.Append(" AND Case_Avail_Cd           IN (1,3)");
+           strQuery.Append(" AND Case_Valid_Cd            = 1");
+           strQuery.Append(" ORDER BY country_Name");
+
+           return objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+        }
+
+        //public DataTable FetchAccessSuppRepForACountry(string countryID)
+        //{
+        //    strQuery.Clear();
+
+        //    strQuery.Append(" SELECT DISTINCT char_name,");
+        //    strQuery.Append(" C.char_id");
+        //    strQuery.Append(" FROM csu_cases A,");
+        //    strQuery.Append(" csu_case_details B,");
+        //    strQuery.Append(" csu_ref_valid_char C,");
+        //    strQuery.Append(" csu_ref_char_type D");
+        //    strQuery.Append(" WHERE A.case_id             = B.case_id");
+        //    strQuery.Append(" AND A.product_cd            = 15");
+        //    strQuery.Append(" AND A.country_id            = '" + countryID + "'");
+        //    strQuery.Append(" AND B.char_id               = C.char_id");
+        //    strQuery.Append(" AND B.char_type_id          = D.char_type_id");
+        //    strQuery.Append(" AND upper(D.char_type_name) = 'CALLER ACCESS TYPE'");
+        //    strQuery.Append("AND Case_Valid_Cd           = 1");
+
+        //    return objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+
+        //}
+
+      
+
+            public DataTable FetchColHeadAndValues(int countryID)
+            {
+                string strQuery = string.Empty;
+                DataTable dtResultTable = new DataTable();
+                string strInnerQuery = string.Empty;
+
+                strQuery = " SELECT distinct char_name, C.char_id from csu_cases A, csu_case_details B, csu_ref_valid_char C, csu_ref_char_type D WHERE A.case_id = B.case_id and A.product_cd = 15 and A.country_id = '" + countryID + "'  and B.char_id = C.char_id and B.char_type_id = D.char_type_id and upper(D.char_type_name) = 'CALLER ACCESS TYPE' and Case_Valid_Cd = 1";
+
+                DataTable dtColHeaders = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+
+                for (int i = 0; i < dtColHeaders.Rows.Count; i++)
+                {
+                    dtResultTable.Columns.Add(dtColHeaders.Rows[i]["CHAR_NAME"].ToString());
+
+                }
+
+
+                for (int i = 0; i < dtColHeaders.Rows.Count; i++)
+                {
+                    strQuery = " Select b.char_id, b.char_actual_value FROM csu_ref_char_depend a, csu_ref_valid_char b where a.char_id = b.char_id and a.depend_char_id = '" + dtColHeaders.Rows[i]["CHAR_ID"] + "' and a.Avail_cd = 1 and a.depend_product_Cd = 15 and a.depend_valid_cd = 1";
+                    DataTable dtColValues = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+                    if (dtColValues.Rows.Count > 1)
+                    {
+
+                        for (int j = 0; j < dtColValues.Rows.Count; j++)
+                        {
+
+                            strInnerQuery = "Select b.char_value FROM csu_cases a, csu_case_details b where a.case_id = b.case_id and b.char_id = '" + dtColValues.Rows[j]["CHAR_ID"] + "' and a.product_Cd = 15 and a.country_id = '" + countryID + "'  and a.case_valid_cd = 1 and b.case_detail_valid_cd = 1";
+
+                            DataTable dtInnerColValues = objGetDataFromDB.GetDataTable(strInnerQuery.ToString());
+
+                            if (dtInnerColValues.Rows.Count > 0)
+                            {
+                                for (int k = 0; k < dtInnerColValues.Rows.Count; k++)
+                                {
+                                    if (dtResultTable.Rows.Count > 0)
+                                    {
+                                        dtResultTable.Rows[0][i] = dtResultTable.Rows[0][i].ToString() +" "+ dtInnerColValues.Rows[k][0].ToString();
+                                    }
+                                    else
+                                    {
+                                        DataRow dr = dtResultTable.NewRow();
+                                        dr[i]  = dtInnerColValues.Rows[k][0].ToString();
+                                        dtResultTable.Rows.Add(dr);
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+                DataRow dr1 = dtResultTable.NewRow();
+                for (int i = 0; i < dtColHeaders.Rows.Count; i++)
+                {
+
+                    dr1[i] = dtColHeaders.Rows[i][0];
+                }
+                dtResultTable.Rows.Add(dr1);
+                return dtResultTable;
+
+            }
+        #endregion
+
+        #region Capman Report ----Haribabu
+            public DataTable FetchproductList(int userid, bool issuperuser)
+            {
+                string sqlQuery = string.Empty;
+                strQuery.Clear();
+                DataTable dtResultTable = new DataTable();
+                string strInnerQuery = string.Empty;
+
+                if (issuperuser)
+                {
+                    sqlQuery = "Select PRODUCT_cd from csu_PRODUCT";
+                }
+                else
+                {
+                    sqlQuery ="Select PRODUCT_cd  from csu_user_PRODUCT_owner where Upper(emp_id) = " + userid + " and PRODUCT_owner_status_cd =1";
+                }
+
+                strQuery.Append(" SELECT product_cd,product_abbr,product_name FROM CSU_PRODUCT where");
+                strQuery.Append(" PRODUCT_LOC_LEVEL_CD NOT IN (1,2,3) And PRODUCT_cd in (" + sqlQuery + ") ORDER BY upper(product_name)");
+
+                DataTable dtproductValues = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+                dtproductValues.Columns.Add("subproduct_cd");
+                
+                if (dtproductValues.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dtproductValues.Rows.Count; i++)
+                    {
+                        strInnerQuery = "Select subproduct_cd, subproduct_name from csu_ref_subproduct where product_cd = '"+ dtproductValues.Rows[i]["product_cd"] +"' ";
+                        DataTable dtsubproductValues = objGetDataFromDB.GetDataTable(strInnerQuery.ToString());
+
+                        if (dtsubproductValues.Rows.Count > 0)
+                        {
+                            for (int k = 0; k < dtsubproductValues.Rows.Count; k++)
+                            {
+                              dtproductValues.Rows[i]["product_name"] = dtproductValues.Rows[i]["product_name"] + " - " + dtsubproductValues.Rows[k]["subproduct_name"];
+                              dtproductValues.Rows[i]["subproduct_cd"] = dtsubproductValues.Rows[k]["subproduct_cd"];
+                            }
+                        }
+                        else
+                        {
+                            dtproductValues.Rows[i]["subproduct_cd"] = 0; 
+                        }
+                    }
+                }
+
+                dtproductValues.Columns.Remove("service_type_cd");
+                dtproductValues.Columns.Remove("service_type_cd");
+
+                return dtproductValues;
+            }
+
+            public DataTable fetchcountriesbyproduct(int productid)
+            {
+                
+               strQuery.Clear();
+               DataTable dtcountries = new DataTable();
+               strQuery.Append("Select distinct a.country_id,c.country_name from csu_cases a ,csu_country c,csu_product p where a.country_id=c.country_id and country_valid_cd=1 and");
+               strQuery.Append(" a.product_cd=" +productid+ " and p.product_cd=a.product_cd and p.product_loc_level_cd ='4' order by c.country_name");
+               dtcountries = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+               return dtcountries;
+            }
+
+            public DataTable fetchCityPopSpeeds(int countryid,int productid,int subproductid)
+            {
+                
+                string sqlQuery = string.Empty;
+                strQuery.Clear();
+                DataTable dtResultTable = new DataTable();
+                dtResultTable.Columns.Add("Country");
+                dtResultTable.Columns.Add("City-Pop");
+                dtResultTable.Columns.Add("CityPop-Port-Exists");
+                dtResultTable.Columns.Add("Access_Speed");
+                dtResultTable.Columns.Add("portSpeedExists");
+                StringBuilder sqlsubQuery = new StringBuilder();
+
+                strQuery.Append(" SELECT HUB_SITE_NAME, '' AS CHAR_NAME, '' AS CHAR_ACTUAL_VALUE, '' AS CHAR_UNIT_OF_MEASURE, 0 AS CHAR_NUM_VALUE, COUNTRY_NAME, CITY_NAME, CC.CASE_AVAIL_CD, CC.CASE_VALID_CD,");
+                strQuery.Append(" -1 AS CHAR_AVAIL_CD, -1 AS CASE_DETAIL_VALID_CD, CC.CASE_ID, CHS.HUB_SITE_ID, -1 AS PC_SPEED_ID, CSU_PRODUCT.PRODUCT_NAME, CSU_CITY.CITY_ID,cp.CAPMAN_PLATFORM_NAME,cp.CAPMAN_PLATFORM_ID ,g.char_name || '-' || 'Port Speed ' || h.char_actual_value || ' ' || h.char_unit_of_measure x_name FROM ");
+                strQuery.Append(" CAPMAN_POP_MAP CPM, CSU_HUB_SITE CHS, CSU_CASES CC, CSU_COUNTRY, CSU_CITY, CSU_PRODUCT, CAPMAN_PLATFORMS cp ,csu_ref_valid_char g,csu_ref_valid_char h WHERE CPM.PC_POP_ID = CHS.HUB_SITE_ID AND CSU_COUNTRY.COUNTRY_ID = CHS.COUNTRY_ID AND CC.HUB_SITE_ID = CHS.HUB_SITE_ID AND");
+                strQuery.Append(" CHS.CITY_ID = CSU_CITY.CITY_ID AND CC.CITY_ID = CHS.CITY_ID AND CC.COUNTRY_ID = CHS.COUNTRY_ID AND CC.PRODUCT_CD =" + productid + "AND cp.CAPMAN_PLATFORM_ID = cc.CAPMAN_PLATFORM_ID AND CC.SUBPRODUCT_CD ='"+ subproductid +"'");
+                strQuery.Append(" AND CC.PRODUCT_CD = CSU_PRODUCT.PRODUCT_CD AND CITY_NAME != 'All Cities' AND CC.COUNTRY_ID IN (" + countryid + ") AND g.char_id = cc.access_supplier_char_id AND h.char_id = cc.access_speed_char_id ORDER BY COUNTRY_NAME, CITY_NAME, HUB_SITE_NAME, CHAR_NUM_VALUE");
+                DataTable dtcitypops = objGetDataFromDB.GetDataTable(strQuery.ToString());
+               
+
+                if (dtcitypops.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dtcitypops.Rows.Count; i++)
+                    {
+                        sqlsubQuery.Clear();
+                        sqlsubQuery.Append("SELECT DISTINCT access_speed_char_id,char_actual_value ||char_unit_of_measure AS AccessSpeed,(SELECT DECODE(MAX(valid_cd),'',2)");
+                        sqlsubQuery.Append(" FROM csu_case_port_access_speeds c1 WHERE c1.ACCESS_SPEED_CHAR_ID =c2.access_speed_char_id AND c1.ACCESS_PRODUCT_TYPE_ID =c2.ACCESS_PRODUCT_TYPE_ID");
+                        sqlsubQuery.Append(" AND c1.ACCESS_SUPPLIER_CHAR_ID=c2.ACCESS_SUPPLIER_CHAR_ID AND c1.ACCESS_SUPPLIER_NAME_ID=c2.ACCESS_SUPPLIER_NAME_ID AND c1.CASE_ID ='" + dtcitypops.Rows[i]["CASE_ID"] + "'");
+                        sqlsubQuery.Append(" AND c1.valid_cd =1) AS valid_cd, (SELECT DECODE(MAX(valid_cd),'',2) FROM csu_case_port_access_speeds c1 WHERE c1.ACCESS_SPEED_CHAR_ID =c2.access_speed_char_id");
+                        sqlsubQuery.Append(" AND c1.ACCESS_PRODUCT_TYPE_ID =c2.ACCESS_PRODUCT_TYPE_ID AND c1.ACCESS_SUPPLIER_CHAR_ID=c2.ACCESS_SUPPLIER_CHAR_ID AND c1.ACCESS_SUPPLIER_NAME_ID=c2.ACCESS_SUPPLIER_NAME_ID");
+                        sqlsubQuery.Append(" AND c1.CASE_ID = (SELECT case_id FROM csu_cases WHERE product_cd = (SELECT parent_product_cd FROM csu_product WHERE product_cd=" + productid + ") AND hub_site_id='" + dtcitypops.Rows[i]["HUB_SITE_ID"] + "'");
+                        sqlsubQuery.Append(" AND capman_platform_id=0)AND c1.valid_cd=1) AS valid_cd_2, (SELECT DECODE(MAX(valid_cd),'',2) FROM csu_parent_port_access_speeds c1 WHERE c1.ACCESS_SPEED_CHAR_ID =c2.access_speed_char_id");
+                        sqlsubQuery.Append(" AND c1.ACCESS_PRODUCT_TYPE_ID =c2.ACCESS_PRODUCT_TYPE_ID AND c1.ACCESS_SUPPLIER_CHAR_ID=c2.ACCESS_SUPPLIER_CHAR_ID AND c1.ACCESS_SUPPLIER_NAME_ID=c2.ACCESS_SUPPLIER_NAME_ID");
+                        sqlsubQuery.Append(" AND c1.CASE_ID =" + dtcitypops.Rows[i]["CASE_ID"] + " AND c1.valid_cd=1) AS valid_cd_3 FROM csu_ref_valid_char c3,csu_cases c2 WHERE country_id =" + countryid + " AND city_id =" + dtcitypops.Rows[i]["CITY_ID"] + " AND hub_site_id  ='" + dtcitypops.Rows[i]["HUB_SITE_ID"] + "'");
+                        sqlsubQuery.Append(" AND case_valid_cd=1 AND c3.CHAR_ID = c2.ACCESS_SPEED_CHAR_ID AND product_cd =25");
+                        DataTable dtaccessspeeds = objGetDataFromDB.GetDataTable(sqlsubQuery.ToString());
+                        string speeds = string.Empty;
+                        String portspeedExist = string.Empty;
+                        if (dtaccessspeeds.Rows.Count > 0)
+                        {
+                            for (int k = 0; k < dtaccessspeeds.Rows.Count; k++)
+                            {
+                                
+                                speeds = speeds + dtaccessspeeds.Rows[k]["AccessSpeed"] + ",";
+                                if (dtaccessspeeds.Rows[k]["valid_cd"] == DBNull.Value || dtaccessspeeds.Rows[k]["valid_cd_2"] == DBNull.Value || dtaccessspeeds.Rows[k]["valid_cd_3"] == DBNull.Value)
+                                {
+                                    portspeedExist = portspeedExist + dtaccessspeeds.Rows[k]["AccessSpeed"] +",";
+                                }
+                            }
+                        }
+
+                            DataRow dr = dtResultTable.NewRow();
+                            dr["Country"] = dtcitypops.Rows[0]["COUNTRY_NAME"];
+                            dr["City-Pop"] = dtcitypops.Rows[i]["CITY_NAME"] + "-" + dtcitypops.Rows[i]["HUB_SITE_NAME"] + "-" + dtcitypops.Rows[i]["X_NAME"];
+                            dr["CityPop-Port-Exists"] = dtcitypops.Rows[i]["CASE_VALID_CD"];
+                            dr["Access_Speed"] = speeds;
+                            dr["portSpeedExists"] = portspeedExist;
+                            dtResultTable.Rows.Add(dr);
+                       
+                    }
+                }
+                return dtResultTable;
+            }
+            public DataTable fetchAccessSuppliers(int countryid)
+            {
+                string sqlQuery = string.Empty;
+                strQuery.Clear();
+                DataTable dtaccesssuppliers = new DataTable();
+                strQuery.Append("select distinct char_id as access_supplier_char_id, char_name as supplier_name from csu_ref_valid_char crvc, capman_access_cases_map cacm,");
+                 strQuery.Append(" capman_supplier_map supplier_map, capman_pop_map cpm, csu_hub_site chs where char_type_id = 505 and cacm.c_supplier_id = supplier_map.c_supplier_id");
+               strQuery.Append(" and supplier_map.pc_supplier_id = crvc.char_id and cacm.c_pop_id = cpm.c_pop_id and cpm.pc_pop_id = chs.hub_site_id");
+               if (countryid != 0)
+               {
+                   strQuery.Append(" and chs.country_id ='" +countryid+ "'");
+               }
+                strQuery.Append((" ORDER BY UPPER(supplier_name)"));
+               dtaccesssuppliers = objGetDataFromDB.GetDataTable(strQuery.ToString());
+               return dtaccesssuppliers;
+            }
+
+            public DataTable fetchAccessSpeeds(int countryid,string supplierid)
+            {
+                strQuery.Clear();
+                strQuery.Append("select distinct crvc2.CHAR_ID, crvc2.char_name, crvc2.char_actual_value, crvc2.char_num_value, crvc2.char_unit_of_measure");
+                strQuery.Append(" from csu_ref_valid_char crvc, csu_ref_valid_char crvc2, capman_access_cases_map cacm, capman_supplier_map supplier_map, capman_pop_map cpm,");
+                strQuery.Append(" csu_hub_site chs, capman_access_speed_map casm, csu_cases where cacm.c_supplier_id = supplier_map.c_supplier_id and supplier_map.pc_supplier_id = crvc.char_id");
+                strQuery.Append(" and cacm.c_pop_id = cpm.c_pop_id and cpm.pc_pop_id = chs.hub_site_id and casm.c_speed_id = cacm.c_speed_id and crvc2.char_id = casm.pc_speed_id");
+                strQuery.Append(" and csu_cases.hub_site_id = cpm.pc_pop_id and csu_cases.product_cd = 25 and csu_cases.access_speed_char_id = casm.pc_speed_id");
+                strQuery.Append(" and csu_cases.access_supplier_char_id = supplier_map.pc_supplier_id");
+                if (countryid !=0)
+                {
+                strQuery.Append(" and chs.country_id ='" +countryid+"'");
+                }
+                if (supplierid !="")
+                {
+                    strQuery.Append(" and supplier_map.pc_supplier_id in ('" + supplierid.ToString().Replace(",", "','") + "')");
+                }
+
+                strQuery.Append(" order by char_num_value");
+               DataTable dtaccessspeed =objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+                if(dtaccessspeed.Rows.Count>0)
+                {
+                    for (int i=0;i<dtaccessspeed.Rows.Count;i++)
+                    {
+                        dtaccessspeed.Rows[i]["char_actual_value"] = dtaccessspeed.Rows[i]["char_actual_value"].ToString() +" "+ dtaccessspeed.Rows[i]["char_unit_of_measure"].ToString();
+                    }
+                }
+
+                return dtaccessspeed;
+            }
+            public DataTable fetchinterfacetypes(int countryid, string supplierid, string accessspeedid)
+            {
+                strQuery.Clear();
+                DataTable dtInterfaceTypes = new DataTable();
+                strQuery.Append("select distinct d_interface.char_id as d_interface_id, d_interface.char_name as d_interface_name from csu_ref_valid_char crvc,csu_ref_valid_char crvc2,");
+                strQuery.Append(" capman_access_cases_int_map cacim, capman_supplier_map supplier_map, capman_access_speed_map casm , capman_pop_map cpm, csu_hub_site chs ,");
+                strQuery.Append(" capman_d_interface_map d_interface_map, csu_cases , csu_ref_valid_char d_interface where cacim.c_supplier_id = supplier_map.c_supplier_id and supplier_map.pc_supplier_id = crvc.char_id ");
+                strQuery.Append(" and cacim.c_pop_id = cpm.c_pop_id and cpm.pc_pop_id = chs.hub_site_id and casm.c_speed_id = cacim.c_speed_id and crvc2.char_id = casm.pc_speed_id ");
+                strQuery.Append(" and d_interface_map.c_interface_id = cacim.c_interface_id and d_interface_map.c_framing_id = cacim.c_framing_id and d_interface_map.c_connector_id = cacim.c_connector_id ");
+                strQuery.Append("and d_interface_map.pc_d_interface_id = d_interface.char_id and csu_cases.hub_site_id = cpm.pc_pop_id and csu_cases.product_cd = 25 and csu_cases.access_speed_char_id = casm.pc_speed_id ");
+                strQuery.Append(" and csu_cases.access_supplier_char_id = supplier_map.pc_supplier_id");
+                if (countryid != 0)
+                {
+                    strQuery.Append(" and chs.country_id ='"+countryid+"'" );
+                }
+                if (supplierid != "")
+                {
+                    strQuery.Append(" and supplier_map.pc_supplier_id in ('" + supplierid.ToString().Replace(",", "','") + "')");
+                }
+                if (accessspeedid != "")
+                {
+                    strQuery.Append(" and casm.pc_speed_id in ('" + accessspeedid.ToString().Replace(",", "','") + "')");
+                }
+                strQuery.Append(" order by d_interface_name");
+
+                dtInterfaceTypes = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+                return dtInterfaceTypes;
+            }
+
+            public DataTable fetchAccessReportdetails(int countryid, string supplierid, string accessspeedid)
+            {
+                strQuery.Clear();
+                DataTable dtAccessreportdetails = new DataTable();
+
+                strQuery.Append(" select distinct cc.country_name, csu_city.city_name ||'-'||chs.hub_site_name As City,crvc.char_name  AS supplier_name,crvc2.char_actual_value||crvc2.char_unit_of_measure||' - '||access_type.char_name||' - '||supplier_prod_name.char_name As Speeds, crvc2.char_name as speed_name,chs.hub_site_name,");
+                strQuery.Append(" crvc2.char_actual_value as speed_value, crvc2.char_num_value as speed_num_value, crvc2.char_unit_of_measure as speed_unit_measure, csu_Cases.case_avail_cd,");
+                strQuery.Append(" csu_cases.case_valid_cd, ccd.char_avail_cd, access_type.char_name as access_type,supplier_prod_name.char_name as supplier_prod_name,csu_cases.case_id from");
+                strQuery.Append(" csu_ref_valid_char crvc, csu_ref_valid_char crvc2, csu_country cc, csu_city, csu_cases, csu_case_details ccd, csu_ref_valid_char access_type, csu_ref_valid_char supplier_prod_name,");
+                strQuery.Append(" csu_hub_site chs where csu_cases.product_cd = 25 and csu_cases.capman_case_valid = 1 and ccd.capman_detail_valid = 1 and ccd.case_id = csu_cases.case_id and ccd.char_type_id = 868 and");
+                strQuery.Append(" chs.hub_site_id = csu_cases.hub_site_id and cc.country_id = chs.country_id and csu_city.city_id = chs.city_id and supplier_prod_name.char_id = csu_cases.access_supplier_name_id and access_type.char_id =");
+                strQuery.Append(" csu_cases.access_product_type_id and crvc.char_id = csu_cases.access_supplier_char_id and crvc2.char_id = csu_cases.access_speed_char_id ");
+                if (countryid != 0)
+                {
+                    strQuery.Append(" and csu_cases.country_id in ('" + countryid.ToString().Replace(",", "','") + "')");
+                }
+                if (supplierid != "")
+                {
+                    strQuery.Append(" and csu_cases.access_supplier_char_id in ('" + supplierid.ToString().Replace(",", "','") + "')");
+                }
+                if (accessspeedid != "")
+                {
+                    strQuery.Append(" and csu_cases.access_speed_char_id in ('" + accessspeedid.ToString().Replace(",", "','") + "')");
+                }
+                strQuery.Append(" order by  1, 2, 3, 4, 7, 6, 8");
+                dtAccessreportdetails = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+                dtAccessreportdetails.Columns.Add("Display_Interfaces");
+                dtAccessreportdetails.Columns.Add("Support");
+                dtAccessreportdetails.Columns.Add("Resiliency");
+
+                if (dtAccessreportdetails.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dtAccessreportdetails.Rows.Count; i++)
+                    {//fetching interfacetype based on caseid
+                        strQuery.Append("Select r.char_name, c.CASE_DETAIL_VALID_CD, av.avail_abbr, c.char_value from CSU_CASE_DETAILS c, csu_ref_valid_char r , csu_ref_availability av , CSU_Cases ,");
+                        strQuery.Append(" ( Select a.PC_POP_ID,b.PC_SUPPLIER_ID,c.PC_ACCESS_TYPE_ID,d.PC_ACCESS_SUPPLIER_NAME_ID,d.PC_COUNTRY_ID, e.PC_SPEED_ID,i.PC_D_INTERFACE_ID,j.IS_ICB From capman_pop_map a,");
+                        strQuery.Append(" capman_supplier_map b,capman_access_type_map c, capman_supplier_prod_name_map d, capman_access_speed_map e, capman_d_interface_map i, V_PC_Zone_Product j,V_PC_BT_POP_CONNECTIONS k ,");
+                        strQuery.Append(" V_PC_PORTTYPE l where A.C_POP_ID = k.SiteID And j.Zoneid = k.ZoneID and j.PORTTYPEID = l.PORTTYPEID and b.c_supplier_id = j.SUPPLIERPRODUCT_SUPPLIERID and ");
+                        strQuery.Append(" c.c_access_type_id = j.SUPPLIERACCESSTYPE_ID and d.c_access_supplier_name_id = j.SupplierProductId and d.c_supplier_id = j.SUPPLIERPRODUCT_SUPPLIERID and e.c_speed_id = l.SPEEDID and");
+                        strQuery.Append(" i.c_interface_id = l.INTERFACEID and i.c_framing_id = l.FRAMINGSTRUCTUREID and i.c_connector_id = l.CONNECTORID ) Access_Cases_int_Map where Access_Cases_int_Map.PC_POP_Id = csu_cases.HUB_SITE_ID");
+                        strQuery.Append(" And Access_Cases_int_Map.PC_SUPPLIER_ID = csu_cases.ACCESS_SUPPLIER_CHAR_ID And Access_Cases_int_Map.PC_ACCESS_SUPPLIER_NAME_ID = csu_cases.ACCESS_SUPPLIER_NAME_ID And Access_Cases_int_Map.PC_COUNTRY_ID = csu_cases.COUNTRY_ID");
+                        strQuery.Append(" And Access_Cases_int_Map.PC_SPEED_ID = csu_cases.ACCESS_SPEED_CHAR_ID And Access_Cases_int_Map.PC_ACCESS_TYPE_ID = csu_cases.ACCESS_PRODUCT_TYPE_ID And C.Char_id = Access_Cases_int_Map.PC_D_INTERFACE_ID");
+                        strQuery.Append(" And c.case_id =" + dtAccessreportdetails.Rows[i]["case_id"] + " and csu_cases.case_id = '"+dtAccessreportdetails.Rows[i]["case_id"]+"' and c.capman_detail_valid=1 and c.char_type_id = 868 and r.char_id = c.char_id and Decode(access_cases_int_map.is_icb,'0','1','3') = av.avail_cd");
+                       String interfacetype = objGetDataFromDB.GetSingleRowFromDB(strQuery.ToString());
+
+                       dtAccessreportdetails.Rows[i]["Display_Interfaces"] = interfacetype;
+
+                       //fetching support based on caseid
+                       strQuery.Clear();
+                       strQuery.Append("Select r.char_actual_value, c.CASE_DETAIL_VALID_CD from CSU_CASE_DETAILS c, csu_ref_valid_char r where c.case_id = '"+dtAccessreportdetails.Rows[i]["case_id"]+"' and c.capman_detail_valid=1 and c.char_type_id = 502 and r.char_id = c.char_id");
+                       String Support = objGetDataFromDB.GetSingleRowFromDB(strQuery.ToString());
+                       dtAccessreportdetails.Rows[i]["Support"] = Support;
+
+                        //fetching resiliency
+                       strQuery.Clear();
+                       strQuery.Append("Select r.char_actual_value, c.CASE_DETAIL_VALID_CD from CSU_CASE_DETAILS c, csu_ref_valid_char r where c.case_id ='"+dtAccessreportdetails.Rows[i]["case_id"]+"' and c.capman_detail_valid=1 and c.char_type_id = 721 and r.char_id = c.char_id ");
+                       String Resiliency = objGetDataFromDB.GetSingleRowFromDB(strQuery.ToString());
+                       dtAccessreportdetails.Rows[i]["Resiliency"] = Resiliency;
+
+                    }
+                }
+
+                return dtAccessreportdetails;
+            }
+
+        #endregion
+#region Standard Report
+
+        public string GetPdtList_OneVoice(string user, int userid)
+        {
+            string sqlquery = string.Empty;
+            if (user =="SPUSER")
+            {
+                sqlquery = "Select PRODUCT_cd from csu_PRODUCT where product_cd not in (select mappedproduct_id from csu_product_sub_product where product_id = 79)";
+            }
+            else if(user=="Product Owner")
+            {
+                sqlquery="Select PRODUCT_cd from csu_PRODUCT where product_cd not in (select mappedproduct_id from csu_product_sub_product where product_id = 79)";
+            }
+            else
+            {
+                sqlquery="Select PRODUCT_cd from csu_user_PRODUCT_owner where Upper(emp_id) = '"+userid+"' and PRODUCT_owner_status_cd =1";
+            }
+            return sqlquery;
+        }
+        public string GetProductList(string user,int userid)
+        {
+            string sqlquery = string.Empty;
+            if (user =="SPUSER")
+            {
+                sqlquery= "Select PRODUCT_cd from csu_PRODUCT";
+            }
+            else
+            {
+                sqlquery= " Select PRODUCT_cd from csu_user_PRODUCT_owner where Upper(emp_id) = '"+userid+"' and PRODUCT_owner_status_cd = 1";
+            }
+
+            return sqlquery;
+        }
+
+            public DataTable fetproductlist(string parent,string user,int userid,string strServiceType,int productcd)
+            {
+                string sqlquery =string.Empty;
+                strQuery.Clear();
+                DataTable dtproductlist = new DataTable();
+
+                if (parent == "/Prodcat22/Administration/AdminReportView.asp" || parent == "DefineStandardReport.asp" || parent == "/Prodcat22/Administration/AdminReportColumnView.asp" || parent == "AdminDisplayOrderUpdate.asp" || parent == "AdminCharDisplayOrderUpdate.asp")
+                {
+               sqlquery =GetProductList(user,userid);
+                }
+                else
+                {
+                   sqlquery= GetPdtList_OneVoice(user,userid);
+                }
+
+                    strQuery.Append("Select product_cd, product_name from csu_product ");
+
+                if(sqlquery!="")
+                {
+                    strQuery.Append(" where "+ sqlquery);
+
+                    if (parent.IndexOf("ADMINCREATENEWCASES", 1) > 0)
+                    {
+                        strQuery.Append(" and product_cd != 25");
+
+                        if (strServiceType == "BANDWIDTH_SERVICE_TYPE" || strServiceType == "ETHERNET_SERVICE_TYPE")
+                        {
+                            strQuery.Append(" and product_cd != '" + productcd + "'");
+                        }
+                    }
+
+                    else if ((parent.IndexOf("ADMINCASEVIEW", 1)) > 0)
+                    {
+                        strQuery.Append(" and product_cd != (select distinct fieldvalue from csu_config_tbl where upper(FIELDNAME) = 'DSL ACCESS'");
+                    }
+        
+                    if((parent.IndexOf("ADMINREPORTVIEW",1))>0 || (parent.IndexOf("DEFINESTANDARDREPORT",1))>0)
+                    {
+                        strQuery.Append(" and product_cd != (select distinct fieldvalue from csu_config_tbl where upper(FIELDNAME) = 'DSL ACCESS')");
+                    }
+		
+        
+                }
+                else
+                {
+                     if (parent.IndexOf("ADMINCREATENEWCASES", 1) > 0)
+                     {
+			            strQuery.Append(" where product_cd != 25");
+
+                         if (strServiceType == "BANDWIDTH_SERVICE_TYPE" || strServiceType == "ETHERNET_SERVICE_TYPE")
+                        {
+                            strQuery.Append(" and product_cd != '" + productcd + "'");
+                        }
+		
+                     }
+		
+                     if((parent.IndexOf("ADMINREPORTVIEW",1))>0 || (parent.IndexOf("DEFINESTANDARDREPORT",1))>0)
+                    {
+                        strQuery.Append(" and product_cd != (select distinct fieldvalue from csu_config_tbl where upper(FIELDNAME) = 'DSL ACCESS')");
+		
+                     }
+                }
+                  if((parent.IndexOf("ADMINDEFINEPRODUCTVIEW",1))>0 || (parent.IndexOf("ADMINCASEVIEW",1))>0)
+                  {
+                      strQuery.Append("and product_cd <> 11");
+                  }
+
+                  strQuery.Append(" order by upper(product_name)");
+                  DataTable dtprodduct = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+                  return dtprodduct;
+
+            }
+
+        public DataTable Fetchsubproduct(int productcd,string parent,string user,int userid)
+    {
+
+        string sqlquery =string.Empty;
+        strQuery.Clear();
+        DataTable dtsubproductlist = new DataTable();
+        sqlquery=GetProductList(user,userid);
+
+         if ((productcd == 79 || productcd == 108) & (parent== "/Prodcat22/Administration/AdminReportView.asp") & (parent!= "DefineStandardReport.asp") & parent!= "/Prodcat22/Administration/AdminReportColumnView.asp")
+         {
+           strQuery.Append("Select distinct a.mappedproduct_id as product_id ,b.product_name as product_name from ");
+           strQuery.Append(" csu_product_sub_product a,csu_product b WHERE a.product_id = " + productcd + " and a.mappedproduct_id = b.product_cd and product_cd not in(100,76) order by upper(b.product_name)");
+	     }
+         else
+         {
+	       strQuery.Append("Select subproduct_cd, subproduct_name from csu_ref_subproduct where product_cd ='" +productcd+"' "+ sqlquery+" order by upper(subproduct_name)" );
+	     }
+         dtsubproductlist = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+         return dtsubproductlist;
+    }
+#endregion
+        #region --define standard report
+
+        public DataTable listCharacteristic(int matrixid)
+        {
+            strQuery.Clear();
+            DataTable dtcharacteristic = new DataTable();
+            strQuery.Append("select a.char_type_id, a.char_id, char_name, a.option_matrix_id, char_actual_value");
+            strQuery.Append(" from CSU_REF_PRODUCT_OPT_MATRIX a, CSU_REF_VALID_CHAR B where option_matrix_id = " + matrixid);
+            strQuery.Append(" and a.char_id = b.char_id and option_matrix_valid_cd = 1");
+            dtcharacteristic = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+            return dtcharacteristic;
+        }
+
+        public bool checkcpeProduct(string productid, string subproductid)
+        {
+            bool iscpeprod;
+            String useCpeProd = string.Empty;
+            string sqlquery = string.Empty;
+            sqlquery = "select use_cpe_product from csu_product where product_Cd = " + productid;
+            useCpeProd = objGetDataFromDB.GetSingleRowFromDB(sqlquery);
+            if (useCpeProd == "1")
+            {
+                iscpeprod = true;
+            }
+            sqlquery = string.Empty;
+            sqlquery = "select use_cpe_subproduct from csu_ref_subproduct where product_cd = " + productid + " and subproduct_cd = " + subproductid;
+            useCpeProd = objGetDataFromDB.GetSingleRowFromDB(sqlquery);
+            if (useCpeProd == "1")
+            {
+                iscpeprod = true;
+            }
+            else
+            {
+                iscpeprod = false;
+            }
+            return iscpeprod;
+        }
+
+        public DataTable dispalySpeedTabColumns(string productid, string subproductid)
+        {
+            strQuery.Clear();
+            DataTable dtspeedcolumns = new DataTable();
+
+            if (checkcpeProduct(productid, subproductid))
+            {
+                if (subproductid != "")
+                {
+                    strQuery.Append("SELECT * FROM csu_ref_report_speedcolumn WHERE product_cd ='" + productid + "' AND subproduct_cd = '" + subproductid + "' order by report_column_cd");
+                }
+                else
+                {
+                    strQuery.Append("SELECT * FROM csu_ref_report_speedcolumn WHERE product_cd ='" + productid + "' order by report_column_cd ");
+                }
+            }
+            else
+            {
+                if (subproductid != "")
+                {
+                    strQuery.Append("SELECT * FROM csu_ref_report_speedcolumn WHERE product_cd ='" + productid + "' AND subproduct_cd ='" + subproductid + "' and column_name not in ('Service Lead Time(With CPE)') order by report_column_cd ");
+                }
+                else
+                {
+                    strQuery.Append("SELECT * FROM csu_ref_report_speedcolumn WHERE product_cd ='" + productid + "' and column_name not in ('Service Lead Time(With CPE)') order by report_column_cd ");
+                }
+            }
+            dtspeedcolumns = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            return dtspeedcolumns;
+        }
+
+        public DataTable displayReports(string productid, string subproductid,string user,int userid)
+        {
+            string productlist;
+            strQuery.Clear();
+            DataTable dtreports = new DataTable();
+            productlist = GetProductList(user, userid);
+            strQuery.Append("select report_cd,report_desc,report_loc_level_cd from csu_ref_report where product_cd = '" + productid + "'");
+            if (subproductid != "")
+            {
+                strQuery.Append(" and subproduct_cd =" + subproductid);
+            }
+            else
+            {
+                strQuery.Append(" and subproduct_cd is null");
+            }
+            strQuery.Append(" and report_valid_cd = 1 order by upper(report_desc)");
+
+            dtreports = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            return dtreports;
+        }
+        public DataTable displayColumnHeaders(string reportid,string reportlevelid)
+        {
+            strQuery.Clear();
+            DataTable dtcolumnheaders = new DataTable();
+            strQuery.Append(" SELECT * FROM csu_ref_report_std_column WHERE report_cd = "+reportid);
+                if (reportlevelid!="4")
+                    {
+                        strQuery.Append(" and column_header <> 'Support Resilient Only' ");
+                    }
+             strQuery.Append(" order by order_cd");
+
+             dtcolumnheaders = objGetDataFromDB.GetDataTable(strQuery.ToString());
+             return dtcolumnheaders;
+        }
+
+        public DataTable dispalyCPEBundleTab (string productid)
+        {
+                strQuery.Clear();
+                DataTable dtCPEBundleTabs = new DataTable();
+                strQuery.Append("select * from CSU_REF_REPORT_CPECOLUMN WHERE product_cd = '" + productid + "' AND cpe_characteristics = 941 order by REPORT_COLUMN_CD");
+                dtCPEBundleTabs = objGetDataFromDB.GetDataTable(strQuery.ToString());
+                return dtCPEBundleTabs;
+        }
+
+        public DataTable fetchCPEMaintTab(string productid)
+        {
+            strQuery.Clear();
+            DataTable dtcpemainttab = new DataTable();
+            string sqlquery = string.Empty;
+            string strpromapped = string.Empty;
+            sqlquery = "select distinct cpe_product_map from csu_ref_product_opt_matrix where product_cd=63 and char_type_id=926 and cpe_product_map='" + productid + "'";
+            strpromapped = objGetDataFromDB.GetSingleRowFromDB(sqlquery);
+            if (strpromapped == "")
+            {
+                strpromapped = "0";
+            }
+            sqlquery = string.Empty;
+
+            sqlquery = "SELECT DISTINCT (char_id) FROM csu_ref_report_cpecolumn WHERE cpe_characteristics = 1021 AND product_cd = " + productid + " and char_id is not null";
+            sqlquery = sqlquery + " MINUS SELECT DISTINCT a.char_id FROM csu_ref_report_column a, csu_ref_char_type b, csu_ref_valid_char c WHERE a.char_type_id = b.char_type_id";
+            sqlquery = sqlquery + " AND b.char_type_id = c.char_type_id AND a.char_id = c.char_id AND b.char_type_value_count NOT IN (5, 6) AND product_cd = 63 AND report_cd = 113 AND MAPPED_PRODUCT = " + strpromapped;
+            DataTable dtcpe = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+            if (dtcpe.Rows.Count > 0)
+            {
+                strQuery.Append("SELECT * FROM csu_ref_report_cpecolumn WHERE product_cd = " + productid + " AND cpe_characteristics = 1021 ");
+                strQuery.Append(" MINUS SELECT * FROM csu_ref_report_cpecolumn WHERE product_cd = " + productid + " AND cpe_characteristics = 1021");
+                strQuery.Append(" and char_id in(" + sqlquery + ") order by 1,2 DESC ");
+            }
+            else
+            {
+                strQuery.Append(" SELECT * FROM csu_ref_report_cpecolumn WHERE product_cd = " + productid + " AND cpe_characteristics = 1021 order by 1,2 DESC");
+            }
+            dtcpemainttab = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+            return dtcpemainttab;
+        }
+        #endregion
+
+        #region Capman Report
+
+
+        public DataTable FetchProducts(int userid, bool issuperuser)
+        {
+            string sqlQuery = string.Empty;
+            strQuery.Clear();
+            DataTable dtResultTable = new DataTable();
+            string strInnerQuery = string.Empty;
+            if (issuperuser)
+            {
+                sqlQuery = "Select PRODUCT_cd from csu_PRODUCT";
+            }
+            else
+            {
+                sqlQuery = "Select PRODUCT_cd  from csu_user_PRODUCT_owner where Upper(emp_id) = " + userid + " and PRODUCT_owner_status_cd =1";
+            }
+
+            strQuery.Append(" SELECT product_cd,product_abbr,product_name FROM CSU_PRODUCT where");
+            strQuery.Append(" PRODUCT_LOC_LEVEL_CD NOT IN (1,2,3) And PRODUCT_cd in (" + sqlQuery + ") ORDER BY upper(product_name)");
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable FetchSubProducts(int productid)
+        {
+            strQuery.Clear();
+            string strInnerQuery = string.Empty;
+            strQuery.Append("Select subproduct_cd, subproduct_name from csu_ref_subproduct where product_cd = " + productid + " ");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable FetchCountriesByProduct(int productid)
+        {
+            strQuery.Clear();
+            DataTable dtcountries = new DataTable();
+            strQuery.Append("Select distinct a.country_id,c.country_name from csu_cases a ,csu_country c,csu_product p where a.country_id=c.country_id and country_valid_cd=1 and");
+            strQuery.Append(" a.product_cd=" + productid + " and p.product_cd=a.product_cd and p.product_loc_level_cd ='4' order by c.country_name");
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable FetchAccessSuppliers(int countryid)
+        {
+            string sqlQuery = string.Empty;
+            strQuery.Clear();
+            DataTable dtaccesssuppliers = new DataTable();
+            strQuery.Append("select distinct char_id as access_supplier_char_id, char_name as supplier_name from csu_ref_valid_char crvc, capman_access_cases_map cacm,");
+            strQuery.Append(" capman_supplier_map supplier_map, capman_pop_map cpm, csu_hub_site chs where char_type_id = 505 and cacm.c_supplier_id = supplier_map.c_supplier_id");
+            strQuery.Append(" and supplier_map.pc_supplier_id = crvc.char_id and cacm.c_pop_id = cpm.c_pop_id and cpm.pc_pop_id = chs.hub_site_id");
+            if (countryid != 0)
+            {
+                strQuery.Append(" and chs.country_id ='" + countryid + "'");
+            }
+            strQuery.Append((" ORDER BY UPPER(supplier_name)"));
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable FetchAccessSpeeds(int countryid, string[] supplierid)
+        {
+            strQuery.Clear();
+            strQuery.Append("select distinct crvc2.CHAR_ID, crvc2.char_name, crvc2.char_actual_value, crvc2.char_num_value, crvc2.char_unit_of_measure");
+            strQuery.Append(" from csu_ref_valid_char crvc, csu_ref_valid_char crvc2, capman_access_cases_map cacm, capman_supplier_map supplier_map, capman_pop_map cpm,");
+            strQuery.Append(" csu_hub_site chs, capman_access_speed_map casm, csu_cases where cacm.c_supplier_id = supplier_map.c_supplier_id and supplier_map.pc_supplier_id = crvc.char_id");
+            strQuery.Append(" and cacm.c_pop_id = cpm.c_pop_id and cpm.pc_pop_id = chs.hub_site_id and casm.c_speed_id = cacm.c_speed_id and crvc2.char_id = casm.pc_speed_id");
+            strQuery.Append(" and csu_cases.hub_site_id = cpm.pc_pop_id and csu_cases.product_cd = 25 and csu_cases.access_speed_char_id = casm.pc_speed_id");
+            strQuery.Append(" and csu_cases.access_supplier_char_id = supplier_map.pc_supplier_id");
+            if (countryid != 0)
+            {
+                strQuery.Append(" and chs.country_id ='" + countryid + "'");
+            }
+            if (supplierid.Length > 0 && !supplierid.Contains("-1"))
+            {
+                strQuery.Append(" and supplier_map.pc_supplier_id in (");
+                foreach (string supId in supplierid)
+                {
+                    strQuery.Append(" '" + supId + "' ");
+                    strQuery.Append(",");
+                }
+                strQuery.Append(")");
+                strQuery.Replace(",)", ")");
+            }
+
+
+            strQuery.Append(" order by char_num_value");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+        public DataTable FetchInterfaceTypes(int countryid, string[] supplierid, string[] accessSpeedId)
+        {
+            strQuery.Clear();
+            DataTable dtInterfaceTypes = new DataTable();
+            strQuery.Append("select distinct d_interface.char_id as d_interface_id, d_interface.char_name as d_interface_name from csu_ref_valid_char crvc,csu_ref_valid_char crvc2,");
+            strQuery.Append(" capman_access_cases_int_map cacim, capman_supplier_map supplier_map, capman_access_speed_map casm , capman_pop_map cpm, csu_hub_site chs ,");
+            strQuery.Append(" capman_d_interface_map d_interface_map, csu_cases , csu_ref_valid_char d_interface where cacim.c_supplier_id = supplier_map.c_supplier_id and supplier_map.pc_supplier_id = crvc.char_id ");
+            strQuery.Append(" and cacim.c_pop_id = cpm.c_pop_id and cpm.pc_pop_id = chs.hub_site_id and casm.c_speed_id = cacim.c_speed_id and crvc2.char_id = casm.pc_speed_id ");
+            strQuery.Append(" and d_interface_map.c_interface_id = cacim.c_interface_id and d_interface_map.c_framing_id = cacim.c_framing_id and d_interface_map.c_connector_id = cacim.c_connector_id ");
+            strQuery.Append("and d_interface_map.pc_d_interface_id = d_interface.char_id and csu_cases.hub_site_id = cpm.pc_pop_id and csu_cases.product_cd = 25 and csu_cases.access_speed_char_id = casm.pc_speed_id ");
+            strQuery.Append(" and csu_cases.access_supplier_char_id = supplier_map.pc_supplier_id");
+            if (countryid != 0)
+            {
+                strQuery.Append(" and chs.country_id ='" + countryid + "'");
+            }
+            if (supplierid.Length > 0 && !supplierid.Contains("-1"))
+            {
+                strQuery.Append(" and supplier_map.pc_supplier_id in (");
+                foreach (string supId in supplierid)
+                {
+                    strQuery.Append(" '" + supId + "' ");
+                    strQuery.Append(",");
+                }
+                strQuery.Append(")");
+                strQuery.Replace(",)", ")");
+            }
+            if (accessSpeedId.Length > 0 && !accessSpeedId.Contains("-1"))
+            {
+                strQuery.Append(" and casm.pc_speed_id in (");
+                foreach (string speedId in accessSpeedId)
+                {
+                    strQuery.Append(" '" + speedId + "' ");
+                    strQuery.Append(",");
+                }
+                strQuery.Append(")");
+                strQuery.Replace(",)", ")");
+            }
+            strQuery.Append(" order by d_interface_name");
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable GetAccessReportData(int countryid, string[] supplierid, string[] accessSpeedId, string[] InterfaceType)
+        {
+            strQuery.Clear();
+            DataTable dtAccessReportDetails = new DataTable();
+            strQuery.Append("select distinct");
+            strQuery.Append(" cc.country_name, csu_city.city_name, chs.hub_site_name, crvc.char_name as supplier_name, crvc2.char_name as speed_name,");
+            strQuery.Append(" chs.hub_site_name,");
+            strQuery.Append(" crvc2.char_actual_value as speed_value, crvc2.char_num_value as speed_num_value, crvc2.char_unit_of_measure as speed_unit_measure,");
+            strQuery.Append(" csu_Cases.case_avail_cd, csu_cases.case_valid_cd, ccd.char_avail_cd, access_type.char_name as access_type,");
+            strQuery.Append(" supplier_prod_name.char_name as supplier_prod_name,");
+            strQuery.Append(" csu_cases.case_id from ");
+            strQuery.Append(" csu_ref_valid_char crvc,");
+            strQuery.Append(" csu_ref_valid_char crvc2,");
+            strQuery.Append(" csu_country cc,");
+            strQuery.Append(" csu_city,");
+            strQuery.Append(" csu_cases,");
+            strQuery.Append(" csu_case_details ccd,");
+            strQuery.Append(" csu_ref_valid_char access_type,");
+            strQuery.Append(" csu_ref_valid_char supplier_prod_name,");
+            strQuery.Append(" csu_hub_site chs where");
+            strQuery.Append(" csu_cases.product_cd = 25");
+            strQuery.Append(" and csu_cases.capman_case_valid = 1 and ccd.capman_detail_valid = 1");
+            strQuery.Append(" and ccd.case_id = csu_cases.case_id");
+            strQuery.Append(" and ccd.char_type_id = 868 ");
+            strQuery.Append(" and chs.hub_site_id = csu_cases.hub_site_id");
+            strQuery.Append(" and cc.country_id = chs.country_id");
+            strQuery.Append(" and csu_city.city_id = chs.city_id");
+            strQuery.Append(" and supplier_prod_name.char_id = csu_cases.access_supplier_name_id");
+            strQuery.Append(" and access_type.char_id = csu_cases.access_product_type_id");
+            strQuery.Append(" and crvc.char_id = csu_cases.access_supplier_char_id");
+            strQuery.Append(" and crvc2.char_id = csu_cases.access_speed_char_id ");
+            if (countryid != 0)
+            {
+                strQuery.Append(" and csu_cases.country_id in ('" + countryid.ToString().Replace(",", "','") + "')");
+            }
+            if (supplierid.Length > 0 && !supplierid.Contains("-1"))
+            {
+                strQuery.Append(" and csu_cases.access_supplier_char_id in (");
+                foreach (string supId in supplierid)
+                {
+                    strQuery.Append(" '" + supId + "' ");
+                    strQuery.Append(",");
+                }
+                strQuery.Append(")");
+                strQuery.Replace(",)", ")");
+            }
+            if (accessSpeedId.Length > 0 && !accessSpeedId.Contains("-1"))
+            {
+                strQuery.Append(" and csu_cases.access_speed_char_id in (");
+                foreach (string speedId in accessSpeedId)
+                {
+                    strQuery.Append(" '" + speedId + "' ");
+                    strQuery.Append(",");
+                }
+                strQuery.Append(")");
+                strQuery.Replace(",)", ")");
+            }
+            strQuery.Append(" order by  1, 2, 3, 4, 7, 6, 8");
+            dtAccessReportDetails = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+            dtAccessReportDetails.Columns.Add("Display_Interfaces");
+            dtAccessReportDetails.Columns.Add("Support");
+            dtAccessReportDetails.Columns.Add("Resiliency");
+            if (dtAccessReportDetails.Rows.Count > 0)
+            {
+                for (int i = 0; i < dtAccessReportDetails.Rows.Count; i++)
+                {
+                    //fetching support based on caseid
+                    strQuery.Clear();
+                    strQuery.Append("Select r.char_actual_value, c.CASE_DETAIL_VALID_CD from CSU_CASE_DETAILS c, csu_ref_valid_char r where c.case_id = '" + dtAccessReportDetails.Rows[i]["case_id"] + "' and c.capman_detail_valid=1 and c.char_type_id = 502 and r.char_id = c.char_id");
+                    String Support = objGetDataFromDB.GetSingleRowFromDB(strQuery.ToString());
+                    dtAccessReportDetails.Rows[i]["Support"] = Support;
+
+                    //fetching resiliency
+                    strQuery.Clear();
+                    strQuery.Append("Select r.char_actual_value, c.CASE_DETAIL_VALID_CD from CSU_CASE_DETAILS c, csu_ref_valid_char r where c.case_id ='" + dtAccessReportDetails.Rows[i]["case_id"] + "' and c.capman_detail_valid=1 and c.char_type_id = 721 and r.char_id = c.char_id ");
+                    String Resiliency = objGetDataFromDB.GetSingleRowFromDB(strQuery.ToString());
+                    dtAccessReportDetails.Rows[i]["Resiliency"] = Resiliency;
+                }
+            }
+            return dtAccessReportDetails;
+        }
+
+        public DataTable FetchCityPOPSData(int countryid, int productid, int subproductid)
+        {
+            string sqlQuery = string.Empty;
+            strQuery.Clear();
+            DataTable dtResultTable = new DataTable();
+            dtResultTable.Columns.Add("Country");
+            dtResultTable.Columns.Add("City-Pop");
+            dtResultTable.Columns.Add("CityPop-Port-Exists");
+            dtResultTable.Columns.Add("Access_Speed");
+            dtResultTable.Columns.Add("portSpeedExists");
+            StringBuilder sqlsubQuery = new StringBuilder();
+
+            strQuery.Append("SELECT HUB_SITE_NAME, '' AS CHAR_NAME, '' AS CHAR_ACTUAL_VALUE, '' ");
+            strQuery.Append(" AS CHAR_UNIT_OF_MEASURE, 0 AS CHAR_NUM_VALUE, COUNTRY_NAME, CITY_NAME, CC.CASE_AVAIL_CD, CC.CASE_VALID_CD, -1");
+            strQuery.Append(" AS CHAR_AVAIL_CD, -1 AS CASE_DETAIL_VALID_CD, CC.CASE_ID, CHS.HUB_SITE_ID, -1");
+            strQuery.Append(" AS PC_SPEED_ID, CSU_PRODUCT.PRODUCT_NAME, CSU_CITY.CITY_ID,cp.CAPMAN_PLATFORM_NAME,cp.CAPMAN_PLATFORM_ID");
+            if (productid == 58)
+            {
+                strQuery.Append(" ,g.char_name || '-' || 'Port Speed ' || h.char_actual_value || ' ' || h.char_unit_of_measure x_name");
+            }
+
+            strQuery.Append(" FROM CAPMAN_POP_MAP CPM, CSU_HUB_SITE CHS, CSU_CASES CC, CSU_COUNTRY, CSU_CITY, CSU_PRODUCT, CAPMAN_PLATFORMS cp");
+            if (productid == 58)
+            {
+                strQuery.Append(" ,csu_ref_valid_char g,csu_ref_valid_char h");
+            }
+            strQuery.Append(" WHERE CPM.PC_POP_ID = CHS.HUB_SITE_ID AND CSU_COUNTRY.COUNTRY_ID = CHS.COUNTRY_ID");
+            strQuery.Append(" AND CC.HUB_SITE_ID = CHS.HUB_SITE_ID AND CHS.CITY_ID = CSU_CITY.CITY_ID");
+            strQuery.Append(" AND CC.CITY_ID = CHS.CITY_ID AND CC.COUNTRY_ID = CHS.COUNTRY_ID AND CC.PRODUCT_CD =" + productid + "");
+            strQuery.Append(" AND cp.CAPMAN_PLATFORM_ID = cc.CAPMAN_PLATFORM_ID ");
+            if (subproductid != 0)
+            {
+                strQuery.Append(" AND CC.SUBPRODUCT_CD ='" + subproductid + "'");
+            }
+            strQuery.Append(" AND CC.PRODUCT_CD = CSU_PRODUCT.PRODUCT_CD AND CITY_NAME != 'All Cities' AND CC.COUNTRY_ID IN (" + countryid + ")");
+            if (productid == 58)
+            {
+                strQuery.Append(" AND g.char_id = cc.access_supplier_char_id AND h.char_id = cc.access_speed_char_id");
+            }
+            strQuery.Append(" ORDER BY COUNTRY_NAME, CITY_NAME, HUB_SITE_NAME, CHAR_NUM_VALUE");
+            DataTable dtcitypops = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+
+            if (dtcitypops.Rows.Count > 0)
+            {
+                for (int i = 0; i < dtcitypops.Rows.Count; i++)
+                {
+                    sqlsubQuery.Clear();
+                    sqlsubQuery.Append("SELECT DISTINCT access_speed_char_id,char_actual_value ||char_unit_of_measure AS AccessSpeed,(SELECT DECODE(MAX(valid_cd),'',2)");
+                    sqlsubQuery.Append(" FROM csu_case_port_access_speeds c1 WHERE c1.ACCESS_SPEED_CHAR_ID =c2.access_speed_char_id AND c1.ACCESS_PRODUCT_TYPE_ID =c2.ACCESS_PRODUCT_TYPE_ID");
+                    sqlsubQuery.Append(" AND c1.ACCESS_SUPPLIER_CHAR_ID=c2.ACCESS_SUPPLIER_CHAR_ID AND c1.ACCESS_SUPPLIER_NAME_ID=c2.ACCESS_SUPPLIER_NAME_ID AND c1.CASE_ID ='" + dtcitypops.Rows[i]["CASE_ID"] + "'");
+                    sqlsubQuery.Append(" AND c1.valid_cd =1) AS valid_cd, (SELECT DECODE(MAX(valid_cd),'',2) FROM csu_case_port_access_speeds c1 WHERE c1.ACCESS_SPEED_CHAR_ID =c2.access_speed_char_id");
+                    sqlsubQuery.Append(" AND c1.ACCESS_PRODUCT_TYPE_ID =c2.ACCESS_PRODUCT_TYPE_ID AND c1.ACCESS_SUPPLIER_CHAR_ID=c2.ACCESS_SUPPLIER_CHAR_ID AND c1.ACCESS_SUPPLIER_NAME_ID=c2.ACCESS_SUPPLIER_NAME_ID");
+                    sqlsubQuery.Append(" AND c1.CASE_ID = (SELECT case_id FROM csu_cases WHERE product_cd = (SELECT parent_product_cd FROM csu_product WHERE product_cd=" + productid + ") AND hub_site_id='" + dtcitypops.Rows[i]["HUB_SITE_ID"] + "'");
+                    sqlsubQuery.Append(" AND capman_platform_id=0)AND c1.valid_cd=1) AS valid_cd_2, (SELECT DECODE(MAX(valid_cd),'',2) FROM csu_parent_port_access_speeds c1 WHERE c1.ACCESS_SPEED_CHAR_ID =c2.access_speed_char_id");
+                    sqlsubQuery.Append(" AND c1.ACCESS_PRODUCT_TYPE_ID =c2.ACCESS_PRODUCT_TYPE_ID AND c1.ACCESS_SUPPLIER_CHAR_ID=c2.ACCESS_SUPPLIER_CHAR_ID AND c1.ACCESS_SUPPLIER_NAME_ID=c2.ACCESS_SUPPLIER_NAME_ID");
+                    sqlsubQuery.Append(" AND c1.CASE_ID =" + dtcitypops.Rows[i]["CASE_ID"] + " AND c1.valid_cd=1) AS valid_cd_3 FROM csu_ref_valid_char c3,csu_cases c2 WHERE country_id =" + countryid + " AND city_id =" + dtcitypops.Rows[i]["CITY_ID"] + " AND hub_site_id  ='" + dtcitypops.Rows[i]["HUB_SITE_ID"] + "'");
+                    sqlsubQuery.Append(" AND case_valid_cd=1 AND c3.CHAR_ID = c2.ACCESS_SPEED_CHAR_ID AND product_cd =25");
+                    DataTable dtaccessspeeds = objGetDataFromDB.GetDataTable(sqlsubQuery.ToString());
+                    string speeds = string.Empty;
+                    //String portspeedExist = string.Empty;
+                    StringBuilder sbSpeed = new StringBuilder();
+                    if (dtaccessspeeds.Rows.Count > 0)
+                    {
+                        for (int k = 0; k < dtaccessspeeds.Rows.Count; k++)
+                        {
+                            if (dtaccessspeeds.Rows[k]["valid_cd"] == DBNull.Value || (dtaccessspeeds.Rows[k]["valid_cd_2"] == DBNull.Value && dtaccessspeeds.Rows[k]["valid_cd_3"] == DBNull.Value))
+                            {
+                                //portspeedExist = portspeedExist + dtaccessspeeds.Rows[k]["AccessSpeed"] + ",";
+                                speeds = speeds + "<font color=" + "'green'" + ">" + dtaccessspeeds.Rows[k]["AccessSpeed"].ToString().Trim() + "</font>" + ",";
+                            }
+                            else
+                            {
+                                speeds = speeds + dtaccessspeeds.Rows[k]["AccessSpeed"].ToString().Trim() + ",";
+                            }
+                            if (k == 10 || k==20 || k==30)
+                            {
+                                speeds = speeds + Environment.NewLine;
+                            }
+                        }
+                    }
+
+                    DataRow dr = dtResultTable.NewRow();
+                    dr["Country"] = dtcitypops.Rows[0]["COUNTRY_NAME"];
+                    if (dtcitypops.Rows[i]["CASE_VALID_CD"].ToString() == "1")
+                    {
+                        dr["City-Pop"] = "<font color=" + "'green'" + ">" + dtcitypops.Rows[i]["CITY_NAME"] + "-" + dtcitypops.Rows[i]["HUB_SITE_NAME"] + "-" + dtcitypops.Rows[i]["CAPMAN_PLATFORM_NAME"] + "</font>";
+                    }
+                    else
+                    {
+                        dr["City-Pop"] = dtcitypops.Rows[i]["CITY_NAME"] + "-" + dtcitypops.Rows[i]["HUB_SITE_NAME"] + "-" + dtcitypops.Rows[i]["CAPMAN_PLATFORM_NAME"];
+                    }
+                    dr["CityPop-Port-Exists"] = dtcitypops.Rows[i]["CASE_VALID_CD"];
+                    dr["Access_Speed"] = speeds;
+                    //dr["portSpeedExists"] = portspeedExist;
+                    dtResultTable.Rows.Add(dr);
+
+                }
+            }
+            return dtResultTable;
+        }
+        #endregion
+
+        #region Define Standard Report
+        public DataTable GetStandardReportProducts()
+        {
+            strQuery.Clear();
+            strQuery.Append("Select product_cd, product_name from csu_product where PRODUCT_cd");
+            strQuery.Append(" in ( 11, 14, 15, 16, 21, 25, 30, 32, 58, 62, 63, 67, 72, 79, 96, 97, 101, 102, 103, 104, 105, 108, 116, 117, 118, 119, 121, 122, 123, 124, 125, 126, 127, 128, 130, 131, 129, 75, 76, 78, 82, 85, 120, 31, 98, 99, 100, 106, 12 )");
+            strQuery.Append(" and product_cd != (select distinct fieldvalue from csu_config_tbl");
+            strQuery.Append(" where upper(FIELDNAME) = 'DSL ACCESS') order by upper(product_name)");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable GetStandardReportSubProducts(int productId)
+        {
+            strQuery.Clear();
+            strQuery.Append("Select subproduct_cd, subproduct_name from csu_ref_subproduct where product_cd = " + productId + " ");
+            
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+        public DataTable GetStandardReportName(int productId, int subProductId)
+        {
+            strQuery.Clear();
+            strQuery.Append("select report_cd, report_desc from csu_ref_report ");
+            strQuery.Append(" where product_cd = " + productId + " ");
+            if (subProductId != 0)
+            {
+                strQuery.Append(" and subproduct_cd = " + subProductId + " ");
+            }
+            strQuery.Append(" and report_valid_cd = 1");
+            strQuery.Append(" order by upper(report_desc)");
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable GetStandardColumnsData(int reportId)
+        {
+            strQuery.Clear();
+            strQuery.Append("SELECT * FROM csu_ref_report_std_column WHERE report_cd =" + reportId + " ");
+            //if (column_loc_level_cd != "4")
+            //{
+            //    strQuery.Append(" and column_header <> 'Support Resilient Only'");
+            //}
+            strQuery.Append(" order by order_cd");
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable UpdateStandardColumnsData(DataTable dtStandardColumns, int reportId)
+        {
+            strQuery.Clear();
+            for (int i = 0; i < dtStandardColumns.Rows.Count - 1; i++)
+            {
+                strQuery.Append("UPDATE csu_ref_report_std_column");
+                strQuery.Append(" SET");
+                //strQuery.Append(" column_header = '" & strStatusHeader & "',");
+                //strQuery.Append(" column_loc_level_cd = " & strStatusLocLevelCd & ",");
+                //strQuery.Append(" order_cd = " & strStatusOrderCd & ",");
+                //strQuery.Append(" valid_cd = " & strStatusValidCd & ",");
+                //strQuery.Append(" column_width = " & strStatusWidth & ",");
+                //strQuery.Append(" updated_emp_id = '" & sUser_id & "',");
+                //strQuery.Append(" updated_dt = sysdate ");
+                strQuery.Append(" WHERE report_cd = " + reportId + " ");
+                //strQuery.Append(" AND column_desc = '"	& strStatusDesc & "';");
+            }
+            return null;
+        }
+        public DataTable GetCharacteristicsData(int productId)
+        {
+            strQuery.Clear();
+            strQuery.Append("select distinct a.char_id, char_name || ' - ' || char_actual_value as char_name, option_matrix_id");
+            strQuery.Append(" from csu_ref_product_opt_matrix a, csu_ref_valid_char b, csu_ref_char_type c");
+            strQuery.Append(" where a.char_id = b.char_id and product_cd =" + productId + " ");
+            strQuery.Append(" AND b.char_type_id = c.char_type_id AND c.char_type_value_count NOT IN (5, 6)");
+            if (productId == 63)
+            {
+                strQuery.Append(" and nvl(CPE_PRODUCT_MAP,0) in (0, '-1')");
+            }
+            //if (Servicetype == "BANDWIDTH_SERVICE_TYPE" || Servicetype == "ETHERNET_SERVICE_TYPE")
+            //{
+            strQuery.Append("and b.char_type_id != 28 and b.char_type_id != 641");
+            //}
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+        }
+
+        public DataTable GetPOPCharacteristicsData(int productId, int subProductId)
+        {
+            strQuery.Clear();
+            strQuery.Append("SELECT display_mpls_product as DisplayFlag  FROM csu_product  WHERE product_cd =" + productId + " ");
+            DataTable dtDisplayFlag = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            //if (dtDisplayFlag == "1")
+            //{
+            strQuery.Clear();
+            strQuery.Append("SELECT display_reports, char_name, column_header_1,column_header_2,column_header_3, report_col_width, report_col_order,char_id,column_valid_cd FROM csu_product_pop_char");
+            strQuery.Append(" WHERE product_cd =" + productId + " ");
+            if (subProductId != 0)
+            {
+                strQuery.Append(" AND subproduct_cd = " + subProductId + " ");
+            }
+
+            strQuery.Append(" AND display_reports = 1 ");
+            strQuery.Append(" order by report_col_order");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            //}
+            //else
+            //{
+            //    return null;
+            //}
+        }
+        public int GetReportColumnCd(int reportId)
+        {
+            int reportColumnCd = 1;
+            strQuery.Clear();
+            strQuery.Append("select max(report_column_cd) as report_column_cd from csu_ref_report_column where report_cd =" + reportId + " ");
+            DataTable dtReportColumnCd = objGetDataFromDB.GetDataTable(strQuery.ToString());
+                foreach (DataRow dr in dtReportColumnCd.Rows)
+                {
+                    if (!(dr["report_column_cd"] is DBNull))
+                    {
+                        reportColumnCd = Convert.ToInt32(dr["report_column_cd"]) + 1;
+                    }
+                    else
+                    {
+                        reportColumnCd = 1;
+                    }
+                }
+  
+            return reportColumnCd;
+        }
+        public int GetCharTypeId(string strCharId)
+        {
+            int charTypeId = -1;
+            strQuery.Clear();
+            strQuery.Append("select char_type_id  from csu_ref_valid_char where char_id ="+strCharId+" ");
+            DataTable dtcharTypeId = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            if (dtcharTypeId != null)
+            {
+                foreach (DataRow dr in dtcharTypeId.Rows)
+                {
+                    charTypeId = Convert.ToInt32(dr["char_type_id"]);
+                }
+            }
+            return charTypeId;
+        }
+        public int CheckOrdercd(int productId)
+        {
+            int checkOrder = 1;
+            strQuery.Clear();
+            strQuery.Append("select max(nvl(report_col_order,0)) as check_order_cd from csu_product_pop_char where product_cd=" + productId + " ");
+            strQuery.Append(" and display_reports=1");
+            DataTable dtcheckOrder = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            if (dtcheckOrder != null)
+            {
+                foreach (DataRow dr in dtcheckOrder.Rows)
+                {
+                    checkOrder = Convert.ToInt32(dr["check_order_cd"]);
+                }
+            }
+            return checkOrder;
+        }
+
+        public int GetMaxOrdercd(int productId, int reportId,string strColumnValidCd)
+        {
+            int maxOrder = 1;
+            strQuery.Clear();
+            strQuery.Append("select nvl(max(order_cd),0) as maxOrder_cd  from csu_ref_report_column a, csu_ref_char_type b, csu_ref_valid_char c ");
+            strQuery.Append(" where a.char_type_id = b.char_type_id  and b.char_type_id = c.char_type_id and a.char_id = c.char_id and b.char_type_value_count NOT IN (5, 6)");
+            strQuery.Append(" and product_cd =" + productId + " ");
+            //strQuery.Append("GetProductList(sUser_id,"a.")");
+            strQuery.Append(" and report_cd =" + reportId + " ");
+            strQuery.Append(" and column_valid_cd=" + strColumnValidCd +" ");
+            DataTable dtMaxOrder = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            if (dtMaxOrder != null)
+            {
+                foreach (DataRow dr in dtMaxOrder.Rows)
+                {
+                    maxOrder = Convert.ToInt32(dr["maxOrder_cd"]);
+                }
+            }
+            return maxOrder;
+        }
+
+        public int AddNewReportColumn(int productId, int subProductId, int reportId, string strCharId, string strOptionMatrixId, string strColumnHeader1, string strColumnHeader2, string strColumnHeader3, string strColumnValidCd, string strProductMappedId, string userId)
+        {
+            strQuery.Clear();
+            int newOrdercd = 0;
+            int reportColumnCd = GetReportColumnCd(reportId);
+            int charTypeId = GetCharTypeId(strCharId);
+            int checkOrder = CheckOrdercd(productId);
+            int maxorder = GetMaxOrdercd(productId,reportId, strColumnValidCd);
+            if (maxorder > checkOrder)
+            {
+                newOrdercd = maxorder + 1;
+            }
+            else
+            {
+                newOrdercd = checkOrder + 1;
+            }
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                connection.Open();
+                strQuery.Clear();
+
+                strQuery.Append("Insert into csu_ref_report_column( ");
+                strQuery.Append(" report_column_cd,report_cd,product_cd,option_matrix_id,char_id,char_type_id,column_header_1, ");
+                strQuery.Append(" column_header_2,column_header_3,column_valid_cd,order_cd,COLUMN_WIDTH,");
+                if (productId == 63)
+                {
+                    strQuery.Append(" MAPPED_PRODUCT,");
+                }
+                strQuery.Append(" created_emp_id,created_dt,updated_emp_id,updated_dt) ");
+                strQuery.Append(" VALUES");
+                strQuery.Append(" ( '" + reportColumnCd + "' ");
+                strQuery.Append(",");
+                strQuery.Append("  '" + reportId + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + productId + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + strOptionMatrixId + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + strCharId + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + charTypeId + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + strColumnHeader1 + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + strColumnHeader2 + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + strColumnHeader3 + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + strColumnValidCd + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + newOrdercd + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + 5 + "' ");
+                if (productId == 63)
+                {
+                    strQuery.Append(",");
+                    strQuery.Append(" '" + strProductMappedId + "' ");
+                }
+                strQuery.Append(",");
+                strQuery.Append(" '" + userId + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" sysdate ");
+                strQuery.Append(",");
+                strQuery.Append(" '" + userId + "' ");
+                strQuery.Append(",");
+                strQuery.Append(" sysdate ");
+                strQuery.Append(")");
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            //OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQuery);
+            return 0;
+        }
+
+
+        public DataTable GetMappedProduct(int productId)
+        {
+            strQuery.Clear();
+            strQuery.Append("select distinct cpe_product_map from csu_ref_product_opt_matrix where product_cd=63 and char_type_id=926 and cpe_product_map=" + productId + " ");
+            DataTable dtMappedProdcuct = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            if (dtMappedProdcuct != null)
+            {
+                return dtMappedProdcuct;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public DataTable GetCharID(int productId, int mappedProduct)
+        {
+            strQuery.Clear();
+            if (mappedProduct == 0)
+            {
+                mappedProduct = -1;
+            }
+            strQuery.Append("SELECT DISTINCT (char_id) FROM csu_ref_report_cpecolumn");
+            strQuery.Append(" WHERE cpe_characteristics = 1021 AND product_cd =" + productId + " AND char_id IS NOT NULL");
+            strQuery.Append(" MINUS SELECT DISTINCT a.char_id FROM csu_ref_report_column a,");
+            strQuery.Append(" csu_ref_char_type b, csu_ref_valid_char c WHERE a.char_type_id= b.char_type_id");
+            strQuery.Append(" AND b.char_type_id= c.char_type_id AND a.char_id= c.char_id");
+            strQuery.Append(" AND b.char_type_value_count NOT IN (5, 6) AND product_cd = 63 AND report_cd= 113");
+            strQuery.Append("AND MAPPED_PRODUCT=" + mappedProduct + " ");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+        public DataTable GetCPEMaintenanceOptionsTab(int productId, string charId)
+        {
+            strQuery.Clear();
+            if (charId != "0")
+            {
+                strQuery.Append("SELECT * FROM csu_ref_report_cpecolumn");
+                strQuery.Append(" WHERE product_cd =" + productId + " AND cpe_characteristics =1021 ");
+                strQuery.Append(" MINUS SELECT * FROM csu_ref_report_cpecolumn");
+                strQuery.Append(" WHERE product_cd =" + productId + " AND cpe_characteristics =1021 ");
+                strQuery.Append(" and char_id in (" + charId.Substring(0, charId.Length - 1) + ")");
+                strQuery.Append(" order by 1,2 DESC");
+            }
+            else
+            {
+                strQuery.Append("SELECT * FROM csu_ref_report_cpecolumn");
+                strQuery.Append(" WHERE product_cd =" + productId + " AND cpe_characteristics = 1021 ");
+                strQuery.Append(" order by 1,2 DESC");
+            }
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable GetCPERouterBundlesTab(int productId)
+        {
+            strQuery.Clear();
+            strQuery.Append("SELECT * FROM csu_ref_report_cpecolumn WHERE product_cd =" + productId + " ");
+            strQuery.Append(" AND cpe_characteristics = 941 order by report_column_cd");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+        public int UpdateColumnsInCPEDataTabs(int productId, string CPERouterWidth, string CPEMaintenanceWidth, string validRouterCd, string validMaintenanceCd)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                connection.Open();
+                strQuery.Clear();
+                string[] arrWidthCd = Regex.Split(CPERouterWidth.Substring(0, CPERouterWidth.Length - 1), ",");
+                string[] arrWidthCdMaintenance = Regex.Split(CPEMaintenanceWidth.Substring(0, CPEMaintenanceWidth.Length - 1), ",");
+                string[] arrChkValidBundleCd = Regex.Split(validRouterCd.Substring(0, validRouterCd.Length - 1), ",");
+                string[] arrChkValidMaintenanceCd = Regex.Split(validMaintenanceCd.Substring(0, validMaintenanceCd.Length - 1), ",");
+                strQuery.Append("begin");
+                for (int i = 0; i < arrWidthCd.Length; i++)
+                {
+                    strQuery.Append(" update csu_ref_report_cpecolumn set ");
+                    strQuery.Append(" column_width = " + Convert.ToString(arrWidthCd[i]) + " ");
+                    strQuery.Append(" , valid_cd = " + Convert.ToString(arrChkValidBundleCd[i]) + " ");
+                    strQuery.Append(" where product_cd = " + productId + " ");
+                    strQuery.Append(" and  report_column_cd ="+ (i+1) +" ");
+                    strQuery.Append(" and cpe_characteristics = 941");
+                    strQuery.Append(";");
+                }
+                for (int i = 0; i < arrWidthCdMaintenance.Length; i++)
+                {
+                    strQuery.Append("update csu_ref_report_cpecolumn set ");
+                    strQuery.Append(" column_width = " + Convert.ToString(arrWidthCdMaintenance[i]) + " ");
+                    strQuery.Append(" , valid_cd = " + Convert.ToString(arrChkValidMaintenanceCd[i]) + " ");
+                    strQuery.Append(" where product_cd = " + productId + " ");
+                    strQuery.Append(" and  report_column_cd =" + (i + 1) + " ");
+                    strQuery.Append(" and cpe_characteristics = 1021 ");
+                    strQuery.Append(";");
+                }
+                strQuery.Append("end;");
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+        public DataTable GetSpeedDataTabInfo(int productId, int subProductId)
+        {
+             strQuery.Clear();
+             strQuery.Append("SELECT count(*) from csu_ref_product_opt_matrix where  product_cd =" + productId + " ");
+             strQuery.Append(" and option_matrix_valid_cd=1 and char_type_id = 28");
+             if (subProductId != 0)
+             {
+                 strQuery.Append(" and subproduct_cd = " + subProductId + " ");
+             }
+             return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+        public DataTable GetEditColumnWidthData(int productId, int subProductId)
+        {
+            DataTable dtSpeedDataTabInfo = GetSpeedDataTabInfo(productId, subProductId);
+            if (Convert.ToInt32(dtSpeedDataTabInfo.Rows[0]["count(*)"]) != 0 && productId != 79)
+            {
+                strQuery.Clear();
+                strQuery.Append("SELECT * FROM csu_ref_report_speedcolumn WHERE product_cd =" + productId + " ");
+                if (subProductId != 0)
+                {
+                    strQuery.Append(" AND subproduct_cd =" + subProductId + "  ");
+                }
+                strQuery.Append(" order by report_column_cd");
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            }
+            return null;
+        }
+
+        public int UpdateStandardReportColumnWidthInSpeedTabs(int productId, int subProductId, string columnWidth)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                connection.Open();
+                strQuery.Clear();
+                string[] arrWidthCd = Regex.Split(columnWidth.Substring(0, columnWidth.Length - 1), ",");
+                strQuery.Append("begin");
+                for (int i = 0; i < arrWidthCd.Length; i++)
+                {
+                    strQuery.Append(" update csu_ref_report_speedcolumn set ");
+                    strQuery.Append(" column_width = " + Convert.ToString(arrWidthCd[i]) + " ");
+                    strQuery.Append(" where product_cd = " + productId + " ");
+                    if (subProductId != 0)
+                    {
+                        strQuery.Append(" and subproduct_cd = " + subProductId + " ");
+                    }
+                    strQuery.Append(" and report_column_cd =" + (i+1) + " ");
+                    strQuery.Append(";");
+                }
+                strQuery.Append("end;");
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+        public int GetShowSLAFlag(int productId, int reportId, int subProductId)
+        {
+            strQuery.Clear();
+            int showFlag = 0;
+            strQuery.Append("select sla_cols_in_rep from CSU_REF_REPORT where report_cd = " + reportId + " and product_cd = " + productId + " ");
+            if (subProductId != 0)
+            {
+                strQuery.Append(" and subproduct_cd =" + subProductId + " ");
+            }
+            DataTable dtShowFlag = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            if (dtShowFlag != null)
+            {
+                    foreach (DataRow dr in dtShowFlag.Rows)
+                    {
+                        if (!(dr["sla_cols_in_rep"] is DBNull))
+                        {
+                        showFlag = Convert.ToInt32(dr["sla_cols_in_rep"]);
+                        }
+                    }
+            }
+            return showFlag;
+        }
+
+        public int UpdateSLAFlag(int productId, int reportId, int subProductId, int SLAFlag)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                connection.Open();
+                strQuery.Clear();
+                strQuery.Append("Update CSU_REF_REPORT Set sla_cols_in_rep=" + SLAFlag + "  ");
+                strQuery.Append(" where report_cd = " + reportId + " and product_cd = " + productId + " ");
+                if (subProductId != 0)
+                {
+                    strQuery.Append(" and subproduct_cd =" + subProductId + " ");
+                }
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+
+        public int GetDisplaySLAInformation(int productId, int subProductId)
+        {
+            strQuery.Clear();
+            int displaySLAInfo = 0;
+            strQuery.Append("Select PRODUCT_LOC_LEVEL_CD from CSU_Product where product_cd = " + productId + " ");
+            DataTable dtDisplaySLAInfo=  objGetDataFromDB.GetDataTable(strQuery.ToString());
+            if (dtDisplaySLAInfo != null)
+            {
+                foreach (DataRow dr in dtDisplaySLAInfo.Rows)
+                {
+                    displaySLAInfo = Convert.ToInt32(dr["PRODUCT_LOC_LEVEL_CD"]);
+                }
+            }
+            return displaySLAInfo;
+        }
+
+        public DataTable GetdisplaySLAAttributesForProduct(int productId, int subProductId, int reportId)
+        {
+            int showSLAFlag = GetShowSLAFlag(productId, reportId, subProductId);
+            int DisplaySLAInfo= GetDisplaySLAInformation(productId, subProductId);
+
+            if (showSLAFlag == 1 && DisplaySLAInfo == 4)
+            {
+                strQuery.Clear();
+                strQuery.Append("SELECT SLA_COLUMN_CD, SLA_COLUMN_NAME, SLA_COLUMN_WIDTH, PRODUCT_CD, SUBPRODUCT_CD, SLA_COLUMN_VALID_CD");
+                strQuery.Append(" FROM csu_ref_sla_speedcolumn WHERE product_cd = " + productId + " ");
+                if (subProductId != 0)
+                {
+                    strQuery.Append(" and subproduct_cd = " + subProductId + " ");
+                }
+                strQuery.Append(" and SLA_COLUMN_VALID_CD = 1");
+                strQuery.Append(" order by SLA_COLUMN_NAME ");
+
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            }
+            else
+                return null;
+        }
+
+        public DataTable GetReportColumnReferenceData(int productId, int reportId)
+        {
+            strQuery.Clear();
+            strQuery.Append("SELECT DISTINCT a.char_type_id,a.char_id,a.column_valid_cd,a.column_header_2,a.column_header_3,report_column_cd,option_matrix_id,");
+            strQuery.Append(" column_header_1,char_type_name,char_name,order_cd,column_width");
+            strQuery.Append(" FROM csu_ref_report_column a,csu_ref_char_type b,csu_ref_valid_char c");
+            strQuery.Append(" WHERE a.char_type_id= b.char_type_id AND b.char_type_id= c.char_type_id");
+            strQuery.Append(" AND a.char_id= c.char_id AND b.char_type_value_count NOT IN (5, 6)");
+            strQuery.Append(" AND a.product_cd=" + productId + " ");
+            strQuery.Append(" AND report_cd =" + reportId + " ");
+            strQuery.Append(" ORDER BY order_cd");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public int UpdatePOPChar(int productId, int subProductId, string strPOPChar, string strColumnHeader1, string strColumnHeader2, string strColumnHeader3,int ColumnValidCd)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                connection.Open();
+                strQuery.Clear();
+
+                strQuery.Append(" UPDATE csu_product_pop_char  SET column_header_1 = '" + strColumnHeader1 + "',");
+                strQuery.Append(" column_header_2 = '" + strColumnHeader2 + "',");
+                strQuery.Append(" column_header_3 = '" +strColumnHeader3 + "', ");
+                    strQuery.Append(" column_valid_cd = "+ColumnValidCd+" ");
+                    strQuery.Append(" WHERE char_id = '"+strPOPChar+"' ");
+                    strQuery.Append(" AND product_cd = " + productId + " ");
+                    if (subProductId != 0)
+                    {
+                        strQuery.Append(" AND subproduct_cd = " + subProductId + " ");
+                    }
+
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+        public int GetOptionMatrixId(int productId, int subProductId, string strChar, int charTypeId)
+        {
+            strQuery.Clear();
+            int optionMatrixId = 0;
+            strQuery.Append("select option_matrix_id from csu_ref_product_opt_matrix where product_cd =" + productId + " ");
+            if(subProductId!=0)
+            {
+              strQuery.Append(" and subproduct_cd = "+ subProductId +" ");
+            }
+            strQuery.Append(" and char_type_id =" + charTypeId + " ");
+            strQuery.Append(" and char_id = '" + strChar + "' ");
+            DataTable dtOptionMatrixId = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            if(dtOptionMatrixId!=null)
+            {
+                foreach (DataRow dr in dtOptionMatrixId.Rows)
+                {
+                    optionMatrixId = Convert.ToInt32(dr["option_matrix_id"]);
+                }
+            }
+            return optionMatrixId;
+        }
+        public int GetReportColumnCdData(int reportId, int orderCd)
+        {
+            int reportColumnCd = 1;
+            strQuery.Clear();
+            strQuery.Append("select report_column_cd from csu_ref_report_column where report_cd =" + reportId + " ");
+            strQuery.Append(" AND order_cd=" + orderCd + " ");
+            DataTable dtReportColumnCd = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            foreach (DataRow dr in dtReportColumnCd.Rows)
+            {
+                if (!(dr["report_column_cd"] is DBNull))
+                {
+                    reportColumnCd = Convert.ToInt32(dr["report_column_cd"]);
+                }
+                else
+                {
+                    reportColumnCd = 1;
+                }
+            }
+
+            return reportColumnCd;
+        }
+
+        public int UpdateChar(int productId, int subProductId, int reportId, string strChar, int charTypeId, string strColumnHeader1, string strColumnHeader2, string strColumnHeader3, string strColumnValidCd, string userId, string strProductMappedId, int orderCd)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            charTypeId = GetCharTypeId(strChar);
+            int optionMatrixId = GetOptionMatrixId(productId, subProductId, strChar, charTypeId);
+            int reportColumnCd = GetReportColumnCdData(reportId, orderCd);
+            try
+            {
+                connection.Open();
+                strQuery.Clear();
+                strQuery.Append(" update csu_ref_report_column  set  char_id ='"+ strChar +"' ,");  
+                strQuery.Append(" char_type_id = "+ charTypeId +" ,");
+                strQuery.Append(" option_matrix_id= "+ optionMatrixId +" ,");
+                strQuery.Append(" column_header_1 = '" + strColumnHeader1 + "',");
+                strQuery.Append(" column_header_2 = '" + strColumnHeader2 + "',");
+                strQuery.Append(" column_header_3 = '" + strColumnHeader3 + "', ");
+                strQuery.Append(" column_valid_cd = " + strColumnValidCd + " ,");
+                if (productId == 63)
+                {
+                    strQuery.Append(" MAPPED_PRODUCT = " + strProductMappedId + " ,");
+                }
+                if (subProductId != 0)
+                {
+                    strQuery.Append(" AND subproduct_cd = " + subProductId + " ");
+                }
+                strQuery.Append(" updated_emp_id ='"+userId+"' ,");
+                strQuery.Append(" updated_dt = sysdate");
+                strQuery.Append(" WHERE report_column_cd = '" + reportColumnCd + "' ");
+                strQuery.Append(" AND report_cd = " + reportId + " ");
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+
+        public int DeleteChar(int reportId, int orderCd)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            int reportColumnCd = GetReportColumnCdData(reportId, orderCd);
+            try
+            {
+                connection.Open();
+                strQuery.Clear();
+                strQuery.Append("Delete from csu_ref_report_column where report_column_cd = " + reportColumnCd + " ");
+                strQuery.Append(" and report_cd = " + reportId + " ");
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+        public string GetReportColumnCdData(int reportId, string orderCd)
+        {
+            string reportColumnCd = string.Empty;
+            strQuery.Clear();
+            strQuery.Append("select report_column_cd from csu_ref_report_column where report_cd =" + reportId + " ");
+            strQuery.Append(" AND order_cd In(" + orderCd.Substring(0, orderCd.Length - 1) + " )");
+            strQuery.Append(" order by report_column_cd");
+            DataTable dtReportColumnCd = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            foreach (DataRow dr in dtReportColumnCd.Rows)
+            {
+                if (!(dr["report_column_cd"] is DBNull))
+                {
+                    reportColumnCd = reportColumnCd +  Convert.ToString(dr["report_column_cd"]) +",";
+                }
+                else
+                {
+                    reportColumnCd = "1";
+                }
+            }
+
+            return reportColumnCd;
+        }
+        public int UpdateDefineStandardData(int productId, int subProductId, int reportId, string standardColHeader, string standardColWidth, string StandardValid, string StandardDisplayOrder, string ColRefWidth, string ColRefDisplayOrder, string ColPOPWidth, string ColPOPDisplayOrder, string WrapTextData, string SLAData, string userId)
+        {
+            string reportColumnCd = GetReportColumnCdData(reportId, ColRefDisplayOrder);
+            string strCharId = string.Empty;
+            strQuery.Clear();
+            strQuery.Append("SELECT CHAR_ID FROM CSU_PRODUCT_POP_CHAR WHERE PRODUCT_CD ="+productId+" ");
+            strQuery.Append(" AND display_reports = 1  order by report_col_order");
+            DataTable dtCharId = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            if (dtCharId != null)
+            {
+                foreach (DataRow dr in dtCharId.Rows)
+                {
+                    strCharId = strCharId + Convert.ToString(dr["CHAR_ID"]) + ",";
+                }
+            }
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                connection.Open();
+                strQuery.Clear();
+                string[] arrStandardWidthCd = Regex.Split(standardColWidth.Substring(0, standardColWidth.Length - 1), ",");
+                string[] arrStandardHeader = Regex.Split(standardColHeader.Substring(0, standardColHeader.Length - 1), ",");
+                string[] arrStandardValid= Regex.Split(StandardValid.Substring(0, StandardValid.Length - 1), ",");
+                string[] arrStandardDisplay = Regex.Split(StandardDisplayOrder.Substring(0, StandardDisplayOrder.Length - 1), ",");
+                string[] arrColRefWidth = Regex.Split(ColRefWidth.Substring(0, ColRefWidth.Length - 1), ",");
+                string[] arrColRefDisplayOrder = Regex.Split(ColRefDisplayOrder.Substring(0, ColRefDisplayOrder.Length - 1), ",");
+                string[] arrReportColumnCd = Regex.Split(reportColumnCd.Substring(0, reportColumnCd.Length - 1), ",");
+                string[] arrCharId = Regex.Split(strCharId.Substring(0, strCharId.Length - 1), ",");
+                string[] arrColPOPWidth = Regex.Split(ColPOPWidth.Substring(0, ColPOPWidth.Length - 1), ",");
+                string[] arrColPOPDisplayOrder = Regex.Split(ColPOPDisplayOrder.Substring(0, ColPOPDisplayOrder.Length - 1), ",");
+                strQuery.Append("begin");
+                // UPDATE Standard Columns
+                for (int i = 0; i < arrStandardWidthCd.Length; i++)
+                {
+                    strQuery.Append(" UPDATE csu_ref_report_std_column SET ");
+                    strQuery.Append(" order_cd = " + Convert.ToString(arrStandardDisplay[i]) + " ,");
+                    strQuery.Append(" valid_cd = " +Convert.ToString(arrStandardValid[i]) + ",");
+                    strQuery.Append(" column_width = " + Convert.ToString(arrStandardWidthCd[i]) + " ,");
+                    strQuery.Append(" updated_emp_id = '"+userId+ "',");
+                    strQuery.Append(" updated_dt = sysdate ");
+                    strQuery.Append(" WHERE report_cd =" + reportId + " ");
+                    strQuery.Append(" And column_header='" + Convert.ToString(arrStandardHeader[i]).Trim() + "' ");
+                    strQuery.Append(";");
+                }
+                // UPDATE Report Column Reference
+                for (int i = 0; i < arrColRefWidth.Length; i++)
+                {
+                    strQuery.Append(" update csu_ref_report_column set ");
+                    strQuery.Append(" order_cd =" + Convert.ToString(arrColRefDisplayOrder[i]) + ", ");
+                    strQuery.Append(" column_width = " + Convert.ToString(arrColRefWidth[i]) + ", ");
+                    strQuery.Append(" updated_emp_id = '"+userId +"' ,");
+                    strQuery.Append(" updated_dt = sysdate");
+                    strQuery.Append(" where product_cd = "+ productId +" ");
+                    strQuery.Append(" and report_cd = "+ reportId +" ");
+                    strQuery.Append(" and report_column_Cd =" + Convert.ToString(arrReportColumnCd[i]) + " ");
+                    strQuery.Append(";");
+                }
+                // UPDATE PoP Characteristics
+                for (int i = 0; i < arrColPOPWidth.Length; i++)
+                {
+                    strQuery.Append("update csu_product_pop_char set ");
+                    strQuery.Append(" report_col_order =" + Convert.ToString(arrColPOPDisplayOrder[i]) + ", ");
+                    strQuery.Append(" report_col_width =" + Convert.ToString(arrColPOPWidth[i]) + " ");
+                    strQuery.Append(" where product_cd = "+productId+" ");
+                    if (subProductId != 0)
+                    {
+                        strQuery.Append(" and subproduct_cd = " + subProductId + " ");
+                    }
+                    strQuery.Append(" and char_id =" + Convert.ToString(arrCharId[i]) + " ");
+                    strQuery.Append(";");
+                }
+                //Wrap text
+                strQuery.Append("update csu_ref_report set ");
+                strQuery.Append(" wrap_text=" + WrapTextData + " ");
+                strQuery.Append(" where product_cd ="+productId+" ");
+                strQuery.Append(" and report_cd ="+reportId+" ");
+                strQuery.Append(";");
+                //Update Date
+                strQuery.Append("update csu_ref_report_update set ");
+                strQuery.Append(" updated_emp_id = '"+userId+"' ,");
+                strQuery.Append(" updated_dt = sysdate");
+                strQuery.Append(" where product_cd = "+productId+" ");
+                if (subProductId != 0)
+                {
+                    strQuery.Append(" and subproduct_cd ="+subProductId+" ");
+                }
+                strQuery.Append(";");
+                // SLA
+                if (SLAData == "1")
+                {
+                    strQuery.Append("update csu_ref_report set sla_cols_in_rep = 1, updated_emp_id = '"+userId+"' ,");
+                    strQuery.Append(" updated_dt = sysdate");
+                    strQuery.Append(" where product_cd ="+productId+" ");
+                    strQuery.Append(" and report_cd = "+reportId+" ");
+                    if (subProductId != 0)
+                    {
+                        strQuery.Append(" and subproduct_cd =" + subProductId + " ");
+                    }
+                    strQuery.Append(";");
+                }
+                else
+                {
+                    strQuery.Append("update csu_ref_report set sla_cols_in_rep = 0, updated_emp_id = '" + userId + "' ,");
+                    strQuery.Append(" updated_dt = sysdate");
+                    strQuery.Append(" where product_cd =" + productId + " ");
+                    strQuery.Append(" and report_cd = " + reportId + " ");
+                    if (subProductId != 0)
+                    {
+                        strQuery.Append(" and subproduct_cd =" + subProductId + " ");
+                    }
+                    strQuery.Append(";");
+                }
+                strQuery.Append("end;");
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+
+        public DataTable GetUpdatedDateDetails(int productId)
+        {
+            strQuery.Clear();
+            strQuery.Append("select * from csu_ref_report_update where product_cd ="+productId+" ");
+            DataTable dtCompleteData = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            string CreatedBy = dtCompleteData.Rows[0]["created_emp_id"].ToString();
+            string UpdatedBy = dtCompleteData.Rows[0]["updated_emp_id"].ToString();
+
+            strQuery.Clear();
+            strQuery.Append("select * from csu_user where emp_id='" + CreatedBy + "' ");
+            DataTable dtCreatedName = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+            strQuery.Clear();
+            strQuery.Append("select * from csu_user where emp_id='" + UpdatedBy + "' ");
+            DataTable dtUpdatedName = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            
+            
+            DataTable dtEmpNames = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            DataTable dtResult = new DataTable();
+            dtResult.Columns.Add("CreatedBy");
+            dtResult.Columns.Add("CreatedDate");
+            dtResult.Columns.Add("UpdatedBy");
+            dtResult.Columns.Add("UpdatedDate");
+            DataRow dr = dtResult.NewRow();
+            if (dtCreatedName.Rows.Count == 0)
+            {
+                dr["CreatedBy"] = "UNKNOWN";
+            }
+            else
+            {
+                dr["CreatedBy"] = dtCreatedName.Rows[0]["user_name"].ToString();
+            }
+
+                dr["CreatedDate"] = dtCompleteData.Rows[0]["created_dt"].ToString();
+            if (dtUpdatedName.Rows.Count == 0)
+            {
+                dr["UpdatedBy"] = "UNKNOWN";
+            }
+            else
+            {
+                dr["UpdatedBy"] = dtUpdatedName.Rows[0]["user_name"].ToString();
+            }
+            dr["UpdatedDate"] = dtCompleteData.Rows[0]["updated_dt"].ToString();
+            dtResult.Rows.Add(dr);
+            return dtResult;
+        }
+
+        public DataTable GetUpdatedDateDetailsForCharData(int productId, int reportId, int orderCd)
+        {
+            int reportColumnCd = GetReportColumnCdData(reportId, orderCd);
+            strQuery.Clear();
+            strQuery.Append(" select * from csu_ref_report_column where product_cd =" + productId + " ");
+            strQuery.Append(" and Report_column_cd=" + reportColumnCd + " ");
+            DataTable dtCompleteData = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            if (dtCompleteData.Rows.Count != 0)
+            {
+                string CreatedBy = dtCompleteData.Rows[0]["created_emp_id"].ToString();
+                string UpdatedBy = dtCompleteData.Rows[0]["updated_emp_id"].ToString();
+
+                strQuery.Clear();
+                strQuery.Append("select * from csu_user where emp_id='" + CreatedBy + "' ");
+                DataTable dtCreatedName = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+                strQuery.Clear();
+                strQuery.Append("select * from csu_user where emp_id='" + UpdatedBy + "' ");
+                DataTable dtUpdatedName = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+
+                DataTable dtEmpNames = objGetDataFromDB.GetDataTable(strQuery.ToString());
+                DataTable dtResult = new DataTable();
+                dtResult.Columns.Add("CreatedBy");
+                dtResult.Columns.Add("CreatedDate");
+                dtResult.Columns.Add("UpdatedBy");
+                dtResult.Columns.Add("UpdatedDate");
+                DataRow dr = dtResult.NewRow();
+                if (dtCreatedName.Rows.Count == 0)
+                {
+                    dr["CreatedBy"] = "UNKNOWN";
+                }
+                else
+                {
+                    dr["CreatedBy"] = dtCreatedName.Rows[0]["user_name"].ToString();
+                }
+
+                dr["CreatedDate"] = dtCompleteData.Rows[0]["created_dt"].ToString();
+                if (dtUpdatedName.Rows.Count == 0)
+                {
+                    dr["UpdatedBy"] = "UNKNOWN";
+                }
+                else
+                {
+                    dr["UpdatedBy"] = dtUpdatedName.Rows[0]["user_name"].ToString();
+                }
+                dr["UpdatedDate"] = dtCompleteData.Rows[0]["updated_dt"].ToString();
+                dtResult.Rows.Add(dr);
+                return dtResult;
+            }
+            return null;
+        }
+
+        public int SaveSLAAttributeData(int productId, string colAssuranceWidth,string colDeliveryWidth, string SLAAssuranceColCd, string SLADeliveryColCd, string userId)
+        {
+             OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+             try
+             {
+                 connection.Open();
+                 strQuery.Clear();
+                 string[] arrcolAssuranceWidth = Regex.Split(colAssuranceWidth.Substring(0, colAssuranceWidth.Length - 1), ",");
+                 string[] arrSLAAssuranceColCd = Regex.Split(SLAAssuranceColCd.Substring(0, SLAAssuranceColCd.Length - 1), ",");
+                 string[] arrcolDeliveryWidth = Regex.Split(colDeliveryWidth.Substring(0, colDeliveryWidth.Length - 1), ",");
+                 string[] arrDeliveryColCd = Regex.Split(SLADeliveryColCd.Substring(0, SLADeliveryColCd.Length - 1), ",");
+                 strQuery.Append("begin");
+                 for (int i = 0; i < arrcolAssuranceWidth.Length; i++)
+                 {
+                     strQuery.Append(" update csu_ref_sla_speedcolumn set  sla_column_width = " + Convert.ToString(arrcolAssuranceWidth[i]) + " ,");
+                     strQuery.Append(" updated_emp_id ='" + userId + "' ,");
+                     strQuery.Append(" updated_dt = sysdate");
+                     strQuery.Append(" where product_cd =" + productId + " ");
+                     strQuery.Append(" and  sla_column_cd =" + Convert.ToString(arrSLAAssuranceColCd[i]) + "  ");
+                     strQuery.Append(";");
+                 }
+                 for (int j = 0; j < arrcolDeliveryWidth.Length; j++)
+                 {
+                     strQuery.Append(" update csu_ref_sla_speedcolumn set  sla_column_width = " + Convert.ToString(arrcolDeliveryWidth[j]) + " ,");
+                     strQuery.Append(" updated_emp_id ='" + userId + "' ,");
+                     strQuery.Append(" updated_dt = sysdate");
+                     strQuery.Append(" where product_cd =" + productId + " ");
+                     strQuery.Append(" and  sla_column_cd =" + Convert.ToString(arrDeliveryColCd[j]) + "  ");
+                     strQuery.Append(";");
+                 }
+                 strQuery.Append("end;");
+                 OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                 cmdOra.CommandType = CommandType.Text;
+                 cmdOra.ExecuteNonQuery();
+                 return 1;
+             }
+             catch (Exception ex)
+             {
+             }
+             finally
+             {
+                 connection.Close();
+                 connection.Dispose();
+             }
+             return 0;
+        }
+
+        public DataTable GetSLAUpdatedDateDetails(int productId)
+        {
+            strQuery.Clear();
+            strQuery.Append("SELECT * FROM (");
+            strQuery.Append(" SELECT * FROM CSU_REF_SLA_SPEEDCOLUMN WHERE PRODUCT_CD =" + productId + " "); 
+            strQuery.Append(" ORDER BY CREATED_DT DESC");
+            strQuery.Append(" ) where rownum=1 ");
+            DataTable dtSLAData= objGetDataFromDB.GetDataTable(strQuery.ToString());
+            string CreatedBy = dtSLAData.Rows[0]["created_emp_id"].ToString();
+            string UpdatedBy = dtSLAData.Rows[0]["updated_emp_id"].ToString();
+
+            strQuery.Clear();
+            strQuery.Append("select * from csu_user where emp_id='" + CreatedBy + "' ");
+            DataTable dtCreatedName = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+            strQuery.Clear();
+            strQuery.Append("select * from csu_user where emp_id='" + UpdatedBy + "' ");
+            DataTable dtUpdatedName = objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+
+            DataTable dtEmpNames = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            DataTable dtResult = new DataTable();
+            dtResult.Columns.Add("CreatedBy");
+            dtResult.Columns.Add("CreatedDate");
+            dtResult.Columns.Add("UpdatedBy");
+            dtResult.Columns.Add("UpdatedDate");
+            DataRow dr = dtResult.NewRow();
+            if (dtCreatedName.Rows.Count == 0)
+            {
+                dr["CreatedBy"] = "UNKNOWN";
+            }
+            else
+            {
+                dr["CreatedBy"] = dtCreatedName.Rows[0]["user_name"].ToString();
+            }
+
+            dr["CreatedDate"] = dtSLAData.Rows[0]["created_dt"].ToString();
+            if (dtUpdatedName.Rows.Count == 0)
+            {
+                dr["UpdatedBy"] = "UNKNOWN";
+            }
+            else
+            {
+                dr["UpdatedBy"] = dtUpdatedName.Rows[0]["user_name"].ToString();
+            }
+            dr["UpdatedDate"] = dtSLAData.Rows[0]["updated_dt"].ToString();
+            dtResult.Rows.Add(dr);
+            return dtResult;
+        }
+
+        #endregion
+
+        #region  Standard Reports
+
+        public DataSet FetchStandardProductList(string user, int userid, string strServiceType)
+        {
+            DataSet ds = new DataSet();
+            strQuery.Clear();
+
+            strQuery.Append(" Select product_cd, product_name from csu_product");
+            strQuery.Append(" where PRODUCT_cd in(121, 104, 102, 76, 128, 58, 98, 25, 62, 31, 103, 32, 16, 11, 124, 126, 125, 15, 101, 82, 123, 75, 21, 122, 129, 30, 79, 105, 72, 85, 12, 96, 63, 108, 14, 127, 130, 78, 100, 67, 131, 97)");
+            // strQuery.Append(" where PRODUCT_cd in(" + GetProductList(user, userid) + ")");
+            //strQuery.Append(GetProductList(user, userid));
+            strQuery.Append(" and product_cd != (select distinct fieldvalue from csu_config_tbl where upper(FIELDNAME) = 'DSL ACCESS')");
+            strQuery.Append(" order by upper(product_name)");
+
+            // strQuery.Append("select report_cd, report_desc from csu_ref_report where product_cd ="++" and subproduct_cd is null order by upper(report_desc)");
+
+            OracleCommand cmd = new OracleCommand(strQuery.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetStandardProductList(int userid, string isUserType)
+        {
+            DataSet ds = new DataSet();
+            strQuery.Clear();
+
+            strQuery.Append(" Select product_cd, product_name from csu_product");
+            strQuery.Append(" where PRODUCT_cd in(121, 104, 102, 76, 128, 58, 98, 25, 62, 31, 103, 32, 16, 11, 124, 126, 125, 15, 101, 82, 123, 75, 21, 122, 129, 30, 79, 105, 72, 85, 12, 96, 63, 108, 14, 127, 130, 78, 100, 67, 131, 97)");
+            // strQuery.Append(" where PRODUCT_cd in(" + GetProductList(user, userid) + ")");
+            //strQuery.Append(GetProductList(user, userid));
+            strQuery.Append(" and product_cd != (select distinct fieldvalue from csu_config_tbl where upper(FIELDNAME) = 'DSL ACCESS')");
+            strQuery.Append(" order by upper(product_name)");
+
+            // strQuery.Append("select report_cd, report_desc from csu_ref_report where product_cd ="++" and subproduct_cd is null order by upper(report_desc)");
+
+            OracleCommand cmd = new OracleCommand(strQuery.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetReportsDetailsList()
+        {
+            DataSet ds = new DataSet();
+            strQuery.Clear();
+            //subProduct Parameter passing as null since not much information to get SubProduct details
+           // strQuery.Append("select report_cd, product_cd, subproduct_cd, report_loc_level_cd, report_desc, report_path_desc, report_valid_cd, report_abbr from csu_ref_report where product_cd =" + ProductCD + " and subproduct_cd is null order by upper(report_desc)");
+            strQuery.Append("select report_cd, product_cd, subproduct_cd, report_loc_level_cd, report_desc, report_path_desc, report_valid_cd, report_abbr from csu_ref_report  where  subproduct_cd is  null  order by upper(report_desc) ");
+
+            OracleCommand cmd = new OracleCommand(strQuery.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+        public DataSet GetProductReportsDetailsList(int productID)
+        {
+            DataSet ds = new DataSet();
+            strQuery.Clear();
+            //subProduct Parameter passing as null since not much information to get SubProduct details
+            // strQuery.Append("select report_cd, product_cd, subproduct_cd, report_loc_level_cd, report_desc, report_path_desc, report_valid_cd, report_abbr from csu_ref_report where product_cd =" + ProductCD + " and subproduct_cd is null order by upper(report_desc)");
+            strQuery.Append("select report_cd, product_cd, subproduct_cd, report_loc_level_cd, report_desc, report_path_desc, report_valid_cd, report_abbr from csu_ref_report where product_cd=" + productID + " and subproduct_cd is  null  order by upper(report_desc)");
+
+            OracleCommand cmd = new OracleCommand(strQuery.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetSubProductList(int ProductID, string userType,string userid)
+        {
+            DataSet ds = new DataSet();
+            strQuery.Clear();
+            strQuery.Append("Select subproduct_cd, subproduct_name from csu_ref_subproduct where product_cd =" + ProductID + "");
+           // strQuery.Append(" where PRODUCT_cd in(121, 104, 102, 76, 128, 58, 98, 25, 62, 31, 103, 32, 16, 11, 124, 126, 125, 15, 101, 82, 123, 75, 21, 122, 129, 30, 79, 105, 72, 85, 12, 96, 63, 108, 14, 127, 130, 78, 100, 67, 131, 97)");
+           // strQuery.Append(" and PRODUCT_cd in(" + GetProductList(userType, Convert.ToInt32(userid)) + ")");
+            strQuery.Append(" and PRODUCT_cd in(121, 104, 102, 76, 128, 58, 98, 25, 62, 31, 103, 32, 16, 11, 124, 126, 125, 15, 101, 82, 123, 75, 21, 122, 129, 30, 79, 105, 72, 85, 12, 96, 63, 108, 14, 127, 130, 78, 100, 67, 131, 97)");
+            strQuery.Append("order by upper(subproduct_name)");
+
+            // strQuery.Append("select report_cd, report_desc from csu_ref_report where product_cd ="++" and subproduct_cd is null order by upper(report_desc)");
+
+            OracleCommand cmd = new OracleCommand(strQuery.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetSubProductReportsList(int ProductID)
+        {
+
+            //select report_cd, report_desc from csu_ref_report where product_cd = 25 and subproduct_cd = 50 order by upper(report_desc)
+            DataSet ds = new DataSet();
+            strQuery.Clear();
+            strQuery.Append("select report_cd, product_cd, subproduct_cd, report_loc_level_cd, report_desc, report_path_desc, report_valid_cd, report_abbr from csu_ref_report where product_cd = " + ProductID + "  order by upper(report_desc)");
+
+            OracleCommand cmd = new OracleCommand(strQuery.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public int AddNewReportDetails(int ProdID, string ProdDescription, string Abbreviation, bool ValidCheck, string userid,int? subProductID)
+        {
+
+            if (subProductID == null)
+            {
+                subProductID = null;
+            }
+            string query = string.Empty;
+            int status = 0;
+            int? report_cd, product_loc_level_cd = null;
+
+            string product_abbr = string.Empty;
+            string commandQuery = @"select max(report_cd)+1 from csu_ref_report";
+
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+            OracleDataReader dr = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+            report_cd = null;
+            if (dr.HasRows)
+            {
+                while (dr.Read())
+                {
+                    report_cd = Convert.ToInt32(dr.GetValue(0));
+                }
+
+            }
+
+
+            commandQuery = string.Empty;
+            commandQuery = @"select product_abbr from csu_product where product_cd = " + ProdID + "";
+            OracleDataReader dr1 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+
+            if (dr1.HasRows)
+            {
+                while (dr1.Read())
+                {
+                    product_abbr = dr1.GetValue(0).ToString();
+                }
+            }
+
+            commandQuery = string.Empty;
+            commandQuery = @"select product_loc_level_cd from csu_product  where product_cd= " + ProdID + "";
+            OracleDataReader dr2 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+
+            if (dr2.HasRows)
+            {
+                while (dr2.Read())
+                {
+                    product_loc_level_cd = Convert.ToInt32(dr2.GetValue(0).ToString());
+                }
+            }
+            int checkVal = 0;
+            if (ValidCheck == true)
+            {
+                checkVal = 1;
+            }
+
+            if (subProductID == null)
+            {
+                query = "Insert into csu_ref_report (report_cd, product_cd, subproduct_cd, report_loc_level_cd, report_desc, report_path_desc, report_valid_cd, report_abbr, created_emp_id, created_dt, updated_emp_id, updated_dt ) VALUES (" + report_cd + ", " + ProdID + " , null , " + product_loc_level_cd + " ,'" + ProdDescription + "','" + product_abbr + ".xls', " + checkVal + ", '" + Abbreviation + "', '" + userid + "', sysdate, '" + userid + "', sysdate)";
+            }
+            else
+            {
+                //passing null for  subProduct_cd , since not sure about the  value 
+                query = "Insert into csu_ref_report (report_cd, product_cd, subproduct_cd, report_loc_level_cd, report_desc, report_path_desc, report_valid_cd, report_abbr, created_emp_id, created_dt, updated_emp_id, updated_dt ) VALUES (" + report_cd + ", " + ProdID + " , " + subProductID + " , " + product_loc_level_cd + " ,'" + ProdDescription + "','" + product_abbr + ".xls', " + checkVal + ", '" + Abbreviation + "', '" + userid + "', sysdate, '" + userid + "', sysdate)";
+            }
+            status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+            commandQuery = string.Empty;
+            commandQuery = @"Select product_cd from csu_ref_report_update where  product_cd= " + ProdID + "";
+            OracleDataReader dr3 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+            bool productCdExist = false;
+            if (dr3.HasRows)
+            {
+                while (dr3.Read())
+                {
+                    productCdExist = true;
+                }
+            }
+            if (productCdExist == false)
+            {
+                query = "";
+                //'Added for R21 Onevoice
+                if (subProductID == null)
+                {
+                    query = "Insert into csu_ref_report_update(product_cd, subproduct_cd, created_emp_id, updated_emp_id, created_dt, updated_dt ) VALUES (" + ProdID + " ,null , '" + userid + "' ,'" + userid + "' ,sysdate, sysdate)";
+                }
+                else {
+                    query = "Insert into csu_ref_report_update(product_cd, subproduct_cd, created_emp_id, updated_emp_id, created_dt, updated_dt ) VALUES (" + ProdID + " , " + subProductID + " , '" + userid + "' ,'" + userid + "' ,sysdate, sysdate)";
+                }
+                int result = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+            }
+
+
+            return status;
+        }
+        public int UpdateReportDetails(int Report_CD, int ProdID, string ReportDescription, string Abbreviation, bool ValidCheck, string userid,int? subProductID)
+        {
+            if (subProductID == null)
+            {
+                subProductID = null;
+            }
+            string query = string.Empty;
+            int status = 0;
+            int? product_loc_level_cd;
+
+            string product_abbr = string.Empty;
+            string commandQuery = string.Empty;
+
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+
+            commandQuery = string.Empty;
+            commandQuery = @"select product_abbr from csu_product where product_cd = " + ProdID + "";
+            OracleDataReader dr1 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+
+            if (dr1.HasRows)
+            {
+                while (dr1.Read())
+                {
+                    product_abbr = dr1.GetValue(0).ToString();
+                }
+            }
+
+            commandQuery = string.Empty;
+            commandQuery = @"select product_loc_level_cd from csu_product  where product_cd= " + ProdID + "";
+            OracleDataReader dr2 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+            product_loc_level_cd = null;
+            if (dr2.HasRows)
+            {
+                while (dr2.Read())
+                {
+                    if (dr2.GetValue(0) != null)
+                    {
+                        product_loc_level_cd = Convert.ToInt32(dr2.GetValue(0).ToString());
+                    }
+                }
+            }
+            int checkVal = 0;
+            if (ValidCheck == true)
+            {
+                checkVal = 1;
+            }
+
+            if (subProductID == null)
+            {
+                subProductID = null;
+            }
+
+            if (subProductID == null)
+            {
+                //passing null for  subProduct_cd , since not sure about the  value 
+                query = "update csu_ref_report set product_cd=" + ProdID + ", subproduct_cd=null, report_loc_level_cd=" + product_loc_level_cd + ", report_desc='" + ReportDescription + "', report_valid_cd=" + checkVal + ", report_abbr='" + Abbreviation + "', updated_emp_id='" + userid + "', updated_dt=sysdate where report_cd = " + Report_CD + "";
+            }
+            else {
+                //passing null for  subProduct_cd , since not sure about the  value 
+                query = "update csu_ref_report set product_cd=" + ProdID + ", subproduct_cd=" + subProductID + ", report_loc_level_cd=" + product_loc_level_cd + ", report_desc='" + ReportDescription + "', report_valid_cd=" + checkVal + ", report_abbr='" + Abbreviation + "', updated_emp_id='" + userid + "', updated_dt=sysdate where report_cd = " + Report_CD + "";
+            }
+           
+            status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+            return status;
+        }
+        public int DeleteReportDetails(int Report_CD)
+        {
+            string query = string.Empty;
+            int status = 0;
+            string commandQuery = string.Empty;
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            query = "DELETE FROM csu_ref_report where report_cd = " + Report_CD + "";
+
+            status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+            return status;
+        }
+
+
+
+        #endregion
+    }
+    
+}

@@ -1,0 +1,150 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminBAL;
+using SCAdminDAL.PoPTypeMappingsDAL;
+namespace ProductDefinations.SCAdminBAL
+{
+    public class PoPTypeMappingBAL
+    {
+
+       private PoPTypeMappingsDAL objPoPTypeMappingsDAL = new PoPTypeMappingsDAL();
+
+
+
+       public int GetFieldValue()
+       {
+           int FieldValue = 0;
+           try
+           {
+               FieldValue = objPoPTypeMappingsDAL.GetFieldValue();
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return FieldValue;
+       }
+
+      
+
+       public List<PoPTypeMapping> UnassignAccessMethods(int FieldValue)
+       {
+           List<PoPTypeMapping> lstUnassignAccessMethods = new List<PoPTypeMapping>();
+           try
+           {
+               DataTable dtAccMthds = objPoPTypeMappingsDAL.UnassignAccessMethods(FieldValue);
+               foreach (DataRow dr in dtAccMthds.Rows)
+               {
+                   PoPTypeMapping PoPTypeMapping = new PoPTypeMapping();
+                   PoPTypeMapping.CharId = Convert.ToInt32(dr["char_id"]);
+                   PoPTypeMapping.CharName = Convert.ToString(dr["char_name"]);
+                   lstUnassignAccessMethods.Add(PoPTypeMapping);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return lstUnassignAccessMethods;
+       }
+
+       public List<PoPTypeMapping> GetAllGPOPs(int FieldValue)
+       {
+           List<PoPTypeMapping> lstGPops = new List<PoPTypeMapping>();
+           try
+           {
+               DataTable dtGPops = objPoPTypeMappingsDAL.GetAllGPOPs(FieldValue);
+               foreach (DataRow dr in dtGPops.Rows)
+               {
+                   PoPTypeMapping PoPTypeMapping = new PoPTypeMapping();
+                   PoPTypeMapping.CharId = Convert.ToInt32(dr["char_id"]);
+                   PoPTypeMapping.CharName = Convert.ToString(dr["char_name"]);
+                   lstGPops.Add(PoPTypeMapping);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return lstGPops;
+       }
+
+       public List<PoPTypeMapping> GetAllAPOPs(int FieldValue)
+       {
+           List<PoPTypeMapping> lstAPOPs = new List<PoPTypeMapping>();
+           try
+           {
+               DataTable dtAPOPs = objPoPTypeMappingsDAL.GetAllAPOPs(FieldValue);
+               foreach (DataRow dr in dtAPOPs.Rows)
+               {
+                   PoPTypeMapping PoPTypeMapping = new PoPTypeMapping();
+                   PoPTypeMapping.CharId = Convert.ToInt32(dr["char_id"]);
+                   PoPTypeMapping.CharName = Convert.ToString(dr["char_name"]);
+                   lstAPOPs.Add(PoPTypeMapping);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstAPOPs;
+       }
+
+       public List<PoPTypeMapping> GetAllLLPOPs(int FieldValue)
+       {
+           List<PoPTypeMapping> lstLLPOPs = new List<PoPTypeMapping>();
+           try
+           {
+               DataTable dtLLPOPs = objPoPTypeMappingsDAL.GetAllLLPOPs(FieldValue);
+               foreach (DataRow dr in dtLLPOPs.Rows)
+               {
+                   PoPTypeMapping PoPTypeMapping = new PoPTypeMapping();
+                   PoPTypeMapping.CharId = Convert.ToInt32(dr["char_id"]);
+                   PoPTypeMapping.CharName = Convert.ToString(dr["char_name"]);
+                   lstLLPOPs.Add(PoPTypeMapping);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstLLPOPs;
+       }
+
+       public int PoPTypesInsert(int[] PoPTypeIDs, string SourceID, string TargetID)
+       {
+           int status = 0;
+           try
+           {
+               status = objPoPTypeMappingsDAL.PoPTypesInsert(PoPTypeIDs, SourceID, TargetID);
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return status;
+       }
+
+       public int PopTypesDelete(int[] PoPTypeIDs, string SourceID, string TargetID)
+       {
+           int status = 0;
+           try
+           {
+               status = objPoPTypeMappingsDAL.PopTypesDelete(PoPTypeIDs, SourceID, TargetID);
+
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return status;
+       }
+
+    }
+}

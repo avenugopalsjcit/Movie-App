@@ -1,0 +1,194 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using SCAdminBAL;
+using System.Web.Services;
+using SCAdminBAL.MCU;
+using SCAdminBAL.Mass_case_update;
+
+namespace SCAdmin
+{
+    public partial class MCU : System.Web.UI.Page
+    {
+        public MCUSession MCUSessionData
+        {
+            get
+            {
+                if (Session["MCUSession"] == null)
+                {
+                    MCUSession _MCUSession = new MCUSession();
+                    Session["MCUSession"] = _MCUSession;
+                }
+                return (MCUSession)Session["MCUSession"];
+            }
+            set
+            {
+                Session["MCUSession"] = value;
+            }
+        }
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+             
+        }
+
+        [WebMethod]
+        public static MCUSession LoadMCUSession()
+        { 
+            return new MCU().MCUSessionData;
+        }
+
+
+        [WebMethod]
+        public static string getLoadOwnerProducts(string UserID)
+        {
+            MCUBAL objMCUBAL = new MCUBAL();
+            return objMCUBAL.LoadOwnerProducts(UserID);
+        }
+
+
+        //[WebMethod]
+        //public static MCUProdcuctList getLoadOwnerProducts(string UserID)
+        //{
+        //    MCUBAL objMCUBAL = new MCUBAL();
+        //    return objMCUBAL.LoadOwnerProducts(UserID);
+        //}
+
+        //[WebMethod]
+        //public static MCUSession LoadMCUSession(int productID, int subProductID, int mode)
+        //{
+        //    return new MCU().getMCUSession(productID, subProductID, mode);
+        //}
+
+        [WebMethod]
+        public static string getAvailability()
+        {
+            MCUBAL obj = new MCUBAL();
+            return obj.getAvailability();
+        }
+
+        [WebMethod]
+        public static string GetPortSpeedData(Int32 ProductCd, Int32 SubproductCd)
+        {
+            MCUBAL obj = new MCUBAL();
+            return obj.GetPortSpeedData(ProductCd, SubproductCd);
+        }
+        [WebMethod]
+        public static AccessFilter GetAccessFilterData(int[] SelectedCases, int[] SelectedPops, int[] SelectedPortSpeeds, int ProdCd, int SubProdCd)
+        {
+            MCUBAL obj = new MCUBAL();
+            return obj.GetAccessFilterData(SelectedCases, SelectedPops, SelectedPortSpeeds, ProdCd, SubProdCd);
+        }
+
+        [WebMethod]
+        public static string GetCharectristic(Int32 ProductCd, Int32 SubproductCd)
+        {
+           return  new MCU().GetCharectristicFromBAL(ProductCd, SubproductCd);
+        }
+
+        private string GetCharectristicFromBAL(Int32 ProductCd, Int32 SubproductCd)
+        {
+            return new MCUBAL().GetCharectristic(ProductCd, SubproductCd, MCUSessionData.LocLevel, MCUSessionData.ParentProductCd);
+        }
+
+        [WebMethod]
+        public static void SaveCharecteristics()
+        { 
+        
+        }
+
+        [WebMethod]
+        //when access supplier will be selected in charecteristics listbox
+        public static string getAccessSupplier(int[] selectedPop)
+        {
+            return new AccessSuppChar().GetAccessDetails(selectedPop);
+        }
+
+        //when parent port speed will be selected in charecteristics list box
+        [WebMethod]
+        public static List<PortSpeedCharacteristics> getParentPortSpeed(Int32[] aiPopSelected, Int32[] aiPlatforms, int iProductCd, int subProductId)
+        {
+            return new Charecteristics().GetParentPortDetails(aiPopSelected, aiPlatforms, iProductCd, subProductId);
+        }
+
+        [WebMethod]
+        public static MCUSession populateSession(int productID, int subProductID, int mode)
+        {
+            return new MCU().getMCUSession(productID, subProductID, mode);
+        }
+
+        [WebMethod]
+        public static string getAccessSpeed(int[] Caselist, int[] PopList, int[] PortSpeedList,
+            int ProductCd, int SubProductCd, string accessSuppID, string SuppProd, string AccType, string type)
+        {
+          // return new MCUBAL().getAccessSpeed(Caselist, PopList, PortSpeedList, ProductCd, SubProductCd, accessSuppID, SuppProd, AccType);
+            return new getAccessSpeed().GetAccessSpeed(Caselist, PopList, PortSpeedList, ProductCd, SubProductCd, accessSuppID, SuppProd, AccType, type);
+        
+        }
+
+
+        [WebMethod]
+        public static string[] UpdateCases(string param)
+        {
+           return new MCUBAL().UpdateCase(param);
+        }
+
+        [WebMethod]
+        public static string getValidAccessType(int productID)
+        {
+            return new MCUBAL().getValidAccessType(productID);
+        }
+
+        [WebMethod]
+        public static string CaseIdExists(int[] caseIDs)
+        {
+            return new MCUBAL().CaseIdExists(caseIDs);
+        }
+
+        private MCUSession getMCUSession(int productID, int subProductID, int mode)
+        {
+            MCUSession oMcuSession = new MCUSession();
+            MCUSessionData = null;
+            MCUSessionData = oMcuSession;
+            MCUSessionData.ProductCd = productID;
+            MCUSessionData.SubProductCd = subProductID;
+            MCUSessionData.Mode = mode;
+            if (MCUSessionData.Mode == 1)
+            {
+                MCUSessionData.GetInitiationDataHvpn();
+            }
+            else
+            {
+                MCUSessionData.GetInitiationData();
+            }
+
+            return MCUSessionData;
+        }
+
+        [WebMethod]
+        public static string GetHVPNPortSpeed(int productId, int subproductId, int[] country, int selectedState, int[] popList, int[] caseList)
+        {
+            return new MCUBAL().GetHVPNPortSpeed(productId, subproductId, country, selectedState, popList, caseList);
+        }
+
+        [WebMethod]
+        public static int Save(int[] caseID, int[] popId, int caseValidCD, int caseAvailCd,
+            List<PortSpeed> oportspeed, List<AccessSuppChar> oAccessSuppChar)
+        {
+
+            return 1;
+        }
+
+
+        private int SaveCases(int[] caseID, int[] popId, int caseValidCD, int caseAvailCd,
+            List<PortSpeed> oportspeed, List<AccessSuppChar> oAccessSuppChar, List<Charecteristics> oCharecteristics)
+        {
+            return 1;
+        }
+    }
+
+
+}

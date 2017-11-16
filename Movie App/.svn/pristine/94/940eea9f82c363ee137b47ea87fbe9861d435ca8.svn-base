@@ -1,0 +1,114 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+  public  class AdminCallerAccessSupplierDAL
+    {
+
+
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        public DataTable GetGridAdminCallerAccessSupplier()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();  
+
+            string str = string.Empty;
+           
+              
+
+                str = @"  SELECT option_matrix_id,  char_name
+                            FROM csu_ref_product_opt_matrix a,
+                              csu_ref_char_type b,
+                              csu_ref_valid_char c
+                            WHERE a.product_cd  = 15
+                            AND a.subproduct_cd = 8
+                            AND a.char_type_id  = 24
+                            AND a.char_type_id  = b.char_type_id
+                            AND b.char_type_id  = c.char_type_id
+                            AND a.char_id       = c.char_id
+                            ORDER BY char_name";
+            
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+
+        public DataTable GetGridAdminCallerAccessSupplierDropdown()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+
+            str = @"  select avail_cd, avail_abbr, avail_desc from csu_ref_availability order by upper(avail_desc)";
+
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public DataTable GetGridAdminCallerAccessSupplierMatrix()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+
+            str = @"  select option_matrix_id, char_name, char_actual_value from 
+                    csu_ref_product_opt_matrix a , csu_ref_char_type b, csu_ref_valid_char c 
+                    where a.product_cd = 15 and a.subproduct_cd = 8 and a.char_type_id = 40 and
+                    a.char_type_id = b.char_type_id and b.char_type_id = c.char_type_id and a.char_id = c.char_id 
+                    and a.option_matrix_valid_cd = 1 order by char_name";
+
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+        public DataTable SetDropdownAdminCallerAccessSupplierMatrix(string depOptMatrixId)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+
+
+            str = @"  select depend_id, depend_product_cd, 
+                    depend_subproduct_cd,  depend_char_type_id, 
+	                 depend_char_id,    depend_option_matrix_id, 
+                     product_cd, subproduct_cd, 
+	                  char_id, char_opt_matrix_id, 
+                      avail_cd from csu_ref_char_depend  
+                       where depend_product_cd = 15
+	                    and depend_subproduct_cd = 8
+                        and depend_option_matrix_id = "+ depOptMatrixId +
+                       " and depend_valid_cd = 1 order by 2,3,4,5 ";
+
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+
+
+    }
+}

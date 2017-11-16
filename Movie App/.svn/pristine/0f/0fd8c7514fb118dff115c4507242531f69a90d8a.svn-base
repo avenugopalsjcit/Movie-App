@@ -1,0 +1,218 @@
+﻿<div ng-controller="UserAccessCntrl as ua">
+    <ul class="nav nav-tabs">
+        <li class="active Arrow"><a data-toggle="tab" data-target="#divSuperAdmin">Super Admin</a></li>
+        <li><a data-toggle="tab" class="Show_HVPN clickable1" data-target="#divProductOwner">
+            Product Owner</a> </li>
+        <li><a data-toggle="tab" class="Show_DSL clickable1" data-target="#divEndUser">End User</a></li>
+    </ul>
+    <div class="tab-content ">
+        <div id="divSuperAdmin" class="tab-pane active ">
+            <div ng-show="SuperAdminData.data.length==0" class="alert alert-danger Arrow" role="alert"
+                style="display: none">
+                No SuperAdmin(s) present.</div>
+            <div ng-show="SuperAdminData.data.length!=0">
+                <table ng-table="SuperAdminData" class="table table-bordered table-striped Arrow" >
+                    <tr ng-repeat="user in $data">
+                        <td data-title="'User'"  sortable="'UserName'"  class="Arrow">
+                           <u> <a data-target="#divshowData" ng-click="OpenPopup(user)" data-toggle="modal">{{user.UserName}}
+                            </a></u>
+                        </td>
+                         <td data-title="'UIN'" class="Arrow" sortable="'EmpID'">
+                            {{user.EmpID}}
+                        </td>
+                        <td data-title="'Status'" class="Arrow" sortable="'UserStatusDesc'">
+                            {{user.UserStatusDesc}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="divProductOwner" class="tab-pane">
+            <div class="row" style="padding-left: 5px" ng-show="ProductOwnerData.data.length!=0">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <p style="color: Red;" class="Arrow">
+                        <span style="color: Black">Note:</span> A "P" before a product indicates that the
+                        Product Owner is "Primary" for that product.
+                    </p>
+                </div>
+            </div>
+            <div ng-show="ProductOwnerData.data.length==0" class="alert alert-danger Arrow" role="alert">
+                No ProductOwner(s) present.
+            </div>
+            <div ng-show="ProductOwnerData.data.length!=0">
+                <table ng-table="ProductOwnerData" class="table" >
+                   <!-- <tr>
+                        <th class="Arrow">
+                            User/UIN
+                        </th>
+                        <th class="Arrow">
+                            Product
+                        </th>
+                        <th class="Arrow">
+                            Status
+                        </th>
+                    </tr>-->
+                    <tr ng-repeat="user in $data">
+                        <td data-title="'User'" sortable="'UserName'" class="Arrow">
+                            <u><a data-target="#divshowData" ng-click="OpenPopup(user)" data-toggle="modal">{{user.UserName}}
+                            </a></u>
+                        </td>
+                        <td data-title="'Product'">
+                            <!--<table>
+                                <tr ng-repeat="item in user.lstProducts">
+                                    <td  class="Arrow">
+                                        <span ng-show="item.PrimaryCD=='1'">(P)</span> {{item.ProductName}}
+                                    </td>
+                                </tr>
+                            </table>-->
+                            <ul class="uiStyle">
+    <li ng-repeat="item in user.lstProducts" class="listyle">
+       <span ng-show="item.PrimaryCD=='1'">(P)</span> {{item.ProductName}}
+    </li>
+    </ul>
+                        </td>
+                         <td data-title="'UIN'" class="Arrow" sortable="'EmpID'">
+                            {{user.EmpID}}
+                        </td>
+                        <td data-title="'Status'" class="Arrow" sortable="'UserStatusDesc'">
+                            {{user.UserStatusDesc}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="divEndUser" class="tab-pane">
+            <div ng-show="EndUserData.data.length==0" class="alert alert-danger Arrow" role="alert">
+                No EndUser(s) present.
+            </div>
+            <!--show-filter="true"
+            filter="{ UserName: 'text'}"
+            -->
+            <div ng-show="EndUserData.data.length!=0">
+                <table ng-table="EndUserData" class="table table-bordered table-striped"  >
+                   <!-- <tr>
+                        <th class="Arrow">
+                            User/UIN
+                        </th>
+                        <th class="Arrow">
+                            Status
+                        </th>
+                    </tr>-->
+                    <tr ng-repeat="user in $data">
+                        <td  sortable="'UserName'" class="Arrow" data-title="'User'">
+                           <u> <a data-target="#divshowData" ng-click="OpenPopup(user)" data-toggle="modal">{{user.UserName}}
+                            </a></u>
+                        </td>
+                         <td data-title="'UIN'" class="Arrow" sortable="'EmpID'">
+                            {{user.EmpID}}
+                        </td>
+                         <td data-title="'Email'" class="Arrow" sortable="'UserEmailID'">
+                          
+                            <u><a href="mailto:{{user.UserEmailID}}" style="margin-top: 0px">
+                                            {{user.UserEmailID}}</a></u>
+                        </td>
+                        <td data-title="'Status'" class="Arrow" sortable="'UserStatusDesc'">
+                            {{user.UserStatusDesc}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="pageLoaderOverlay">
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="divshowData" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content" style="width: 500px">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title Arrow" ng-show="prodOwner==0" id="myModalLabel">
+                            {{HeaderText}}</h4>
+                        <h4 class="modal-title Arrow" ng-show="prodOwner==1" id="myModalLabe2">
+                            User Access for Products</h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div id="divMain" ng-show="prodOwner==0">
+                                <div class="form-group col-md-10">
+                                    <div class="col-md-2" style="margin-left:-55px">
+                                        <label class="control-label" for="inputDescription">
+                                            User</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="control-label" for="inputDescription">
+                                            {{UserName}}</label>
+                                        <label class="control-label" for="inputDescription" ng-model="EmpID" style="display: none">
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-10">
+                                    <div class="col-md-2" style="margin-left:-55px">
+                                        <label class="control-label" for="inputValid" >
+                                            Access</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select ng-model="UserCategory" ng-options="category.UserCategoryCD as category.UserCategoryDesc for category in UserCatagoriesData"
+                                            class="form-control">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-10">
+                                    <div class="col-md-2" style="margin-left:-55px">
+                                        <label class="control-label" for="inputValid" >
+                                            Status</label>
+                                    </div>
+                                    <div class="col-md-6" >
+                                        <select ng-model="UserStatus" ng-options="status.UserStatusId as status.UserStatusDesc for status in StatusData"
+                                            class="form-control">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-10">
+                                    <div class="col-md-2" style="margin-left:-55px">
+                                        <label class="control-label" for="inputValid" style="margin-top: 6px;" >
+                                            E-Mail</label>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <input type="checkbox" ng-model="email" class="form-control" style="margin-top: 0px" />
+                                    </div>
+                                   <!-- <div class="col-md-3">
+                                       <u><a href="mailto:{{UserEmailID}}" style="margin-top: 0px">
+                                            {{UserEmailID}}</a></u>
+                                    </div>-->
+                                </div>
+                            </div>
+                            <div id="AssignOwnerProducts" ng-show="prodOwner==1">
+                                <table>
+                                    <tr ng-repeat="item in Products">
+                                        <td class="Arrow">
+                                            <input type="checkbox" ng-model="Products" value="{{item.ProductID}}" ng-checked="item.ProductAssigned!='0'"
+                                                ng-click="toggleProductSelection(item.ProductID)" />
+                                            {{item.ProductName}}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" ng-show="prodOwner==1" ng-click="SubmitProductOwner()"
+                            value="Update" />
+                        <input type="button" class="btn btn-sm btn-primary" ng-show="prodOwner==0" value="Update"
+                            ng-click="UpdateUserAccess()" />
+                        <input type="button" class="btn btn-sm btn-primary" ng-show="prodOwner==0" value="Delete"
+                            ng-click="DeleteUserAccess()" />
+                        <button class="btn btn-primary" type="button" ng-show="prodOwner==0" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+</div>

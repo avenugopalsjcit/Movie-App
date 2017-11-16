@@ -1,0 +1,255 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace SCAdminDAL
+{
+    class SLABuilder
+    {
+    }
+
+
+
+    public class SLAFile
+    {
+        public int product_id { get; set; }
+        public string ProductName { get; set; }
+    }
+
+    //public class SLAMasterData
+    //{
+    //    public int ProductitemId { get; set; }
+    //    public int CountryId { get; set; }
+    //    public int PartnerId { get; set; }
+    //    public int ResiliencyId { get; set; }
+    //    public string PrimaryAccessaName { get; set; }
+    //    public string SecondaryAccessName { get; set; }
+
+
+    //    public string PrimaryAccessTechnologyName { get; set; }
+    //    public string PrimaryServiceVariantNameName { get; set; }
+    //    public string PrimaryDeleveryModeName { get; set; }
+    //    public string SecondaryAccesstechnologyName { get; set; }
+    //    public string SecondaryServiceVariantName { get; set; }
+    //    public string SecondaryDeleveryModeName { get; set; }
+
+    //    public string DescriptionName { get; set; }
+    //    public string SLACategoryName { get; set; }
+    //    public string SiteAvailabilityTargetName { get; set; }
+
+    //    public string Service1RepairTargetName { get; set; }
+    //    public string ResiliencyRepairTargetName { get; set; }
+    //    public string BandName { get; set; }
+    //    public string SBPName { get; set; }
+    //}
+
+
+
+    public class SLAMasterData
+    {
+        public string ProductitemName { get; set; }
+        public string CountryName { get; set; }
+        public string PartnerName { get; set; }
+        public string ResiliencyName { get; set; }
+        public string PrimaryAccessaName { get; set; }
+        public string SecondaryAccessName { get; set; }
+
+
+        public string PrimaryAccessTechnologyName { get; set; }
+        public string PrimaryServiceVariantName { get; set; }
+        public string PrimaryDeleveryModeName { get; set; }
+        public string SecondaryAccesstechnologyName { get; set; }
+        public string SecondaryServiceVariantName { get; set; }
+        public string SecondaryDeleveryModeName { get; set; }
+
+        public string DescriptionName { get; set; }
+        public string SLACategoryName { get; set; }
+        public string SiteAvailabilityTargetName { get; set; }
+
+        public string Service1RepairTargetName { get; set; }
+        public string ResiliencyRepairTargetName { get; set; }
+        public string BandName { get; set; }
+        public string SBRName { get; set; }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public class SLAMasterData1
+    {
+        public int SLA_CONFIG_ID { get; set; }
+        public int COUNTRY_ID { get; set; }
+        public string COUNTRY_ABBR { get; set; }
+        public string DESCRIPTION { get; set; }
+        public int SLA_CATEGORY_ID { get; set; }
+        public decimal SITE_AVAILABILITY_TARGET { get; set; }
+        public string SEVERITY_1_REPAIR_TARGET { get; set; }
+        public string RESILIENCY_REPAIR_TARGET { get; set; }
+        public int BAND_CHAR_ID { get; set; }
+        public int SLA_TYPE_ID { get; set; }
+        public string SLA2PLUS { get; set; }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public class SLAConfigData
+    {
+        
+        public int ProductSLA { get; set; }
+        public int ProductID { get; set; }
+        public int BAUPOP1 { get; set; }
+        public int ReutersPOP1 { get; set; }
+        public int BAUPOP2 { get; set; }
+        public int ReutersPOP2 { get; set; }
+        public int networkrel { get; set; }
+        public int AccessResiliencyType { get; set; }
+        public int AsymmetricalAccessProductType { get; set; }
+        public int AsymmetricalAccessSpeed { get; set; }
+        public int CommericialSeparacyMandatory { get; set; }
+        public int NoCommonPOP { get; set; }
+        public int MTNISLA { get; set; }
+        public int MultiCast { get; set; }
+        public int Diversity { get; set; }
+       
+        
+       
+        public string CREATED_DT { get; set; }
+        public string UPDATED_DT{ get; set; }
+        public string UPDATED_EMP_ID { get; set; }  
+        public string CREATED_EMP_ID{ get; set; }
+        
+     
+     
+       
+
+    }
+
+
+
+    public class AccessConfigData
+    {
+        public int ACCESS_RES_TYPE_ID { get; set; }
+        public string ACCESS_RES_TYPE_VALUE { get; set; }
+        public int PRODUCT_SLA_TYPE_ID { get; set; }
+        public string PRODUCT_SLA_TYPE_NAME { get; set; }
+        public string LEG1_ACCESS_TYPE_NAME { get; set; }
+        public int LEG1_ACCESSTYPE_ID { get; set; }
+        public string LEG2_ACCESS_TYPE_NAME { get; set; }
+        public int LEG2_ACCESSTYPE_ID { get; set; }
+        public string LEG1_SERVICE_VARIANT_NAME { get; set; }
+        public int LEG1_SERVICE_VARIANT_ID { get; set; }
+        public string LEG2_SERVICE_VARIANT_NAME { get; set; }
+        public int LEG2_SERVICE_VARIANT_ID { get; set; }
+        public string LEG1_DELIVERY_MODE_NAME { get; set; }
+        public int LEG1_DELIVERY_MODE_ID { get; set; }
+        public string LEG2_DELIVERY_MODE_NAME { get; set; }
+        public int LEG2_DELIVERY_MODE_ID { get; set; }
+    }
+
+
+
+    public class AccessTypeException
+    {
+        public int ACCESS_RES_TYPE_ID { get; set; }
+        public string ACCESS_RES_TYPE_VALUE { get; set; }
+        public int PRODUCT_SLA_TYPE_ID { get; set; }
+        public string PRODUCT_SLA_TYPE_NAME { get; set; }
+        public int LegSpeedRdo { get; set; }
+    }
+
+    public class Country
+    {
+        public int ACCESS_RES_TYPE_ID { get; set; }
+        public string ACCESS_RES_TYPE_VALUE { get; set; }
+
+        public int COUNTRY_ID { get; set; }
+        public string COUNTRY_NAME { get; set; }
+
+        public int PRODUCT_SLA_TYPE_ID { get; set; }
+        public string PRODUCT_SLA_TYPE_NAME { get; set; }
+
+        public int LEG1_ACCESSSPEED_ID { get; set; }
+        public string LEG1_ACCESSSPEED_NAME { get; set; }
+
+        public int LEG2_ACCESSSPEED_ID { get; set; }
+        public string LEG2_ACCESSSPEED_NAME { get; set; }
+    }
+
+    public class Platform
+    {
+        public int PRODUCT_ID { get; set; }
+
+        public int PRODUCT_SLA_TYPE_ID { get; set; }
+        public string PRODUCT_SLA_TYPE_NAME { get; set; }
+
+        public int ACCESS_RES_TYPE_ID { get; set; }
+        public string ACCESS_RES_TYPE_VALUE { get; set; }
+
+        public int LEG1_PLATFORM_ID { get; set; }
+        public int LEG2_PLATFORM_ID { get; set; }
+
+    }
+
+
+
+
+
+
+
+
+}

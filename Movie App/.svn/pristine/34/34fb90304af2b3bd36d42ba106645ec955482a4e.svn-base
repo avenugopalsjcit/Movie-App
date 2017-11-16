@@ -1,0 +1,772 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+
+namespace SCAdminDAL
+{
+   public class CpeSupplierAdminDAL
+    {
+
+       public DataTable GetCPESuppliers()
+       {
+           GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               strbuilder.Append(" SELECT DISTINCT a.CHAR_ID,a.CHAR_NAME " );
+               strbuilder.Append(" FROM CSU_REF_VALID_CHAR a, CSU_REF_CHAR_TYPE b ");
+               strbuilder.Append(" WHERE a.CHAR_TYPE_ID = b.CHAR_TYPE_ID ");
+               strbuilder.Append(" AND b.CHAR_TYPE_NAME = 'CPE Suppliers' ");
+               strbuilder.Append(" ORDER BY a.CHAR_NAME ");
+
+           }
+           catch(Exception ex)
+           {
+               throw ex;
+           }
+
+           return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+       }
+
+       public DataTable GetCPESupplierType()
+       {
+           GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               strbuilder.Append(" SELECT a.char_name, a.char_id ");
+               strbuilder.Append(" FROM CSU_REF_VALID_CHAR a, CSU_REF_CHAR_TYPE b ");
+               strbuilder.Append(" WHERE a.CHAR_TYPE_ID = b.CHAR_TYPE_ID ");
+               strbuilder.Append(" AND b.CHAR_TYPE_NAME = 'CPE Supplier Types' ");
+               
+
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+       }
+
+
+       public DataTable GetCPEPricingTypes()
+       {
+           GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               strbuilder.Append(" SELECT a.char_name, a.char_id ");
+               strbuilder.Append(" FROM CSU_REF_VALID_CHAR a, CSU_REF_CHAR_TYPE b ");
+               strbuilder.Append(" WHERE a.CHAR_TYPE_ID = b.CHAR_TYPE_ID ");
+               strbuilder.Append(" AND b.CHAR_TYPE_NAME = 'CPE Pricing Types' ");
+               strbuilder.Append(" ORDER BY CHAR_NAME ");
+
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+       }
+
+       public DataTable GetProductBasedonSupplier(int supplierId)
+       {
+           GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+
+           try
+           {
+
+               strbuilder.Append(" SELECT DISTINCT product_cd, product_name ");
+               strbuilder.Append(" FROM csu_product a ");
+               strbuilder.Append(" INNER JOIN csu_cpe_cntry_supp b ");
+               strbuilder.Append(" ON a.product_cd =b.product_id ");
+               strbuilder.Append(" AND a.PRODUCT_VALID_CD = 1 ");
+               strbuilder.Append(" AND b.supplier_id     = "+supplierId+" ");
+               strbuilder.Append(" ORDER BY product_name ");
+
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+
+           return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+       }
+
+
+       public DataTable GetSuppandPricesBasedonProd(int supplierId, int ProductID)
+       {
+           GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               if (ProductID == 0)
+               {
+                   strbuilder.Append(" SELECT a.char_name,a.char_id FROM csu_ref_valid_char a, csu_ref_char_type b ");
+                   strbuilder.Append(" WHERE a.char_type_id = b.char_type_id AND b.char_type_name = 'CPE Supplier Types' ");
+               }
+               else
+               {
+                   strbuilder.Append(" select a.char_name,a.char_id from csu_ref_valid_char  a, csu_ref_char_type b ");
+                   strbuilder.Append(" where a.char_name in (SELECT DISTINCT a.supp_type  ");
+                   strbuilder.Append("  FROM csu_cpe_cntry_supp a, csu_product b, csu_country c, csu_ref_valid_char d, csu_ref_valid_char e,");
+                   strbuilder.Append(" csu_cpe_country_suppliers f ,csu_ref_char_type g ");
+                   strbuilder.Append(" WHERE a.product_id = b.product_cd(+)  AND a.country_id = c.country_id AND d.char_id = a.supplier_id ");
+                   strbuilder.Append(" AND e.char_id = f.supplier_char_id AND f.supplier_char_id = a.maintainer_id  AND e.char_id = a.maintainer_id ");
+                   strbuilder.Append("  AND g.char_type_name = 'CPE Supplier Types' and supplier_id=" + supplierId + " and b.product_cd = " + ProductID + ") ");
+                   strbuilder.Append(" AND b.char_type_name = 'CPE Supplier Types' and a.char_type_id = b.char_type_id ORDER BY char_id ");
+               }
+                                            
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+       }
+
+
+
+
+       public DataTable GetPricingTypesBasedonProd(int supplierId, int ProductID)
+       {
+           GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               if (ProductID == 0)
+               {
+                   strbuilder.Append(" SELECT a.char_name,a.char_id FROM csu_ref_valid_char a, csu_ref_char_type b ");
+                   strbuilder.Append(" WHERE a.char_type_id = b.char_type_id AND b.char_type_name = 'CPE Pricing Types' ");
+               }
+               else
+               {
+                   strbuilder.Append(" select a.char_name,a.char_id from csu_ref_valid_char  a, csu_ref_char_type b ");
+                   strbuilder.Append(" where a.char_name in (SELECT DISTINCT a.pricing_type  ");
+                   strbuilder.Append("  FROM csu_cpe_cntry_supp a, csu_product b, csu_country c, csu_ref_valid_char d, csu_ref_valid_char e,");
+                   strbuilder.Append(" csu_cpe_country_suppliers f ,csu_ref_char_type g ");
+                   strbuilder.Append(" WHERE a.product_id = b.product_cd(+)  AND a.country_id = c.country_id AND d.char_id = a.supplier_id ");
+                   strbuilder.Append(" AND e.char_id = f.supplier_char_id AND f.supplier_char_id = a.maintainer_id  AND e.char_id = a.maintainer_id ");
+                   strbuilder.Append("  AND g.char_type_name = 'CPE Pricing Types' and supplier_id=" + supplierId + " and b.product_cd = " + ProductID + ") ");
+                   strbuilder.Append(" AND b.char_type_name = 'CPE Pricing Types' and a.char_type_id = b.char_type_id");
+               }
+
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+       }
+
+       public DataTable CPESUPPLIERFooterGridDetails(int supplierId)
+       {
+           GetDataFromDB objGetData = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();      
+           try
+           {
+               strbuilder.Append(" Select to_char(SUPPLIER_CREATED_DT,'DD-MON-YYYY HH24:MI') AS SUPPLIER_CREATED_DT ,SUPPLIER_CREATED_BY, ");
+               strbuilder.Append(" to_char(SUPPLIER_UPDATED_DT,'DD-MON-YYYY HH24:MI') as SUPPLIER_UPDATED_DT,SUPPLIER_UPDATED_BY  ");
+               strbuilder.Append(" from csu_cpe_cntry_supp where SUPPLIER_UPDATED_DT in ");
+               strbuilder.Append(" (SELECT DISTINCT Max(SUPPLIER_UPDATED_DT)from CSU_CPE_CNTRY_SUPP where supplier_id= " + supplierId + " ) ");
+               strbuilder.Append("  and supplier_id = " + supplierId + " ");
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return objGetData.GetDataTable(strbuilder.ToString());
+       }
+
+       public DataTable CntryAssignCreatedGridData(int supplierId)
+       {
+           GetDataFromDB objGetData = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               strbuilder.Append(" SELECT distinct to_char(cnt_assign_created_dt,'DD-MON-YYYY HH24:MI') AS cnt_assign_created_dt, ");
+               strbuilder.Append(" CNT_ASSIGN_CREATED_BY from CSU_CPE_CNTRY_SUPP where cnt_assign_created_dt in ");
+               strbuilder.Append(" (SELECT DISTINCT min(cnt_assign_created_dt) from CSU_CPE_CNTRY_SUPP WHERE supplier_id =" + supplierId + ") ");
+               strbuilder.Append("  and supplier_id = " + supplierId + " ");
+              
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return objGetData.GetDataTable(strbuilder.ToString());
+       }
+
+       public DataTable CntryAssignUpdatedGridData(int supplierId)
+       {
+           GetDataFromDB objGetData = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               strbuilder.Append(" SELECT distinct to_char(cnt_assign_updated_dt,'DD-MON-YYYY HH24:MI') AS cnt_assign_updated_dt,cnt_assign_updated_by ");
+               strbuilder.Append(" from CSU_CPE_CNTRY_SUPP where cnt_assign_UPDATED_dt in ");
+               strbuilder.Append(" (SELECT DISTINCT max(cnt_assign_updated_dt) from CSU_CPE_CNTRY_SUPP WHERE supplier_id =" + supplierId + ") ");
+               strbuilder.Append("  and supplier_id = " + supplierId + " ");
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return objGetData.GetDataTable(strbuilder.ToString());
+       }
+       
+
+       public DataTable EmailAssignUnAssignGridData(int supplierId)
+       {
+           GetDataFromDB objGetData = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               
+                   strbuilder.Append("  SELECT distinct to_char(SUP_EMAIL_CREATED_DT,'DD-MON-YYYY HH24:MI') AS SUP_EMAIL_CREATED_DT, ");
+                   strbuilder.Append(" SUP_EMAIL_CREATED_BY from CPE_CNTRY_SUPP_EMAIL where SUP_EMAIL_CREATED_DT in ");
+                   strbuilder.Append(" (SELECT DISTINCT min(SUP_EMAIL_CREATED_DT) from CPE_CNTRY_SUPP_EMAIL WHERE supplier_id =" + supplierId + ")");
+                   strbuilder.Append("  and supplier_id = " + supplierId + " ");
+               
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return objGetData.GetDataTable(strbuilder.ToString());
+       }
+
+       public DataTable EmailAssignUnAssignUpdatedGrid(int supplierId)
+       {
+           GetDataFromDB objGetData = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               strbuilder.Append(" SELECT distinct to_char(SUP_EMAIL_UPDATED_DT,'DD-MON-YYYY HH24:MI') AS SUP_EMAIL_UPDATED_DT,SUP_EMAIL_UPDATED_BY ");
+               strbuilder.Append(" from CPE_CNTRY_SUPP_EMAIL where SUP_EMAIL_UPDATED_DT in ");
+               strbuilder.Append(" (SELECT DISTINCT max(SUP_EMAIL_UPDATED_DT) from CPE_CNTRY_SUPP_EMAIL WHERE supplier_id =" + supplierId + ") ");
+               strbuilder.Append("  and supplier_id = " + supplierId + " ");
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return objGetData.GetDataTable(strbuilder.ToString());
+       }
+
+       public DataTable ACCTYPECREATED(int supplierId)
+       {
+           GetDataFromDB objGetData = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               strbuilder.Append(" Select distinct to_char(ACC_TYPE_CREATED_DT,'DD-MON-YYYY HH24:MI') AS  ACC_TYPE_CREATED_DT,ACC_TYPE_CREATED_BY ");
+               strbuilder.Append(" from CSU_CPE_SUPPLIER_ACCESS_TYPE where ACC_TYPE_CREATED_DT in ");
+               strbuilder.Append(" (SELECT DISTINCT min(ACC_TYPE_CREATED_DT) from CSU_CPE_SUPPLIER_ACCESS_TYPE WHERE supplier_id =" + supplierId + " ) ");
+               strbuilder.Append(" and SUPPLIER_ID= "+supplierId+" ");
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return objGetData.GetDataTable(strbuilder.ToString());
+       }
+       public DataTable ACCTYPEUpdated(int supplierId)
+       {
+           GetDataFromDB objGetData = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           try
+           {
+               strbuilder.Append(" Select distinct  to_char(ACC_TYPE_UPDATED_DT,'DD-MON-YYYY HH24:MI') AS ACC_TYPE_UPDATED_DT,ACC_TYPE_UPDATED_BY ");
+               strbuilder.Append(" from CSU_CPE_SUPPLIER_ACCESS_TYPE where ACC_TYPE_UPDATED_DT in ");
+               strbuilder.Append(" (SELECT DISTINCT min(ACC_TYPE_UPDATED_DT) from CSU_CPE_SUPPLIER_ACCESS_TYPE WHERE supplier_id =" + supplierId + " ) ");
+               strbuilder.Append(" and SUPPLIER_ID= " + supplierId + " ");
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return objGetData.GetDataTable(strbuilder.ToString());
+       }
+       public List<string> OnSelectionSupptypeandPriceType(string supptype, string pricingtype)
+       {
+           GetDataFromDB objdata = new GetDataFromDB();
+          List<string> ListTypes = new List<string>();
+          string  strSuppSql = string.Empty;
+          string strPsql = string.Empty;
+           //Get All Pricing type ID'S
+          string Pricing_Type = "";
+          string strMainSql = "Select CHAR_TYPE_ID FROM CSU_REF_CHAR_TYPE where UPPER(TRIM(CHAR_TYPE_NAME))='CPE PRICING TYPES'";
+          DataTable dtMainSql = objdata.GetDataTable(strMainSql.ToString());
+          string strAggIDSql = "Select char_id from CSU_REF_VALID_CHAR where upper(trim(char_name))='AGGREGATOR' and char_type_id= " + dtMainSql.Rows[0]["CHAR_TYPE_ID"];
+          DataTable rsAggID = objdata.GetDataTable(strAggIDSql.ToString());
+
+           string strIndSql="Select char_id from CSU_REF_VALID_CHAR where upper(trim(char_name))='INDIRECT' and char_type_id= "+ dtMainSql.Rows[0]["CHAR_TYPE_ID"];
+           DataTable rsInd = objdata.GetDataTable(strIndSql.ToString());
+
+           string strStndSql = "Select char_id from CSU_REF_VALID_CHAR where upper(trim(char_name))='STANDARD' and char_type_id= " + dtMainSql.Rows[0]["CHAR_TYPE_ID"];
+
+           DataTable rsStd = objdata.GetDataTable(strStndSql.ToString());
+
+           string strFixedIDSql = "Select char_id from CSU_REF_VALID_CHAR where upper(trim(char_name))='FIXED' and char_type_id= " + dtMainSql.Rows[0]["CHAR_TYPE_ID"];
+           DataTable rsFixedID = objdata.GetDataTable(strFixedIDSql.ToString());
+
+           string strBTALSSql = "Select char_id from CSU_REF_VALID_CHAR where upper(trim(char_name))='SPECIAL-BT AL SAUDIA' and char_type_id= " + dtMainSql.Rows[0]["CHAR_TYPE_ID"];
+
+           DataTable rsBTALS = objdata.GetDataTable(strBTALSSql.ToString());
+           try
+           {
+               if (supptype != null && supptype != "")
+               {
+                   strSuppSql = "Select char_name from CSU_REF_VALID_CHAR where char_id=" + supptype + " ";
+                   DataTable dt = objdata.GetDataTable(strSuppSql.ToString());
+                   if (dt != null && dt.Rows.Count > 0)
+                   {
+                       supptype = dt.Rows[0]["char_name"].ToString();
+                   }
+
+               }
+               else
+               {
+                   supptype = ""; //15564- Preferred SSP
+               }
+
+               if (pricingtype != null && pricingtype != "")
+               {
+                   strPsql = "Select char_name from CSU_REF_VALID_CHAR where char_id=" + pricingtype;
+                   DataTable dtpricing = objdata.GetDataTable(strPsql.ToString());
+                   if (dtpricing != null && dtpricing.Rows.Count > 0)
+                   {
+                       pricingtype = dtpricing.Rows[0]["char_name"].ToString();
+                   }
+
+               }
+               else
+               {
+                   pricingtype = ""; //15567 - Pricing item- Standard
+               }
+
+               if (supptype == "SSP" && (pricingtype == "Fixed" || pricingtype == "Aggregator")) // 15565-SSP , Pricing item:- { 15569 - Fixed, 15570- Aggregator}
+               {
+
+                   pricingtype = "Standard"; //15567 - Pricing item- Standard
+                   Pricing_Type = rsStd.Rows[0]["char_id"].ToString();
+               }
+
+               if (supptype == "SSP" && (pricingtype == "Standard")) 
+               {
+
+                   pricingtype = "Standard"; 
+                   Pricing_Type = rsStd.Rows[0]["char_id"].ToString();
+               }
+
+               if (supptype == "SSP" && (pricingtype == "Special-BT Al Saudia")) 
+               {
+
+                   pricingtype = "Special-BT Al Saudia"; 
+                   Pricing_Type = rsBTALS.Rows[0]["char_id"].ToString();
+               }
+
+               if (supptype == "SSP" && (pricingtype == "Indirect"))
+               {
+
+                   pricingtype = "Standard";
+                   Pricing_Type = rsInd.Rows[0]["char_id"].ToString();
+               }
+
+
+               if (supptype == "Preferred SSP" && pricingtype == "Aggregator")
+               {
+                   pricingtype = "Standard"; 
+                   Pricing_Type = rsStd.Rows[0]["char_id"].ToString();
+               }
+
+               if (supptype == "Preferred SSP" && pricingtype == "Standard")
+               {
+                   pricingtype = "Standard"; 
+                   Pricing_Type = rsStd.Rows[0]["char_id"].ToString();
+               }
+
+               if (supptype == "Preferred SSP" && pricingtype == "Fixed")
+               {
+                   pricingtype = "Fixed";
+                   Pricing_Type = rsFixedID.Rows[0]["char_id"].ToString();
+               }
+
+               if (supptype == "Preferred SSP" && pricingtype == "Indirect")
+               {
+                   pricingtype = "Standard";
+                   Pricing_Type = rsInd.Rows[0]["char_id"].ToString();
+               }
+
+               if (supptype == "Preferred SSP" && pricingtype == "Special-BT Al Saudia")
+               {
+                   pricingtype = "Special-BT Al Saudia";
+                   Pricing_Type = rsBTALS.Rows[0]["char_id"].ToString();
+               }
+
+               if (supptype == "Indirect") 
+               {
+                   pricingtype = "Indirect";
+                   Pricing_Type = rsInd.Rows[0]["char_id"].ToString();
+               }
+
+               if (supptype == "Aggregator")
+               {
+                   pricingtype = "Aggregator";
+                   Pricing_Type = rsAggID.Rows[0]["char_id"].ToString();
+               }
+
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           ListTypes.Insert(0, supptype);
+           ListTypes.Insert(1, pricingtype);
+           ListTypes.Insert(2, Pricing_Type);
+           return ListTypes;
+       }
+       public List<string> GetInstallerandMaintainerFlags(int supplierId)
+       {
+           GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+           StringBuilder strbuilder = new StringBuilder();
+           List<string> lstsupplflags = new List<string>();
+           string InsflagStatus = string.Empty;
+           string MaiflagStatus = string.Empty;
+           string ManuFlagStatus = string.Empty;
+           string DistFlagStatus = string.Empty;
+           DataTable dtsuppflag=new DataTable();
+           try
+           {
+               strbuilder.Append(" SELECT a.INSTALLER_FLAG,  a.MAINTAINER_FLAG,  b.char_name, a.supplier_char_id ");
+               strbuilder.Append(" FROM CSU_CPE_COUNTRY_SUPPLIERS a, csu_ref_valid_char b ");
+               strbuilder.Append(" WHERE a.supplier_char_id = b.char_id AND a.supplier_char_id   = " + supplierId + " ");
+
+               DataTable dt = objGetDataFromDB.GetDataTable(strbuilder.ToString());
+               if (dt != null && dt.Rows.Count > 0)
+               {
+
+                   if (dt.Rows[0]["INSTALLER_FLAG"].ToString() == "Y")
+                   {
+                       InsflagStatus = "Yes";
+
+                   }
+                   else
+                   {
+
+                       InsflagStatus = "No";
+
+                   }
+                   if (dt.Rows[0]["MAINTAINER_FLAG"].ToString() == "Y")
+                   {
+                       MaiflagStatus = "Yes";
+
+                   }
+                   else
+                   {
+                       MaiflagStatus = "No";
+
+                   }
+
+                   strbuilder.Clear();
+                   strbuilder.Append(" select count(1) AS COUNT from csu_cpe_cntry_supp where manufacturer_name ='" + dt.Rows[0]["char_name"] + "'");
+                   dtsuppflag = objGetDataFromDB.GetDataTable(strbuilder.ToString());
+                   if (dtsuppflag != null && dtsuppflag.Rows[0]["COUNT"].ToString() != "0")
+                   {
+                       ManuFlagStatus = "Yes";
+                   }
+                   else
+                   {
+                       ManuFlagStatus = "No";
+                   }
+
+                   dtsuppflag.Clear();
+                   strbuilder.Clear();
+                   strbuilder.Append(" select count(1) AS COUNT from csu_cpe_cntry_supp where distributor_name ='" + dt.Rows[0]["char_name"] + "'");
+                   dtsuppflag = objGetDataFromDB.GetDataTable(strbuilder.ToString());
+
+                   if (dtsuppflag != null && dtsuppflag.Rows[0]["COUNT"].ToString() != "0")
+                   {
+                       DistFlagStatus = "Yes";
+                   }
+                   else
+                   {
+                       DistFlagStatus = "No";
+                   }
+               }
+
+               else
+               {
+                   InsflagStatus = "No";
+                   MaiflagStatus = "No";
+                   ManuFlagStatus = "No";
+                   DistFlagStatus = "No";
+               }
+               
+                
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           lstsupplflags.Insert(0, InsflagStatus);
+           lstsupplflags.Insert(1, MaiflagStatus);
+           lstsupplflags.Insert(2, ManuFlagStatus);
+           lstsupplflags.Insert(3, DistFlagStatus);
+
+           return lstsupplflags;
+       }
+
+       public int GetNonStandardConfiguration(int supplierId, int ProductID, string supptype, string pricingtype)
+       {
+           int chk_non_std_config = 0;
+           GetDataFromDB GetData = new GetDataFromDB();
+           StringBuilder SBuilder = new StringBuilder();
+           try
+           {
+               
+               SBuilder.Append(" SELECT DISTINCT NON_STD_CONFIG FROM cpe_cntry_supp_email a, csu_cpe_cntry_supp b ");
+               SBuilder.Append(" WHERE a.supplier_id =" + supplierId + " ");
+               SBuilder.Append(" AND a.supplier_id =b.supplier_id ");
+               SBuilder.Append(" AND a.country_id = b.country_id ");
+               SBuilder.Append(" AND Trim(b.SUPP_TYPE)   ='" + supptype + "' ");
+               SBuilder.Append(" AND Trim(b.Pricing_type)='" + pricingtype + "' ");
+
+               DataTable Dtnon_std_config = GetData.GetDataTable(SBuilder.ToString());
+               if (ProductID == 0)
+               {
+                   chk_non_std_config = 2;
+
+               }
+               else if (Dtnon_std_config != null && Dtnon_std_config.Rows.Count > 0)
+               {
+                   chk_non_std_config = 1;
+               }
+               else
+               {
+                   chk_non_std_config = 0;
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return chk_non_std_config;
+       }
+
+
+
+       public DataTable UnassignedCPESupplierCountries(int supplierId, string supptype, string pricingtype)
+       {
+           GetDataFromDB objgetdata = new GetDataFromDB();
+           StringBuilder StrQrybuilder = new StringBuilder();
+         
+           try
+           {
+               StrQrybuilder.Append(" SELECT DISTINCT COUNTRY_ID, COUNTRY_NAME FROM csu_country ");
+
+          
+
+             if (supptype!=null || supptype!="")
+             {
+                 if (supptype == "15564") //15564- Preferred SSP
+                 {
+                     StrQrybuilder.Append("  WHERE Country_ID NOT IN ( Select Distinct Country_id from CSU_CPE_CNTRY_SUPP b where Upper(Trim(B.Supp_Type))='PREFERRED SSP') ");
+                 }
+                 else if (supptype == "15565") // 15565-SSP
+                 {
+                     StrQrybuilder.Append(" Where Country_ID IN (Select Distinct Country_id From CSU_CPE_CNTRY_SUPP a where ");
+
+                     if (supplierId != 0)
+                     {
+                         StrQrybuilder.Append(" a.Supplier_id <> " + supplierId + " and a.country_id in ( Select Distinct Country_id from CSU_CPE_CNTRY_SUPP b where Upper(Trim(B.Supp_Type))='PREFERRED SSP')) ");
+                     }
+                     else
+                     {
+                         StrQrybuilder.Append(" Upper(Trim(a.Supp_Type))='PREFERRED SSP') ");
+                     }
+                 }
+                 else if (supptype == "15566") //15566- Aggregator
+                 {
+                     if (supplierId != 0)
+                     {
+                         StrQrybuilder.Append(" Where Country_ID NOT IN ( Select Distinct Country_id from CSU_CPE_CNTRY_SUPP b where supplier_ID = " + supplierId + " ) ");
+                         StrQrybuilder.Append(" and upper(data_report(Country_ID,0,0,0)) ='AVAILABLE' ");
+                     }
+                     else
+                     {
+                         StrQrybuilder.Append(" where upper(data_report(Country_ID,0,0,0)) ='AVAILABLE' ");
+                     }
+                 }
+                 else if (supptype == "35364") //35364 - Indirect
+                 {
+                     if (supplierId != 0)
+                     {
+                         StrQrybuilder.Append(" Where Country_ID NOT IN ( Select Distinct Country_id from CSU_CPE_CNTRY_SUPP b where supplier_ID = " + supplierId + " ) ");
+                      
+                     }
+                     
+                 }
+             }
+             else
+             {
+                 StrQrybuilder.Append(" Where Country_ID Not IN (Select Distinct Country_id From CSU_CPE_CNTRY_SUPP a where Upper(Trim(a.Supp_Type))='PREFERRED SSP') ");
+             }
+
+
+           
+
+             if (pricingtype!=null || pricingtype!="") //15569 - Fixed 15568- Special-BT Al Saudia
+             {
+                 if (pricingtype == "15569" || pricingtype == "15568")
+                 {
+                     StrQrybuilder.Append(" and upper(data_report(Country_ID,0,0,0)) ='AVAILABLE' ");
+                 }
+                 else
+                 {
+                     StrQrybuilder.Append(" and upper(data_report(Country_ID,0,0,0)) <> 'NOT AVAILABLE' ");
+                 }
+             }
+             
+             StrQrybuilder.Append(" order by COUNTRY_NAME ");
+           }
+               
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return objgetdata.GetDataTable(StrQrybuilder.ToString());
+       }
+
+       public DataTable AssignedAccessTypes(int supplierId, string supptype)
+       {
+           GetDataFromDB objgetdata = new GetDataFromDB();
+           StringBuilder stringbuilder = new StringBuilder();
+           try
+           {
+               stringbuilder.Append(" SELECT DISTINCT b.Access_type FROM CSU_CPE_CNTRY_SUPP a , CSU_CPE_SUPPLIER_ACCESS_TYPE b ");
+               stringbuilder.Append(" WHERE a.supplier_id =b.supplier_id ");
+               stringbuilder.Append(" AND Trim(a.Supp_type) ='" + supptype + "' ");
+               stringbuilder.Append(" AND a.Supplier_ID  = " + supplierId + " ");
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return objgetdata.GetDataTable(stringbuilder.ToString());
+       }
+
+       public DataTable AssignedCPESupplierCountries(int supplierId, int ProductID, string supptype, string pricingtype)
+       {
+           GetDataFromDB objgetdata=new GetDataFromDB();
+           StringBuilder stringbuilder=new StringBuilder();
+           try
+           {
+               stringbuilder.Append("  SELECT DISTINCT b.COUNTRY_ID, b.COUNTRY_NAME  FROM CSU_CPE_CNTRY_SUPP a, csu_country b ");
+               stringbuilder.Append(" WHERE a.COUNTRY_ID  = b.COUNTRY_ID ");
+               stringbuilder.Append(" AND a.SUPPLIER_ID   = " + supplierId + " ");
+               if (ProductID == 0)
+               {
+                   stringbuilder.Append(" AND PRODUCT_ID in (-1,0) ");
+               }
+               else
+               {
+                   stringbuilder.Append(" AND PRODUCT_ID  = '" + ProductID + "' ");
+               }
+
+               if (supptype != "" || supptype!=null)
+               {
+                   stringbuilder.Append(" and Trim(a.Supp_Type)='" + supptype + "' ");
+               }
+               else
+               {
+                   stringbuilder.Append("  and Upper(Trim(a.Supp_Type))='PREFERRED SSP' ");
+               }
+               if (pricingtype != "" || pricingtype != null)
+               {
+                   stringbuilder.Append(" and Trim(a.Pricing_type)= '" + pricingtype + "' ");
+               }
+               else
+               {
+                   stringbuilder.Append(" and Upper(Trim(a.Pricing_type))='STANDARD' ");
+               }
+               stringbuilder.Append(" AND upper(data_report(b.Country_ID,a.SUPPLIER_ID,0,0)) <> 'NOT AVAILABLE' ");
+               stringbuilder.Append(" order by COUNTRY_NAME ");
+           }
+           catch(Exception ex)
+           {
+               throw ex;
+           }
+           return objgetdata.GetDataTable(stringbuilder.ToString());
+
+       }
+     
+       public DataTable RetrieveEmailId(int SupplierId, int CountryId,string ProductIDs)
+       {
+           GetDataFromDB getdata = new GetDataFromDB();
+           StringBuilder stringbuilder = new StringBuilder();
+           try
+           {
+               if (CountryId == 0)
+               {
+                   stringbuilder.Append(" Select EMAIL_ID ,product_id from cpe_cntry_supp_email where COUNTRY_ID = 0 and SUPPLIER_ID=" + SupplierId + "  and PRODUCT_ID IN (" + ProductIDs + ") ");
+               }
+               else
+               {
+                   stringbuilder.Append(" Select EMAIL_ID ,product_id from cpe_cntry_supp_email where COUNTRY_ID =" + CountryId + " and SUPPLIER_ID=" + SupplierId + "  and PRODUCT_ID IN (" + ProductIDs + ") ");
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return getdata.GetDataTable(stringbuilder.ToString());
+       }
+
+       public DataTable ValidOwnerCPEProducts()
+       {
+           GetDataFromDB ObjGetDataFromDB = new GetDataFromDB();
+           StringBuilder sbuilder = new StringBuilder();
+           try
+           {
+              
+               sbuilder.Append(" SELECT DISTINCT a.PRODUCT_CD,  a.PRODUCT_NAME ");
+               sbuilder.Append(" FROM csu_product a, csu_cpe_product_bndls b WHERE a.product_cd = b.PRODUCT_CD ");
+               sbuilder.Append(" AND a. PRODUCT_cd IN ( 11, 14, 15, 16, 21, 25, 30, 32, 58, 62, 63, 67, 72, 79, 96, 97, 101, 102, 103,104, 105, 108,");
+               sbuilder.Append(" 116, 117, 118, 119, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 75, 76, 78, 82, 85, 120, 31, 98, 99, 100, 106, 12 )");
+               sbuilder.Append(" AND a.product_cd  IN (SELECT DISTINCT a.product_cd  FROM CSU_PRODUCT a  WHERE a.product_cd NOT IN ");
+               sbuilder.Append("  (SELECT DISTINCT b.product_cd FROM CSU_REF_SUBPRODUCT b ) AND (a.product_valid_cd = 1  AND a.use_cpe_product   = 1) ");
+               sbuilder.Append("  UNION SELECT DISTINCT a.product_cd FROM CSU_PRODUCT a,  CSU_REF_SUBPRODUCT b ");
+               sbuilder.Append(" WHERE a.product_cd = b.product_cd");
+               sbuilder.Append(" AND b.subproduct_valid_cd = 1 ");
+               sbuilder.Append(" AND b.use_cpe_subproduct  = 1 ");
+               sbuilder.Append(" AND a.product_valid_cd    = 1 ");
+               sbuilder.Append("  AND a.use_cpe_product    = 1 ) ORDER BY upper(PRODUCT_NAME) ");
+    
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return ObjGetDataFromDB.GetDataTable(sbuilder.ToString());
+           
+       }
+
+    }
+}
+

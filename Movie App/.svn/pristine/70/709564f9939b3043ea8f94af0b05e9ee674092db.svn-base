@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <div ng-controller="CaseDetailAuditReportCtrl" class="container">
+<!--<nav class="navbar navbar-default center" role="navigation">
+  <div class="navbar-header ">
+    <a class="navbar-brand Arrow" style="text-align: center" href="#">Case Detail Audit Information</a><p style="padding:15px 15px 15px 15px;"><b>Service Type&nbsp;:&nbsp;</b>{{modServiceType}}&nbsp;&nbsp;
+    <b>Product&nbsp;:&nbsp;</b>{{modProduct}}&nbsp;&nbsp;
+    <b>Country&nbsp;:&nbsp;</b>{{CountryName}}&nbsp;&nbsp;
+    <b>Case Id&nbsp;:&nbsp;</b>{{CaseId}}&nbsp;&nbsp;</p>
+    </div>      
+    </nav>-->
+    <nav class="navbar-default" role="navigation">
+  
+    <p><a class="navbar-brand Arrow" href="#">Case Detail Audit Information for </a></p><p style="padding:15px 15px 15px 15px;">/ {{modServiceType}} /  {{modProduct}} / {{CountryName}} / {{CaseId}} </p>
+</nav>
+        <div class="row" style="padding-left: 10px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">                
+                    <div class="panel-body">
+                        <!--<h4 style="text-align: center">
+                            Case Detail Audit Information</h4>-->
+                            <table ng-table="CaseDetailAuditData" class="table">                
+                    <tr ng-repeat="user in $data">           
+            <td data-title="'Char Type Name'" filter="{ CharTypeName: 'text'}" sortable="'CharTypeName'" class="Arrow">
+                {{user.CharTypeName}}
+            </td>
+            
+            <td data-title="'Char Name'" filter="{ CharName: 'text'}" sortable="'CharName'" class="Arrow">
+                {{user.CharName}}
+            </td>                  
+
+            <td data-title="'Created User Name'" filter="{ CreatedBy: 'text'}" sortable="'CreatedBy'" class="Arrow">
+                {{user.CreatedBy}}
+            </td>
+           
+            <td data-title="'Created On'" filter="{ CreatedDate: 'text'}" sortable="'CreatedDate'" class="Arrow">
+                {{user.CreatedDate}}
+            </td>
+           
+            <td data-title="'Updated User Name'" filter="{ UpdatedBy: 'text'}" sortable="'UpdatedBy'" class="Arrow">
+                {{user.UpdatedBy}}
+            </td>
+            
+            <td data-title="'Updated On'" filter="{ UpdatedDate: 'text'}" sortable="'UpdatedDate'" class="Arrow">
+                {{user.UpdatedDate}}
+            </td>
+
+             <td data-title="'Valid / Invalid'" filter="{ Validity: 'text'}" sortable="'Validity'" class="Arrow">
+                {{user.Validity}}
+            </td>
+            </tr>
+            </table>
+                    </div>                
+            </div>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+</div>
+    <style type="text/css">
+.ng-table-pager div
+{
+    margin:20px 0px 20px 0px;
+    }
+</style>
+</body>
+</html>

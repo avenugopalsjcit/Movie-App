@@ -1,0 +1,763 @@
+﻿namespace SCAdminDAL
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using Oracle.DataAccess.Client;
+    using System.Data;    
+    using System.Configuration;
+
+
+    public class ProductMappingDAL
+    {
+        DataSet ds;
+        OracleDataAdapter dad;
+        OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+        public DataTable GetTabledata(int Id, string TabName)
+        {
+            string query = string.Empty;
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            if (Id == -1)
+            {
+                switch (TabName)
+                {
+                    case "UserStatus": query = "select us1.user_status_cd, us1.user_status_cd_desc, (select User_name from CSU_USER where EMP_Id = us1.Created_emp_id) Created_By, to_char(us1.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt, (select User_name from CSU_USER where EMP_Id = us1.Updated_emp_id) Updated_By,to_char(us1.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt from csu_ref_user_status us1 order by upper(us1.user_status_cd_desc)";
+                        break;
+                    case "UserCategory": query = "select uc1.User_category_cd, uc1.User_category_desc, (select User_name from CSU_USER where EMP_Id = uc1.Created_emp_id) Created_By, to_char(uc1.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt, (select User_name from CSU_USER where EMP_Id = uc1.Updated_emp_id) Updated_By," +
+                                        "to_char(uc1.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt" +
+                                        " from csu_ref_user_category uc1 order by upper(uc1.User_category_desc)";
+                        break;
+                    case "ProductOwnerStatus": query = "select pos.product_owner_status_cd, pos.product_owner_status_desc, (select User_name from CSU_USER where EMP_Id = pos.Created_emp_id) Created_By, to_char(pos.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt, (select User_name from CSU_USER where EMP_Id = pos.Updated_emp_id) Updated_By," +
+                                        "to_char(pos.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt" +
+                                        " from csu_ref_owner_status pos order by upper(pos.product_owner_status_desc)";
+                        break;
+                }
+            }
+            else
+            {
+                switch (TabName)
+                {
+                    case "UserStatus": query = "select us1.user_status_cd, us1.user_status_cd_desc, (select User_name from CSU_USER where EMP_Id = us1.Created_emp_id) Created_By, to_char(us1.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt, (select User_name from CSU_USER where EMP_Id = us1.Updated_emp_id) Updated_By,to_char(us1.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt from csu_ref_user_status us1 where us1.User_status_cd = " + Id + " order by upper(us1.user_status_cd_desc)";
+                        break;
+                    case "UserCategory": query = "select uc1.User_category_cd, uc1.User_category_desc, (select User_name from CSU_USER where EMP_Id = uc1.Created_emp_id) Created_By, to_char(uc1.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt, (select User_name from CSU_USER where EMP_Id = uc1.Updated_emp_id) Updated_By," +
+                                        "to_char(uc1.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt" +
+                                        " from csu_ref_user_category uc1 where uc1.User_category_cd = " + Id + " order by upper(uc1.User_category_desc)";
+                        break;
+                    case "ProductOwnerStatus": query = "select pos.product_owner_status_cd, pos.product_owner_status_desc, (select User_name from CSU_USER where EMP_Id = pos.Created_emp_id) Created_By, to_char(pos.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt, (select User_name from CSU_USER where EMP_Id = pos.Updated_emp_id) Updated_By," +
+                                        "to_char(pos.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt" +
+                                        " from csu_ref_owner_status pos where pos.product_owner_status_cd = " + Id + " order by upper(pos.product_owner_status_desc)";
+                        break;
+                }
+
+                query = string.Format(query, Id);
+            }
+
+            return objGetDataFromDB.GetDataTable(query.ToString());
+        }
+
+
+
+
+        public DataSet GetProductMappingDetails(string TabName, string ProductID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+            if (TabName == "Distributor")
+            {
+                sb.Append("SELECT  distinct * FROM csu_product c  left outer join  (SELECT se.product_cd, di.dist_id, di.dist_name,di.dist_short_name as short  FROM csu_segregation se, csu_distributor di  WHERE se.segregation_id = di.dist_id   AND di.dist_valid_cd = 1  AND di.dist_id >= 0 ) d  ON  c.product_cd= d.product_cd and c.PRODUCT_VALID_CD=1 order by c.product_name");
+            }
+
+            if (TabName == "BTGFR")
+            {
+
+                sb.Append("SELECT  distinct * FROM csu_product c  inner join (SELECT mp.product_cd, bt.btgfr_id, bt.description FROM csu_btgfr_product_map mp, csu_btgfr bt  WHERE mp.btgfr = bt.btgfr_id AND mp.product_cd='" + ProductID + "' AND bt.valid_cd = 1  AND bt.btgfr >= '0'  AND bt.ORG_GFR_FLAG = 'GFR' order by upper(description) ) d ON  c.product_cd= d.product_cd and c.PRODUCT_VALID_CD=1   order by c.product_name");
+            }
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetProductMappingBasedOnBTGFR(string TabName, string BTGFRID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            if (BTGFRID != null)
+            {
+                sb.Append("SELECT pr.product_cd, pr.product_name FROM csu_product pr, csu_btgfr bt, csu_btgfr_product_map mp  WHERE mp.btgfr = bt.btgfr_id  AND pr.product_cd = mp.product_cd  AND bt.btgfr >= '0'  AND pr.product_valid_cd = 1  and bt.btgfr_id = " + BTGFRID + " AND bt.ORG_GFR_FLAG = 'GFR'  AND bt.valid_cd = 1  and pr.product_cd!=25 order by upper(product_name)");
+
+                OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+                dad = new OracleDataAdapter(cmd);
+                ds = new DataSet();
+                dad.Fill(ds);
+               
+            }
+            return ds;
+        }
+
+        public DataSet GetUnassignProductbasedonbtgfr(string TabName, string BTGFRID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append(" SELECT product_name, product_cd  FROM csu_product WHERE product_valid_cd = 1  AND product_cd not in (25)  MINUS  SELECT pr.product_name, bt.product_cd FROM csu_btgfr_product_map bt, csu_product pr  WHERE bt.btgfr =" + BTGFRID + " AND pr.product_cd = bt.product_cd  AND pr.product_cd not in (25)");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetUnassignProductbasedonorg(string TabName, string ORGID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("SELECT product_name, product_cd FROM csu_product WHERE product_valid_cd = 1  MINUS SELECT pr.product_name, bt.product_cd  FROM csu_btgfr_product_map bt, csu_product pr  WHERE bt.btgfr = "+ORGID+" AND pr.product_cd = bt.product_cd  AND pr.product_valid_cd = 1  order by 1 ");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+
+        public DataSet GetAssignProductbasedonorg(string TabName, string ORGID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("	SELECT pr.product_name, bt.product_cd  FROM csu_btgfr_product_map bt, csu_product pr  WHERE bt.btgfr = "+ORGID+" AND pr.product_cd = bt.product_cd  AND pr.product_valid_cd = 1 order by 1 ");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+        
+        public DataSet GetassignProductbasedonbtgfr(string TabName, string BTGFRID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append(" 	SELECT pr.product_name, bt.product_cd  FROM csu_btgfr_product_map bt, csu_product pr  WHERE bt.btgfr = " + BTGFRID + " AND pr.product_cd = bt.product_cd  AND pr.product_valid_cd = 1 order by 1");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetUnassignProductbasedondistributor(string TabName, string DistributorID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append(" SELECT product_name, product_cd  FROM csu_product  WHERE product_valid_cd = 1 MINUS  SELECT pr.product_name, se.product_cd  FROM csu_segregation se, csu_product pr  WHERE se.segregation_id = " + DistributorID + " AND pr.product_cd = se.product_cd  AND pr.product_valid_cd = 1  order by 1 ");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+
+        public DataSet GetAssignProductbasedondistributor(string TabName, string DistributorID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("	SELECT pr.product_name, se.product_cd  FROM csu_segregation se, csu_product pr WHERE se.segregation_id = " + DistributorID + " AND pr.product_cd = se.product_cd  AND pr.product_valid_cd = 1 order by 1");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+        
+
+          
+
+        public DataSet GetUnassignbtfgrbasedonproduct(string TabName, string ProductID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append(" select * from csu_btgfr where btgfr_id in((SELECT btgfr_id      AS id FROM csu_btgfr WHERE btgfr     >= '0' AND ORG_GFR_FLAG = 'GFR' AND valid_cd = 1)  MINUS (select  distinct  btgfr from csu_btgfr_product_map where product_cd = " + ProductID + " and btgfr >= 0) ) order by description");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetUnassignorgbasedonproduct(string TabName, string ProductID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("(select distinct btgfr_id as id, description as name from csu_btgfr where org_gfr_flag='ORG' and valid_cd = 1 ) MINUS (select distinct a.btgfr,b.Description from csu_btgfr_product_map a, csu_btgfr b where product_cd= "+ProductID+" and org_gfr_flag='ORG' and a.btgfr = b.btgfr_id and valid_cd = 1  )");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetAssignorgbasedonproduct(string TabName, string ProductID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("select distinct a.btgfr,b.Description from csu_btgfr_product_map a, csu_btgfr b where product_cd= "+ProductID+" and org_gfr_flag='ORG' and a.btgfr = b.btgfr_id and valid_cd = 1 order by 2");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+        
+        public DataSet GetUnassigndistributorbasedonproduct(string TabName, string ProductID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("SELECT  dist_name AS name,  dist_id  AS id,  dist_short_name AS short,  dist_valid_cd   AS valid FROM csu_distributor WHERE dist_id    >= 0 AND dist_valid_cd = 1  MINUS SELECT di.dist_name, di.dist_id, di.dist_short_name AS short, dist_valid_cd   AS valid FROM csu_segregation se, csu_distributor di WHERE se.segregation_id = di.dist_id AND se.product_cd  = " + ProductID + " AND di.dist_valid_cd= 1 AND di.dist_id>= 0");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetAssigndistributorbasedonproduct(string TabName, string ProductID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("SELECT di.dist_name, di.dist_id, di.dist_short_name AS short, dist_valid_cd   AS valid FROM csu_segregation se, csu_distributor di WHERE se.segregation_id = di.dist_id AND se.product_cd = " + ProductID + " AND di.dist_valid_cd = 1 AND di.dist_id >= 0 ");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+        
+        public DataSet GetAssignbtfgrbasedonproduct(string TabName, string ProductID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append(" SELECT Distinct * FROM csu_btgfr WHERE btgfr_id IN (SELECT DISTINCT btgfr FROM csu_btgfr_product_map WHERE product_cd = " + ProductID + " AND btgfr       >= 0 )  AND valid_cd>0 ORDER BY description asc");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+      
+        public DataSet GetDistributorsBasedOnProductdd(string TabName, string ProductID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("SELECT di.dist_id, di.dist_name,di.dist_short_name as short  FROM csu_segregation se, csu_distributor di  WHERE se.segregation_id = di.dist_id  AND se.product_cd = " + ProductID + " AND di.dist_valid_cd = 1  AND di.dist_id >= 0  order by upper(dist_name)");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+
+        public DataSet GetOrgBasedOnProductdd(string TabName, string ProductID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("SELECT distinct bt.btgfr_id, bt.description FROM csu_btgfr_product_map mp, csu_btgfr bt  WHERE mp.btgfr = bt.btgfr_id  AND mp.product_cd ="+ProductID+" AND bt.ORG_GFR_FLAG='ORG' and valid_cd = 1 order by upper(description) ");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+        
+        public DataSet GetProductsBasedOnDistributordd(string TabName, string DistributorID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("SELECT pr.product_cd, pr.product_name  FROM csu_product pr, csu_distributor di, csu_segregation se  WHERE se.segregation_id = di.dist_id AND pr.product_cd = se.product_cd  AND di.dist_id >= 0  AND pr.product_valid_cd = 1  and di.dist_id =" + DistributorID + " order by upper(product_name)");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetProductsBasedOnORGdd(string TabName, string ORGID)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("	SELECT pr.product_name, bt.product_cd  FROM csu_btgfr_product_map bt, csu_product pr  WHERE bt.btgfr = " + ORGID + " AND pr.product_cd = bt.product_cd  AND pr.product_valid_cd = 1  order by 1");
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+        
+
+        public DataSet ProductNamesdd(string TabName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("SELECT  distinct * FROM csu_product where PRODUCT_VALID_CD=1 order by product_name");
+
+
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet DistributorsNamesdd(string TabName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("SELECT  DIST_ID,DIST_NAME, dist_short_name as short FROM csu_distributor ");
+
+
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+
+        public DataSet OrganisationNamesdd(string TabName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append(" SELECT distinct bt.btgfr_id, bt.description  FROM csu_btgfr_product_map mp, csu_btgfr bt  WHERE mp.btgfr = bt.btgfr_id  AND bt.ORG_GFR_FLAG='ORG' and valid_cd = 1 and bt.description!='None' order by upper(description)  ");
+
+
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+        
+        public DataSet BTGFRNamesdd(string TabName)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+
+            sb.Append("SELECT  *  FROM csu_btgfr where valid_cd = 1 AND ORG_GFR_FLAG = 'GFR' ");
+
+
+
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+
+        public DataTable GetDropDownMapUOMDetails(string CharTypeId)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"SELECT pr.product_name, bt.product_cd  FROM csu_btgfr_product_map bt, csu_product pr  WHERE bt.btgfr = 100214 AND pr.product_cd = bt.product_cd 	AND pr.product_valid_cd = 1 order by 1";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), con);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+
+        public int SaveBTGFRMapping(int ProductID, string MapList, string User_id)
+        {
+            string query = string.Empty;
+            string commandQuery = string.Empty;
+            int status = 0;
+            User_id = "609682300";
+            try
+            {
+                con.Open();
+                query = "DELETE FROM csu_btgfr_product_map where product_cd = " + ProductID + "";
+
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+                string[] BTGFRIds = MapList.Split(',');
+                for (int i = 0; i < BTGFRIds.Length; i++)
+                {
+
+                    commandQuery = string.Empty;
+                    int currentBTGFRID = 0;
+                    commandQuery = @"SELECT max(BTGFR)+1 from  csu_btgfr_product_map";
+                    OracleDataReader dr11 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+                    if (dr11.HasRows)
+                    {
+                        while (dr11.Read())
+                        {
+                            currentBTGFRID = Convert.ToInt32(dr11.GetValue(0).ToString()); 
+                        }
+                    }
+
+                    //  status = OracleDataAccess.ExecuteNonQuery(oConn, CommandType.Text, query);
+
+                    string str = @"Insert into csu_btgfr_product_map
+                        (
+                      BTGFR, 
+                       PRODUCT_CD, 
+                      created_emp_id, 
+                        created_dt,
+                       updated_emp_id, 
+                        updated_dt 
+                        )
+                         VALUES  (" + BTGFRIds[i] + "," + ProductID + " , '" + User_id + "',sysdate,'" + User_id + "',sysdate)";
+                    OracleCommand cmd = new OracleCommand(str.ToString(), con);
+
+                    status = cmd.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+            catch (Exception e) { con.Close(); }
+            finally { con.Close(); }
+
+            return status;
+        }
+
+
+
+        public int SaveORGMapping(int ProductID, string MapList, string User_id)
+        {
+            string query = string.Empty;
+            string commandQuery = string.Empty;
+            int status = 0;
+            User_id = "609682300";
+            try
+            {
+                con.Open();
+                query = "DELETE FROM csu_btgfr_product_map where product_cd = " + ProductID + "";
+
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+                string[] BTGFRIds = MapList.Split(',');
+                for (int i = 0; i < BTGFRIds.Length; i++)
+                {
+
+                    commandQuery = string.Empty;
+                    int currentBTGFRID = 0;
+                    commandQuery = @"SELECT max(BTGFR)+1 from  csu_btgfr_product_map";
+                    OracleDataReader dr11 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+                    if (dr11.HasRows)
+                    {
+                        while (dr11.Read())
+                        {
+                            currentBTGFRID = Convert.ToInt32(dr11.GetValue(0).ToString()); 
+                        }
+                    }
+
+                    //  status = OracleDataAccess.ExecuteNonQuery(oConn, CommandType.Text, query);
+
+                    string str = @"Insert into csu_btgfr_product_map
+                        (
+                      BTGFR, 
+                       PRODUCT_CD, 
+                      created_emp_id, 
+                        created_dt,
+                       updated_emp_id, 
+                        updated_dt 
+                        )
+                         VALUES  (" + BTGFRIds[i] + "," + ProductID + " , '" + User_id + "',sysdate,'" + User_id + "',sysdate)";
+                    OracleCommand cmd = new OracleCommand(str.ToString(), con);
+
+                    status = cmd.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+            catch (Exception e) { con.Close(); }
+            finally { con.Close(); }
+
+            return status;
+        }
+
+        
+
+        public int SaveBTGFRMapping_ProductBasedOnBTGFR(int BTGFRID, string MapList, string User_id)
+        {
+            string query = string.Empty;
+            string commandQuery = string.Empty;
+            int status = 0;
+            User_id = "609682300";
+            try
+            {
+                con.Open();
+                query = "DELETE FROM csu_btgfr_product_map where BTGFR = " + BTGFRID + "";
+
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+                string[] ProductIds = MapList.Split(',');
+                for (int i = 0; i < ProductIds.Length; i++)
+                {
+
+                    commandQuery = string.Empty;
+                    int currentBTGFRID = 0;
+                    commandQuery = @"SELECT max(BTGFR)+1 from  csu_btgfr_product_map";
+                    OracleDataReader dr11 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+                    if (dr11.HasRows)
+                    {
+                        while (dr11.Read())
+                        {
+                            currentBTGFRID = Convert.ToInt32(dr11.GetValue(0).ToString());
+                        }
+                    }
+
+                    //  status = OracleDataAccess.ExecuteNonQuery(oConn, CommandType.Text, query);
+
+                    string str = @"Insert into csu_btgfr_product_map
+                        (
+                      BTGFR, 
+                       PRODUCT_CD, 
+                      created_emp_id, 
+                        created_dt,
+                       updated_emp_id, 
+                        updated_dt 
+                        )
+                         VALUES  (" + BTGFRID + "," + ProductIds[i] + " , '" + User_id + "',sysdate,'" + User_id + "',sysdate)";
+                    OracleCommand cmd = new OracleCommand(str.ToString(), con);
+
+                    status = cmd.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+            catch (Exception e) { con.Close(); }
+            finally { con.Close(); }
+
+            return status;
+        }
+
+
+        public int SaveORGMapping_ProductBasedOnORG(int ORGID, string MapList, string User_id)
+        {
+            string query = string.Empty;
+            string commandQuery = string.Empty;
+            int status = 0;
+            User_id = "609682300";
+            try
+            {
+                con.Open();
+                query = "DELETE FROM csu_btgfr_product_map where BTGFR = " + ORGID + "";
+
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+                string[] ProductIds = MapList.Split(',');
+                for (int i = 0; i < ProductIds.Length; i++)
+                {
+
+                    commandQuery = string.Empty;
+                    int currentBTGFRID = 0;
+                    commandQuery = @"SELECT max(BTGFR)+1 from  csu_btgfr_product_map";
+                    OracleDataReader dr11 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+                    if (dr11.HasRows)
+                    {
+                        while (dr11.Read())
+                        {
+                            currentBTGFRID = Convert.ToInt32(dr11.GetValue(0).ToString());
+                        }
+                    }
+
+                    //  status = OracleDataAccess.ExecuteNonQuery(oConn, CommandType.Text, query);
+
+                    string str = @"Insert into csu_btgfr_product_map
+                        (
+                      BTGFR, 
+                       PRODUCT_CD, 
+                      created_emp_id, 
+                        created_dt,
+                       updated_emp_id, 
+                        updated_dt 
+                        )
+                         VALUES  (" + ORGID + "," + ProductIds[i] + " , '" + User_id + "',sysdate,'" + User_id + "',sysdate)";
+                    OracleCommand cmd = new OracleCommand(str.ToString(), con);
+
+                    status = cmd.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+            catch (Exception e) { con.Close(); }
+            finally { con.Close(); }
+
+            return status;
+        }
+        
+        public int SaveDistributorProductMapping(int ProductID, string MapList, string User_id)
+        {
+            string query = string.Empty;
+            string commandQuery = string.Empty;
+            int status = 0;
+            User_id = "609682300";
+            try
+            {
+                con.Open();
+                query = "DELETE FROM CSU_segregation where product_cd = " + ProductID + "";
+
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+                string[] DistributorIds = MapList.Split(',');
+                for (int i = 0; i < DistributorIds.Length; i++)
+                {
+
+                    commandQuery = string.Empty;
+                    int currentDistributorId = 0;
+                    commandQuery = @"SELECT max(BTGFR)+1 from  csu_btgfr_product_map";
+                    OracleDataReader dr11 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+                    if (dr11.HasRows)
+                    {
+                        while (dr11.Read())
+                        {
+                            currentDistributorId = Convert.ToInt32(dr11.GetValue(0).ToString());
+                        }
+                    }
+
+                    //  status = OracleDataAccess.ExecuteNonQuery(oConn, CommandType.Text, query);
+
+                    string str = @"Insert into CSU_segregation
+                        (
+                      SEGREGATION_ID, 
+                       PRODUCT_CD, 
+                      created_emp_id, 
+                       Access_Supplier_Char_id,
+                        created_dt,
+                       updated_emp_id, 
+                        updated_dt 
+                        )
+                         VALUES  (" + DistributorIds[i] + "," + ProductID + " , '" + User_id + "','0',sysdate,'" + User_id + "',sysdate)";
+                    OracleCommand cmd = new OracleCommand(str.ToString(), con);
+
+                    status = cmd.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+            catch (Exception e) { con.Close(); }
+            finally { con.Close(); }
+
+            return status;
+        }
+
+
+        public int SaveDistributorProductMapping_ProductBasedOnDistributor(int DistributorID, string MapList, string User_id)
+        {
+            string query = string.Empty;
+            string commandQuery = string.Empty;
+            int status = 0;
+            User_id = "609682300";
+            try
+            {
+                con.Open();
+                query = "DELETE FROM csu_segregation  where SEGREGATION_ID = " + DistributorID + "";
+
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+                string[] ProductIds = MapList.Split(',');
+                for (int i = 0; i < ProductIds.Length; i++)
+                {
+
+                    commandQuery = string.Empty;
+                    int currentBTGFRID = 0;
+                    commandQuery = @"SELECT max(BTGFR)+1 from  csu_btgfr_product_map";
+                    OracleDataReader dr11 = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+                    if (dr11.HasRows)
+                    {
+                        while (dr11.Read())
+                        {
+                            currentBTGFRID = Convert.ToInt32(dr11.GetValue(0).ToString());
+                        }
+                    }
+
+                    //  status = OracleDataAccess.ExecuteNonQuery(oConn, CommandType.Text, query);
+
+                    string str = @"Insert into csu_segregation
+                        (
+                      SEGREGATION_ID, 
+                       PRODUCT_CD, 
+                      created_emp_id, 
+                      Access_Supplier_Char_id,
+                        created_dt,
+                       updated_emp_id, 
+                        updated_dt 
+                        )
+                         VALUES  (" + DistributorID + "," + ProductIds[i] + " , '" + User_id + "','0',sysdate,'" + User_id + "',sysdate)";
+                    OracleCommand cmd = new OracleCommand(str.ToString(), con);
+
+                    status = cmd.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+            catch (Exception e) { con.Close(); }
+            finally { con.Close(); }
+
+            return status;
+        }
+
+        
+    }
+}

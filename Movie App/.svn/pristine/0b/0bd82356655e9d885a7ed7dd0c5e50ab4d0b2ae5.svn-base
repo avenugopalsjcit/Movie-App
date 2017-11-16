@@ -1,0 +1,131 @@
+﻿(function (ng, app) {
+
+
+    app.controller("Controllers.MonthlyUsaseReportCtrl", function ($scope, $http, MonthlyReport, NgTableParams, JSONToCSVConvertor,$timeout) {
+
+        $scope.TotalSessionReportData = false;
+        $scope.DistributorReportData = false;
+        $scope.GFRReportData = false;
+        $scope.ORGReportData = false;
+        $scope.AllReportData = false;
+        $scope.NoReportData = false;
+        $scope.NoDropdownSelection = false;
+        $scope.isExportAvailable = false;
+        $scope.reportTypeList = [
+        //{ reportTypeId: "5", reportType: "All" },
+                                 {reportTypeId: "1", reportType: "Total Sessions" },
+                                 { reportTypeId: "2", reportType: "Distributor" },
+                                 { reportTypeId: "3", reportType: "GFR" },
+                                 { reportTypeId: "4", reportType: "Organisation" }
+
+                                 ];
+        $scope.modReport = "1";
+        $scope.ExportReportData = [];
+
+        $timeout(function () {
+            $("#Select1").select2(
+           {
+           });
+        },2000);
+
+
+        $scope.GetUsageReport = function (modReport) {
+            $(".pageLoaderOverlay").show();
+            if (modReport == 1) {
+                $scope.TotalSessionReportData = true;
+                $scope.DistributorReportData = false;
+                $scope.GFRReportData = false;
+                $scope.ORGReportData = false;
+                $scope.AllReportData = false;
+                $scope.NoDropdownSelection = false;
+            }
+            else if (modReport == 2) {
+                $scope.TotalSessionReportData = false;
+                $scope.DistributorReportData = true;
+                $scope.GFRReportData = false;
+                $scope.ORGReportData = false;
+                $scope.AllReportData = false;
+                $scope.NoDropdownSelection = false;
+            }
+            else if (modReport == 3) {
+                $scope.TotalSessionReportData = false;
+                $scope.DistributorReportData = false;
+                $scope.GFRReportData = true;
+                $scope.ORGReportData = false;
+                $scope.AllReportData = false;
+                $scope.NoDropdownSelection = false;
+            }
+            else if (modReport == 4) {
+                $scope.TotalSessionReportData = false;
+                $scope.DistributorReportData = false;
+                $scope.GFRReportData = false;
+                $scope.ORGReportData = true;
+                $scope.AllReportData = false;
+                $scope.NoDropdownSelection = false;
+            }
+            else if (modReport == 5) {
+                $scope.TotalSessionReportData = false;
+                $scope.DistributorReportData = false;
+                $scope.GFRReportData = false;
+                $scope.ORGReportData = false;
+                $scope.AllReportData = true;
+                $scope.NoDropdownSelection = false;
+            }
+            else if (modReport == null) {
+                $scope.TotalSessionReportData = false;
+                $scope.DistributorReportData = false;
+                $scope.GFRReportData = false;
+                $scope.ORGReportData = false;
+                $scope.AllReportData = false;
+                $scope.NoDropdownSelection = true;
+            }
+            MonthlyReport.GetMonthlyUsageReport(modReport).success(function (data) {
+                $scope.ExportReportData = [];
+                if (data.d.length > 0) {
+                    $scope.NoReportData = false;
+                    $scope.isExportAvailable = true;
+                    data.d.forEach(function (item) {
+                        if ($scope.modReport == 1) {
+                            $scope.ExportReportData.push({ Month: item.Month, Count: item.Count });
+                        }
+                        else if ($scope.modReport == 2) {
+                            $scope.ExportReportData.push({ Month: item.Month, Distributor: item.Description, Product: item.Product, Count: item.Count });
+                        }
+                        else if ($scope.modReport == 3) {
+                            $scope.ExportReportData.push({ Month: item.Month, GFR: item.Description, Product: item.Product, Count: item.Count });
+                        } else if ($scope.modReport == 4) {
+                            $scope.ExportReportData.push({ Month: item.Month, Organisation: item.Description, Product: item.Product, Count: item.Count });
+                        } else if ($scope.modReport == 5) {
+                            $scope.ExportReportData.push({ Month: item.Month, "Dist/GFR/ORG": item.Description, Product: item.Product, Count: item.Count });
+                        }
+                    });
+                    $scope.UsageReportTable = new NgTableParams({}, { 'dataset': data.d });
+                }
+                else {
+                    $scope.TotalSessionReportData = false;
+                    $scope.DistributorReportData = false;
+                    $scope.GFRReportData = false;
+                    $scope.ORGReportData = false;
+                    $scope.AllReportData = false;
+                    $scope.NoReportData = true;
+                    $scope.NoDropdownSelection = false;
+                    $scope.isExportAvailable = false;
+                }
+                $(".pageLoaderOverlay").hide();
+            })
+    .error(function (error) {
+        alert("Problem occured while loading Supplier Data; " + error);
+        $(".pageLoaderOverlay").hide();
+    });
+        }
+        $scope.GetUsageReport(1);
+        $scope.ExportMonthlyReport = function () {
+            JSONToCSVConvertor.ConvertJSONToCSV($scope.ExportReportData, true, "MonthlyUsageReport", "csvDownloadFrame");
+        }
+    });
+
+} (angular, app));
+
+
+
+

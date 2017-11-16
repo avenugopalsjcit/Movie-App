@@ -1,0 +1,207 @@
+﻿
+    <div >
+        
+            <div id="divAnnouncements"  ng-controller="AdminDocumentationCtrl" >
+         
+               <div >
+                       
+                        <div id="Div6">
+                       
+
+                        <div class="row text-left Arrow ">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                                 Documentation
+                            </h3>
+                        </div>  
+                    </div>
+                        
+                        <div class="col-md-12"  >
+                       
+                        <button class="btn btn-default btn-sm pull-right" id="Addbtn" data-toggle="modal" data-target="#basicModal" ng-click="addNewTask(DocumentId)" >Add  Documentation</button>
+                         </div>
+                        
+                            
+
+                              <table ng-table="usersTable" id="tblAvailability" show-filter="true" class="table table-striped Arrow">
+                                <tr ng-repeat="category in $data">
+                                       <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                                        <td data-title="' Document Title'" filter="{ 'DocumentTitle': 'text' }" sortable="'DocumentTitle'" class="Arrow">
+                                            {{category.DocumentTitle}}
+                                            
+                                        </td> <td data-title="' Document URL'" filter="{ 'DocumentURL': 'text' }" sortable="'DocumentTitle'" class="Arrow">
+                                            {{category.DocumentURL}}
+                                            
+                                        </td>
+                                         <td data-title="' Document Description'" filter="{ 'DocumentDesc': 'text' }" sortable="'DocumentTitle'" class="Arrow">
+                                            {{category.DocumentDesc}}
+                                            
+                                        </td>
+                                        <td data-title="' Edit'">
+                                        <button class="btn btn-default btn-sm" id="Editbtn" data-toggle="modal" ng-click="EditRecord(category)" data-target="#basicModal" ><span class="glyphicon glyphicon-pencil"></span></button>
+                                        </td>
+                                        <td data-title="' Delete'">
+                                        <button value="Delete" class="btn btn-sm btn-danger" id="AnnouncementId" class="chkAnnounmence" data-ng-click="DeleteAdminAvail(category)"> <span class="glyphicon glyphicon-trash"></span></button></span>
+                                    </td>
+                                        
+                                    </tr>
+                                   
+                                </table>
+                            
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+
+               
+
+                   
+               
+            <!--   <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true" style="background: transparent; box-shadow: none;   border-style: none;  display: block; width: 900px;  margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;" >-->
+              <div class="modal fade" id="basicModal" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" >
+                <div class="modal-content">
+                    <div class="modal-header" ng-show="Reset==0">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add  Documentation</h4>
+                    </div>
+                                        <div class="modal-header" ng-show="Reset==1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Edit  Documentation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" name="Documentationform" novalidate>
+                        <div class="control-group" >
+                         <label for="inputtitle" class=" control-label">
+                                                Product <span style="color: Red">*</span>
+                                            </label>
+
+                                            <div class="col-sm-3" id="divddlProduct" >
+                                                <select id="ddlProduct" ng-change="changevalid()" style="padding-left:8px;width:30em" ng-model="ProductName" ng-options="prod.ProductId as prod.ProductName for prod in Products" ng-change="change(ProductId)"
+                                                    required>
+                                                    <option value="">--- Select ---</option>
+                                                </select>
+                                            </div>
+                                             <div>
+                                        <p style="margin-left: 132px; color: Red" ng-show="Documentationform.ddlProduct.$invalid && !Documentationform.ddlProduct.$pristine"
+                                            class="help-block">
+                                            Please Enter AvailabilityAbbrevation.</p>
+                                    </div>
+                        </div>
+                        <div class="control-group" >
+                            <label class="control-label" for="inputtitle" >
+                                Title  <span style="color: Red">*</span></label>
+                              
+                            <div class="controls" >
+                                  <input id="Titleid" ng-change="changevalid()" style="font-weight:normal" multiple size="5" ng-model="Title" 
+
+                                        class="form-control" id="DistList" required>
+                                        <!--<option value="">--- Select ---</option>-->
+
+                                    </input>
+                                     <div>
+                                        <p style="margin-left: 132px; color: Red" ng-show="Documentationform.Titleid.$invalid && !Documentationform.Titleid.$pristine"
+                                            class="help-block">
+                                            Please Enter Title.</p>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label"  for="inputDescription" >
+                                Document URL  <span style="color: Red">*</span></label>
+                            <div class="controls" >
+                                   <input id="DocURLID" ng-change="changevalid()" style="font-weight:normal" multiple size="5" ng-model="DocumentURL" 
+                                       
+                                        class="form-control" id="DistList" required>
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </input>
+                                     <div>
+                                        <p style="margin-left: 132px; color: Red" ng-show="Documentationform.DocURLID.$invalid && !Documentationform.DocURLID.$pristine"
+                                            class="help-block">
+                                            Please Enter Document URL.</p>
+                                    </div>
+                            </div>
+                        </div>
+
+                          <div class="control-group">
+                            <label class="control-label" for="inputDescription" >
+                                Description  <span style="color: Red">*</span></label>
+                            <div class="controls" >
+                                 <input id="DescId" ng-change="changevalid()" multiple size="5" ng-model="Description" 
+                                       
+                                        class="form-control" id="DistList" required>
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </input>
+                                     <div>
+                                        <p style="margin-left: 132px; color: Red" ng-show="Documentationform.DescId.$invalid && !Documentationform.DescId.$pristine"
+                                            class="help-block">
+                                            Please Enter Description.</p>
+                                    </div>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                    <div>
+                    
+                    
+                           
+                    </div>
+                    <div class="modal-footer" style="background-color:none">
+                   
+                        <button type="button" id="Resetbtn" ng-show="Reset==1" class="btn btn-default"  ng-click="ResetRecord()">
+                            Reset</button>
+                        
+                           <button type="button" id="closebtn" data-dismiss="modal"  class="btn btn-default"  >
+                            Close </button>
+                        <button type="button" id="submitbtn" class="btn btn-primary" ng-show="Reset==0" data-dismiss="modal"   disabled = "disabled"  ng-click="SaveAdminAvail()">
+                            Add</button>
+                             <button type="button" class="btn btn-primary" ng-show="Reset==1"  data-dismiss="modal"   ng-disabled="Documentationform.$invalid"  ng-click="UpdateAdminAvail(DocumentId)">
+                            Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+               
+
+               </div>
+               
+            </div>
+            
+       
+        
+        
+        
+    </div>
+    
+  
+    
+    <div class="pageLoaderOverlay">
+    </div>
+    
+    <div>
+        
+    
+   
+       
+
+        
+  
+
+    </div>
+
+     
+    
+    
+   
+
+

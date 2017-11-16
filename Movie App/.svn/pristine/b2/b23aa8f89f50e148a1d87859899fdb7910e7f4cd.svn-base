@@ -1,0 +1,187 @@
+﻿<style>
+    ul
+    {
+        list-style-type: none;
+    }
+    .wTreeStyle > li span
+    {
+        position:relative;bottom:-4px; 
+    }
+    .wTreeStyle > li img
+    {
+        margin-bottom:-3px;
+    }
+</style>
+<div ng-controller="Controller.CountryNoPort" id="mcucountryNoPort">
+    <div class="panel panel-default mcu-panel">
+        <div class="panel-body" style="padding: 1.5px">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 no-padding" id="leftpanel">
+                <div class="panel panel-primary mcu-panel no-padding">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            <span>Case Selection</span>
+                        </div>
+                    </div>
+                    <div class="panel-body overflowScroll" style="height: 350px;">
+                        <mcu-tree></mcu-tree>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 no-padding">
+                    <div class="panel panel-primary mcu-panel" style="border-right-width: 0px">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                <span>Case Availability</span>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="height: 155px; padding: 7px">
+                            <case-availability></case-availability>
+                            <br />
+                            <span style="margin-top: 40%">
+                                <button ng-click="addCasePop()" id="caseGo">
+                                    Go</button>
+                                <button id="caseReset" ng-click="ResetCountrySel(0)">
+                                    Reset</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 no-padding">
+                    <div class="panel panel-primary mcu-panel " style="border-left-width: 0px; border-right-width: 0px;">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                <span>Case Validity</span>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="height: 155px; padding: 7px;">
+                            <case-validity></case-validity>
+                            <br />
+                            <span>
+                                <input type="radio" name="radioGroup" ng-value="-1" ng-change="ResetCountrySel(1,formData.resetCase)"
+                                    ng-model="formData.resetCase" style="margin: 0px">
+                                All</span><br />
+                            <span>
+                                <input type="radio" name="radioGroup" ng-value="1" checked="checked" ng-change="ResetCountrySel(1,formData.resetCase)"
+                                    ng-model="formData.resetCase" style="margin: 0px">
+                                Valid</span><br />
+                            <span>
+                                <input type="radio" name="radioGroup" ng-value="0" ng-change="ResetCountrySel(1,formData.resetCase)"
+                                    ng-model="formData.resetCase" style="margin: 0px">
+                                Invalid</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 no-padding" id="rightpanel">
+                <display-charlist></display-charlist>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 small-padding-panel" id="savecontinuepanel">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: Green" title="Pops coloured green indicate that a valid case exists for that pop.">
+                    Valid Case</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: Black"
+                        title="Pops coloured black indicate that an invalid case exists for that pop.If a Port-Access combination is coloured black it indicates that the combination exists for the case selected."
+                        class="">Invalid Case</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="lblNoCase"
+                            style="color: Red" title="Pops coloured red indicate that a case does not exist for that pop.If a Port-Access combination is coloured red it indicates that the combination does not exist for the case selected."
+                            class="lbltxtred">Case Doesn't Exist</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>
+                    <button ng-click="writeSavedCases()"
+                        id="saveContinue">Save and Continue</button></span>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-padding" style="overflow: scroll;
+                height: 300px">
+                {{CasestoUpdate}}
+                <table class="table table-bordered table-striped tblSavedDetails" width="100%">
+                    <tr>
+                        <th ng-if="showcharcol">
+                        </th>
+                        <th>
+                            Region
+                        </th>
+                        <th>
+                            Country
+                        </th>
+                        <th>
+                            Case Validity
+                        </th>
+                        <th>
+                            Case Availability
+                        </th>
+                        
+                    </tr>
+                    <tr ng-repeat="item in CaseArray">
+                        <td ng-if="showcharcol" class="popoverRootTd">
+                            <button ng-show="item.showChar" ng-click="openInnerTable(item.countryId,$index)" id="iconSymbol{{$index}}{{item.countryId}}">+</button>
+                            <div id="innerTable{{$index}}{{item.countryId}}" class="panel panel-primary mcu-panel no-padding overflowScroll popoverDiv no-padding" style="display: none;border:0px;height:auto">
+                                       <div class="panel-body small-padding-panel">
+                                        <table class="table table-bordered" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        Characteristic
+                                                    </th>
+                                                    <th>
+                                                        Validity
+                                                    </th>
+                                                    <th>
+                                                        Value
+                                                    </th>
+                                                    <th>
+                                                        Availability
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="charitem in item.savedCharList">
+                                                    <td>
+                                                        {{charitem.CharName}}
+                                                    </td>
+                                                    <td>
+                                                        {{charitem.ValidText}}
+                                                    </td>
+                                                    <td>
+                                                        {{charitem.CharValue}}
+                                                    </td>
+                                                    <td>
+                                                        {{charitem.CharAvailText}}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                        </td>
+                        <td ng-style="set_color(item.existingValid)" ng-if="item.caseId!=0">
+                            {{ item.regionName}}
+                        </td>
+                        <td ng-style="set_color(item.existingValid)" ng-if="item.caseId!=0">
+                            {{item.countryName}}
+                        </td>
+                        <td ng-style="set_color(item.existingValid)" ng-if="item.caseId!=0">
+                            {{item.CaseAvailtxt}}
+                        </td>
+                        <td ng-style="set_color(item.existingValid)" ng-if="item.caseId!=0">
+                            {{item.caseValidText}}
+                        </td>
+                        <td style="color:Red" ng-if="item.caseId==0">
+                            {{ item.regionName}}
+                        </td>
+                        <td style="color:Red" ng-if="item.caseId==0">
+                            {{item.countryName}}
+                        </td>
+                        <td style="color:Red" ng-if="item.caseId==0">
+                            {{item.CaseAvailtxt}}
+                        </td>
+                        <td style="color:Red" ng-if="item.caseId==0">
+                            {{item.caseValidText}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <button id="processChanges" style="margin-left: 25%" title="Processes the selections you have made" 
+                class="button" ng-click="processChanges()">
+                Process Changes</button>
+            <button style="margin-left: 20%; display: none" class="button" id="updatecase" ng-click="onUpdateCases()">
+                Update changes</button>&nbsp;&nbsp;
+            <button id="cancelcase" style="display: none" class="button" ng-click="onCancelCases()">
+                Cancel Changes</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,130 @@
+﻿<div ng-controller="Controllers.ProductLocationLevelCtrl as v">
+    <div class="container">
+        <h2>
+            <span style="float: left; cursor: default">Product Location Level</span></h2>
+    </div>
+    <br />
+    <div class="container">
+        <div style="margin-left: 80%;">
+            <a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addAdminProductLevelModal">
+                Add New Product Location </a>
+        </div>
+    </div>
+    <div class="container">
+        <!--    <div class="container" style="width: 60%; margin-right: 29%;">-->
+        <table ng-table="v.tableParams" class="table" show-filter="true">
+            <tr ng-repeat="user in $data">
+                <td title="'View Product Location Level Name'" filter="{ Name: 'text'}" sortable="'name'">
+                    <a data-target="#updateAdminProductLevelModal" data-toggle="modal">{{user.Name}}
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div tabindex="-1" class="modal fade in" id="addAdminProductLevelModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H1">
+                            Add New Product Location Level
+                        </h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-10">
+                                <label for="inputDescription" class="control-label col-md-3">
+                                    Description</label>
+                                <div class="col-md-5">
+                                    <input type="text" value="" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <label for="inputDescription" class="control-label col-md-3">
+                                    Valid</label>
+                                <div class="col-md-2">
+                                    <input type="checkbox" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Save" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in" id="updateAdminProductLevelModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Edit Product Location Level Reference</h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-10">
+                                <label class="control-label col-md-3" for="inputDescription">
+                                    Description</label>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" value="City">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <label class="control-label col-md-3" for="inputDescription">
+                                    Valid</label>
+                                <div class="col-md-2">
+                                    <input type="checkbox" checked="checked">
+                                </div>
+                            </div>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <div style="font-size: 13px; padding-left: 3%" class="form-horizontal">
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-3">
+                                        <u><b><span>Created by</span></b></u><br>
+                                        <span>MacGamwell,John</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Created Date</span></b></u><br>
+                                        <span>21-MAY-1999 09:58:12 AM&nbsp;GMT</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Updated by</span></b></u><br>
+                                        <span>Prasad, Achutha</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Date Last Updated</span></b></u><br>
+                                        <span>18-DEC-2003 06:47:38 PM&nbsp;GMT</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Update" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Delete" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

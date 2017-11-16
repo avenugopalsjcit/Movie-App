@@ -1,0 +1,386 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using PCDataAccess;
+using Newtonsoft.Json;
+
+namespace SCAdminBAL.MCU
+{
+    public class AccessSuppChar
+    {
+
+        #region Private Variables
+        private Int32 _ACCESS_ID = -1;
+        private String _ACCESS_NAME = String.Empty;
+        //1.5 starts
+        //private Int32 _ACCESS_VALUE = -1;
+        //private Double _ACCESS_VALUE = -1.0;
+        private String _ACCESS_VALUE = String.Empty;
+
+        //1.5 ends
+        private Int32 _SUPPLIER_ID = -1;
+        private String _SUPPLIER_NAME = String.Empty;
+        private Int32 _ACCESS_TYPE_CHAR_ID = -1;
+        private String _ACCESS_TYPE_NAME = String.Empty;
+        private Int32 _SUPPLIER_NAME_ID = -1;
+        private String _SUPPLIER_NAME_NAME = String.Empty;
+        private Int32 _SUPPLIER_VALID_CD = -1;
+        //private String[] _VALID_PORT_COMBOS = new String[1] {String.Empty};
+        // 1.2 Add begins
+        //private String _CASE_LINK = String.Empty;
+        // 1.2 Add ends
+        //1.3 Add begins
+        private String _UOM = String.Empty;
+        //1.3 ends
+        //1.6 Add begins
+        //Infosys - kiruthika - Drop 3.8 - Begins - Delete - 11/12/2007
+        //private BiDirectionalDictionary _ValidPortCombosHash = new BiDirectionalDictionary();
+        //Infosys - kiruthika - Drop 3.8 - end- Delete - 11/12/2007
+        private DataTable _ValidCombos = new DataTable();
+        //1.7 starts
+        private String _ACCESS_ACTUAL_VALUE = String.Empty;
+        //1.7 ends
+
+        //Added by Vikas : R32 changes
+        private List<Int32> _PORT_SPEED_LIST = new List<Int32>();
+        private string _LEAD_TIME = String.Empty;
+        private string _CARRIER_NAME = String.Empty;
+        private string _PORT_AVAILABILITY_NAME = String.Empty;
+        private string _VALID_PORT_NAME = String.Empty;
+        private Int32 _CARRIER = -1;
+        private Int32 _PORT_AVAILABILITY = -1;
+        private Int32 _VALID_PORT = -1;
+        //END : R32 changes
+        #endregion
+        #region Public Property
+        //1.7 starts
+        public String AccessActualValue
+        {
+            get
+            {
+                return _ACCESS_ACTUAL_VALUE;
+            }
+            set
+            {
+                _ACCESS_ACTUAL_VALUE = value;
+            }
+        }
+
+
+
+        //1.7 ends
+        //1,9 Delete begins
+        ////1.6 Add begins
+        //Infosys - kiruthika - Drop 3.8 - Begins - Delete - 11/12/2007
+        //public BiDirectionalDictionary ValidPortCombosHash
+        //{
+        //    get
+        //    {
+        //        return _ValidPortCombosHash;
+        //    }
+        //    set
+        //    {
+        //        _ValidPortCombosHash = value;
+        //    }
+        //}
+        //1,9 Delete Ends
+        //Infosys - kiruthika - Drop 3.8 - Begins - Delete - 11/12/2007
+        public DataTable ValidCombos
+        {
+            get
+            {
+                return _ValidCombos;
+            }
+            set
+            {
+                _ValidCombos = value;
+            }
+        }
+        //1.6 Add ends
+
+        //  public String CaseLink
+        //  {
+        //      get 
+        //      {
+        //          return _CASE_LINK;
+        //      }
+        //      set 
+        //      {
+        //          _CASE_LINK = value;
+        //      }
+        //  }
+        //1.3 start
+        public String UOM
+        {
+            get
+            {
+                return _UOM;
+            }
+            set
+            {
+                _UOM = value;
+            }
+        }
+        //1.3 end
+
+        //Added by Vikas : R32 changes
+        public List<Int32> PortSpeedList
+        {
+            get
+            {
+                return _PORT_SPEED_LIST;
+            }
+            set
+            {
+                _PORT_SPEED_LIST = value;
+            }
+        }
+        public string LeadTime
+        {
+            get
+            {
+                return _LEAD_TIME;
+            }
+            set
+            {
+                _LEAD_TIME = value;
+            }
+        }
+        public Int32 Carrier
+        {
+            get
+            {
+                return _CARRIER;
+            }
+            set
+            {
+                _CARRIER = value;
+            }
+        }
+        public Int32 PortAvailability
+        {
+            get
+            {
+                return _PORT_AVAILABILITY;
+            }
+            set
+            {
+                _PORT_AVAILABILITY = value;
+            }
+        }
+        public Int32 validPort
+        {
+            get
+            {
+                return _VALID_PORT;
+            }
+            set
+            {
+                _VALID_PORT = value;
+            }
+        }
+        public string CarrierName
+        {
+            get
+            {
+                return _CARRIER_NAME;
+            }
+            set
+            {
+                _CARRIER_NAME = value;
+            }
+        }
+        public string PortAvailabilityName
+        {
+            get
+            {
+                return _PORT_AVAILABILITY_NAME;
+            }
+            set
+            {
+                _PORT_AVAILABILITY_NAME = value;
+            }
+        }
+        public string ValidPortName
+        {
+            get
+            {
+                return _VALID_PORT_NAME;
+            }
+            set
+            {
+                _VALID_PORT_NAME = value;
+            }
+        }
+        //END : R32 changes
+
+        public Int32 SupplierValidCd
+        {
+            get
+            {
+                return _SUPPLIER_VALID_CD;
+            }
+            set
+            {
+                _SUPPLIER_VALID_CD = value;
+            }
+        }
+        public Int32 AccessId
+        {
+            get
+            {
+                return _ACCESS_ID;
+            }
+            set
+            {
+                _ACCESS_ID = value;
+            }
+        }
+        public String AccessName
+        {
+            get
+            {
+                return _ACCESS_NAME;
+            }
+            set
+            {
+                _ACCESS_NAME = value;
+            }
+        }
+        //1.5 starts
+        //public Int32 AccessValue
+        // public Double AccessValue
+        public String AccessValue
+        //1.5 ends
+        {
+            get
+            {
+                return _ACCESS_VALUE;
+            }
+            set
+            {
+                _ACCESS_VALUE = value;
+            }
+        }
+        public Int32 SupplierId
+        {
+            get
+            {
+                return _SUPPLIER_ID;
+            }
+            set
+            {
+                _SUPPLIER_ID = value;
+            }
+        }
+        public String SupplierName
+        {
+            get
+            {
+                return _SUPPLIER_NAME;
+            }
+            set
+            {
+                _SUPPLIER_NAME = value;
+            }
+        }
+        public Int32 AccessTypeId
+        {
+            get
+            {
+                return _ACCESS_TYPE_CHAR_ID;
+            }
+            set
+            {
+                _ACCESS_TYPE_CHAR_ID = value;
+            }
+        }
+
+        public String AccessTypeName
+        {
+            get
+            {
+                return _ACCESS_TYPE_NAME;
+            }
+            set
+            {
+                _ACCESS_TYPE_NAME = value;
+            }
+        }
+        public Int32 SupplierNameId
+        {
+            get
+            {
+                return _SUPPLIER_NAME_ID;
+            }
+            set
+            {
+                _SUPPLIER_NAME_ID = value;
+            }
+        }
+        public String SupplierNameName
+        {
+            get
+            {
+                return _SUPPLIER_NAME_NAME;
+            }
+            set
+            {
+                _SUPPLIER_NAME_NAME = value;
+            }
+        }
+        //public String[] ValidPortCombos
+        //{
+        //    get
+        //    {
+        //        return _VALID_PORT_COMBOS;
+        //    }
+        //    set
+        //    {
+        //        _VALID_PORT_COMBOS = value;
+        //    }
+        //}
+
+        #endregion
+
+
+        public string GetAccessDetails(Int32[] aiPopSelected)
+        {
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+
+            try
+            {
+                dsData = oDataAccess.GetAccessDetails(aiPopSelected);
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return JsonConvert.SerializeObject(dsData.Tables[0]);
+        }
+
+        public string GetSupplierAccSpeedForAccess(int[] PopList, Int32 ProductCd)
+        {
+            DataSet dsSupp = new DataSet();
+            DataSet dsPort = new DataSet();
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+
+            try
+            {
+                dsSupp = oDataAccess.GetSupplierForAccess(PopList, ProductCd);
+                dsPort = oDataAccess.GetAccessForAccess(PopList, ProductCd);
+            }
+            catch
+            {
+                throw;
+            }
+            return "[" +JsonConvert.SerializeObject(dsSupp.Tables[0]) + "," + JsonConvert.SerializeObject(dsPort.Tables[0]) + "]";
+        }
+
+
+    }
+}

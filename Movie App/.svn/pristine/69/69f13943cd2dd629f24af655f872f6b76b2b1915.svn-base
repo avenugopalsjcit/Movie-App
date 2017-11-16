@@ -1,0 +1,297 @@
+﻿<style>
+    label
+    {
+        font-size: 12px;
+    }
+</style>
+<div ng-controller="Controllers.DisplayOrderCtrl" style="margin-left:3px">
+    <div style="cursor: default; margin-left: 2px">
+        <h2>
+            Display Order
+        </h2>
+    </div>
+    <br />
+    <div class="form-group col-md-12">
+        <div class="form-group col-md-3" style="margin-left: -11px;">
+            <label class="control-label" for="drpAdminValidCharView">
+                Select the ProductType
+            </label>
+        </div>
+        <div class="form-group col-md-6" style="margin-left: -3em;">
+            <select class="clsdisplayproduct2" style="width: 70%">
+                <option>AC VPN ENCORE </option>
+                <option>Access </option>
+                <option>Assure Managed Devices </option>
+                <option>BT Bandwidth Services </option>
+                <option>BT Business Voice Select </option>
+                <option>BT Business Voice VoicePort </option>
+                <option>BT CCS Direct </option>
+                <option>BT Contact Centre Service </option>
+                <option>BT CPE </option>
+                <option>BT Etherflow Global </option>
+                <option>BT Finance Extranet </option>
+                <option>BT Generic Voice Information </option>
+                <option>BT GS Portfolio Database </option>
+                <option>BT Internet Connect Global </option>
+                <option>BT IP Sec </option>
+                <option>BT iVPN </option>
+                <option>BT LAN SAN Extension Service </option>
+                <option>BT Managed Firewall </option>
+                <option>BT Media and Broadcast </option>
+                <option>BT MessageScan </option>
+                <option>BT MFS </option>
+                <option>BT MobileXpress Mobile IPsec VPN </option>
+                <option>BT MPLS </option>
+                <option>BT MPLS8 </option>
+                <option>BT Onevoice </option>
+                <option>BT WAS </option>
+                <option>Connect Acceleration </option>
+                <option>Connect Intelligence </option>
+                <option>Connect Optimisation </option>
+                <option>Customer Service </option>
+                <option>DSL-HVPN Access </option>
+                <option>Etherflow Capability </option>
+                <option>Generic CPE </option>
+                <option>Internet Connect Reach </option>
+                <option>IP Connect Web-VPN </option>
+                <option>IP Video VPN - Encore </option>
+                <option>IP Voice VPN - Encore </option>
+                <option>IP VPN Offnet </option>
+                <option>IP VPN Secure - Encore </option>
+                <option>MobileXpress </option>
+                <option>MPLS Capability </option>
+                <option>Radianz Ethernet </option>
+                <option>Special Bid </option>
+                <option>SWIFT - Encore </option>
+                <option>TDM Voice </option>
+                <option>Test Product </option>
+            </select>
+        </div>
+        <!-- <div class="col-md-1">
+                <a href="#" data-target="#addDefineProductModal" data-toggle="modal" class="btn btn-primary">
+                    <span class="">Add New product type</span></a>
+            </div>-->
+    </div>
+    <div class="form-group col-md-12">
+        <div class="col-md-3"  style="margin-left: -11px;">
+            <label class="control-label" for="drpAdminValidCharView">
+                Select the Sub product Type
+            </label>
+        </div>
+        <div class="col-md-6" style="margin-left: -3em">
+            <select class="clsdisplayproduct1" style="width: 70%">
+                <option>11</option>
+                <option>1234</option>
+                <option>ada </option>
+                <option>xxx</option>
+            </select>
+        </div>
+    </div>
+  
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+   
+    <div style="cursor:default;margin-left: 2px">
+        <h4>
+            Order details
+        </h4>
+    </div>
+    <div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        Characteristic Type
+                    </th>
+                    <th>
+                        Display Order
+                    </th>
+                    <th>
+                        Characteristic Type Alias
+                    </th>
+                    <th>
+                        Order Characteristics?
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        1) Access Method
+                    </td>
+                    <td>
+                        <input type="text" value="1" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" value="Access Method" />
+                    </td>
+                    <td>
+                        <a data-target="#updateDisplayOrderViewModal" data-toggle="modal">order</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        2) Display Placeholder
+                    </td>
+                    <td>
+                        <input type="text" value="4" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" value="Parent Port Speeds" />
+                    </td>
+                    <td>
+                        <a data-target="#updateDisplayOrderViewModal" data-toggle="modal">order</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        3) NOTE
+                    </td>
+                    <td>
+                        <input type="text" value="2" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" value="NOTE" class="form-control" />
+                    </td>
+                    <td>
+                        <a href="#">
+                            <label>
+                                <u>order</u></label></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        4) Port Speed
+                    </td>
+                    <td>
+                        <input type="text" value="3" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" value="Port Speed" class="form-control" />
+                    </td>
+                    <td>
+                        <a href="#">
+                            <label>
+                                <u>order</u></label></a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        5) Product Availability via BT Internet Connect Global
+                    </td>
+                    <td>
+                        <input type="text" value="5" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" value="Product Availability via BT Internet Connect Global" />
+                    </td>
+                    <td>
+                        <a data-target="#updateDisplayOrderViewModal" data-toggle="modal">order</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="form-group col-md-12">
+            <div class="col-md-5">
+            </div>
+            <div class="col-md-1">
+                <input type="button" class="btn btn-primary" value="Update" />
+            </div>
+            <div class="col-md-2">
+                <input type="button" class="btn btn-primary" value="Reset" />
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in" id="updateDisplayOrderViewModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Edit Display Order - Characteristic
+                        </h4>
+                    </div>
+                    <div>
+                        <div class="modal-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Characteristic Type
+                                        </th>
+                                        <th>
+                                            Display Order
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="EditDisplayOrderId">
+                                    <tr>
+                                        <td>
+                                            1) APOP
+                                        </td>
+                                        <td>
+                                            <input type="text" value="1" class="form-control" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            2) EPOP
+                                        </td>
+                                        <td>
+                                            <input type="text" value="2" class="form-control" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            3) GPOP
+                                        </td>
+                                        <td>
+                                            <input type="text" value="4" class="form-control" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            4) LLPOP
+                                        </td>
+                                        <td>
+                                            <input type="text" value="5" class="form-control" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            5) MSE GPOP
+                                        </td>
+                                        <td>
+                                            <input type="text" value="6" class="form-control" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            6) VPOP
+                                        </td>
+                                        <td>
+                                            <input type="text" value="6" class="form-control" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-primary btn-sm " value="Update" />
+                        <input type="button" class="btn btn-primary btn-sm" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

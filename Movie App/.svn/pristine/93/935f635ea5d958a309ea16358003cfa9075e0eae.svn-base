@@ -1,0 +1,753 @@
+﻿app.controller("EditCaseCntrl", function ($http, $scope, NgTableParams, $rootScope, $location, CaseFactory, $stateParams, ProductDet, $log, ProductLevel, AvailDescfactory, NetworkFactory, PopCharacteristics, SuppliersFactory, Regionfactory, StateFactory, Countryfactory, CityFactory, UserDetailsFactory, PoPFactory, CPECaseDetailsFactory) {
+
+
+    $scope.Product = $stateParams.ProductID;
+    $scope.Country = $stateParams.CountryID;
+    $scope.ProductName = $stateParams.ProductName;
+    $scope.CountryName = $stateParams.CountryName;
+    $scope.Region = $stateParams.RegionID;
+    $scope.ProdName = $stateParams.RegionName;
+    $scope.FromSearch = $stateParams.FromSearch;
+    $scope.SubProductID = $stateParams.SubProductID;
+
+    $scope.CaseID = $stateParams.CaseID;
+    $scope.HubSiteID = $stateParams.HubSiteID;
+    $scope.CityID = $stateParams.CityID;
+    $scope.CityIDOld = $stateParams.CityID;
+    $scope.StateProvinceID = $stateParams.StateProvinceID;
+    $scope.CityName = $stateParams.CityName;
+    $scope.CityNameOld = $stateParams.CityName;
+    $scope.POPName = $stateParams.POPName;
+    $scope.POPNameOld = $stateParams.POPName;
+    $scope.StateProvinceName = $stateParams.StateProvinceName;
+    $scope.StateProvinceNameOld = $stateParams.StateProvinceName;
+    $scope.CaseValid = $stateParams.CaseValid;
+    if ($stateParams.CaseValid == 1) {
+        $scope.modValid = true;
+    }
+    else {
+        $scope.modValid = false;
+    }
+    $scope.modValidOld = $scope.modValid;
+    if ($stateParams.Exception == 1) {
+        $scope.ExceptionRequired = true;
+    }
+    else {
+        $scope.ExceptionRequired = false;
+    }
+    $scope.ExceptionRequiredOld = $scope.ExceptionRequired;
+    if ($stateParams.SupportResilientPop == 1) {
+        $scope.SupportResilientPOP = true;
+    }
+    else {
+        $scope.SupportResilientPOP = false;
+    }
+    $scope.SupportResilientPOPOld = $scope.SupportResilientPOP;
+    $scope.SiteAvailability = $stateParams.SiteAvailability;
+    $scope.SiteAvailabilityOld = $stateParams.SiteAvailability;
+
+
+    $scope.Suppliers = [];
+
+    $(".pageLoaderOverlay").show();
+
+    $scope.TempAvailID = 0;
+    $scope.TempAvailName = '';
+
+    AvailDescfactory.GetAvailDesc().success(function (data) {
+        $scope.AvailDescData = data.d;
+
+        if (data.d.length > 0) {
+            $scope.TempAvailID = data.d[0].AvailID;
+            $scope.TempAvailName = data.d[0].AvailDesc;
+        }
+
+        AvailDescfactory.GetCaseAvail($scope.CaseID).success(function (data) {
+
+            $scope.ddlAvailability = data.d;
+
+            var availName = "";
+            angular.forEach($scope.AvailDescData, function (item) {
+                if (item.AvailID == $scope.ddlAvailability) {
+                    availName = item.AvailDesc;
+                }
+            });
+
+            $("#lstBoxAvailability").select2({});
+            if (availName != "") {
+                $('#divAvailability .select2-chosen').html(availName);
+                $scope.AvailNameOld = availName;
+                $scope.ddlAvailabilityOld = $scope.ddlAvailability;
+            }
+            else {
+                $('#divAvailability .select2-chosen').html($scope.TempAvailName);
+                $scope.ddlAvailability = $scope.TempAvailID;
+                $scope.ddlAvailabilityOld = $scope.TempAvailID;
+                $scope.AvailNameOld = $scope.TempAvailName;
+            }
+
+            AvailLoaded = 1;
+            if (AvailLoaded == 1 && NetFactory == 1 && PopChars == 1 && PopChars1 == 1 && Suppliers == 1) {
+                $(".pageLoaderOverlay").hide();
+            }
+        });
+    });
+
+    var AvailLoaded = 0, NetFactory = 0, PopChars = 0, PopChars1 = 0, Suppliers = 0;
+
+    ProductLevel.GetProductLevel($scope.Product, $scope.Country).success(function (data) {
+
+        angular.forEach(data.d, function (item) {
+
+            if (item == "REGION") {
+                $scope.isRegion = 1;
+            }
+            else if (item == "COUNTRY") {
+                $scope.isCountry = 1;
+            }
+            else if (item == "CITY") {
+                $scope.isCity = 1;
+            }
+            else if (item == "POP") {
+                $scope.isPOP = 1;
+            }
+            else if (item == "STATE") {
+                $scope.isState = 1;
+            }
+            else if (item == "HUB SITE") {
+                $scope.isHubSite = 1;
+            }
+        });
+
+        if ($scope.isPOP == 1 || $scope.isHubSite == 1) {
+            NetworkFactory.GetNetworkDetails($scope.CaseID).success(function (data) {
+
+                $scope.NetworkName = data.d;
+                $scope.SiteAvailability = $scope.SiteAvailability;
+
+                NetFactory = 1;
+                if (AvailLoaded == 1 && NetFactory == 1 && PopChars == 1 && PopChars1 == 1 && Suppliers == 1) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        }
+        else {
+            NetFactory = 1;
+            if (AvailLoaded == 1 && NetFactory == 1 && PopChars == 1 && PopChars1 == 1 && Suppliers == 1) {
+                $(".pageLoaderOverlay").hide();
+            }
+        }
+        if ($scope.isPOP == 1 || $scope.isHubSite == 1) {
+            PopCharacteristics.GetPoPCharValues($scope.HubSiteID, $scope.Product).success(function (data) {
+
+                $scope.POPCharacteristicsData = data.d;
+
+                PopChars = 1;
+                if (AvailLoaded == 1 && NetFactory == 1 && PopChars == 1 && PopChars1 == 1 && Suppliers == 1) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        }
+        else {
+            PopChars = 1;
+            if (AvailLoaded == 1 && NetFactory == 1 && PopChars == 1 && PopChars1 == 1 && Suppliers == 1) {
+                $(".pageLoaderOverlay").hide();
+            }
+        }
+
+        if ($scope.isState == 1) {
+            StateFactory.GetStates($scope.Region, $scope.Country).success(function (data) {
+
+                $scope.StateData = data.d;
+                $("#ddlState").select2({});
+                $('#divState .select2-chosen').html($scope.StateProvinceName);
+                StateLoaded = 1;
+                $scope.modState = Number($scope.StateProvinceID);
+                $scope.modStateOld = Number($scope.StateProvinceID);
+            });
+        }
+        else {
+            StateLoaded = 1;
+            $scope.modState = $scope.StateProvinceID;
+            if (AvailLoaded == 1 && NetFactory == 1 && PopChars == 1 && PopChars1 == 1 && Suppliers == 1) {
+                $(".pageLoaderOverlay").hide();
+            }
+            $scope.modStateOld = $scope.StateProvinceID;
+        }
+
+        if ($scope.isPOP == 1 || $scope.isHubSite == 1) {
+            PoPFactory.GetPopDetails($scope.Region, $scope.Country, $scope.CityID).success(function (data) {
+                $scope.PoPData = data.d;
+
+                $scope.modPoP = Number($scope.HubSiteID);
+                $("#ddlPoP").select2({});
+                $('#divPoP .select2-chosen').html($scope.POPName);
+                $scope.modPoPOld = $scope.modPoP;
+
+
+            });
+        }
+
+
+    });
+
+    if ($scope.Product == 63) {
+        $(".pageLoaderOverlay1").show();
+        CPECaseDetailsFactory.GetCPESuppliers().success(function (data) {
+            $scope.CPESuppliers = data.d;
+            $("#cpeSupplierddl").select2({});
+
+            CPECaseDetailsFactory.GetCPECaseData($scope.CaseID).success(function (data) {
+                $scope.CaseData = data.d[0];
+                $scope.modCaseAvailability = $scope.CaseData.CaseAvailCd;
+                $scope.modCaseAvailabilityOld = $scope.CaseData.CaseAvailCd;
+                if ($scope.CaseData.Validity == 'Valid') {
+                    $scope.CaseValidity = true;
+                }
+                else {
+                    $scope.CaseValidity = false;
+                }
+                $scope.CaseValidityOld = $scope.CaseValidity;
+                $scope.CaseId = $scope.CaseData.CaseId;
+                $scope.CreatedBy = $scope.CaseData.CreatedBy;
+                $scope.CreatedDate = $scope.CaseData.CreatedDate;
+                $scope.UpdatedBy = $scope.CaseData.UpdatedBy;
+                $scope.UpdatedDate = $scope.CaseData.UpdatedDate;
+                $scope.CaseAvailableOld = $scope.CaseData.CaseAvailability;
+                $scope.modCPESuppliers = $scope.CaseData.CPESupplierId;
+                $scope.modCPESuppliersOld = $scope.CaseData.CPESupplierId;
+                angular.forEach($scope.CPESuppliers, function (item) {
+                    if (item.SupplierId == $scope.CaseData.CPESupplierId) {
+                        $('#divCPESupplier .select2-chosen').html(item.SupplierName);
+                        $scope.SupplierNameOld = item.SupplierName;
+                    }
+                });
+                $scope.ExceptionRequired = $scope.CaseData.Exception;
+
+                $scope.CityName = $scope.CaseData.CityName;
+                $(".pageLoaderOverlay1").hide();
+            });
+        });
+    }
+
+
+
+    if ($scope.HubSiteID > 0) {
+        PopCharacteristics.GetPopChars($scope.HubSiteID, $scope.Product, $scope.CaseID).success(function (data) {
+
+            angular.forEach(data.d, function (item) {
+
+                if (item.CharName == "POP_PLATFORM_CODE") {
+                    $scope.isPoPCode = 1;
+                    $scope.POPCode = item.CharValue;
+                }
+
+                if (item.CharName == "NETWORK_COLOUR") {
+                    $scope.isPoPColor = 1;
+                    $scope.POPColour = item.CharValue;
+                }
+            });
+            PopChars1 = 1;
+            if (AvailLoaded == 1 && NetFactory == 1 && PopChars == 1 && PopChars1 == 1 && Suppliers == 1) {
+                $(".pageLoaderOverlay").hide();
+            }
+        });
+    }
+    else {
+        PopChars1 = 1;
+        if (AvailLoaded == 1 && NetFactory == 1 && PopChars == 1 && PopChars1 == 1 && Suppliers == 1) {
+            $(".pageLoaderOverlay").hide();
+        }
+    }
+
+    if ($scope.Country > 0 && $scope.HubSiteID > 0 && $scope.Product != 58) {
+        SuppliersFactory.GetSuppliers($scope.Product, $scope.HubSiteID, $scope.CaseID).success(function (data) {
+
+            angular.forEach(data.d, function (item) {
+                if (item.Selected > 0) {
+                    $scope.Suppliers.push(item.Selected);
+                }
+            });
+
+            $scope.SuppliersOld = $scope.Suppliers;
+            $scope.Suppliersdata = data.d;
+
+            Suppliers = 1;
+            if (AvailLoaded == 1 && NetFactory == 1 && PopChars == 1 && PopChars1 == 1 && Suppliers == 1) {
+                $(".pageLoaderOverlay").hide();
+            }
+        });
+    }
+    else {
+        Suppliers = 1;
+        if (AvailLoaded == 1 && NetFactory == 1 && PopChars == 1 && PopChars1 == 1 && Suppliers == 1) {
+            $(".pageLoaderOverlay").hide();
+        }
+    }
+
+    UserDetailsFactory.GetCaseUpdatedDetails($scope.CaseID, 1).success(function (data) {
+
+        $scope.CreatedBy = data.d.CreatedBy;
+        $scope.CreatedDate = data.d.CreatedDate;
+        $scope.UpdatedBy = data.d.UpdatedBy;
+        $scope.UpdatedDate = data.d.UpdatedDate;
+    });
+
+    $scope.CPESupplierChange = function () {
+        if ($scope.modCPESuppliers == '' || angular.isUndefined($scope.modCPESuppliers) || $scope.modCPESuppliers == null) {
+            $("#CPESupplierError").show();            
+        } else {
+            $("#CPESupplierError").hide();
+        }
+
+
+    }
+
+    $(function () {
+
+        $("#inputDate").datepicker({ startDate: new Date() });
+
+        $("#inputDate").datepicker().on('changeDate', function (ev) {
+            $("#inputDate").datepicker('hide');
+
+        });
+
+        $('#btndate').on('click', function () {
+
+            $("#inputDate").datepicker('show');
+        })
+        $('#ddlState .select2-chosen').html($scope.StateProvinceName);
+    });
+
+
+    $scope.ShowCaseDetails = function () {
+
+        var AvailSelected = $("#lstBoxAvailability option:selected").text();
+
+        if ($scope.Product == 63) {
+            //$location.path('/CaseDefinition/AdminCPECaseDetails').search({ 'CaseId': $scope.CaseID, 'CityName': $scope.CityName, 'Valid': $scope.CaseValid, 'CaseAvailable': AvailSelected, 'SiteAvailability': $scope.SiteAvailability });
+            $location.path('/CaseDefinition/AdminCPECaseDetails').search({ 'ProductID': $scope.Product, 'CityName': $scope.CityName, 'RegionID': $scope.Region, 'CountryID': $scope.Country, 'ProductName': $scope.ProductName, 'RegionName': $scope.RegionName, 'CountryName': $scope.CountryName, 'CaseId': $scope.CaseID, 'CaseValid': $scope.CaseValid, 'CaseAvailable': AvailSelected, 'SiteAvailability': $scope.SiteAvailability, 'FromSearch': 0 });
+
+        } else {
+
+            //        var url = "Views/EditPoPLevelCaseDetails.htm?CaseID=" + $scope.CaseID + "&countryid=" + $scope.Country + "&ProdName=" + $scope.ProductName + "&RegName=" + $scope.RegionName + "&CountName=" + $scope.CountryName + "&CityName=" + $scope.CityName + "&POPName=" + $scope.POPName + "&Valid=" + $scope.CaseValid + "&POPCode=" + $scope.POPCode + "&NetworkName=" + $scope.NetworkName + "&ProductID=" + $scope.Product + "&HubSiteID=" + $scope.HubSiteID + "&Availability=" + AvailSelected;
+
+            //        window.open(url, "_blank", "toolbar=yes, scrollbars=yes, resizable=yes");
+
+            $scope.CountryAccess = true;
+            $scope.editcase = 1;
+
+            $location.path('/CaseDefinition/EditPopCase').search({ 'CaseID': $scope.CaseID, 'SubProductID' : $scope.SubProductID, 'CountryID': $scope.Country, 'ProdName': $scope.ProductName, 'RegName': $scope.RegionName, 'CountName': $scope.CountryName, 'CityName': $scope.CityName, 'POPName': $scope.POPName, 'Valid': $scope.CaseValid, 'POPCode': $scope.POPCode, 'NetworkName': $scope.NetworkName, 'ProductID': $scope.Product, 'HubSiteID': $scope.HubSiteID, 'Availability': AvailSelected });
+        }
+    }
+
+    $scope.ShowCaseList = function () {
+
+        $location.path('/CaseDefinition/PopCaseList').search({ 'ProductID': $scope.Product, 'SubProductID': $scope.SubProductID, 'RegionID': $scope.Region, 'CountryID': $scope.Country, 'ProductName': $scope.ProductName, 'RegionName': $scope.RegionName, 'CountryName': $scope.CountryName });
+    }
+
+    $scope.ChangeExcepton = function () {
+        if ($scope.modValid == false) {
+            $scope.ExceptionRequired = false;
+        }
+    }
+
+    $scope.ResetCaseInfo = function () {
+        $scope.CityName = $scope.CityNameOld;
+        $scope.modState = $scope.modStateOld;
+        $scope.StateProvinceName = $scope.StateProvinceNameOld;
+        $('#divState .select2-chosen').html($scope.StateProvinceNameOld);
+
+        $scope.CityID = $scope.CityIDOld;
+
+        PoPFactory.GetPopDetails($scope.Region, $scope.Country, $scope.CityID).success(function (data) {
+            $scope.PoPData = data.d;
+
+            $scope.modPoP = Number($scope.HubSiteID);
+            $("#ddlPoP").select2({});
+            $('#divPoP .select2-chosen').html($scope.POPNameOld);
+        });
+
+        $scope.AvailName = $scope.AvailNameOld;
+        $('#divAvailability .select2-chosen').html($scope.AvailNameOld);
+        $scope.ddlAvailability = $scope.ddlAvailabilityOld;
+
+        $scope.modValid = $scope.modValidOld;
+        $scope.ExceptionRequired = $scope.ExceptionRequiredOld;
+        $scope.SupportResilientPOP = $scope.SupportResilientPOPOld;
+
+        $scope.Suppliers = $scope.SuppliersOld;
+
+        $scope.SiteAvailability = $scope.SiteAvailabilityOld;
+
+        $scope.modCPESuppliers = $scope.modCPESuppliersOld;
+        $scope.SupplierName = $scope.SupplierNameOld;
+        $('#divCPESupplier .select2-chosen').html($scope.SupplierNameOld);
+    }
+
+    $scope.UpdateCaseInfo = function () {
+        var availExists = 0;
+        $("#CPESupplierError").hide();
+        angular.forEach($scope.AvailDescData, function (availItem) {
+            if (availItem.AvailID == $scope.ddlAvailability) {
+                availExists = 1;
+            }
+        });
+
+
+        if (availExists == 0) {
+            bootbox.alert("Please select Availability");
+            return;
+        }
+
+        if ($scope.CPESuppliers) {
+            if ($scope.modCPESuppliers == '' || angular.isUndefined($scope.modCPESuppliers) || $scope.modCPESuppliers == null) {
+                $("#CPESupplierError").show();
+                return;
+            }
+        }
+
+
+        var ExcRequired = 0, SuppResilientPOP = 0;
+        if (!angular.isUndefined($scope.ExceptionRequired) && $scope.ExceptionRequired == true) {
+            ExcRequired = 1;
+        }
+
+        if (!angular.isUndefined($scope.SupportResilientPOP) && $scope.SupportResilientPOP == true) {
+            SuppResilientPOP = 1;
+        }
+        var SiteAvail = '';
+        if (!angular.isUndefined($scope.SiteAvailability) && $scope.SiteAvailability != null && $scope.SiteAvailability != '') {
+            SiteAvail = $scope.SiteAvailability;
+        }
+        var CityID = 0, StatePovinceID = 0, HubSiteID = 0, SelectedSuppliers = '';
+
+        if ($scope.CityID != '' && !angular.isUndefined($scope.CityID) && $scope.CityID != null) {
+            CityID = $scope.CityID;
+        }
+
+        if ($scope.modState != '' && !angular.isUndefined($scope.modState) && $scope.modState != null) {
+            StatePovinceID = $scope.modState;
+        }
+
+        if ($scope.modPoP != '' && !angular.isUndefined($scope.modPoP) && $scope.modPoP != null) {
+            HubSiteID = $scope.modPoP;
+        }
+
+        if ($scope.Suppliers.join() != '' && !angular.isUndefined($scope.Suppliers.join()) && $scope.Suppliers.join() != null) {
+            SelectedSuppliers = $scope.Suppliers.join();
+        }
+
+        var CPESupplierID = 0;
+        if ($scope.modCPESuppliers != '' && !angular.isUndefined($scope.modCPESuppliers) && $scope.modCPESuppliers != null) {
+            CPESupplierID = $scope.modCPESuppliers;
+        }
+
+        var CaseValid = 0;
+        if ($scope.modValid == true) {
+            CaseValid = 1;
+        }
+
+        bootbox.confirm("Are you sure to update case ?", function (result) {
+
+            if (result) {
+                $(".pageLoaderOverlay").show();
+
+                $http.post("SingleCase.aspx/SaveCaseDetails", { 'CaseID': $scope.CaseID, 'CityID': CityID, 'StatePovinceID': StatePovinceID, 'HubSiteID': HubSiteID, 'EmpID': $rootScope.User_Id, 'SiteAvailabilityDate': SiteAvail, 'SupportResilientPOP': SuppResilientPOP, 'ExceptionRequired': ExcRequired, 'SelectedSuppliers': SelectedSuppliers, 'Availability': $scope.ddlAvailability, 'CaseValid': CaseValid, 'CPESupplierId': CPESupplierID }).success(function (data) {
+
+                    if (data.d == 1) {
+                        UserDetailsFactory.GetCaseUpdatedDetails($scope.CaseID, 1).success(function (data) {
+
+                            $scope.CreatedBy = data.d.CreatedBy;
+                            $scope.CreatedDate = data.d.CreatedDate;
+                            $scope.UpdatedBy = data.d.UpdatedBy;
+                            $scope.UpdatedDate = data.d.UpdatedDate;
+
+                            /////
+                            $scope.CityNameOld = $scope.CityName;
+                            $scope.modStateOld = $scope.modState;
+                            $scope.StateProvinceNameOld = $scope.StateProvinceName;
+                            $('#divState .select2-chosen').html($scope.StateProvinceName);
+
+                            $scope.CityIDOld = $scope.CityID;
+
+                            //PoPFactory.GetPopDetails($scope.Region, $scope.Country, $scope.CityID).success(function (data) {
+                            //    $scope.PoPData = data.d;
+
+                            //    $scope.modPoP = Number($scope.HubSiteID);
+                            //    $("#ddlPoP").select2({});
+                            //    $('#divPoP .select2-chosen').html($scope.POPNameOld);
+                            //});
+                            
+                            $scope.HubSiteID = Number($scope.modPoP);
+                            angular.forEach($scope.PoPData, function (item) {
+                                if (item.PoPID == $scope.HubSiteID) {
+                                    $scope.POPNameOld = item.PoPName;    
+                                }
+                            });
+
+                            $scope.AvailNameOld = $scope.AvailName;
+                            $('#divAvailability .select2-chosen').html($scope.AvailName);
+                            $scope.ddlAvailability = $scope.ddlAvailabilityOld;
+
+                            $scope.modValidOld = $scope.modValid;
+                            $scope.ExceptionRequiredOld = $scope.ExceptionRequired;
+                            $scope.SupportResilientPOPOld = $scope.SupportResilientPOP;
+
+                            $scope.SuppliersOld = $scope.Suppliers;
+
+                            $scope.SiteAvailabilityOld = $scope.SiteAvailability;
+
+                            $scope.modCPESuppliersOld = $scope.modCPESuppliers;
+                            $scope.SupplierNameOld = $scope.SupplierName;
+                            $('#divCPESupplier .select2-chosen').html($scope.SupplierName);
+                            /////
+
+                            bootbox.alert("Case updated Successfully");
+                            $(".pageLoaderOverlay").hide();
+                        });
+
+                    }
+                    else {
+                        bootbox.alert("Problem occured while updating case");
+                        $(".pageLoaderOverlay").hide();
+                    }
+
+                });
+            }
+        });
+    }
+
+    $scope.DeleteCaseInfo = function () {
+
+        bootbox.confirm("Are you sure to delete case ?", function (result) {
+
+            if (result) {
+
+                $(".pageLoaderOverlay").show();
+
+
+                $http.post("SingleCase.aspx/DeleteCaseDetails", { 'AccessLevel': $rootScope.AccessLevel, 'CaseID': $scope.CaseID, 'UserID': $rootScope.User_Id }).success(function (data) {
+                    $(".pageLoaderOverlay").hide();
+                    if (data.d == 1) {
+                        bootbox.alert("Case deleted successfully");
+                        $scope.ShowCaseList();
+                    }
+                    else {
+                        bootbox.alert("Problem occured while updating");
+                    }
+
+                });
+            }
+        });
+    }
+
+    $scope.SelectRegion = function (RegionDetails) {
+        $scope.Region = RegionDetails.RegionID;
+        $scope.RegionName = RegionDetails.RegionName;
+
+        $("#divShowRegions").hide();
+        $(".modal-backdrop").hide();
+
+    }
+
+
+    $scope.SelectCountry = function (CountryDetails) {
+
+        $scope.Country = CountryDetails.CountryID;
+        $scope.CountryName = CountryDetails.CountryName;
+        $("#divShowCountries").hide();
+        $(".modal-backdrop").hide();
+    }
+
+    $scope.SelectState = function (StateDetails) {
+
+        $scope.StatePovinceID = StateDetails.StateID;
+        $scope.StateName = StateDetails.StateName;
+        $("#divState").hide();
+        $(".modal-backdrop").hide();
+    }
+
+    $scope.SelectCity = function (CityDetails) {
+
+        $scope.CityID = CityDetails.Cityid;
+        $scope.CityName = CityDetails.CityName;
+        $(".pageLoaderOverlay").show();
+        PoPFactory.GetPopDetails($scope.Region, $scope.Country, $scope.CityID).success(function (data) {
+            if (data.d.length > 0) {
+                $scope.PoPData = data.d;
+                $scope.modPoP = data.d[0].PoPID;
+            }
+            else {
+                $scope.PoPData = [];
+                $scope.modPoP = 0;
+                $('#divPoP .select2-chosen').html("");
+            }
+            $("#btnCaseUpdate").click();
+            $(".pageLoaderOverlay").hide();
+            //$scope.modPoP = Number($scope.HubSiteID);
+        });
+
+        //        $("#divShowCities").hide();
+        //        $(".modal-backdrop").hide();
+    }
+
+
+    $scope.GetRegions = function () {
+        $(".pageLoaderOverlay").show();
+        Regionfactory.GetRegions().success(function (data) {
+            $scope.Regiondata = data.d;
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+    $scope.GetStates = function () {
+        $(".pageLoaderOverlay").show();
+
+        StateFactory.GetStates($scope.Region, $scope.Country).success(function (data) {
+            $scope.StateData = data.d;
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+
+    $scope.GetCountries = function () {
+        $(".pageLoaderOverlay").show();
+
+        Countryfactory.GetCountries($scope.Region, $scope.Product).success(function (data) {
+
+            $scope.CountryData = data.d;
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+    $scope.PageNo = 1;
+    $scope.PageCount = 0;
+    $scope.PageSize = 100;
+    $scope.Filter = "A";
+    $scope.CityPagination = false;
+
+
+    $scope.GetCities = function (flag) {
+
+        $(".pageLoaderOverlay").show();
+        if (flag) {
+            $scope.PageNo = 1;
+        }
+
+        CityFactory.GetCities($scope.Region, $scope.Country, $scope.Filter, $scope.PageNo).success(function (data) {
+
+            if (data.d.length > 0) {
+                $scope.MaxRecords = data.d[0].Count;
+                $scope.PageCount = data.d[0].PageCount;
+                $scope.CityData = data.d;
+                if ($scope.PageCount > 100) {
+                    $scope.CityPagination = true;
+                }
+                else {
+                    $scope.CityPagination = false;
+                }
+            }
+            else {
+                $scope.CityPagination = false;
+            }
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+    $scope.PrevParent = function () {
+        $scope.Paging = true;
+
+        if ($scope.PageNo == 1) {
+            return;
+        }
+
+        if ($scope.PageNo > 1) {
+            $scope.PageNo = $scope.PageNo - 1;
+        }
+        else {
+            $scope.PageNo = 1;
+        }
+        $scope.GetCities(false);
+    }
+
+    $scope.NextParent = function () {
+        $scope.Paging = true;
+        var RecCount = 0;
+
+        if ($scope.PageNo > 0) {
+
+            if (($scope.PageNo * $scope.PageSize) >= $scope.MaxRecords) {
+
+                return;
+            }
+            else {
+                $scope.PageNo = $scope.PageNo + 1;
+            }
+
+        }
+        else {
+            $scope.PageNo = 1;
+        }
+        $scope.GetCities(false);
+    }
+
+    $scope.SearchCity = function () {
+
+        $scope.PageNo = 1;
+        var SearchText = "";
+        if ($scope.CitySearchText != '') {
+            SearchText = $scope.CitySearchText;
+        }
+        else {
+            SearchText = $scope.Filter;
+        }
+        $(".pageLoaderOverlay").show();
+        CityFactory.GetCities($scope.Region, $scope.Country, SearchText, $scope.PageNo).success(function (data) {
+            $(".pageLoaderOverlay").hide();
+            if (data.d.length > 0) {
+                $scope.MaxRecords = data.d[0].Count;
+                $scope.PageCount = data.d[0].PageCount;
+            }
+            $scope.CityData = data.d;
+
+        });
+    }
+
+});
+
+
+app.factory('UserDetailsFactory', function ($http) {
+
+    var UserDetailsFactory = {};
+
+    UserDetailsFactory.GetCaseUpdatedDetails = function (CaseID,flag) {
+        return $http.post('SingleCase.aspx/GetCaseUpdatedDetails', { 'CaseID': CaseID, 'flag': flag });
+    }
+
+    return UserDetailsFactory;
+});
+
+app.factory('PoPFactory', function ($http) {
+
+    var PoPFactory = {};
+
+    PoPFactory.GetPopDetails = function (RegionID, CountryID, CityID) {
+        return $http.post('SingleCase.aspx/GetPopDetails', { 'RegionID': RegionID, 'CountryID': CountryID, 'CityID': CityID });
+    }
+
+    return PoPFactory;
+});
+
+app.factory('CPECaseDetailsFactory', function ($http) {
+
+    var CPECaseDetailsFactory = {};
+
+    CPECaseDetailsFactory.GetCPECaseData = function (CaseId) {
+        return $http.post('SingleCase.aspx/GetCPECaseData', { 'CaseId': CaseId });
+    }
+ 
+    CPECaseDetailsFactory.GetCPESuppliers = function () {
+        return $http.post('SingleCase.aspx/GetCPESuppliers', {});
+    }
+    return CPECaseDetailsFactory;
+});

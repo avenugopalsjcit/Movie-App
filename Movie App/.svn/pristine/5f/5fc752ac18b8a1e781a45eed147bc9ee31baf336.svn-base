@@ -1,0 +1,57 @@
+﻿
+app.factory('CPESupplier', function ($http) {
+    
+    var CPESupplier = {};
+
+
+    CPESupplier.BindSupplierData = function (supplierName) {
+        return $http.post('CpeSupplierReport.aspx/BindSupplierData', {});
+    }
+
+    return CPESupplier;
+
+});
+
+app.controller("CPESupplierReportCtrl", function ($scope, $http, CPESupplier, NgTableParams) {
+
+    $(".pageLoaderOverlay").show();
+    //$scope.modsupplier = {};
+
+
+
+
+
+    var self = this;
+    CPESupplier.BindSupplierData().success(function (data, status, headers, config) {
+        
+
+        var json = angular.toJson(data.d);
+
+        var json1 = json.replace('"__type":"SCAdminBAL.CPESupplierReport",', '');
+        var json2 = json1.replace('"[', '[');
+         var finaljson = json2.replace(']"', ']');
+
+        $scope.CpeSupplierData = data.d;
+
+        $scope.usersTable = new NgTableParams({ // initial grouping
+          
+        }, {
+            'dataset': data.d
+        });
+//        self.tableParams = new NgTableParams({}, { 'dataset': finaljson });
+        //var sample = $scope.CpeSupplierData;
+        //alert(sample);
+        $(".pageLoaderOverlay").hide();
+    })
+    .error(function (error) {
+        console.log("Problem occured while loading Supplier Data; " + error);
+        $(".pageLoaderOverlay").hide();
+    });
+
+
+
+
+
+
+
+});

@@ -1,0 +1,107 @@
+﻿(function (ng, app) {
+    app.controller("Controllers.PrimaryProductOwnerCntrl", function ($scope, $http, NgTableParams, $rootScope, ProductAccurateAdminfactory, ProductAccurateUserDetailsFactory, $timeout) {
+        //$scope.Owners = [[{ 'EmployeeId': 10, 'UserName': 'naren' }, { 'EmployeeId': 20, 'UserName': 'naren2' }, { 'EmployeeId': 30, 'UserName': 'naren3'}], [{ 'EmployeeId': 10, 'UserName': 'naren' }, { 'EmployeeId': 20, 'UserName': 'naren2' }, { 'EmployeeId': 30, 'UserName': 'naren3'}]];
+        $scope.modOwner = [];
+        $scope.OldProductOwner = '';
+        $scope.Emailid = [];
+        $scope.FullNames = [];
+        $('.pageLoaderOverlay').show();
+        ProductAccurateAdminfactory.GetProductOwnerDetails().success(function (data) {
+            $scope.ProductAccurateAdminMapping = new NgTableParams({}, { 'dataset': data.d });
+            $scope.tableParams = new NgTableParams({
+                sorting: {
+                    ProductName: 'dsc'
+                }
+            }, {
+                getData: function ($defer, params) {
+                    $defer.resolve($filter('orderBy')($scope.ProductAccurateAdminMapping, params.orderBy()));
+                }
+            });
+            $scope.Ownerdata = data.d.Owners;
+            data.d.forEach(function (item) {
+                var primarySelected = 0;
+                item.Owners.forEach(function (item1) {
+                    if (item1.PrimaryCD == 1) {
+                        //                        $scope.modOwner.push({ EmployeeId: item1.EmployeeId }
+
+                        //                        );
+                        $('#ddlProductOwners' + item.ProductId).val(item1.EmployeeId);
+                        $scope.Emailid.push(item1.Email);
+                        primarySelected = 1;
+                    }
+
+                    var x = $scope.Emailid.push(item1.Email);
+
+                    $scope.FullNames.push(item1.FullName)
+                });
+                if (primarySelected == 0) {
+                    $scope.modOwner.push("0");
+                }
+
+            });
+            $('.pageLoaderOverlay').hide();
+        })
+
+        .error(function (error) {
+            console.log("Problem occured while loading products; " + error);
+            $('.pageLoaderOverlay').hide();
+        });
+
+        $timeout(function () {
+            $(".ddlProductOwnerscls option[value='string:']").remove();
+        }, 3000);
+
+
+        $scope.ddlProductOwnersChange = function (ProductId, CurrentProductOwner, OldProductOwner, index, emailvalue) {
+            var fullnamearray;
+            var userName;
+            var mailid = '';
+            var emailSplit;
+            var EmailID = "";
+            var Currentowner = "";
+            var Uname = "";
+
+            $scope.ProductAccurateAdminMapping.data.forEach(function (item) {
+                var primarySelected = 0;
+                item.Owners.forEach(function (item1) {
+                    if (item1.EmployeeId == CurrentProductOwner) {
+                        EmailID = item1.Email;
+                        Currentowner = CurrentProductOwner;
+                        Uname = item1.UserName;
+                    }
+                });
+            });
+            $('.CurrentPrimaryContact' + index + '').html(Uname);
+            $('.CurrentEmailID' + index + '').html(EmailID);
+            $('.CurrentEmailID' + index + '').html("<u><a href='mailto:" + EmailID + "'>" + EmailID + "</a></u>");
+
+            $('.pageLoaderOverlay').show();
+            ProductAccurateUserDetailsFactory.PostCurrentUserDetails(ProductId, Currentowner, OldProductOwner).success(function (data) {
+                bootbox.alert({ "className": "my-custom-class", message: "Primary product Owner Changed successfully" });
+                //to set selected item to current primary product owner
+                var ddlProductOwners = $("#ddlProductOwners" + ProductId + " option:selected").text();
+                //                if (ddlProductOwners != '') {
+                //                    fullnamearray = ddlProductOwners.split('-');
+                //                    userName = fullnamearray[0];
+
+                //                }
+                //                else {
+                //                    userName = "";
+                //                }
+
+
+                $('.pageLoaderOverlay').hide();
+
+            }).error(function (error) {
+                console.log("Problem occured while Selecting Data; " + error);
+                $('.pageLoaderOverlay').hide();
+            });
+        }
+
+
+
+
+
+    });
+
+} (angular, app));

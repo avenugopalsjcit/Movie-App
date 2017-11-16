@@ -1,0 +1,130 @@
+﻿app.writeSelectedCharTable = function ($scope, $compile) {
+
+    var html = "<table class=\"table table-bordered table-striped\" width=\"100%\" id=\"tblChar\"><thead><tr><th>Change</th><th>Characteristic</th>";
+    html += "<th class=\"lbltxt\">Valid</th><th class=\"lbltxt\">Availability</th><th class=\"lbltxt\">Change Value</th>";
+    html += "<th class=\"lbltxt\">Value</th></tr></thead>";
+    html += "<tbody>";
+    $scope.selectedCharList.forEach(function (item) {
+        html += "<tr>";
+        if (item.CHAR_TYPE_VALUE_COUNT != 6) {
+            html += "<td class='chkSelectcol'><input id='chkSelect" + item.CHAR_ID + "' charType='' ng-click ='toggleCheckox(" + item.CHAR_ID + ")' type='checkbox'/></td>";
+
+
+            //ng-click ='toggleCheckox(" + item.CHAR_ID + ")' type='checkbox'/></td>";
+        } else {
+
+        }
+        //2nd column
+        var charName = Boolean(item.CHAR_ACTUAL_VALUE) ? item.CHAR_NAME + "-" + item.CHAR_ACTUAL_VALUE : item.CHAR_NAME;
+        html += "<td><span id='charname" + item.CHAR_ID + "'>" + charName + "</span></td>";
+        //3rd column
+        html += "<td><input id='chkValid" + item.CHAR_ID + "' disabled ng-click =ValidateChar('" + item.CHAR_ID + "') type='checkbox' /></td>";
+        html += "<td>";
+        //3rd column
+        if (item.CHAR_TYPE_ID != 31 && item.CHAR_TYPE_ID != 40) {
+            html += app.getAvailDropdown($scope, item.CHAR_ID);
+            html += "</td>";
+            $scope.modAvailCD = $scope.lstCaseAvail[0].AVAIL_CD;
+        }
+        html += "<td>";
+        if (item.CHAR_TYPE_VALUE_COUNT == 1 || item.CHAR_TYPE_VALUE_COUNT == 2 || item.CHAR_TYPE_VALUE_COUNT == 5) {
+            html += "<input id='chkChangeVal" + item.CHAR_ID + "' disabled type='checkbox' ng-click='toggletextbox(" + item.CHAR_ID + ")' />";
+        } else if (item.CHAR_TYPE_VALUE_COUNT == 6) {
+            html += "<input id='chkChangeVal" + item.CHAR_ID + "' disabled type='checkbox' ng-click='ValidateValueLength()'>";
+        }
+        html += "</td>";
+
+        switch (item.CHAR_TYPE_VALUE_COUNT) {
+            case '0':
+                var actualval = item.CHAR_ACTUAL_VALUE == null ? '' : item.CHAR_ACTUAL_VALUE;
+                html += "<td>" + actualval + "</td>";
+                break;
+            case '1':
+                if ($scope.MCUSession.Multipoint == 1 && item.CHAR_TYPE_ID == 643 && item.CHAR_ID != 3923) {
+                    html += "<td><input id='chkCharValue" + item.CHAR_ID + "' disabled type='checkbox' ng-click='' />";
+                } else if (item.CHAR_TYPE_ID == 25) {
+                    html += "<td><input type='text' id='txt" + item.CHAR_ID + "' disabled/>";
+                } else {
+                    html += "<td><input type='text' id='txt" + item.CHAR_ID + "' disabled/>";
+                }
+                html += "</td>";
+                break;
+            case '2':
+                if ($scope.MCUSession.Multipoint == 1 && item.CHAR_TYPE_ID == 644) {
+                    if (item.CHAR_NAME == 'Terrestrial Routes' || item.CHAR_NAME == 'Satellite Routes') {
+                        html += "<td><input id='chkCharValue" + item.CHAR_ID + "' disabled type='checkbox' />"
+                    } else {
+                        html += "<td><input type='text' id='txt" + item.CHAR_ID + "' disabled />";
+                        html += "<input id='chkCharValue" + item.CHAR_ID + "' disabled type=checkbox/>";
+                    }
+                } else {
+                    html += " <td><input type='text' id='txt" + item.CHAR_ID + "' disabled/>";
+                    html += "To <input type='text' id='chkCharValue" + item.CHAR_ID + "' disabled/>";
+                }
+                html += " </td>";
+                break;
+            case '5':
+                html += "<td><input type='text' id='txt" + item.CHAR_ID + "' disabled/></td>";
+                break;
+            case '6':
+                var str = "window.open('ProductFileUpload.aspx?txtId=txt" + iten.CHAR_ID + "','_blank','height=180,width=700,top=200,left=200,status=no,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no,copyhistory=false,dependent=true')";
+                html += "<td><input type=button' disabled value='File Upload' id='btnFileUpload'" + item.CHAR_ID + " ng-click=''/></td>";
+                break;
+        }
+        html += "</tr>";
+
+
+
+    });
+
+    if ($scope.selectedAccessSupplier.length != 0) {
+        $scope.selectedAccessSupplier.forEach(function (item) {
+            $scope.MCUSession.AccessSupplierSelected = true;
+            html += "<tr>";
+            html += "<td class='chkSelectcol'><input id='chkSelect" + item.CHAR_ID + "'  type='checkbox' charType='AccSupp'  ng-click='toggleCheckox(" + item.CHAR_ID + ")'></td>";
+            html += "<td><span id='charname" + item.CHAR_ID + "'>" + item.CHAR_NAME + "</span></td>";
+            html += "<td><input id='chkValid" + item.CHAR_ID + "' disabled ng-click ='' type='checkbox'/></td>";
+            html += "<td></td><td></td><td></td></tr>";
+        });
+    }
+
+    if ($scope.parentPortSpeedList.length != 0) {
+        $scope.MCUSession.ParentPortSpeedSelected = true;
+        $scope.parentPortSpeedList.forEach(function (item) {
+            html += "<tr>";
+            if (item.IsValidMapping == 1) {
+                html += "<td class='chkSelectcol'><input id='chkSelect" + item.CharDesc + "'  type='checkbox' charType='ParentPortSpeed'  ng-click='toggleCheckox(" + item.CharDesc + ")'></td>";
+            } else {
+                html += "<td><input id='chkSelect" + item.CharDesc + "' disabled  type='checkbox'  ng-click=''></td>";
+            }
+
+            html += " <td><span id='charname" + item.CHAR_ID + "'>" + item.CHAR_NAME + "</span></td>";
+            html += "<td><input id='chkValid" + item.CharDesc + "' disabled type='checkbox'/></td>";
+            html += "<td></td><td></td><td></td></tr>";
+
+        });
+        $scope.displayparentportnote = true;
+    } else { $scope.displayparentportnote = false; }
+    html += "</tbody>";
+    html += "</table>";
+
+    var temp = $compile(html)($scope);
+    $("#selectedChar").html(temp);
+    //to make available dropdown searchable
+    $('.ddlcharavail').select2();
+    $('.pageLoaderOverlay').hide();
+}
+
+
+app.getAvailDropdown = function($scope,charid) {
+    $scope.avilhtml = "<select class='ddlcharavail' id='avail" + charid + "' style='width: 100%'>";
+    if ($scope.availoptionvalue == '') {
+        $scope.lstCaseAvail.forEach(function (item1) {
+            if (item1.AVAIL_CD != 0)
+                $scope.availoptionvalue += "<option value='" + item1.AVAIL_CD + "'>" + item1.AVAIL_DESC + "</option>";
+        });
+    }
+    $scope.avilhtml += $scope.availoptionvalue;
+    $scope.avilhtml += "</select>";
+    return $scope.avilhtml;
+}

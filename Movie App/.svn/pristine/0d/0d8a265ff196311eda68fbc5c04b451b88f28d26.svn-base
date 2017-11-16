@@ -1,0 +1,1469 @@
+﻿app.controller("DefineStandardReportCtrl", function ($scope, $rootScope, $http, $sce, DefineStandardReport, NgTableParams, JSONToCSVConvertor) {
+    $scope.SubProductData = false;
+    $scope.ReportData = false;
+    $scope.DefineReportData = false;
+    $scope.DefinePOPData = false;
+    $scope.showTabLinks = false;
+    $scope.ShowSubProducts = false;
+    $scope.ColumnReferenceData = false;
+    $scope.NoColumnReferenceData = false;
+    $scope.NoPOPCharacteristicColumnData = false;
+    $scope.ShowInfo = false;
+    $scope.ShowSaveAndUpdateButton = false;
+    $scope.ShowSLATableData = false;
+    $scope.ShowNoSLAData = false;
+    $scope.showColumnWidthTable = false;
+    $scope.ShowCharacteristicsAlert = false;
+    $scope.showSpeedtabData = false;
+    $scope.showSLALink = false;
+    $scope.ShowSLAInfo = false;
+    $scope.AddReportValidation = false;
+    $scope.ValidateStandardReportName = false;
+    $scope.ValidateReportColumnReference = false;
+    $scope.ValidatePOPCharacteristics = false;
+    $scope.ValidateUpdatedDateDetails = false;
+    //$scope.ShowColumnWidthData = false;
+    $scope.modProductType = [];
+    $scope.modSubProductType = [];
+    $scope.ReportName = [];
+    $scope.ReportsType = [];
+    $scope.modProduct = [];
+    $scope.modSubProduct = [];
+    $scope.modColHeader1 = [];
+    $scope.modColHeader2 = [];
+    $scope.modColHeader3 = [];
+    $scope.mappedproduct = [];
+    $scope.CharID = [];
+    $scope.colmnWidth = [];
+    $scope.RouterColWidth = [];
+    $scope.MaintenanceColWidth = [];
+    $scope.RouterValid = [];
+    $scope.MaintenanceValid = [];
+    $scope.updatePOPChar = [];
+    $scope.POPcharValue = [];
+    $scope.columnRefhdr1 = [];
+    $scope.CharValue = [];
+    $scope.StandardColHeader = "";
+    $scope.StandardColWidth = "";
+    $scope.StandardValid = "";
+    $scope.StandardDisplayOrder = "";
+    $scope.ColRefWidth = "";
+    $scope.ColRefDisplayOrder = "";
+    $scope.ColPOPWidth = "";
+    $scope.ColPOPDisplayOrder = "";
+    $scope.WrapTextData = [];
+    $scope.SLAData = [];
+    $scope.SLADeliveryData = [];
+    $scope.SLAAssuranceData = [];
+    $scope.SLAAssuranceColCd = [];
+    $scope.SLADeliveryColCd = [];
+    $scope.AssuranceColWidth = [];
+    $scope.DeliveryColWidth = [];
+    $scope.modSLAValid = [];
+    $scope.modWrappedValid = [];
+    $scope.ShowSLAFlag = [];
+    $scope.ReportsType = [];
+    $(".pageLoaderOverlay").show();
+    DefineStandardReport.GetStandardReportProducts().success(function (data) {
+        //$scope.ShowColumnWidthData = false;
+        var result = [];
+        $scope.ProductsType = data.d;
+        $("#Select1").select2({});
+        $("#subProd").select2({});
+        $("#standardReport").select2({});
+        $scope.ShowInfo = false;
+        $scope.ShowSaveAndUpdateButton = false;
+        $(".pageLoaderOverlay").hide();
+    });
+
+    $scope.showData = function () {
+        $scope.ColumnWidthTable = [];
+        $("#charType").select2({});
+        $('#CharDiv .select2-chosen').html("-- Please Select --");
+        $("#productName").html($("#Select1 option:selected").text());
+        $("#subProductName").html($("#subProd option:selected").text());
+        $("#addReport").html($("#standardReport option:selected").text())[0].innerText;
+        $scope.modColHeader1 = "";
+        $scope.modColHeader2 = "";
+        $scope.modColHeader3 = "";
+        $scope.modValid = true;
+        $scope.modCharacteristicType = "";
+        $scope.AddReportValidation = false;
+    }
+    $scope.showColumnWidthInSpeedData = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.showColumnWidthTable = false;
+        $scope.ColumnWidthTable = [];
+        DefineStandardReport.GetEditColumnWidthData($scope.modProductType, $scope.modSubProductType).success(function (data) {
+            $scope.ColumnWidthTable = new NgTableParams({}, { 'dataset': data.d });
+            if (data.d.length > 0) {
+                $scope.showColumnWidthTable = true;
+                $scope.showSpeedtabData = true;
+                $("#SetColumnWidthInSpeedDataTabs").modal('show');
+            }
+            $(".pageLoaderOverlay").hide();
+        });
+
+    }
+    $scope.showColumnInCPEDataData = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.MaintenanceTable = [];
+        DefineStandardReport.GetCPEMaintenanceOptionsTab($scope.modProductType, $scope.CharID).success(function (data) {
+            $scope.MaintenanceTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+        });
+        DefineStandardReport.GetCPERouterBundlesTab($scope.modProductType).success(function (data) {
+            $scope.RouterBundlesTable = new NgTableParams({}, { 'dataset': data.d });
+        });
+        $("#EditColumnInCPEDataTabs").modal('show');
+
+    }
+    $scope.showSLAData = function () {
+        $(".pageLoaderOverlay").show();
+
+        $scope.ShowSLATableData = false;
+        var resultDelivery = [];
+        var resultAssurance = [];
+        $scope.SLADeliveryData = [];
+        $scope.SLAAssuranceData = [];
+        DefineStandardReport.GetdisplaySLAAttributesForProduct($scope.modProductType, $scope.modSubProductType, $scope.modReport).success(function (data) {
+            data.d.forEach(function (item) {
+                if (item.ServiceName.match("SD") != null) {
+                    resultDelivery.push({
+                        ServiceName: item.ServiceName,
+                        Width: item.Width,
+                        SLAColumnCd: item.SLAColumnCd
+                    });
+
+                }
+                else {
+                    resultAssurance.push({
+                        ServiceName: item.ServiceName,
+                        Width: item.Width,
+                        SLAColumnCd: item.SLAColumnCd
+                    });
+                }
+                $scope.SLADeliveryData = resultDelivery;
+                $scope.SLAAssuranceData = resultAssurance
+            });
+            if (data.d.length > 0) {
+                $scope.ShowSLATableData = true;
+                $scope.ShowNoSLAData = false;
+                $("#EditDisplayOfSLAAttributes").modal('show');
+                //$(".pageLoaderOverlay").hide();
+            }
+            else {
+                $scope.ShowSLATableData = false;
+                $scope.ShowNoSLAData = true;
+                $("#EditDisplayOfSLAAttributes").modal('show');
+            }
+            // $scope.SLAAttributeTable = new NgTableParams({}, { 'dataset': data.d });
+            for (var i = 0; i < resultAssurance.length; i++) {
+                $scope.SLAAssuranceColCd += resultAssurance[i].SLAColumnCd + ",";
+            }
+            for (var j = 0; j < resultDelivery.length; j++) {
+                $scope.SLADeliveryColCd += resultDelivery[j].SLAColumnCd + ",";
+            }
+
+            DefineStandardReport.GetSLAUpdatedDateDetails($scope.modProductType).success(function (data) {
+                var result = [];
+                $scope.UpdatedSLAData = [];
+                result.push({
+                    CreatedBy: data.d[0].CreatedBy,
+                    CreatedDate: data.d[0].CreatedDate,
+                    UpdatedBy: data.d[0].UpdatedBy,
+                    UpdatedDate: data.d[0].UpdatedDate
+                });
+                $scope.UpdatedSLAData = result;
+                $(".pageLoaderOverlay").hide();
+            });
+
+        });
+
+
+
+
+
+    }
+    $scope.passCharacteristicValues = function (item, item1, item2, colhdr2, colhdr3) {
+        $("#POPCharId").html(item);
+        $("#productChar").html($("#Select1 option:selected").text());
+        $("#POPSubProdId").html($("#subProd option:selected").text())[0].innerText;
+        $("#POPReport").html($("#standardReport option:selected").text())[0].innerText;
+        $scope.columnhdr1 = item;
+        $scope.POPcharValue = item1;
+        $scope.updatePOPChar = $scope.columnhdr1;
+        $scope.columnhdr2 = colhdr2;
+        $scope.columnhdr3 = colhdr3;
+        if (item2 != 0) {
+            $scope.POPchkValid = true;
+        }
+        else {
+            $scope.POPchkValid = false;
+        }
+        $("#POPCharacteristics").modal('show');
+    }
+
+    $scope.passColumnReferenceValues = function (item, item1, item2, item3, colhdr2, colhdr3,colhdr1) {
+        $(".pageLoaderOverlay").show();
+        $("#CharID").html(item);
+        $scope.columnRefhdr1 = colhdr1;
+        $scope.CharValue = item1;
+        $("#ProductCharName").html($("#Select1 option:selected").text());
+        $("#subProdRef").html($("#subProd option:selected").text())[0].innerText;
+        $("#RefReport").html($("#standardReport option:selected").text())[0].innerText;
+        $scope.updateChar = $scope.columnRefhdr1;
+        $scope.columnRefhdr2 = colhdr2;
+        $scope.columnRefhdr3 = colhdr3;
+        if (item3 != 0) {
+            $scope.chkRefValid = true;
+        }
+        else {
+            $scope.chkRefValid = false;
+        }
+        $scope.OrderCd = item2;
+        DefineStandardReport.GetUpdatedDateDetailsForCharData($scope.modProductType, $scope.modReport, $scope.OrderCd).success(function (data) {
+            var result = [];
+            $scope.UpdatedCharData = [];
+            if (data.d.length > 0) {
+                result.push({
+                    CreatedBy: data.d[0].CreatedBy,
+                    CreatedDate: data.d[0].CreatedDate,
+                    UpdatedBy: data.d[0].UpdatedBy,
+                    UpdatedDate: data.d[0].UpdatedDate
+                });
+            }
+            $scope.UpdatedCharData = result;
+            $("#Characteristics").modal('show');
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+
+    $scope.GetProducts = function () {
+        $scope.SubProductData = false;
+        $scope.ReportData = false;
+        $scope.DefineReportData = false;
+        $scope.DefinePOPData = false;
+        $scope.showTabLinks = false;
+        $scope.ColumnReferenceData = false;
+        $scope.ShowInfo = false;
+        $scope.ShowSaveAndUpdateButton = false;
+        $scope.NoColumnReferenceData = false;
+        $scope.NoPOPCharacteristicColumnData = false;
+        $scope.ValidateStandardReportName = false;
+        $scope.ValidateReportColumnReference = false;
+        $scope.ValidatePOPCharacteristics = false;
+        $scope.ValidateUpdatedDateDetails = false;
+        $(".pageLoaderOverlay").show();
+        $('#productDiv .select2-chosen').html("-- Please Select --");
+        $('#ReportDiv .select2-chosen').html("-- Please Select --");
+        $scope.modSubProductType = "";
+        if ($scope.modSubProductType.length != undefined) {
+            if ($scope.modSubProductType.length == 0) {
+                $scope.modSubProductType = 0;
+            }
+        }
+        if ($scope.modProductType != null) {
+
+            DefineStandardReport.GetEditColumnWidthData($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                $scope.ColumnWidthTable = new NgTableParams({}, { 'dataset': data.d });
+                if (data.d.length > 0) {
+                    $scope.showSpeedtabData = true;
+                }
+                else {
+                    $scope.showSpeedtabData = false;
+                }
+            });
+            DefineStandardReport.GetMappedProduct($scope.modProductType).success(function (data) {
+                if (data.d.length > 0) {
+                    $scope.mappedproduct = data.d;
+                }
+                else {
+                    $scope.mappedproduct = 0;
+                }
+
+                DefineStandardReport.GetCharID($scope.modProductType, $scope.mappedproduct).success(function (data) {
+                    if (data.d.length > 0) {
+                        data.d.forEach(function (item) {
+                            $scope.CharID += item.CharId + ",";
+                        });
+
+                    }
+                    else {
+                        $scope.CharID = 0;
+                    }
+
+                    DefineStandardReport.GetCPEMaintenanceOptionsTab($scope.modProductType, $scope.CharID).success(function (data) {
+                        if (data.d.length > 0) {
+                            $scope.MaintenanceTable = new NgTableParams({}, { 'dataset': data.d });
+                        }
+                    });
+                });
+
+
+                DefineStandardReport.GetCPERouterBundlesTab($scope.modProductType).success(function (data) {
+                    $scope.RouterBundlesTable = new NgTableParams({}, { 'dataset': data.d });
+                });
+
+            });
+
+            DefineStandardReport.GetStandardReportSubProducts($scope.modProductType).success(function (data) {
+                if (data.d.length > 0) {
+                    $scope.SubProductData = true;
+                    $scope.ReportData = false;
+                    $scope.DefineReportData = false;
+                    $scope.DefinePOPData = false;
+                    $scope.showTabLinks = false;
+                    $scope.ColumnReferenceData = false;
+                    $scope.ShowInfo = false;
+                    $scope.ShowSaveAndUpdateButton = false;
+                    //$scope.ShowColumnWidthData = false;
+                    $scope.SubProductsType = data.d;
+                    $(".pageLoaderOverlay").hide();
+                }
+                else {
+                    $scope.SubProductData = false;
+                    $scope.ReportData = false;
+                    $scope.DefineReportData = false;
+                    $scope.DefinePOPData = false;
+                    $scope.showTabLinks = false;
+                    $scope.ColumnReferenceData = false;
+                    $scope.ShowInfo = false;
+                    $scope.ShowSaveAndUpdateButton = false;
+                    //$(".pageLoaderOverlay").show();
+                    //$scope.ShowColumnWidthData = false;
+                    $scope.modSubProductType = 0;
+                    DefineStandardReport.GetCharacteristicsData($scope.modProductType).success(function (data) {
+                        $scope.ShowSubProducts = false;
+                        $scope.CharacteristicsType = data.d;
+                        $scope.modCharacteristicType = data.d[0];
+                    });
+                    DefineStandardReport.GetStandardReportName($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                        var result = [];
+                        $scope.ReportData = true;
+                        $scope.DefineReportData = false;
+                        $scope.DefinePOPData = false;
+                        $scope.showTabLinks = false;
+                        $scope.ColumnReferenceData = false;
+                        //$scope.ShowColumnWidthData = false;
+                        if (data.d.length > 0) {
+                            //$scope.ReportName = data.d[0].ReportName;
+                            //$scope.ReportId = data.d[0].ReportId;
+                            $scope.ReportsType = data.d;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                        if ($scope.ReportsType.length == 0) {
+                            $(".pageLoaderOverlay").hide();
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            $(".pageLoaderOverlay").hide();
+            $scope.modReport = null;
+            $scope.ShowSaveAndUpdateButton = false;
+            //$scope.modSubProductType = null;
+        }
+    }
+
+    $scope.GetSubProducts = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.ReportData = false;
+        $scope.DefineReportData = false;
+        $scope.DefinePOPData = false;
+        $scope.showTabLinks = false;
+        $scope.ColumnReferenceData = false;
+        $scope.ShowInfo = false;
+        $scope.ShowSaveAndUpdateButton = false;
+        $scope.NoColumnReferenceData = false;
+        $scope.NoPOPCharacteristicColumnData = false;
+        $('#ReportDiv .select2-chosen').html("-- Please Select --");
+        if ($scope.modSubProductType != null) {
+
+            DefineStandardReport.GetCharacteristicsData($scope.modProductType).success(function (data) {
+                $scope.ShowSubProducts = true;
+                $scope.CharacteristicsType = data.d;
+                $scope.modCharacteristicType = data.d[0];
+            });
+
+            DefineStandardReport.GetStandardReportName($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                $scope.ReportData = true;
+                //$scope.ReportsType = data.d;
+                if (data.d.length > 0) {
+                    //$scope.ReportName = data.d[0].ReportName;
+                    //$scope.ReportId = data.d[0].ReportId;
+                    $scope.ReportsType = data.d;
+                    $(".pageLoaderOverlay").hide();
+                }
+                if ($scope.ReportsType.length == 0) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        }
+        else {
+            $(".pageLoaderOverlay").hide();
+            $scope.modReport = null;
+        }
+
+    }
+    $scope.GetReports = function () {
+        if ($scope.modReport != null) {
+            $(".pageLoaderOverlay").show();
+        }
+        $scope.ReportData = true;
+        $scope.DefineReportData = false;
+        $scope.DefinePOPData = false;
+        $scope.showTabLinks = false;
+        $scope.ColumnReferenceData = false;
+        $scope.ShowInfo = false;
+        DefineStandardReport.GetStandardColumnsData($scope.modReport).success(function (data) {
+            var result = [];
+            $scope.DefineReportData = true;
+            $scope.DefinePOPData = false;
+            $scope.showTabLinks = false;
+            $scope.StandardColumnsTable = new NgTableParams({}, { 'dataset': data.d });
+
+            DefineStandardReport.GetReportColumnReferenceData($scope.modProductType, $scope.modReport).success(function (data) {
+                $scope.DefineReportData = true;
+
+                if (data.d.length > 0) {
+                    $scope.ColumnReferenceData = true;
+                    $scope.NoColumnReferenceData = false;
+                    $scope.ColumnReferenceDataTable = new NgTableParams({}, { 'dataset': data.d });
+                }
+                else {
+                    $scope.NoColumnReferenceData = true;
+                    $scope.ColumnReferenceData = false;
+                }
+                $scope.ValidateReportColumnReference = true;
+
+                DefineStandardReport.GetPOPCharacteristicsData($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                    var result = [];
+                    $scope.DefineReportData = true;
+                    $scope.showTabLinks = false;
+                    if (data.d.length > 0) {
+                        $scope.DefinePOPData = true;
+                        $scope.NoPOPCharacteristicColumnData = false;
+                        $scope.StandardPOPTable = new NgTableParams({}, { 'dataset': data.d });
+                    }
+                    else {
+                        $scope.DefinePOPData = false;
+                        $scope.NoPOPCharacteristicColumnData = true;
+                    }
+
+                    DefineStandardReport.GetShowSLAFlag($scope.modProductType, $scope.modReport, $scope.modSubProductType).success(function (data) {
+                        //$scope.ShowSLAFlag = data.d;
+                        if (data.d == 1) {
+                            $scope.modSLAValid = true;
+                        }
+                        else {
+                            $scope.modSLAValid = false;
+                        }
+                    });
+                    DefineStandardReport.GetDisplaySLAInformation($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                        if (data.d == 4) {
+                            $scope.ShowSLAInfo = true;
+                        }
+                        else {
+                            $scope.ShowSLAInfo = false;
+                        }
+                        var resultDelivery = [];
+                        var resultAssurance = [];
+                        $scope.SLADeliveryData = [];
+                        $scope.SLAAssuranceData = [];
+                        DefineStandardReport.GetdisplaySLAAttributesForProduct($scope.modProductType, $scope.modSubProductType, $scope.modReport).success(function (data) {
+                            if (data.d.length > 0) {
+                                $scope.showSLALink = true;
+                            }
+                            else {
+                                $scope.showSLALink = false;
+                            }
+                            data.d.forEach(function (item) {
+                                if (item.ServiceName.match("SD") != null) {
+                                    resultDelivery.push({
+                                        ServiceName: item.ServiceName,
+                                        Width: item.Width,
+                                        SLAColumnCd: item.SLAColumnCd
+                                    });
+
+                                }
+                                else {
+                                    resultAssurance.push({
+                                        ServiceName: item.ServiceName,
+                                        Width: item.Width,
+                                        SLAColumnCd: item.SLAColumnCd
+                                    });
+                                }
+                                $scope.SLADeliveryData = resultDelivery;
+                                $scope.SLAAssuranceData = resultAssurance
+                            });
+
+                            DefineStandardReport.GetUpdatedDateDetails($scope.modProductType).success(function (data) {
+                                $scope.NoDateData = false;
+                                var result = [];
+                                $scope.UpdatedData = [];
+                                if (data.d.length > 0) {
+                                    result.push({
+                                        CreatedBy: data.d[0].CreatedBy,
+                                        CreatedDate: data.d[0].CreatedDate,
+                                        UpdatedBy: data.d[0].UpdatedBy,
+                                        UpdatedDate: data.d[0].UpdatedDate
+                                    });
+                                }
+                                $scope.UpdatedData = result;
+                                $scope.ValidateUpdatedDateDetails = true;
+                                $(".pageLoaderOverlay").hide();
+
+                            });
+
+                        });
+
+                    });
+                    $scope.showTabLinks = true;
+                    $scope.ShowInfo = true;
+                    $scope.ShowSaveAndUpdateButton = true;
+
+
+                });
+            });
+        });
+
+
+    }
+
+
+    $scope.saveWidthInSpeedData = function () {
+        var SaveWidthInSpeedDataJSON = [];
+        var flag = 0;
+        var maxValueFlag = 0;
+        $scope.colmnWidth = "";
+        $("#tblColumnWidth tbody tr").each(function (index, element) {
+            var column_width;
+            column_width = parseInt($(element).find("td:nth-child(2) div input[type='text']").val());
+            if (column_width > 1000) {
+                maxValueFlag = 1;
+            }
+            if (/^[0-9]*$/.test(column_width)) {
+                $scope.colmnWidth += column_width + ",";
+            }
+            else {
+                $scope.colmnWidth += column_width + ",";
+                flag = 1;
+            }
+
+        });
+        if (flag == 1) {
+            $(".pageLoaderOverlay").hide();
+            bootbox.alert("Please enter only numbers into the field.");
+        }
+        if (maxValueFlag == 1) {
+            $(".pageLoaderOverlay").hide();
+            bootbox.alert("Please make sure that the width entered is less than 1000.");
+        }
+
+
+        if (!$scope.colmnWidth.match(NaN) == true && maxValueFlag == 0) {
+            DefineStandardReport.UpdateStandardReportColumnWidthInSpeedTabs($scope.modProductType, $scope.modSubProductType, $scope.colmnWidth).success(function (data) {
+                closeWidthInSpeedData.click();
+                //$("#msgUpdateReportColumn").modal('show');
+                bootbox.alert("Report updated successfully.");
+            });
+        }
+        else {
+            $(".pageLoaderOverlay").show();
+            DefineStandardReport.GetEditColumnWidthData($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                $scope.ColumnWidthTable = new NgTableParams({}, { 'dataset': data.d });
+                $scope.showSpeedtabData = true;
+            });
+            //$("#msgReset").modal('show');
+            $(".pageLoaderOverlay").hide();
+        }
+    }
+
+    $scope.saveColumnInCPEData = function () {
+        $scope.RouterColWidth = "";
+        $scope.RouterValid = "";
+        $scope.MaintenanceColWidth = "";
+        $scope.MaintenanceValid = "";
+        var flag = 0;
+        var maxValueFlag = 0;
+        $("#tblBundles tbody tr").each(function (index, element) {
+            var Router_Col_Width, Chk_Router_Valid;
+            Router_Col_Width = parseInt($(element).find("td:nth-child(3) div input[type='text']").val());
+            if (Router_Col_Width > 1000) {
+                maxValueFlag = 1;
+            }
+            if (/^[0-9]*$/.test(Router_Col_Width)) {
+                $scope.RouterColWidth += Router_Col_Width + ",";
+            }
+            else {
+                $scope.RouterColWidth += Router_Col_Width + ",";
+                flag = 1;
+            }
+            Chk_Router_Valid = $(element).find("td:nth-child(2) div input[type='checkbox']").is(":checked") == true ? 1 : 0;
+            $scope.RouterValid += Chk_Router_Valid + ","
+        });
+
+        $("#tblMaintenance tbody tr").each(function (index, element) {
+            var Maintenance_Col_Width, Chk_Maintenance_Valid;
+            Maintenance_Col_Width = parseInt($(element).find("td:nth-child(3) div input[type='text']").val());
+            if (Maintenance_Col_Width > 1000) {
+                maxValueFlag = 1;
+            }
+            if (/^[0-9]*$/.test(Maintenance_Col_Width)) {
+                $scope.MaintenanceColWidth += Maintenance_Col_Width + ",";
+            }
+            else {
+                $scope.MaintenanceColWidth += Maintenance_Col_Width + ",";
+                flag = 1;
+            }
+            Chk_Maintenance_Valid = $(element).find("td:nth-child(2) div input[type='checkbox']").is(":checked") == true ? 1 : 0;
+            $scope.MaintenanceValid += Chk_Maintenance_Valid + ","
+
+        });
+        if (flag == 1) {
+            $(".pageLoaderOverlay").hide();
+            bootbox.alert("Please enter only numbers into the field.");
+        }
+        if (maxValueFlag == 1) {
+            $(".pageLoaderOverlay").hide();
+            bootbox.alert("Please make sure that the width entered is less than 1000.");
+        }
+        if (!$scope.RouterColWidth.match(NaN) == true && !$scope.MaintenanceColWidth.match(NaN) == true && maxValueFlag == 0) {
+            DefineStandardReport.UpdateColumnsInCPEDataTabs($scope.modProductType, $scope.RouterColWidth, $scope.MaintenanceColWidth, $scope.RouterValid, $scope.MaintenanceValid).success(function (data) {
+                closeColInCPEData.click();
+                //$("#msgUpdateReportColumn").modal('show');
+                bootbox.alert("Report updated successfully.");
+            });
+        }
+        else {
+            $(".pageLoaderOverlay").show();
+            DefineStandardReport.GetCPEMaintenanceOptionsTab($scope.modProductType, $scope.CharID).success(function (data) {
+                $scope.MaintenanceTable = new NgTableParams({}, { 'dataset': data.d });
+            });
+            //$("#tblBundles tbody tr").remove();
+            DefineStandardReport.GetCPERouterBundlesTab($scope.modProductType).success(function (data) {
+                $scope.RouterBundlesTable = new NgTableParams({}, { 'dataset': data.d });
+            });
+            //$("#msgReset").modal('show');
+            $(".pageLoaderOverlay").hide();
+        }
+    }
+
+    $scope.SavePOPCharacteristics = function () {
+
+        //productId, subProductId, strPOPChar, strColumnHeader1, strColumnHeader2, strColumnHeader3, strColumnValidCd
+        DefineStandardReport.UpdatePOPChar($scope.modProductType, $scope.modSubProductType, $scope.POPcharValue, POPcolhdr1.value, POPcolhdr2.value, POPcolhdr3.value, parseInt(POPvalidchk.checked == true ? 1 : 0)).success(function (data) {
+            DefineStandardReport.GetPOPCharacteristicsData($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                var result = [];
+                $scope.DefineReportData = true;
+
+                //$scope.ShowColumnWidthData = false;
+                if (data.d.length > 0) {
+                    $scope.DefinePOPData = true;
+                    $scope.NoPOPCharacteristicColumnData = false;
+                    $scope.StandardPOPTable = new NgTableParams({}, { 'dataset': data.d });
+                }
+                else {
+                    $scope.DefinePOPData = false;
+                    $scope.NoPOPCharacteristicColumnData = true;
+                }
+                $scope.ShowInfo = true;
+                $scope.ShowSaveAndUpdateButton = true;
+            });
+            closePOPChar.click();
+            //$("#msgUpdateReportColumn").modal('show');
+            bootbox.alert("Report updated successfully.");
+        });
+    }
+    $scope.saveColumnReferences = function () {
+        //productId, subProductId, reportId, strChar, charTypeId, strColumnHeader1, strColumnHeader2, strColumnHeader3, strColumnValidCd, userId, strProductMappedId
+        DefineStandardReport.UpdateChar($scope.modProductType, $scope.modSubProductType, $scope.modReport, $scope.CharValue, 0, Refhdr1.value, Refhdr2.value, Refhdr3.value, parseInt(RefchkValid.checked == true ? 1 : 0), $rootScope.User_Id, $scope.mappedproduct, $scope.OrderCd).success(function (data) {
+            DefineStandardReport.GetReportColumnReferenceData($scope.modProductType, $scope.modReport).success(function (data) {
+                $scope.DefineReportData = true;
+
+                if (data.d.length > 0) {
+                    $scope.ColumnReferenceData = true;
+                    $scope.NoColumnReferenceData = false;
+                    $scope.ColumnReferenceDataTable = new NgTableParams({}, { 'dataset': data.d });
+                    $(".pageLoaderOverlay").hide();
+                }
+                else {
+                    $scope.NoColumnReferenceData = true;
+                    $scope.ColumnReferenceData = false;
+                }
+            });
+            closeColumnRef.click();
+            //$("#msgUpdateReportColumn").modal('show');
+            bootbox.alert("Report updated successfully.");
+        });
+    }
+    $scope.deleteColumnReferences = function (item) {
+
+        closeColumnRef.click();
+        $scope.CharValueConfirm = $scope.updateChar;
+        $("#msgDeleteReportColumn").modal('show');
+
+    }
+    $scope.NoChange = function () {
+        closeConfirm.click();
+    }
+    $scope.deleteConfirm = function () {
+        DefineStandardReport.DeleteChar($scope.modReport, $scope.OrderCd).success(function (data) {
+            bootbox.alert("Report deleted successfully.");
+        });
+        DefineStandardReport.GetReportColumnReferenceData($scope.modProductType, $scope.modReport).success(function (data) {
+            $scope.DefineReportData = true;
+
+            if (data.d.length > 0) {
+                $scope.ColumnReferenceData = true;
+                $scope.NoColumnReferenceData = false;
+                $scope.ColumnReferenceDataTable = new NgTableParams({}, { 'dataset': data.d });
+                $(".pageLoaderOverlay").hide();
+            }
+            else {
+                $scope.NoColumnReferenceData = true;
+                $scope.ColumnReferenceData = false;
+            }
+        });
+        closeConfirm.click();
+        closeColumnRef.click();
+
+    }
+    $scope.saveDetails = function () {
+        $(".pageLoaderOverlay").show();
+        //productId, subProductId, reportId, strCharId, strCharTypeId, strOptionMatrixId, strReportColumnCd, strColumnHeader1, strColumnHeader2, strColumnHeader3, strColumnValidCd, newOrdercd, strProductMappedId, userId
+        if ($scope.modCharacteristicType != null) {
+            if ($scope.modCharacteristicType.CharId != undefined) {
+                $scope.ShowCharacteristicsAlert = false;
+                $scope.AddReportValidation = false;
+                DefineStandardReport.AddNewReportColumn($scope.modProductType, $scope.modSubProductType, $scope.modReport, $scope.modCharacteristicType.CharId, $scope.modCharacteristicType.OptionMatrixId, $scope.modColHeader1, $scope.modColHeader2, $scope.modColHeader3, $scope.modValid == true ? 1 : 0, $scope.mappedproduct, $rootScope.User_Id).success(function (data) {
+                    //$("#msgAddReportColumn").modal('show');
+                    if (data.d != 0) {
+                        CloseNewReport.click();
+                        $scope.AddReportValidation = false;
+                        bootbox.alert("Report added successfully.");
+                    }
+                    else {
+                        $scope.AddReportValidation = true;
+                        //bootbox.alert("Column already exist.Please select different Characteristic type.");
+                    }
+                    DefineStandardReport.GetReportColumnReferenceData($scope.modProductType, $scope.modReport).success(function (data) {
+                        $scope.DefineReportData = true;
+                        $scope.ColumnReferenceData = true;
+                        if (data.d.length > 0) {
+                            $scope.ColumnReferenceData = true;
+                            $scope.NoColumnReferenceData = false;
+                            $scope.ColumnReferenceDataTable = new NgTableParams({}, { 'dataset': data.d });
+                        }
+                        else {
+                            $scope.ColumnReferenceData = false;
+                            $scope.NoColumnReferenceData = true;
+                        }
+                        $scope.ShowInfo = true;
+                        $scope.ShowSaveAndUpdateButton = true;
+                        $(".pageLoaderOverlay").hide();
+                    });
+                });
+            }
+            else {
+                $scope.ShowCharacteristicsAlert = true;
+                $(".pageLoaderOverlay").hide();
+            }
+        }
+        else {
+            $scope.ShowCharacteristicsAlert = true;
+            $(".pageLoaderOverlay").hide();
+        }
+
+    }
+
+    $scope.UpdateCompleteDetails = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.StandardColHeader = "";
+        $scope.StandardColWidth = "";
+        $scope.StandardValid = "";
+        $scope.StandardDisplayOrder = "";
+        $scope.ColRefWidth = "";
+        $scope.ColRefDisplayOrder = "";
+        $scope.ColPOPWidth = "";
+        $scope.ColPOPDisplayOrder = "";
+        var flag = 0;
+        var maxValueFlag = 0;
+        $("#tblStandardColumns tbody tr").each(function (index, element) {
+            var Standard_Col_Header, Standard_Col_Width, Chk_Standard_Valid, Standard_display_Order;
+            Standard_Col_Header = $(element).find("td:nth-child(1)")[0].innerText;
+            $scope.StandardColHeader += Standard_Col_Header + ",";
+            Standard_Col_Width = parseInt($(element).find("td:nth-child(2) div input[type='text']").val());
+            if (Standard_Col_Width > 1000) {
+                maxValueFlag = 1;
+            }
+            if (/^[0-9]*$/.test(Standard_Col_Width)) {
+                $scope.StandardColWidth += Standard_Col_Width + ",";
+            }
+            else {
+                $scope.StandardColWidth += Standard_Col_Width + ",";
+                flag = 1;
+            }
+            Chk_Standard_Valid = $(element).find("td:nth-child(3) div input[type='checkbox']").is(":checked") == true ? 1 : 0;
+            $scope.StandardValid += Chk_Standard_Valid + ",";
+            Standard_display_Order = parseInt($(element).find("td:nth-child(4) div input[type='text']").val());
+            if (/^[0-9]*$/.test(Standard_display_Order)) {
+                $scope.StandardDisplayOrder += Standard_display_Order + ",";
+            }
+            else {
+                $scope.StandardDisplayOrder += Standard_display_Order + ",";
+                flag = 1;
+            }
+        });
+
+        $("#tblColumnReferenceData tbody tr").each(function (index, element) {
+            var ColRef_Width, Col_Ref_Order;
+            ColRef_Width = parseInt($(element).find("td:nth-child(5) div input[type='text']").val());
+            if (ColRef_Width > 1000) {
+                maxValueFlag = 1;
+            }
+            if (/^[0-9]*$/.test(ColRef_Width)) {
+                $scope.ColRefWidth += ColRef_Width + ",";
+            }
+            else {
+                $scope.ColRefWidth += ColRef_Width + ",";
+                flag = 1;
+            }
+            Col_Ref_Order = parseInt($(element).find("td:nth-child(6) div input[type='text']").val());
+            if (/^[0-9]*$/.test(Col_Ref_Order)) {
+                $scope.ColRefDisplayOrder += Col_Ref_Order + ",";
+            }
+            else {
+                $scope.ColRefDisplayOrder += Col_Ref_Order + ",";
+                flag = 1;
+            }
+        });
+        $("#tblStandardPOP tbody tr").each(function (index, element) {
+            var ColPOP_Width, Col_POP_Order;
+            ColPOP_Width = parseInt($(element).find("td:nth-child(5) div input[type='text']").val());
+            if (ColPOP_Width > 1000) {
+                maxValueFlag = 1;
+            }
+            if (/^[0-9]*$/.test(ColPOP_Width)) {
+                $scope.ColPOPWidth += ColPOP_Width + ",";
+            }
+            else {
+                $scope.ColPOPWidth += ColPOP_Width + ",";
+                flag = 1;
+            }
+            Col_POP_Order = parseInt($(element).find("td:nth-child(6) div input[type='text']").val());
+            if (/^[0-9]*$/.test(Col_POP_Order)) {
+                $scope.ColPOPDisplayOrder += Col_POP_Order + ",";
+            }
+            else {
+                $scope.ColPOPDisplayOrder += Col_POP_Order + ",";
+                flag = 1;
+            }
+
+        });
+        if (flag == 1) {
+            $(".pageLoaderOverlay").hide();
+            bootbox.alert("Please enter only numbers into the field.");
+        }
+        if (maxValueFlag == 1) {
+            $(".pageLoaderOverlay").hide();
+            bootbox.alert("Please make sure that the width entered is less than 1000.");
+        }
+        if ($scope.StandardColHeader.length == 0) {
+            $scope.StandardColHeader = "Null,";
+        }
+        if ($scope.StandardColWidth.length == 0) {
+            $scope.StandardColWidth = "0,";
+        }
+        if ($scope.StandardValid.length == 0) {
+            $scope.StandardValid = "1,";
+        }
+        if ($scope.StandardDisplayOrder.length == 0) {
+            $scope.StandardDisplayOrder = "1";
+        }
+        if ($scope.ColRefWidth.length == 0) {
+            $scope.ColRefWidth = "0,";
+        }
+        if ($scope.ColRefDisplayOrder.length == 0) {
+            $scope.ColRefDisplayOrder = "1,";
+        }
+        if ($scope.ColPOPWidth.length == 0) {
+            $scope.ColPOPWidth = "0,";
+        }
+        if ($scope.ColPOPDisplayOrder.length == 0) {
+            $scope.ColPOPDisplayOrder = "1,";
+        }
+
+        //Wrap CheckBox 
+        if ($scope.modWrappedValid != undefined) {
+            $scope.WrapTextData = $scope.modWrappedValid == true ? 1 : 0;
+        }
+        else {
+            $scope.WrapTextData = 0;
+        }
+        // Updated Date Info
+        //check SLA
+        if ($scope.modSLAValid != undefined) {
+            $scope.SLAData = $scope.modSLAValid == true ? 1 : 0;
+        }
+        else {
+            $scope.SLAData = 0;
+        }
+
+
+        DefineStandardReport.UpdateSLAFlag($scope.modProductType, $scope.modReport, $scope.modSubProductType, $scope.SLAData).success(function (data) {
+
+        });
+        //productId, subProductId, reportId, standardColHeader, standardColWidth, StandardValid, StandardDisplayOrder, ColRefWidth, ColRefDisplayOrder, ColPOPWidth, ColPOPDisplayOrder, WrapTextData, SLAData, userId
+        if (!$scope.StandardColWidth.match(NaN) == true && !$scope.StandardDisplayOrder.match(NaN) == true && !$scope.ColRefWidth.match(NaN) == true && !$scope.ColRefDisplayOrder.match(NaN) == true && !$scope.ColPOPWidth.match(NaN) == true && !$scope.ColPOPDisplayOrder.match(NaN) == true && maxValueFlag == 0) {
+            DefineStandardReport.UpdateDefineStandardData($scope.modProductType, $scope.modSubProductType, $scope.modReport, $scope.StandardColHeader, $scope.StandardColWidth, $scope.StandardValid, $scope.StandardDisplayOrder, $scope.ColRefWidth, $scope.ColRefDisplayOrder, $scope.ColPOPWidth, $scope.ColPOPDisplayOrder, $scope.WrapTextData, $scope.SLAData, $rootScope.User_Id).success(function (data) {
+
+
+                DefineStandardReport.GetStandardColumnsData($scope.modReport).success(function (data) {
+                    var result = [];
+                    $scope.DefineReportData = true;
+                    $scope.DefinePOPData = false;
+                    $scope.showTabLinks = false;
+                    $scope.StandardColumnsTable = new NgTableParams({}, { 'dataset': data.d });
+
+                    DefineStandardReport.GetReportColumnReferenceData($scope.modProductType, $scope.modReport).success(function (data) {
+                        $scope.DefineReportData = true;
+
+                        if (data.d.length > 0) {
+                            $scope.ColumnReferenceData = true;
+                            $scope.NoColumnReferenceData = false;
+                            $scope.ColumnReferenceDataTable = new NgTableParams({}, { 'dataset': data.d });
+                        }
+                        else {
+                            $scope.NoColumnReferenceData = true;
+                            $scope.ColumnReferenceData = false;
+                        }
+                        $scope.ValidateReportColumnReference = true;
+
+                        DefineStandardReport.GetPOPCharacteristicsData($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                            var result = [];
+                            $scope.DefineReportData = true;
+                            $scope.showTabLinks = false;
+                            if (data.d.length > 0) {
+                                $scope.DefinePOPData = true;
+                                $scope.NoPOPCharacteristicColumnData = false;
+                                $scope.StandardPOPTable = new NgTableParams({}, { 'dataset': data.d });
+                            }
+                            else {
+                                $scope.DefinePOPData = false;
+                                $scope.NoPOPCharacteristicColumnData = true;
+                            }
+
+                            DefineStandardReport.GetShowSLAFlag($scope.modProductType, $scope.modReport, $scope.modSubProductType).success(function (data) {
+                                //$scope.ShowSLAFlag = data.d;
+                                if (data.d == 1) {
+                                    $scope.modSLAValid = true;
+                                }
+                                else {
+                                    $scope.modSLAValid = false;
+                                }
+                            });
+                            DefineStandardReport.GetDisplaySLAInformation($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                                if (data.d == 4) {
+                                    $scope.ShowSLAInfo = true;
+                                }
+                                else {
+                                    $scope.ShowSLAInfo = false;
+                                }
+                                var resultDelivery = [];
+                                var resultAssurance = [];
+                                $scope.SLADeliveryData = [];
+                                $scope.SLAAssuranceData = [];
+                                DefineStandardReport.GetdisplaySLAAttributesForProduct($scope.modProductType, $scope.modSubProductType, $scope.modReport).success(function (data) {
+                                    if (data.d.length > 0) {
+                                        $scope.showSLALink = true;
+                                    }
+                                    else {
+                                        $scope.showSLALink = false;
+                                    }
+                                    data.d.forEach(function (item) {
+                                        if (item.ServiceName.match("SD") != null) {
+                                            resultDelivery.push({
+                                                ServiceName: item.ServiceName,
+                                                Width: item.Width,
+                                                SLAColumnCd: item.SLAColumnCd
+                                            });
+
+                                        }
+                                        else {
+                                            resultAssurance.push({
+                                                ServiceName: item.ServiceName,
+                                                Width: item.Width,
+                                                SLAColumnCd: item.SLAColumnCd
+                                            });
+                                        }
+                                        $scope.SLADeliveryData = resultDelivery;
+                                        $scope.SLAAssuranceData = resultAssurance
+                                    });
+
+                                    DefineStandardReport.GetUpdatedDateDetails($scope.modProductType).success(function (data) {
+                                        $scope.NoDateData = false;
+                                        var result = [];
+                                        $scope.UpdatedData = [];
+                                        if (data.d.length > 0) {
+                                            result.push({
+                                                CreatedBy: data.d[0].CreatedBy,
+                                                CreatedDate: data.d[0].CreatedDate,
+                                                UpdatedBy: data.d[0].UpdatedBy,
+                                                UpdatedDate: data.d[0].UpdatedDate
+                                            });
+                                        }
+                                        $scope.UpdatedData = result;
+                                        $scope.ValidateUpdatedDateDetails = true;
+                                        $(".pageLoaderOverlay").hide();
+
+                                    });
+
+                                });
+
+                            });
+                            $scope.showTabLinks = true;
+                            $scope.ShowInfo = true;
+                            $scope.ShowSaveAndUpdateButton = true;
+
+
+                        });
+                    });
+                });
+            });
+            //$(".pageLoaderOverlay").hide();
+            //$("#msgUpdateReportColumn").modal('show');
+            bootbox.alert("Report updated successfully.");
+        }
+        else {
+            $(".pageLoaderOverlay").show();
+            DefineStandardReport.GetStandardColumnsData($scope.modReport).success(function (data) {
+                var result = [];
+                $scope.DefineReportData = true;
+                $scope.DefinePOPData = false;
+                $scope.showTabLinks = false;
+                $scope.StandardColumnsTable = new NgTableParams({}, { 'dataset': data.d });
+
+                DefineStandardReport.GetReportColumnReferenceData($scope.modProductType, $scope.modReport).success(function (data) {
+                    $scope.DefineReportData = true;
+
+                    if (data.d.length > 0) {
+                        $scope.ColumnReferenceData = true;
+                        $scope.NoColumnReferenceData = false;
+                        $scope.ColumnReferenceDataTable = new NgTableParams({}, { 'dataset': data.d });
+                    }
+                    else {
+                        $scope.NoColumnReferenceData = true;
+                        $scope.ColumnReferenceData = false;
+                    }
+                    $scope.ValidateReportColumnReference = true;
+
+                    DefineStandardReport.GetPOPCharacteristicsData($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                        var result = [];
+                        $scope.DefineReportData = true;
+                        $scope.showTabLinks = false;
+                        if (data.d.length > 0) {
+                            $scope.DefinePOPData = true;
+                            $scope.NoPOPCharacteristicColumnData = false;
+                            $scope.StandardPOPTable = new NgTableParams({}, { 'dataset': data.d });
+                        }
+                        else {
+                            $scope.DefinePOPData = false;
+                            $scope.NoPOPCharacteristicColumnData = true;
+                        }
+
+                        DefineStandardReport.GetShowSLAFlag($scope.modProductType, $scope.modReport, $scope.modSubProductType).success(function (data) {
+                            //$scope.ShowSLAFlag = data.d;
+                            if (data.d == 1) {
+                                $scope.modSLAValid = true;
+                            }
+                            else {
+                                $scope.modSLAValid = false;
+                            }
+                        });
+                        DefineStandardReport.GetDisplaySLAInformation($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                            if (data.d == 4) {
+                                $scope.ShowSLAInfo = true;
+                            }
+                            else {
+                                $scope.ShowSLAInfo = false;
+                            }
+                            var resultDelivery = [];
+                            var resultAssurance = [];
+                            $scope.SLADeliveryData = [];
+                            $scope.SLAAssuranceData = [];
+                            DefineStandardReport.GetdisplaySLAAttributesForProduct($scope.modProductType, $scope.modSubProductType, $scope.modReport).success(function (data) {
+                                if (data.d.length > 0) {
+                                    $scope.showSLALink = true;
+                                }
+                                else {
+                                    $scope.showSLALink = false;
+                                }
+                                data.d.forEach(function (item) {
+                                    if (item.ServiceName.match("SD") != null) {
+                                        resultDelivery.push({
+                                            ServiceName: item.ServiceName,
+                                            Width: item.Width,
+                                            SLAColumnCd: item.SLAColumnCd
+                                        });
+
+                                    }
+                                    else {
+                                        resultAssurance.push({
+                                            ServiceName: item.ServiceName,
+                                            Width: item.Width,
+                                            SLAColumnCd: item.SLAColumnCd
+                                        });
+                                    }
+                                    $scope.SLADeliveryData = resultDelivery;
+                                    $scope.SLAAssuranceData = resultAssurance
+                                });
+
+                                DefineStandardReport.GetUpdatedDateDetails($scope.modProductType).success(function (data) {
+                                    $scope.NoDateData = false;
+                                    var result = [];
+                                    $scope.UpdatedData = [];
+                                    if (data.d.length > 0) {
+                                        result.push({
+                                            CreatedBy: data.d[0].CreatedBy,
+                                            CreatedDate: data.d[0].CreatedDate,
+                                            UpdatedBy: data.d[0].UpdatedBy,
+                                            UpdatedDate: data.d[0].UpdatedDate
+                                        });
+                                    }
+                                    $scope.UpdatedData = result;
+                                    $scope.ValidateUpdatedDateDetails = true;
+                                    $(".pageLoaderOverlay").hide();
+
+                                });
+
+                            });
+
+                        });
+                        $scope.showTabLinks = true;
+                        $scope.ShowInfo = true;
+                        $scope.ShowSaveAndUpdateButton = true;
+
+
+                    });
+                });
+            });
+        }
+    }
+
+    $scope.ResetCompleteDetails = function () {
+        $scope.ValidateStandardReportName = false;
+        $scope.ValidateReportColumnReference = false;
+        $scope.ValidatePOPCharacteristics = false;
+        $scope.ValidateUpdatedDateDetails = false;
+        $(".pageLoaderOverlay").show();
+        DefineStandardReport.GetStandardColumnsData($scope.modReport).success(function (data) {
+            var result = [];
+            $scope.DefineReportData = true;
+            $scope.DefinePOPData = false;
+            $scope.showTabLinks = false;
+            $scope.StandardColumnsTable = new NgTableParams({}, { 'dataset': data.d });
+
+            DefineStandardReport.GetReportColumnReferenceData($scope.modProductType, $scope.modReport).success(function (data) {
+                $scope.DefineReportData = true;
+
+                if (data.d.length > 0) {
+                    $scope.ColumnReferenceData = true;
+                    $scope.NoColumnReferenceData = false;
+                    $scope.ColumnReferenceDataTable = new NgTableParams({}, { 'dataset': data.d });
+                }
+                else {
+                    $scope.NoColumnReferenceData = true;
+                    $scope.ColumnReferenceData = false;
+                }
+                $scope.ValidateReportColumnReference = true;
+
+                DefineStandardReport.GetPOPCharacteristicsData($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                    var result = [];
+                    $scope.DefineReportData = true;
+                    $scope.showTabLinks = false;
+                    if (data.d.length > 0) {
+                        $scope.DefinePOPData = true;
+                        $scope.NoPOPCharacteristicColumnData = false;
+                        $scope.StandardPOPTable = new NgTableParams({}, { 'dataset': data.d });
+                    }
+                    else {
+                        $scope.DefinePOPData = false;
+                        $scope.NoPOPCharacteristicColumnData = true;
+                    }
+
+                    DefineStandardReport.GetShowSLAFlag($scope.modProductType, $scope.modReport, $scope.modSubProductType).success(function (data) {
+                        //$scope.ShowSLAFlag = data.d;
+                        if (data.d == 1) {
+                            $scope.modSLAValid = true;
+                        }
+                        else {
+                            $scope.modSLAValid = false;
+                        }
+                    });
+                    DefineStandardReport.GetDisplaySLAInformation($scope.modProductType, $scope.modSubProductType).success(function (data) {
+                        if (data.d == 4) {
+                            $scope.ShowSLAInfo = true;
+                        }
+                        else {
+                            $scope.ShowSLAInfo = false;
+                        }
+                        var resultDelivery = [];
+                        var resultAssurance = [];
+                        $scope.SLADeliveryData = [];
+                        $scope.SLAAssuranceData = [];
+                        DefineStandardReport.GetdisplaySLAAttributesForProduct($scope.modProductType, $scope.modSubProductType, $scope.modReport).success(function (data) {
+                            if (data.d.length > 0) {
+                                $scope.showSLALink = true;
+                            }
+                            else {
+                                $scope.showSLALink = false;
+                            }
+                            data.d.forEach(function (item) {
+                                if (item.ServiceName.match("SD") != null) {
+                                    resultDelivery.push({
+                                        ServiceName: item.ServiceName,
+                                        Width: item.Width,
+                                        SLAColumnCd: item.SLAColumnCd
+                                    });
+
+                                }
+                                else {
+                                    resultAssurance.push({
+                                        ServiceName: item.ServiceName,
+                                        Width: item.Width,
+                                        SLAColumnCd: item.SLAColumnCd
+                                    });
+                                }
+                                $scope.SLADeliveryData = resultDelivery;
+                                $scope.SLAAssuranceData = resultAssurance
+                            });
+
+                            DefineStandardReport.GetUpdatedDateDetails($scope.modProductType).success(function (data) {
+                                $scope.NoDateData = false;
+                                var result = [];
+                                $scope.UpdatedData = [];
+                                if (data.d.length > 0) {
+                                    result.push({
+                                        CreatedBy: data.d[0].CreatedBy,
+                                        CreatedDate: data.d[0].CreatedDate,
+                                        UpdatedBy: data.d[0].UpdatedBy,
+                                        UpdatedDate: data.d[0].UpdatedDate
+                                    });
+                                }
+                                $scope.UpdatedData = result;
+                                $scope.ValidateUpdatedDateDetails = true;
+                                $(".pageLoaderOverlay").hide();
+
+                            });
+
+                        });
+
+                    });
+                    $scope.showTabLinks = true;
+                    $scope.ShowInfo = true;
+                    $scope.ShowSaveAndUpdateButton = true;
+
+
+                });
+            });
+        });
+        bootbox.alert("Reset Done Successfully.");
+
+    }
+    $scope.GetCharacteristics = function () {
+        $scope.ShowCharacteristicsAlert = false;
+        $scope.AddReportValidation = false;
+        $scope.modColHeader1 = $scope.modCharacteristicType.CharName;
+    }
+
+    $scope.resetCharacteristics = function () {
+        if ($scope.modCharacteristicType != null) {
+            $scope.modColHeader1 = $scope.modCharacteristicType.CharName;
+        }
+        else {
+            $scope.modColHeader1 = "";
+        }
+        $scope.modColHeader2 = "";
+        $scope.modColHeader3 = "";
+        $scope.modValid = true;
+        $scope.ShowCharacteristicsAlert = false;
+        $scope.AddReportValidation = false;
+        //$("#msgReset").modal('show');
+    }
+
+    $scope.resetPOPCharacteristics = function () {
+        $scope.columnhdr1 = $scope.updatePOPChar;
+        $scope.columnhdr2 = "";
+        $scope.columnhdr3 = "";
+        $scope.POPchkValid = true;
+        //$("#msgReset").modal('show');
+    }
+
+    $scope.resetColumnReferences = function () {
+        $scope.columnRefhdr1 = $scope.updateChar
+        $scope.columnRefhdr2 = "";
+        $scope.columnRefhdr3 = "";
+        $scope.chkRefValid = true;
+        //$("#msgReset").modal('show');
+    }
+
+    $scope.resetWidthInSpeedData = function () {
+        //$('#colwidth') = $scope.ColumnWidthTable.Width;
+        //        $("#tblColumnWidth tbody tr").each(function (index, element) {
+        //            $(element).find("td:nth-child(2) div input[type='text']") = $('#colwidth')[index].defaultValue;
+        //        });
+        // $("#tblColumnWidth tbody tr").remove();
+        $(".pageLoaderOverlay").show();
+        DefineStandardReport.GetEditColumnWidthData($scope.modProductType, $scope.modSubProductType).success(function (data) {
+            $scope.ColumnWidthTable = new NgTableParams({}, { 'dataset': data.d });
+            $scope.showSpeedtabData = true;
+        });
+        //$("#msgReset").modal('show');
+        $(".pageLoaderOverlay").hide();
+    }
+
+    $scope.resetColumnInCPEData = function () {
+        //$("#tblMaintenance tbody tr").remove();
+        $(".pageLoaderOverlay").show();
+        DefineStandardReport.GetCPEMaintenanceOptionsTab($scope.modProductType, $scope.CharID).success(function (data) {
+            $scope.MaintenanceTable = new NgTableParams({}, { 'dataset': data.d });
+        });
+        //$("#tblBundles tbody tr").remove();
+        DefineStandardReport.GetCPERouterBundlesTab($scope.modProductType).success(function (data) {
+            $scope.RouterBundlesTable = new NgTableParams({}, { 'dataset': data.d });
+        });
+        //$("#msgReset").modal('show');
+        $(".pageLoaderOverlay").hide();
+    }
+
+    $scope.saveSLAAttributes = function () {
+
+        $scope.DeliveryColWidth = "";
+        $scope.AssuranceColWidth = "";
+        var flag = 0;
+        var maxValueFlag = 0;
+        $("#tblSLADelivery tbody tr").each(function (index, element) {
+            var Delivery_Col_Width;
+            Delivery_Col_Width = parseInt($(element).find("td:nth-child(2) div input[type='text']").val());
+            if (Delivery_Col_Width > 1000) {
+                maxValueFlag = 1;
+            }
+            if (/^[0-9]*$/.test(Delivery_Col_Width)) {
+                $scope.DeliveryColWidth += Delivery_Col_Width + ",";
+            }
+            else {
+                $scope.DeliveryColWidth += Delivery_Col_Width + ",";
+                flag = 1;
+            }
+
+        });
+        $("#tblSLAAssurance tbody tr").each(function (index, element) {
+            var Assurance_Col_Width;
+            Assurance_Col_Width = parseInt($(element).find("td:nth-child(2) div input[type='text']").val());
+            if (Assurance_Col_Width > 1000) {
+                maxValueFlag = 1;
+            }
+            if (/^[0-9]*$/.test(Assurance_Col_Width)) {
+                $scope.AssuranceColWidth += Assurance_Col_Width + ",";
+            }
+            else {
+                $scope.AssuranceColWidth += Assurance_Col_Width + ",";
+                flag = 1;
+            }
+
+        });
+
+        if (flag == 1) {
+            $(".pageLoaderOverlay").hide();
+            bootbox.alert("Please enter only numbers into the field.");
+        }
+
+        if (maxValueFlag == 1) {
+            $(".pageLoaderOverlay").hide();
+            bootbox.alert("Please make sure that the width entered is less than 1000.");
+        }
+        if (!$scope.AssuranceColWidth.match(NaN) == true && !$scope.DeliveryColWidth.match(NaN) == true && maxValueFlag == 0) {
+            DefineStandardReport.SaveSLAAttributeData($scope.modProductType, $scope.AssuranceColWidth, $scope.DeliveryColWidth, $scope.SLAAssuranceColCd, $scope.SLADeliveryColCd, $rootScope.User_Id).success(function (data) {
+                closeSLAAttribute.click();
+                //$("#msgUpdateReportColumn").modal('show');
+                bootbox.alert("Report updated successfully.");
+            });
+        }
+        else {
+            $(".pageLoaderOverlay").show();
+            var resultDelivery = [];
+            var resultAssurance = [];
+            $scope.SLADeliveryData = [];
+            $scope.SLAAssuranceData = [];
+            $("#EditDisplayOfSLAAttributes").modal('show');
+            $scope.ShowSLATableData = false;
+            DefineStandardReport.GetdisplaySLAAttributesForProduct($scope.modProductType, $scope.modSubProductType, $scope.modReport).success(function (data) {
+                data.d.forEach(function (item) {
+                    if (item.ServiceName.match("SD") != null) {
+                        resultDelivery.push({
+                            ServiceName: item.ServiceName,
+                            Width: item.Width,
+                            SLAColumnCd: item.SLAColumnCd
+                        });
+
+                    }
+                    else {
+                        resultAssurance.push({
+                            ServiceName: item.ServiceName,
+                            Width: item.Width,
+                            SLAColumnCd: item.SLAColumnCd
+                        });
+                    }
+                    $scope.SLADeliveryData = resultDelivery;
+                    $scope.SLAAssuranceData = resultAssurance
+                });
+                if (data.d.length > 0) {
+                    $scope.ShowSLATableData = true;
+                }
+                $(".pageLoaderOverlay").hide();
+            });
+
+        }
+    }
+
+    $scope.resetSLAAttributes = function () {
+        $(".pageLoaderOverlay").show();
+        var resultDelivery = [];
+        var resultAssurance = [];
+        $scope.SLADeliveryData = [];
+        $scope.SLAAssuranceData = [];
+        $("#EditDisplayOfSLAAttributes").modal('show');
+        $scope.ShowSLATableData = false;
+        DefineStandardReport.GetdisplaySLAAttributesForProduct($scope.modProductType, $scope.modSubProductType, $scope.modReport).success(function (data) {
+            data.d.forEach(function (item) {
+                if (item.ServiceName.match("SD") != null) {
+                    resultDelivery.push({
+                        ServiceName: item.ServiceName,
+                        Width: item.Width,
+                        SLAColumnCd: item.SLAColumnCd
+                    });
+
+                }
+                else {
+                    resultAssurance.push({
+                        ServiceName: item.ServiceName,
+                        Width: item.Width,
+                        SLAColumnCd: item.SLAColumnCd
+                    });
+                }
+                $scope.SLADeliveryData = resultDelivery;
+                $scope.SLAAssuranceData = resultAssurance
+            });
+            if (data.d.length > 0) {
+                $scope.ShowSLATableData = true;
+            }
+            $(".pageLoaderOverlay").hide();
+        });
+        //$("#msgReset").modal('show');
+    }
+
+});

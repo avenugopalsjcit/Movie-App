@@ -1,0 +1,14 @@
+﻿<div class="panel panel-primary mcu-panel no-padding">
+    <div class="panel-heading mcu-panel-heading-height">
+        <div class="panel-title">
+            <span>Access Speed Selection</span>
+        </div>
+    </div>
+    <div class="panel-body">
+        <select style="height: 300px; width: 100%" multiple
+        ng-model="modAccSpeed" 
+        ng-options="option.ACCESSACTUALVAL+' '+option.ACCESSUOM+'//'+option.SUPPLIERNAME+'//'+option.TYPENAME+'//'+option.NAMENAME
+         for option in lstAccSpeed track by option.ACCESSID+option.SUPPLIERID+option.TYPEID+option.NAMEID" style="width: 100%">
+        </select>
+    </div>
+</div>

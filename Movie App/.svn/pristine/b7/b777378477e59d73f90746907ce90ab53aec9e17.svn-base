@@ -1,0 +1,287 @@
+﻿app.factory('AdminPriorityGridFactory', function ($http) {
+
+    var AdminPriorityGridFactory = {};
+
+    AdminPriorityGridFactory.GetAdminAddressGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridNotesPriorityDetails', {});
+
+    }
+
+    return AdminPriorityGridFactory;
+});
+app.factory('PriorityDetailsFactory', function ($http) {
+
+    var PriorityDetailsFactory = {};
+
+    PriorityDetailsFactory.GetPriorityDetails = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxPriorityCD', {});
+
+    }
+
+    return PriorityDetailsFactory;  
+});
+
+app.factory('PriorityInsertFactory', function ($http) {
+
+    var PriorityInsertFactory = {};
+
+    PriorityInsertFactory.GetAvailabilityInsert = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/InsertAdminNotesPriority', { 'strAvailCd': strAvailCd, 'PriorityDescription': PriorityDescription, 'User_id': User_id });
+
+    }
+
+    return PriorityInsertFactory;
+});
+
+app.factory('PriorityUpdateFactory', function ($http) {
+
+    var PriorityUpdateFactory = {};
+
+    PriorityUpdateFactory.GetAvailabilityUpdate = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/UpdateAdminNotesPriority', { 'PriorityDescription': PriorityDescription, 'User_id': User_id, 'strAvailCd': strAvailCd });
+
+    }
+
+    return PriorityUpdateFactory;
+});
+
+
+app.factory('PriorityDeleteFactory', function ($http) {
+
+    var PriorityDeleteFactory = {};
+
+    PriorityDeleteFactory.GetAvailabilityDelete = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/DeleteAdminNotesPriority', { 'strAvailCd': strAvailCd });
+
+    }
+
+    return PriorityDeleteFactory;
+});
+
+app.factory('PriorityPopupGrid', function ($http) {
+
+    var PriorityPopupGrid = {};
+
+    PriorityPopupGrid.GetAvailabilityPopup = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/PopupGridAdminNotesPriority', { 'PriorityId': PriorityId });
+
+    }
+
+    return PriorityPopupGrid;
+});
+
+app.controller('AdminNotesPriorityCtrl', ['$scope', 'AdminPriorityGridFactory', 'NgTableParams', 'PriorityDetailsFactory', 'PriorityInsertFactory', 'PriorityUpdateFactory', 'PriorityDeleteFactory', 'PriorityPopupGrid', function ($scope, AdminPriorityGridFactory, NgTableParams, PriorityDetailsFactory, PriorityInsertFactory, PriorityUpdateFactory, PriorityDeleteFactory, PriorityPopupGrid) {
+
+
+
+
+
+
+
+
+
+   
+
+
+
+    AdminPriorityGridFactory.GetAdminAddressGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+        $scope.AddressGrid = data;
+
+
+      
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+    //$(".pageLoaderOverlay").hide();
+
+    PriorityDescription = "", PriorityId = "";
+
+    $scope.EditRecord = function (category) {
+        PriorityId = category.NotesPriorityCD;
+        $scope.PriorityDesc = category.NotesPriorityDesc;
+        PriorityDescription = category.NotesPriorityDesc;
+       
+        $scope.Reset = 1;
+        PriorityPopupGrid.GetAvailabilityPopup(PriorityId).success(function (data) {
+            $scope.usersTable2 = data.d;
+            $(".pageLoaderOverlay").hide();
+        });
+
+      
+    }
+
+
+
+    $scope.addNewTask = function () {
+        $scope.PriorityDesc = "";
+        $scope.Reset = 0;
+    }
+
+
+
+    $scope.ResetRecord = function () {
+
+        $scope.PriorityDesc = PriorityDescription;
+       
+    }
+
+
+
+    $scope.SaveAdminAvail = function () {
+        // debugger;
+
+        PriorityDescription = $scope.PriorityDesc;
+        //        strAvailAbbr = $scope.AvailabilityAbbr;
+        User_id = $scope.User_Id;
+       
+        if (PriorityDescription == "") {
+        }
+        else {
+            PriorityDetailsFactory.GetPriorityDetails().success(function (data) {
+
+
+                strAvailCd = data.d;
+                strAvailCd = strAvailCd + 1;
+                PriorityInsertFactory.GetAvailabilityInsert(strAvailCd, PriorityDescription, User_id).success(function (data) {
+                    //alert("hi");
+                    // str = data.d;
+                    AdminPriorityGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                        $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                        $(".pageLoaderOverlay").hide();
+                        bootbox.alert({
+                            "message": "Notes Priority Added Successfully",
+                            "className": "my-custom-class",
+                            "callback": function () {
+                                console.log("Success callback");
+                            }
+                        });
+                    });
+
+
+                });
+            });
+
+
+        }
+
+    }
+
+
+
+    $scope.UpdateAdminAvail = function () {
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to update Notes Priority?",
+            callback: function (result) {
+                if (result) {
+                    PriorityDescription = $scope.PriorityDesc;
+                    strAvailCd = PriorityId;
+                    //        strAvailAbbr = $scope.AvailabilityAbbr;
+                    User_id = $scope.User_Id;
+                   
+
+                    PriorityUpdateFactory.GetAvailabilityUpdate().success(function (data) {
+                        AdminPriorityGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+
+                            bootbox.alert({
+                                "message": "Notes Priority Updated Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+                    });
+                }
+            }
+        });
+    }
+
+
+    $scope.DeleteAdminAvail = function (category) {
+        strAvailCd = category.NotesPriorityCD;
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Notes Priority? " + category.NotesPriorityDesc,
+            callback: function (result) {
+                if (result) {
+                    $(".pageLoaderOverlay").hide();
+                    PriorityDeleteFactory.GetAvailabilityDelete(strAvailCd).success(function (data) {
+
+
+
+                        AdminPriorityGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert({
+                                "message": "Notes Priority Deleted Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+
+                    });
+                }
+            }
+
+        });
+
+
+    }
+
+
+
+
+
+
+
+
+
+} ]);
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

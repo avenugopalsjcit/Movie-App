@@ -1,0 +1,81 @@
+﻿app.controller("AdminCPECaseDetailsCtrl", function ($scope, $timeout, $http, $rootScope, $location, $stateParams, NgTableParams, CPEOnlyCaseDetailsFactory, UserDetailsFactory, CPECaseDetailsFactory) {
+    $(".pageLoaderOverlay").show();
+
+    $scope.Product = $stateParams.ProductID;
+    $scope.Country = $stateParams.CountryID;
+    $scope.Region = $stateParams.RegionID;
+
+    $scope.ProductName = $stateParams.ProductName;
+    $scope.RegionName = $stateParams.RegionName;
+    $scope.CountryName = $stateParams.CountryName;
+
+    $scope.CaseValid = $stateParams.CaseValid;
+    $scope.CityName = $stateParams.CityName;
+    $scope.CaseId = $stateParams.CaseId;
+    $scope.CaseAvailable = $stateParams.CaseAvailable;
+    $scope.SiteAvailability = $stateParams.SiteAvailability;
+
+    $scope.FromSearch = $stateParams.FromSearch;
+
+    if ($stateParams.CaseValid) {
+        $scope.CaseValidity = 'Y';
+    } else {
+        $scope.CaseValidity = 'N';
+    }
+
+    CPECaseDetailsFactory.GetCPECaseData($scope.CaseId).success(function (data) {
+        $scope.CaseData = data.d[0];
+        $scope.CaseAvailable = $scope.CaseData.CaseAvailability;
+    });
+
+    CPEOnlyCaseDetailsFactory.GetCPEOnlyPorductCaseDetails($scope.CaseId).success(function (data) {
+        $scope.CPECases = new NgTableParams({
+            // initial grouping
+            group:
+        {
+            ProductName: "asc"
+        }
+        }, { 'dataset': data.d, groupOptions: {
+            isExpanded: false
+        }
+        });
+        $(".pageLoaderOverlay").hide();
+
+    });
+
+    UserDetailsFactory.GetCaseUpdatedDetails($scope.CaseId, 2).success(function (data) {
+
+        $scope.CreatedBy = data.d.CreatedBy;
+        $scope.CreatedDate = data.d.CreatedDate;
+        $scope.UpdatedBy = data.d.UpdatedBy;
+        $scope.UpdatedDate = data.d.UpdatedDate;
+    });
+
+
+    //    $scope.CreatedBy = 'PMF Admin';
+    //    $scope.CreatedDate = '08-FEB-2015 07:11';
+    //    $scope.UpdatedBy = 'PMF Admin';
+    //    $scope.UpdatedDate = '08-FEB-2015 15:11';    
+    $scope.EditCPECaseDetails = function (CaseID) {
+        if ($scope.FromSearch == 0) {
+            $location.path('/CaseDefinition/EditCase').search({ 'ProductID': $scope.Product, 'RegionID': $scope.Region, 'CountryID': $scope.Country, 'ProductName': $scope.ProductName, 'RegionName': $scope.RegionName, 'CountryName': $scope.CountryName, 'CaseID': $scope.CaseId, 'HubSiteID': 0, 'CityID': 0, 'StateProvinceID': 0, 'CityName': '', 'POPName': '', 'StateProvinceName': '', 'CaseValid': $scope.CaseValid, 'SiteAvailability': '', 'FromSearch': $scope.FromSearch });
+        }
+        else {
+            $scope.SearchCases();
+        }
+        //$location.path('/CaseDefinition/AdminCPECase').search({ 'CaseId': CaseID });
+
+    }
+
+});
+
+app.factory('CPEOnlyCaseDetailsFactory', function ($http) {
+
+    var CPEOnlyCaseDetailsFactory = {};
+
+    CPEOnlyCaseDetailsFactory.GetCPEOnlyPorductCaseDetails = function (CaseId) {
+        return $http.post('SingleCaseCPEOnly.aspx/GetCPEOnlyPorductCaseDetails', { 'CaseId': CaseId });
+    }
+
+    return CPEOnlyCaseDetailsFactory;
+});

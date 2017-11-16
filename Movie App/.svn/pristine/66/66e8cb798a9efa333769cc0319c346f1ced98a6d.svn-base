@@ -1,0 +1,142 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SCAdminDAL;
+using System.Data;
+namespace SCAdminBAL.GlobalReferences
+{
+   public class AdminAccessMapBAL
+    {
+
+       private AdminAccessMap objAdminAccessMap = new AdminAccessMap();
+
+       public List<PoPTypeMapping> MapAccessProductsForPoP()
+       {
+           List<PoPTypeMapping> lstAccessProductsForPoP = new List<PoPTypeMapping>();
+
+           try
+           {
+               DataTable dtAccessProductsForPoP = objAdminAccessMap.MapAccessProductsForPoP();
+               foreach (DataRow dr in dtAccessProductsForPoP.Rows)
+               {
+                   PoPTypeMapping objPoPTypeMapping = new PoPTypeMapping();
+                   objPoPTypeMapping.CharId = Convert.ToInt32(dr["char_id"]);
+                   objPoPTypeMapping.CharName = Convert.ToString(dr["char_name"]);
+                   lstAccessProductsForPoP.Add(objPoPTypeMapping);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return lstAccessProductsForPoP;
+       }
+
+       public List<PoPTypeMapping> MapAccessProductsForCountry()
+       {
+           List<PoPTypeMapping> lstAccessProductsForCountry = new List<PoPTypeMapping>();
+           try
+           {
+               DataTable dtAccessProductsForCntry = objAdminAccessMap.MapAccessProductsForCountry();
+               foreach (DataRow dr in dtAccessProductsForCntry.Rows)
+               {
+                   PoPTypeMapping PoPTypeMapping = new PoPTypeMapping();
+                   PoPTypeMapping.CharId = Convert.ToInt32(dr["char_id"]);
+                   PoPTypeMapping.CharName = Convert.ToString(dr["char_name"]);
+                   lstAccessProductsForCountry.Add(PoPTypeMapping);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstAccessProductsForCountry;
+           
+       }
+
+       public List<PoPTypeMapping> PoPLevelMapping()
+       {
+           List<PoPTypeMapping> lstPoPLevelMapping = new List<PoPTypeMapping>();
+           try
+           {
+               DataTable dtPoPLevelMapping = objAdminAccessMap.PoPLevelMapping();
+               foreach (DataRow dr in dtPoPLevelMapping.Rows)
+               {
+                   PoPTypeMapping PoPTypeMapping = new PoPTypeMapping();
+                   PoPTypeMapping.CharId = Convert.ToInt32(dr["char_id"]);
+                   PoPTypeMapping.CharName = Convert.ToString(dr["char_name"]);
+                   lstPoPLevelMapping.Add(PoPTypeMapping);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstPoPLevelMapping;
+
+       }
+
+       public List<PoPTypeMapping> CountryLevelMapping()
+       {
+           List<PoPTypeMapping> lstCountryLevelMapping = new List<PoPTypeMapping>();
+           try
+           {
+               DataTable dtCountryLevelMapping = objAdminAccessMap.CountryLevelMapping();
+               foreach (DataRow dr in dtCountryLevelMapping.Rows)
+               {
+                   PoPTypeMapping PoPTypeMapping = new PoPTypeMapping();
+                   PoPTypeMapping.CharId = Convert.ToInt32(dr["char_id"]);
+                   PoPTypeMapping.CharName = Convert.ToString(dr["char_name"]);
+                   lstCountryLevelMapping.Add(PoPTypeMapping);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstCountryLevelMapping;
+
+       }
+
+       public int SaveAccessProductLevelMapping(int[] AccessProductIDs, string User_id)
+       {
+           int count = 0;
+           try
+           {
+               count = objAdminAccessMap.SaveAccessProductLevelMapping(AccessProductIDs, User_id);
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return count;
+       }
+
+       public List<PoPTypeMapping> GetUserDetails()
+       {
+           List<PoPTypeMapping> lstUserDetails = new List<PoPTypeMapping>();
+           DataTable dt = objAdminAccessMap.GetUserDetails();
+           try
+           {
+               if (dt != null && dt.Rows.Count > 0)
+               {
+                   PoPTypeMapping objPoPTypeMapping = new PoPTypeMapping();
+                   objPoPTypeMapping.CreatedBy = dt.Rows[0]["CreatedUser"].ToString();
+                   objPoPTypeMapping.CreatedDate = dt.Rows[0]["CreatedDate"].ToString();
+                   objPoPTypeMapping.UpdatedBy = dt.Rows[0]["UpdatedUser"].ToString();
+                   objPoPTypeMapping.UpdatedDate = dt.Rows[0]["UpdatedDate"].ToString();
+                   lstUserDetails.Add(objPoPTypeMapping);
+               }
+           }
+           catch(Exception ex)
+           {
+               throw ex;
+           }
+           return lstUserDetails;
+       }
+    }
+}

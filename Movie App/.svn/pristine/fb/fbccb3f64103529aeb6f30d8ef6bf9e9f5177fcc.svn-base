@@ -1,0 +1,237 @@
+﻿<div>
+    <div id="divAnnouncements" class="tab-pane active" ng-controller="tableController1" style="cursor:default">
+        <div class="panel panel-primary col-md-12 table-responsive">
+            <h3 style="text-align: left; margin-bottom: 0px;padding-left: 16px">
+                Announcements</h4>
+            <div class="col-sm-12">
+                <div style="padding-bottom: 0px;padding-left:1100px;">
+                    <a class="btn btn-sm btn-success" data-toggle="modal" data-target="#basicModal"
+                        ng-click="btnaddannouncement()" style="background: gray; margin-bottom: 8px;">Add
+                        Announcement</a>
+                </div>
+                <table ng-table="usersTable" id="tblAnnouncements" class="table  table-striped table-bordered">
+                    <tr ng-repeat="category in $data">
+                        <td data-title="'Start Date'">
+                            {{category.anndate}}
+                        </td>
+                        <td data-title="'End Date'">
+                            {{category.annenddate}}
+                        </td>
+                        <td data-title="'Title'" id="anntitle">
+                            {{category.title}}
+                        </td>
+                        <td data-title="'Text'">
+                            {{category.announcement}}
+                        </td>
+                        <td data-title="'Delete'">
+                            <button value="Delete" class="btn btn-sm btn-danger" id="AnnouncementId" class="chkAnnounmence"
+                                ng-click="removeRows(category.annid)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                           
+                        </td>
+                        
+                         <td data-title="'Edit'" >
+                                       
+                                        <button data-target="#EditModalPopUpModal" class="btn btn-sm btn-default" data-toggle="modal" type="button" id="EditAnnouncement" ng-click="EditAnnouncements(category)"> <span class="glyphicon glyphicon-pencil"></span></button>
+                                    </td>
+                                   <!--  <td class="ID" style="display:none">
+                                        {{category.annid}}
+                                    </td>-->
+                    </tr>
+                </table>
+                <div ng-show="showNodata">
+                    <div class="alert alert-danger Arrow ng-binding ng-scope col-sm-12" role="alert">
+                        {{Nodata}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="EditModalPopUpModal"   tabindex="-1" role="dialog" aria-labelledby="EditModalPopUpModal" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="H1">
+                            Edit  Announcement</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" name="userForm1" ng-submit="submitForm()" novalidate>
+                        <div class="control-group" ng-class="{ 'has-error' : userForm1.editinputDate.$invalid && !userForm1.editinputDate.$pristine }" >
+                            <label class="control-label" for="inputDate">
+                                Start Date<span style="color: red"> *</span></label>
+                            <div class="controls" >
+                                <input type="text" name="editinputDate" id="editinputDate" ng-model="Editannstartdate" placeholder="Start Date" style="width: 150px;
+                                    height: 26px;" disabled="disabled" required>
+                                     <button class="btn btn-sm btn-default" id="btnstartdateupdate">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                            </div>
+                        </div>
+                        <div class="control-group" ng-class="{ 'has-error' : userForm1.editinputendDate.$invalid && !userForm1.editinputendDate.$pristine }" >
+                            <label class="control-label" for="inputDate" class="dp" style="padding-top: 0px;
+                                margin-left: 0px;">
+                                End Date <span style="color: red"> *</span></label>
+                            <div class="controls" style="margin-left: 108px; height: 20px;">
+                                <input type="text" name="editinputendDate" id="editinputendDate" disabled="disabled" class="dp" ng-model="Editannenddate" placeholder="End Date"
+                                    style="width: 150px; height: 27px; " required>
+                                     <button class="btn btn-sm btn-default" id="btnenddateupdate">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                            </div>
+                        </div>
+                        <div class="control-group" ng-class="{ 'has-error' : userForm1.inputtitle.$invalid && !userForm1.inputtitle.$pristine }">
+                            <label class="control-label" for="inputtitle" style="color:Black">
+                                Title <span style="color: red"> *</span></label>
+                            <div class="controls" style="margin-right: 0px; margin-left: 108px;">
+                                <input type="text" id="Text3" name="inputtitle" ng-model="Edittitle" placeholder="Title" ng-minlength="1" style="width: 300px;
+                                   height: 28px;" required>
+                                   <div>
+                                        <p ng-show="userForm1.inputtitle.$invalid && !userForm1.inputtitle.$pristine" class="help-block"
+                                            style="color: Red">
+                                            Please Enter Title.</p>
+                                    </div>
+                                    <div style="text-align: center; padding-right: 330px; padding-bottom: 4px; display: none;
+                                margin-right: 27px;" id="divduplicatetitleerroredit">
+                                <span style="color: Red">Title already exist !</span>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="control-group"  ng-class="{ 'has-error' : userForm1.inputDescription.$invalid && !userForm1.inputDescription.$pristine }">
+                            <label class="control-label" for="inputDescription" style="border-right-width: 0px;
+                                 padding-top: 0px; margin-left: 0px; padding-right: 0px;
+                                padding-left: 0px; color:Black">
+                                Announcement <span style="color: red"> *</span></label>
+                            <div class="controls" style="margin-left: 0px;">
+                                <textarea id="Textarea1" name="inputDescription" ng-minlength="1"  ng-model="Editannouncement" placeholder="Description" ng-minlength="1" style="width: 400px;
+                                    height: 80px;margin-left:21px" required></textarea>
+                                    <div>
+                                        <p style="margin-left: 109px; color: Red" ng-show="userForm1.inputDescription.$invalid && !userForm1.inputDescription.$pristine"
+                                            class="help-block">
+                                            Please Enter Announcement.</p>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="control-group" style="display:none" >
+                            <label class="control-label" for="inputannid" style="width: 0px;
+                                    height: 0px;">
+                                Annid</label>
+                            <div class="controls" style="margin-right: 0px; margin-left: 203px;">
+                                <input type="text" id="Text4" ng-model="Editannouncementid" placeholder="Title" style="width: 0px;
+                                    height: 0px;">
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="btncloseupdateann"  data-dismiss="modal">
+                            Close</button>
+                        <button type="button" id="updateannouncement" class="btn btn-primary" ng-click="UpdateNewTask()" ng-disabled="userForm1.$invalid">
+                            Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+            <div class="vertical-alignment-helper">
+                <div class="modal-dialog vertical-align-center" style="width: 45%;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                Add New Announcement</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal" name="userForm" ng-submit="submitForm()" novalidate>
+                            <div class="control-group" style="margin-bottom: 14px" ng-class="{ 'has-error' : userForm.inputDate.$invalid && !userForm.inputDate.$pristine }">
+                                <label class="control-label" for="inputDate" style="padding-right: 24px; color: Black;">
+                                    Start Date<span style="color: red"> *</span></label>
+                                <div class="controls" style="margin-left: 130px;">
+                                    <!--
+                                   <input class="datepicker" type="text" name="inputDate" id="inputDate" style="width: 150px; height: 26px;"
+                                        ng-init="localScopeDate = mainScope.myDate" ng-model="localScopeDate"   ng-minlength="1"  mo-change-proxy="mainScope.myDate"
+                                        mo-date-input="{{dateFormat}}" disabled="disabled"  required />-->
+                                    <input type="text" name="inputDate" id="inputDate" ng-model="anndate" class="datepicker"
+                                        placeholder="MM/dd/yyyy" style="width: 150px; height: 26px;" disabled="disabled" required>
+                                    <button class="btn btn-sm btn-default" id="btnstartdate">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </button>
+                                    <!--<p ng-show="userForm.inputDate.$invalid && !userForm.inputDate.$pristine" class="help-block"
+                                        style="color: Red">
+                                        Please Enter Start Date.</p>-->
+                                </div>
+                            </div>
+                            <div class="control-group" style="margin-bottom: 13px" ng-class="{ 'has-error' : userForm.inputendDate.$invalid && !userForm.inputendDate.$pristine }">
+                                <label class="control-label" for="inputDate" style="padding-right: 28px; color: Black;">
+                                    End Date<span style="color: red"> *</span></label>
+                                <div class="controls" style="margin-left: 129px;">
+                                    <input type="text" id="inputendDate" name="inputendDate" class="dp" ng-model="annenddate"
+                                        ng-minlength="1" class="form-control" placeholder="MM/DD/YYYY" style="width: 150px;
+                                        height: 27px;" disabled="disabled" required>
+                                    <button class="btn btn-sm btn-default" id="btnenddate">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </button>
+                                    <!-- <p  ng-show="userForm.inputendDate.$invalid && !userForm.inputendDate.$pristine" class="help-block" style="color:Red">
+                                        Please Enter End Date.</p>
+                                      -->
+                                </div>
+                            </div>
+                            <div class="control-group" style="margin-bottom: 14px" ng-class="{ 'has-error' : userForm.inputtitle.$invalid && !userForm.inputtitle.$pristine }">
+                                <label class="control-label" for="inputtitle" style="padding-right: 53px; color: Black;">
+                                    Title<span style="color: red"> *</span></label>
+                                <div class="controls" style="margin-right: 0px; margin-left: 129px;">
+                                    <input type="text" id="inputtitle" ng-model="title" name="inputtitle" ng-minlength="1"
+                                        placeholder="Title" style="width: 300px; height: 28px;" required>
+                                    <div>
+                                        <p ng-show="userForm.inputtitle.$invalid && !userForm.inputtitle.$pristine" class="help-block"
+                                            style="color: Red">
+                                            Please Enter Title.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="text-align: center; padding-right: 182px; padding-bottom: 4px; display: none;
+                                margin-right: 27px;" id="divduplicatetitleerror">
+                                <span style="color: Red">Title already exist !</span>
+                            </div>
+                            <div class="control-group" style="padding-left: 0px; margin-left: 0px;" ng-class="{ 'has-error' : userForm.inputDescription.$invalid && !userForm.inputDescription.$pristine }">
+                                <label class="control-label" for="inputDescription" style="color: Black; padding-top: 0px;
+                                    padding-right: 34px; padding-left: 0px; margin-right: 10px; margin-left: 0px;
+                                    border-right-width: 0px;">
+                                    Announcement<span style="color: red"> *</span></label>
+                                <div class="controls" style="margin-left: 0px;">
+                                    <textarea id="inputDescription" ng-model="announcement" name="inputDescription" ng-minlength="1"
+                                        placeholder="Description" style="width: 370px; height: 80px; margin-left: 0px;"
+                                        required></textarea>
+                                    <div>
+                                        <p style="margin-left: 132px; color: Red" ng-show="userForm.inputDescription.$invalid && !userForm.inputDescription.$pristine"
+                                            class="help-block">
+                                            Please Enter Announcement.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-warning" style="display: none" id="daterror">
+                                <strong>Start Date Cannot Be Greater Than End Date</strong>
+                            </div>
+                            <div class="modal-footer" style="border-top: none; text-align: center; padding: 0px">
+                                <button type="button" id="btncloseaddann" class="btn btn-default" data-dismiss="modal" ng-click="closemodal()">
+                                    Cancel</button>
+                                <button type="button" class="btn btn-primary" id="btnaddannmodal" ng-disabled="userForm.$invalid"
+                                    ng-click="addNewTask()">
+                                    Add</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <span style="display: none; color: Red;" id="ValidateStartDate" class="Arrow">Please
+        Select Start Date</span><br />
+    <div class="pageLoaderOverlay">
+    </div>
+</div>

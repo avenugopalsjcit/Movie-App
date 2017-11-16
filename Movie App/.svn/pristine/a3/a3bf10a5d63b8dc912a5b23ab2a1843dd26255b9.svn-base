@@ -1,0 +1,147 @@
+﻿//(function (ng, app) {
+
+
+app.controller("CaseAuditReportCtrl", function ($scope, $http, ServiceTypeProductMap, NgTableParams, CaseAuditReport, CaseDetailAuditReport) {
+    $(".pageLoaderOverlay").show();
+    $scope.ServiceTypes = [];
+    $scope.ServiceTypeProductMap = [];
+    $scope.Products = [];
+    $scope.CaseAuditData = [];
+    $scope.DisplayMessage = false;
+
+    ServiceTypeProductMap.GetServiceTypeProductMap("Case").success(function (data) {
+
+        var serviceTypes = [];
+
+        $scope.ServiceTypeProductMap = data.d;
+
+        data.d.forEach(function (item) {
+            serviceTypes.push(item.ServiceType);
+        });
+
+        var lookup = {};
+        var result = [];
+
+        for (var item, i = 0; item = serviceTypes[i++]; ) {
+            var name = item;
+
+            if (!(name in lookup)) {
+                lookup[name] = 1;
+                result.push(name);
+            }
+        }
+        $scope.ServiceTypes = result;
+        $("#Select1").select2(
+            {
+            });
+        $("#Select2").select2(
+            {
+
+            });
+        $(".pageLoaderOverlay").hide();
+    });
+
+    $scope.ProductChange = function () {
+        if ($scope.modProduct != undefined || $scope.modProduct != null) {
+            $("#spnProduct").hide();
+        }
+    }
+
+    $scope.ExportToExcel = function () {
+        var isMandated = false;
+        if ($scope.modServiceType == undefined || $scope.modServiceType == null) {
+            isMandated = true;
+            $("#spnServiceType").show();
+        } else {
+            $("#spnServiceType").hide();
+        }
+
+        if ($scope.modProduct == undefined || $scope.modProduct == null) {
+            isMandated = true;
+            $("#spnProduct").show();
+        } else {
+            $("#spnProduct").hide();
+        }
+        if (isMandated) {
+            return;
+        }
+        $(".pageLoaderOverlay").show();
+        //var filePath = "../Content/TextDoc.xls";
+        var filePath = "";
+        $scope.ServiceTypeProductMap.forEach(function (item) {
+            if (item.ProductId == $scope.modProduct) {
+                filePath = "../prodcat22/webtemp/ProductCatalog/standardreport/" + item.ProductAbbr + "AUD.xls";
+            }
+        });
+        window.location = filePath;
+        $(".pageLoaderOverlay").hide();
+
+    }
+
+    $scope.GetProducts = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.Products = [];
+        $scope.ServiceTypeProductMap.forEach(function (item) {
+            if ($scope.modServiceType == item.ServiceType) {
+                $scope.Products.push({ ProductId: item.ProductId, ProductName: item.ProductName });
+            }
+        });
+        $('#ProductDiv .select2-chosen').html("  -- Select Product --");        
+        $(".pageLoaderOverlay").hide();
+    }
+
+    $scope.OpenPopup = function (CountryName, CaseId) {
+        $(".pageLoaderOverlay").show();
+        $scope.CountryName = CountryName;
+        $scope.CaseId = CaseId;
+        CaseDetailAuditReport.GetCaseDetailsAuditReport(CaseId).success(function (data) {
+            $scope.CaseDetailAuditData = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+    $scope.GetCaseAuditReport = function () {
+        if ($scope.modProduct != null) {
+            $(".pageLoaderOverlay").show();            
+            $scope.Product = $("#Select2  option:selected").text();
+            CaseAuditReport.GetCaseAuditReport($scope.modProduct).success(function (data) {                
+                $scope.CaseAuditData = new NgTableParams({}, { 'dataset': data.d });
+                if (data.d.length == 0) {
+                    $scope.CaseAuditData = [];
+                    $scope.DisplayMessage = true;
+                }
+                if ($scope.modProduct != '58') {
+                    $("#CaseAuditDataTbl tr th:nth-child(4)").hide();
+                    $("#CaseAuditDataTbl tr th:nth-child(5)").hide();
+                    $("#CaseAuditDataTbl tr th:nth-child(6)").hide();
+                }
+                $(".pageLoaderOverlay").hide();
+            });
+        } else {
+            $scope.CaseAuditData = [];
+            $scope.DisplayMessage = false;
+        }
+    }
+});
+
+app.factory('CaseAuditReport', function ($http) {
+
+    var CaseAuditReport = {};
+    CaseAuditReport.GetCaseAuditReport = function (productCode) {
+        return $http.post('Reports.aspx/GetCaseAuditReport', { productCode: productCode });
+    }
+
+    return CaseAuditReport;
+});
+
+app.factory('CaseDetailAuditReport', function ($http) {
+
+    var CaseDetailAuditReport = {};
+    CaseDetailAuditReport.GetCaseDetailsAuditReport = function (caseID) {
+        return $http.post('Reports.aspx/GetCaseDetailsAuditReport', { caseID: caseID });
+    }
+
+    return CaseDetailAuditReport;
+});
+
+//} (angular, app));

@@ -1,0 +1,12 @@
+﻿app.controller("Controller.Multipop", function ($scope, $timeout) {
+
+    $timeout(function () {
+        $("#lstRegionlist").select2();
+        $("#CaseAvailDDL").select2();
+        $("#ValidCaseDDL").select2();
+        $("#dllvalidport").select2();
+        $("#ddlcarrier").select2();
+        $("#dllportavail").select2();
+    });
+   
+});

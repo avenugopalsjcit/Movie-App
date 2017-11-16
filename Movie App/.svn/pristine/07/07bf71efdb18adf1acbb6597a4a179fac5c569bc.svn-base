@@ -1,0 +1,1532 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Collections.Generic;
+using System.Text;
+using adminBAL = SCAdminDAL;
+
+namespace SCAdminDAL
+{
+    public class SLABuilderDAL
+    {
+
+        public static DataTable getProducts()
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = string.Empty;
+            str = @"select * from csu_product where product_valid_cd = 1 order by product_name";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return objGetDataFromDB.GetDataTable(str.ToString());
+        }
+
+
+        public static DataTable getDatabyFileType(int FiletypeId, int ProductId)
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataTable dt = new DataTable();
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string query = string.Empty;
+            switch (FiletypeId)
+            {
+                case 0:
+                    query = "select * from vw_cos_table1_data product_cd=" + ProductId + "";
+                    break;
+                case 1:
+                    query = "select * from vw_cos_table1_data where product_cd=" + ProductId + "";
+                    break;
+                case 2:
+                    query = "select * from vw_cos_table4_data where product_cd=" + ProductId + "";
+                    break;
+                case 3:
+                    query = "select * from vw_cos_table5_data where product_cd=" + ProductId + "";
+                    break;
+                case 4:
+                    query = "select * from vw_product_sla_master where product_cd=" + ProductId + "";
+                    break;
+                default:
+                    break;
+            }
+            OracleCommand cmd = new OracleCommand(query.ToString(), oConn);
+            return objGetDataFromDB.GetDataTable(query.ToString());
+        }
+
+
+        public static DataTable getCountry()
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command = new OracleCommand("select COUNTRY_ID,COUNTRY_NAME from csu_country where country_valid_cd = 1 order by country_name", connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+            DataTable dataSet = new DataTable();
+            try
+            {
+                connection.Open();
+                adapter.Fill(dataSet);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return dataSet;
+        }
+
+
+        public static DataTable getPartner()
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command = new OracleCommand("select distinct suppliername,supplierid from nni_supplier_capman order by suppliername", connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+            DataTable dataSet = new DataTable();
+            try
+            {
+                connection.Open();
+                adapter.Fill(dataSet);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return dataSet;
+        }
+
+
+        public static DataTable getPrimary()
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command = new OracleCommand("select distinct parent_access_technology from csu_ref_acc_tech_map order by parent_access_technology", connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+            DataTable dataSet = new DataTable();
+            try
+            {
+                connection.Open();
+                adapter.Fill(dataSet);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return dataSet;
+        }
+
+
+        public static DataTable getProducts1()
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command = new OracleCommand("select PRODUCT_CD,PRODUCT_NAME from csu_product where product_valid_cd = 1 order by product_name", connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+            DataTable dataSet = new DataTable();
+            try
+            {
+                connection.Open();
+                adapter.Fill(dataSet);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return dataSet;
+        }
+
+
+        public static DataTable getResiliency()
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command = new OracleCommand("select RES_TYPE_ID,RES_TYPE_NAME from csu_ref_resiliency order by res_type_name", connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+            DataTable dataSet = new DataTable();
+            try
+            {
+                connection.Open();
+                adapter.Fill(dataSet);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return dataSet;
+        }
+
+
+        public static DataTable getSecondary()
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command = new OracleCommand("select distinct child_technology from csu_ref_acc_tech_map order by child_technology", connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+            DataTable dataSet = new DataTable();
+            try
+            {
+                connection.Open();
+                adapter.Fill(dataSet);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return dataSet;
+        }
+
+
+        public static List<DataTable> sendPageLoadData()
+        {
+            List<DataTable> dt = new List<DataTable>();
+            dt.Add(SLABuilderDAL.getCountry());
+            dt.Add(SLABuilderDAL.getPartner());
+            dt.Add(SLABuilderDAL.getPrimary());
+            dt.Add(SLABuilderDAL.getProducts1());
+            dt.Add(SLABuilderDAL.getResiliency());
+            dt.Add(SLABuilderDAL.getSecondary());
+            return dt;
+
+        }
+
+        public static DataTable getSLAMasterDetails(int product_ID, string lstCountry, string ddlPartner, string lstResiliency, string ddlPrimary, string ddlSecondary)
+        {
+            //DataSet dataSet = new DataSet();
+            DataTable dt = new DataTable();
+            using (OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString")))
+            {
+
+                connection.Open();
+
+                StringBuilder sb1 = new StringBuilder();
+                List<int> c1 = lstCountry.Split(',').Select(int.Parse).ToList();
+                for (int i = 0; i < c1.ToList().Count; i++)
+                {
+                    if (i > 0)
+                    {
+                        sb1.Append(",");
+                    }
+                    OracleCommand command1 = new OracleCommand("select country_name from csu_country where country_id in (" + c1[i] + ")", connection);
+                    string str4 = (string)command1.ExecuteScalar();
+                    //string countries = string.Join(", ", str4.ToArray());
+                    sb1.Append(str4);
+                }
+
+
+                //OracleCommand command2 = new OracleCommand("select distinct suppliername from nni_supplier_capman where supplierid=" + ddlPartner, connection);
+                //new OracleDataAdapter(command2);
+                //string str5 = (string)command2.ExecuteScalar();
+
+
+                StringBuilder sb2 = new StringBuilder();
+                List<int> r1 = lstResiliency.Split(',').Select(int.Parse).ToList();
+
+                for (int i = 0; i < r1.Count; i++)
+                {
+                    if (i > 0)
+                    {
+                        sb2.Append(",");
+                    }
+                    OracleCommand command3 = new OracleCommand("select distinct res_type_name from csu_ref_resiliency where res_type_id in (" + r1[i] + ")", connection);
+                    new OracleDataAdapter(command3);
+                    string str6 = (string)command3.ExecuteScalar();
+                    sb2.Append(str6);
+                }
+
+                StringBuilder sb = new StringBuilder();
+                //str4  contains multivalues
+                sb.Append("select product_cd, primary_access_tech,primary_service_variant,primary_del_mode,secondary_access_tech, ");
+                sb.Append("secondary_service_variant,secondary_del_mode,description,sla_category,site_availability_target,");
+                sb.Append("severity_1_repair_target,resiliency_repair_target,band from vw_product_sla_master ");
+                sb.Append(" where product_cd=" + product_ID + "  and product_resiliency  in('" + sb2.ToString().Replace(",", "','") + "') ");
+                sb.Append("and country_name in ('" + sb1.ToString().Replace(",", "','") + "') and partner ='" + ddlPartner + "'");
+
+                OracleCommand command4 = new OracleCommand(sb.ToString(), connection);
+                new OracleDataAdapter(command4).Fill(dt);
+
+            }
+            return dt;
+        }
+
+
+        public static DataTable getSLABanddata()
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command = new OracleCommand("select char_id,char_name,char_type_id from csu_ref_valid_char where char_type_id in (3842,3846)", connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+            DataTable dt = new DataTable();
+            try
+            {
+                connection.Open();
+                adapter.Fill(dt);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return dt;
+        }
+
+        public static List<DataTable> getMasterDetails()
+        {
+            List<DataTable> list = new List<DataTable>();
+
+            //DataTable primaryAccessTechnology = new DataTable();
+            //DataTable primaryServiceVariant = new DataTable();
+            //DataTable PrimaryDeliveryMode = new DataTable();
+            //DataTable SLAcategory = new DataTable();
+
+            //OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            //OracleCommand command1 = new OracleCommand("select *  from csu_ref_acc_tech_map;", connection);
+            //OracleDataAdapter adapter1 = new OracleDataAdapter(command1);
+            //DataTable dt1 = new DataTable();
+
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command1 = new OracleCommand("select *  from csu_ref_acc_tech_map;", connection);
+            OracleDataAdapter adapter1 = new OracleDataAdapter(command1);
+            DataTable dt1 = new DataTable();
+
+
+            OracleCommand command2 = new OracleCommand(" select * from access_delivery_mode;", connection);
+            OracleDataAdapter adapter2 = new OracleDataAdapter(command2);
+            DataTable dt2 = new DataTable();
+
+
+            OracleCommand command3 = new OracleCommand("select * from access_service_variant;", connection);
+            OracleDataAdapter adapter3 = new OracleDataAdapter(command3);
+            DataTable dt3 = new DataTable();
+
+
+            OracleCommand command4 = new OracleCommand("select char_id,char_name,char_type_id from csu_ref_valid_char where char_type_id in (3842,3846)", connection);
+            OracleDataAdapter adapter4 = new OracleDataAdapter(command4);
+            DataTable dt4 = new DataTable();
+
+
+            try
+            {
+                connection.Open();
+                adapter1.Fill(dt1);
+                adapter2.Fill(dt2);
+                adapter3.Fill(dt3);
+                adapter4.Fill(dt4);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            list.Add(dt1); list.Add(dt2); list.Add(dt3); list.Add(dt4);
+            return list;
+        }
+
+        //public static int SaveMasterData(List<SLAMasterData> masters)
+        //{
+        //    try
+        //    {
+        //        using (OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString")))
+        //        {
+        //            connection.Open();
+        //            foreach (adminBAL.SLAMasterData master in masters)
+        //            {
+        //                string SBPname = master.SBPName;
+        //                string SLAName = master.SLACategoryName;
+        //                string SiteAvailibilityTarget = master.SiteAvailabilityTargetName;
+        //                string SeveriatyTarget = master.Service1RepairTargetName;
+        //                string ReseliencyTargetNmae = master.ResiliencyRepairTargetName;
+        //                OracleCommand command = new OracleCommand("select leg_id from csu_ref_leg_info where leg_access_tech in(select parent_access_technology " +
+        //                                                          "from csu_ref_acc_tech_map where parent_access_technology='" + master.PrimaryAccessTechnologyName + "') " +
+        //                                                          "and leg_service_variant in(select service_variant_name from access_service_variant where " +
+        //                                                          "service_variant_name='" + master.PrimaryServiceVariantNameName + "') and leg_delivery_mode " +
+        //                                                          "in(select delivery_mode_name from access_delivery_mode where delivery_mode_name='" + master.PrimaryDeleveryModeName + "')",
+        //                                                           connection);
+        //                new OracleDataAdapter(command);
+        //                int num = Convert.ToInt32(command.ExecuteScalar());
+
+        //                OracleCommand command2 = new OracleCommand("select leg_id from csu_ref_leg_info where leg_access_tech in " +
+        //                    "(select child_technology from csu_ref_acc_tech_map where child_technology='" + master.SecondaryAccesstechnologyName + "') " +
+        //                    "and leg_service_variant in(select service_variant_name from access_service_variant where " +
+        //                    "service_variant_name='" + master.SecondaryServiceVariantName + "') and leg_delivery_mode " +
+        //                    " in(select delivery_mode_name from access_delivery_mode where delivery_mode_name='" + master.SecondaryDeleveryModeName + "')", connection);
+        //                new OracleDataAdapter(command2);
+        //                int num2 = Convert.ToInt32(command2.ExecuteScalar());
+
+        //                OracleCommand command3 = new OracleCommand(string.Concat(new object[] { "select sla_config_id from csu_partner_sla_config where "+
+        //                     "product_cd=" + master.ProductitemId + " and partner_id=" + master.PartnerId + " and primary_leg_id="+ num +" and secondary_leg_id="+ num2+ " and res_type_id=" + master.ResiliencyId })
+        //                         , connection);
+        //                new OracleDataAdapter(command3);
+        //                int num3 = Convert.ToInt32(command3.ExecuteScalar());
+
+        //                OracleCommand command4 = new OracleCommand("select char_id from csu_ref_valid_char where char_type_id=3841 and char_name='" + SLAName + "'", connection);
+        //                new OracleDataAdapter(command4);
+        //                int num4 = Convert.ToInt32(command4.ExecuteScalar());
+
+        //                OracleCommand command5 = new OracleCommand("select char_id from csu_ref_valid_char where char_type_id=3941 and char_name='" + master.BandName + "'", connection);
+        //                new OracleDataAdapter(command5);
+        //                int num5 = Convert.ToInt32(command5.ExecuteScalar());
+
+        //                OracleCommand command6 = new OracleCommand("select char_id from csu_ref_valid_char where char_type_id=3942 and char_name='" + SBPname + "'", connection);
+        //                new OracleDataAdapter(command6);
+        //                int num6 = Convert.ToInt32(command6.ExecuteScalar());
+
+        //                OracleCommand command7 = new OracleCommand("select country_abbr from csu_country where country_id=" + master.CountryId, connection);
+        //                new OracleDataAdapter(command7);
+        //                string str18 = (string)command7.ExecuteScalar();
+
+        //                string str19 = "'" + SBPname + "-SLA(CAT " + SLAName + " >= " + SiteAvailibilityTarget + "% +" + SeveriatyTarget + "+" + ReseliencyTargetNmae;
+
+        //                OracleCommand command8 = new OracleCommand(string.Concat(new object[] { 
+        //                            "insert into csu_access_sla_configuration(sla_config_id,country_id,country_abbr,description,sla_category_id, " +
+        //                            "site_availability_target,severity_1_repair_target,resiliency_repair_target,band_char_id,sla_type_id,sla2plus)"+
+        //                            " values(" +num3 +"," + master.CountryId +",'", str18, "','"+master.DescriptionName+"',"+ num4 +",'"+ master.SiteAvailabilityTargetName+ "','"+master.Service1RepairTargetName+ "','"+master.ResiliencyRepairTargetName+"',"+ num5+","+num6+","+str19+"')"
+        //    }), connection);
+        //                new OracleDataAdapter(command8);
+        //                command8.ExecuteScalar();
+        //            }
+        //        }
+        //        return 1;
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //    }
+        //    finally
+        //    {
+
+
+        //    }
+        //    return 1;
+        //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //For fetching id of the slabuilder after saving without calling getProductLevelSLAbyProdId
+        public static List<DataTable> getProductLevelSLADetails(int Productid)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command =
+                new OracleCommand("Select a.sla_builder_id, a.RES_TYPE_ID, PRODUCT_CD, SECURE_BAU_POP1, SECURE_REUTERS_POP1," +
+                                  "NETWORK_RES, a.ACCESS_RES_TYPE_ID, ASYM_ACCESS_PROD_TYPE, ASYM_ACCESS_SPEED_TYPE, COM_SEPARACY," +
+                                  "access_res_type_value, RES_TYPE_NAME, a.SECURE_BAU_POP2, a.SECURE_REUTERS_POP2, a.NO_COM_POP, a.SLA_TYPE_ID," +
+                                  "a.MULTICAST, a.CORE_DIVERSITY, to_char(d.UPDATED_DATE,'DD-MON-YY') as Updated_DT, User_Name(d.UPDATED_EMPID) " +
+                                  "as Updated_Name from csu_sla_builder a, csu_ref_access_resiliency b, CSU_REF_RESILIENCY c, CSU_SLA_USER d where " +
+                                  "product_cd = " + Productid + " and a.ACCESS_RES_TYPE_ID = b.ACCESS_RES_TYPE_ID " +
+                                  "and c.RES_TYPE_ID = a.RES_TYPE_ID and a.sla_builder_id = d.sla_builder_id " +
+                                  "order by sla_builder_id", connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+
+
+            List<DataTable> tables = new List<DataTable>();
+            DataTable dt = new DataTable();
+            try
+            {
+                connection.Open();
+                adapter.Fill(dt);
+                tables.Add(dt);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return tables;
+        }
+
+
+
+
+
+
+
+
+        public static List<DataTable> getProductLevelSLAbyProdId(int Productid)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command =
+                new OracleCommand("Select a.sla_builder_id, a.RES_TYPE_ID, PRODUCT_CD, SECURE_BAU_POP1, SECURE_REUTERS_POP1," +
+                                  "NETWORK_RES, a.ACCESS_RES_TYPE_ID, ASYM_ACCESS_PROD_TYPE, ASYM_ACCESS_SPEED_TYPE, COM_SEPARACY," +
+                                  "access_res_type_value, RES_TYPE_NAME, a.SECURE_BAU_POP2, a.SECURE_REUTERS_POP2, a.NO_COM_POP, a.SLA_TYPE_ID," +
+                                  "a.MULTICAST, a.CORE_DIVERSITY, to_char(d.UPDATED_DATE,'DD-MON-YY') as Updated_DT, User_Name(d.UPDATED_EMPID) " +
+                                  "as Updated_Name from csu_sla_builder a, csu_ref_access_resiliency b, CSU_REF_RESILIENCY c, CSU_SLA_USER d where " +
+                                  "product_cd = " + Productid + " and a.ACCESS_RES_TYPE_ID = b.ACCESS_RES_TYPE_ID " +
+                                  "and c.RES_TYPE_ID = a.RES_TYPE_ID and a.sla_builder_id = d.sla_builder_id " +
+                                  "order by sla_builder_id", connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+
+            OracleCommand command1 = new OracleCommand("SELECT SLA_TYPE_ID, SLA_TYPE_VALUE FROM CSU_MTNI_SLA", connection);
+            OracleDataAdapter adapter1 = new OracleDataAdapter(command1);
+
+            OracleCommand command2 =
+                new OracleCommand("Select ACCESS_RES_TYPE_ID, ACCESS_RES_TYPE_VALUE from CSU_REF_ACCESS_RESILIENCY", connection);
+            OracleDataAdapter adapter2 = new OracleDataAdapter(command2);
+
+
+            OracleCommand command3 =
+               new OracleCommand("select RES_TYPE_ID,RES_TYPE_NAME from csu_ref_resiliency", connection);
+            OracleDataAdapter adapter3 = new OracleDataAdapter(command3);
+
+
+            OracleCommand command4 =
+               new OracleCommand("SELECT DISTINCT RES_TYPE_ID as PRODUCT_SLA_TYPE_ID , RES_TYPE_NAME as PRODUCT_SLA_TYPE_NAME , ACCESS_RES_TYPE_ID , ACCESS_RES_TYPE_VALUE FROM SLA_BUILDER_VW " +
+                                " WHERE PRODUCT_CD = " + Productid + " AND ACCESS_RES_TYPE_ID IN (3,4)" +
+                                " Order by PRODUCT_SLA_TYPE_NAME", connection);
+            OracleDataAdapter adapter4 = new OracleDataAdapter(command4);
+            DataTable dt4 = new DataTable();
+
+
+
+
+            DataTable dt = new DataTable();
+            DataTable miniSLAs = new DataTable();
+            DataTable Restypes = new DataTable();
+            DataTable Ref_Resiliency = new DataTable();
+
+
+
+            List<DataTable> tables = new List<DataTable>();
+            try
+            {
+                connection.Open();
+                adapter.Fill(dt);
+                adapter1.Fill(miniSLAs);
+                adapter2.Fill(Restypes);
+                adapter3.Fill(Ref_Resiliency);
+                adapter4.Fill(dt4);
+                tables.Add(miniSLAs); tables.Add(dt); tables.Add(Restypes); tables.Add(Ref_Resiliency); tables.Add(dt4);
+                //tables.Add(dt4);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return tables;
+        }
+
+
+        public static int DeleteProductsBySLAId(string SLAIDs, string ProductSLAIds, int ProductId, string AccessSLAIds)
+        {
+            int success = 0;
+            try
+            {
+                OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+                connection.Open();
+                int Product = Convert.ToInt32(ProductId);
+                StringBuilder query = new StringBuilder();
+                
+                query.Append(" BEGIN  Delete from CSU_SLA_BUILDER where SLA_BUILDER_ID in ('" + SLAIDs.ToString().Replace(",", "','") + "')");
+                if (AccessSLAIds.IndexOf("3") != -1 || AccessSLAIds.IndexOf("4") != -1)
+                {
+                    query.Append(" ; Delete from ACCESS_TYPE_CONFIGURATION where PRODUCT_ID=" + ProductId + " and PRODUCT_SLA_ID in ( '" + ProductSLAIds.ToString().Replace(",", "','") + "')");
+                    query.Append(" ; Delete from CSU_PLATFORM_CONFIGURATION where PRODUCT_ID=" + ProductId + " and PRODUCT_SLA_ID in ( '" + ProductSLAIds.ToString().Replace(",", "','") + "')");
+                    query.Append(" ; Delete from ACCESS_SPEED_GENERAL_RULE where PRODUCT_ID=" + ProductId + " and PRODUCT_SLA_ID in ( '" + ProductSLAIds.ToString().Replace(",", "','") + "')");
+                    query.Append(" ; Delete from ACCESS_SPEED_CONFIGURATION where PRODUCT_ID=" + ProductId + " and PRODUCT_SLA_ID in ( '" + ProductSLAIds.ToString().Replace(",", "','") + "')") ;
+                }
+                 query.Append("; END;");
+                OracleCommand command8 = new OracleCommand(query.ToString(), connection);
+                command8.CommandType = CommandType.Text;
+                command8.ExecuteNonQuery();
+
+
+
+                connection.Close();
+                success = 1;
+                return success;
+            }
+
+
+
+
+            catch (Exception ex)
+            {
+
+            }
+            return success;
+
+        }
+
+
+
+        public static int DeleteAccessConfiguration(int productId, List<adminBAL.AccessConfigData> configData)
+        {
+
+            try
+            {
+                OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+                connection.Open();
+                foreach (adminBAL.AccessConfigData configdata in configData)
+                {
+                    StringBuilder query = new StringBuilder();
+                    query.Append(" Delete from ACCESS_TYPE_CONFIGURATION where PRODUCT_ID = " + productId + " ");
+                    if (configdata.PRODUCT_SLA_TYPE_ID != 0)
+                    {
+                        query.Append(" AND PRODUCT_SLA_ID = " + configdata.PRODUCT_SLA_TYPE_ID + " ");
+                    }
+                    //if (Name == "AccessCofig")
+                    //{
+                    if (configdata.PRODUCT_SLA_TYPE_ID == 0)
+                    {
+                        query.Append(" AND PRODUCT_SLA_NAME = '" + configdata.PRODUCT_SLA_TYPE_NAME + "' ");
+                    }
+                    query.Append(" AND ACCESS_SLA_ID = " + configdata.ACCESS_RES_TYPE_ID + " ");
+                    query.Append(" AND LEG1_ACCESSTYPE_ID = " + configdata.LEG1_ACCESSTYPE_ID + " ");
+                    query.Append(" AND LEG2_ACCESSTYPE_ID = " + configdata.LEG2_ACCESSTYPE_ID + " ");
+                    if (configdata.LEG1_SERVICE_VARIANT_NAME != "")
+                    {
+                        query.Append(" AND LEG1_SERVICE_VARIANT = '" + configdata.LEG1_SERVICE_VARIANT_NAME + "'");
+                    }
+                    if (configdata.LEG1_DELIVERY_MODE_NAME != "")
+                    {
+                        query.Append(" AND LEG1_DELIVERY_MODE  = '" + configdata.LEG1_DELIVERY_MODE_NAME + "' ");
+                    }
+                    if (configdata.LEG2_SERVICE_VARIANT_NAME != "")
+                    {
+                        query.Append(" AND LEG2_SERVICE_VARIANT ='" + configdata.LEG2_SERVICE_VARIANT_NAME + "'");
+                    }
+                    if (configdata.LEG2_DELIVERY_MODE_NAME != "")
+                    {
+                        query.Append(" AND LEG2_DELIVERY_MODE ='" + configdata.LEG2_DELIVERY_MODE_NAME + "'");
+                    }
+                    OracleCommand command8 = new OracleCommand(query.ToString(), connection);
+                    command8.CommandType = CommandType.Text;
+                    command8.ExecuteNonQuery();
+                    //}
+
+                }
+
+                connection.Close();
+                connection.Dispose();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return 0;
+        }
+
+
+
+        public static List<DataTable> getProductSLATable(int Productid)
+        {
+            List<DataTable> list = new List<DataTable>();
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+            //ProductsList not the accessrestypes
+            OracleCommand command1 =
+                new OracleCommand("SELECT DISTINCT RES_TYPE_ID as PRODUCT_SLA_TYPE_ID , RES_TYPE_NAME as PRODUCT_SLA_TYPE_NAME , ACCESS_RES_TYPE_ID , ACCESS_RES_TYPE_VALUE FROM SLA_BUILDER_VW " +
+                                 " WHERE PRODUCT_CD = " + Productid + " AND ACCESS_RES_TYPE_ID IN (3,4)" +
+                                 " Order by PRODUCT_SLA_TYPE_NAME", connection);
+            OracleDataAdapter adapter1 = new OracleDataAdapter(command1);
+            DataTable dt1 = new DataTable();
+            adapter1.Fill(dt1);
+            list.Add(dt1);
+            return list;
+        }
+
+
+
+
+
+        public static List<DataTable> AccessConfigData(int productID)
+        {
+            List<DataTable> list = new List<DataTable>();
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            string queryACCessData = " SELECT DISTINCT ACCESS_SLA_ID as ACCESS_RES_TYPE_ID ,ACCESS_SLA_NAME as ACCESS_RES_TYPE_VALUE , " +
+             " PRODUCT_SLA_ID as PRODUCT_SLA_TYPE_ID , PRODUCT_SLA_NAME as PRODUCT_SLA_TYPE_NAME , " +
+             " A.ACCESS_TYPE_NAME AS LEG1_ACCESS_TYPE_NAME,LEG1_ACCESSTYPE_ID,B.ACCESS_TYPE_NAME AS LEG2_ACCESS_TYPE_NAME,LEG2_ACCESSTYPE_ID, " +
+
+             " LEG1_SERVICE_VARIANT as LEG1_SERVICE_VARIANT_NAME, NVL(S1.SERVICE_VARIANT_ID,0)as  LEG1_SERVICE_VARIANT_ID, " +
+             " LEG2_SERVICE_VARIANT as LEG2_SERVICE_VARIANT_NAME, NVL(S2.SERVICE_VARIANT_ID,0) as LEG2_SERVICE_VARIANT_ID, " +
+
+              "LEG1_DELIVERY_MODE as LEG1_DELIVERY_MODE_NAME , NVL(DM1.DELIVERY_MODE_ID,0) as LEG1_DELIVERY_MODE_ID, " +
+              "LEG2_DELIVERY_MODE as LEG2_DELIVERY_MODE_NAME , NVL(DM2.DELIVERY_MODE_ID,0) as LEG2_DELIVERY_MODE_ID " +
+
+              "FROM ACCESS_TYPE_CONFIGURATION C INNER JOIN ACCESS_TYPE_MAP B ON LEG2_ACCESSTYPE_ID = B.ACCESS_TYPE_ID " +
+              "INNER JOIN ACCESS_TYPE_MAP A ON LEG1_ACCESSTYPE_ID = A.ACCESS_TYPE_ID  " +
+
+              "LEFT JOIN ACCESS_SERVICE_VARIANT S1 ON LEG1_SERVICE_VARIANT=S1.SERVICE_VARIANT_NAME " +
+              "LEFT JOIN ACCESS_DELIVERY_MODE DM1 ON DM1.DELIVERY_MODE_NAME=LEG1_DELIVERY_MODE " +
+
+              "LEFT JOIN ACCESS_SERVICE_VARIANT S2 ON LEG2_SERVICE_VARIANT=S2.SERVICE_VARIANT_NAME " +
+              "LEFT JOIN ACCESS_DELIVERY_MODE DM2 ON DM2.DELIVERY_MODE_NAME=LEG2_DELIVERY_MODE " +
+
+              " where PRODUCT_ID = " + productID + " " +
+              " ORDER BY LEG1_ACCESS_TYPE_NAME,LEG2_ACCESS_TYPE_NAME ";
+            OracleCommand command1 =
+                new OracleCommand(queryACCessData, connection);
+            OracleDataAdapter adapter1 = new OracleDataAdapter(command1);
+            try
+            {
+                DataTable dt1 = new DataTable();
+                connection.Open();
+                adapter1.Fill(dt1);
+                list.Add(dt1);
+                return list;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return list;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public static List<DataTable> getAccessTypeConfigById(int Productid)
+        {
+
+            List<DataTable> list = new List<DataTable>();
+
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+            //ProductsList not the accessrestypes
+            OracleCommand command1 =
+                new OracleCommand("SELECT DISTINCT RES_TYPE_ID as PRODUCT_SLA_TYPE_ID , RES_TYPE_NAME as PRODUCT_SLA_TYPE_NAME , ACCESS_RES_TYPE_ID , ACCESS_RES_TYPE_VALUE FROM SLA_BUILDER_VW " +
+                                 " WHERE PRODUCT_CD = " + Productid + " AND ACCESS_RES_TYPE_ID IN (3,4)" +
+                                 " Order by PRODUCT_SLA_TYPE_NAME", connection);
+            OracleDataAdapter adapter1 = new OracleDataAdapter(command1);
+            DataTable dt1 = new DataTable();
+
+
+            OracleCommand command2 = new OracleCommand("SELECT DISTINCT ACCESS_TYPE_ID as LEG1_ACCESSTYPE_ID, ACCESS_TYPE_NAME as LEG1_ACCESS_TYPE_NAME  FROM ACCESS_TYPE_MAP Order by ACCESS_TYPE_ID", connection);
+            OracleDataAdapter adapter2 = new OracleDataAdapter(command2);
+            DataTable dt2 = new DataTable();
+            OracleCommand command5 = new OracleCommand("SELECT DISTINCT ACCESS_TYPE_ID as LEG2_ACCESSTYPE_ID, ACCESS_TYPE_NAME as LEG2_ACCESS_TYPE_NAME FROM ACCESS_TYPE_MAP Order by ACCESS_TYPE_ID", connection);
+            OracleDataAdapter adapter5 = new OracleDataAdapter(command5);
+            DataTable dt5 = new DataTable();
+
+
+            OracleCommand command3 = new OracleCommand("select service_variant_id as LEG1_SERVICE_VARIANT_ID ,service_variant_name as LEG1_SERVICE_VARIANT_NAME from ACCESS_SERVICE_VARIANT order by LEG1_SERVICE_VARIANT_ID", connection);
+            OracleDataAdapter adapter3 = new OracleDataAdapter(command3);
+            DataTable dt3 = new DataTable();
+            OracleCommand command6 = new OracleCommand("select service_variant_id as LEG2_SERVICE_VARIANT_ID,service_variant_name as LEG2_SERVICE_VARIANT_NAME from ACCESS_SERVICE_VARIANT order by LEG2_SERVICE_VARIANT_ID", connection);
+            OracleDataAdapter adapter6 = new OracleDataAdapter(command6);
+            DataTable dt6 = new DataTable();
+
+
+            OracleCommand command4 = new OracleCommand("select DELIVERY_MODE_ID as LEG1_DELIVERY_MODE_ID, DELIVERY_MODE_NAME as LEG1_DELIVERY_MODE_NAME from ACCESS_DELIVERY_MODE order by LEG1_DELIVERY_MODE_ID", connection);
+            OracleDataAdapter adapter4 = new OracleDataAdapter(command4);
+            DataTable dt4 = new DataTable();
+            OracleCommand command7 = new OracleCommand("select DELIVERY_MODE_ID as LEG2_DELIVERY_MODE_ID,DELIVERY_MODE_NAME as LEG2_DELIVERY_MODE_NAME from ACCESS_DELIVERY_MODE order by LEG2_DELIVERY_MODE_ID", connection);
+            OracleDataAdapter adapter7 = new OracleDataAdapter(command7);
+            DataTable dt7 = new DataTable();
+
+            string queryACCessData = " SELECT DISTINCT ACCESS_SLA_ID as ACCESS_RES_TYPE_ID ,ACCESS_SLA_NAME as ACCESS_RES_TYPE_VALUE , " +
+              " PRODUCT_SLA_ID as PRODUCT_SLA_TYPE_ID , PRODUCT_SLA_NAME as PRODUCT_SLA_TYPE_NAME , " +
+              " A.ACCESS_TYPE_NAME AS LEG1_ACCESS_TYPE_NAME,LEG1_ACCESSTYPE_ID,B.ACCESS_TYPE_NAME AS LEG2_ACCESS_TYPE_NAME,LEG2_ACCESSTYPE_ID, " +
+
+              " LEG1_SERVICE_VARIANT as LEG1_SERVICE_VARIANT_NAME, NVL(S1.SERVICE_VARIANT_ID,0)as  LEG1_SERVICE_VARIANT_ID, " +
+              " LEG2_SERVICE_VARIANT as LEG2_SERVICE_VARIANT_NAME, NVL(S2.SERVICE_VARIANT_ID,0) as LEG2_SERVICE_VARIANT_ID, " +
+
+               "LEG1_DELIVERY_MODE as LEG1_DELIVERY_MODE_NAME , NVL(DM1.DELIVERY_MODE_ID,0) as LEG1_DELIVERY_MODE_ID, " +
+               "LEG2_DELIVERY_MODE as LEG2_DELIVERY_MODE_NAME , NVL(DM2.DELIVERY_MODE_ID,0) as LEG2_DELIVERY_MODE_ID " +
+
+               "FROM ACCESS_TYPE_CONFIGURATION C INNER JOIN ACCESS_TYPE_MAP B ON LEG2_ACCESSTYPE_ID = B.ACCESS_TYPE_ID " +
+               "INNER JOIN ACCESS_TYPE_MAP A ON LEG1_ACCESSTYPE_ID = A.ACCESS_TYPE_ID  " +
+
+               "LEFT JOIN ACCESS_SERVICE_VARIANT S1 ON LEG1_SERVICE_VARIANT=S1.SERVICE_VARIANT_NAME " +
+               "LEFT JOIN ACCESS_DELIVERY_MODE DM1 ON DM1.DELIVERY_MODE_NAME=LEG1_DELIVERY_MODE " +
+
+               "LEFT JOIN ACCESS_SERVICE_VARIANT S2 ON LEG2_SERVICE_VARIANT=S2.SERVICE_VARIANT_NAME " +
+               "LEFT JOIN ACCESS_DELIVERY_MODE DM2 ON DM2.DELIVERY_MODE_NAME=LEG2_DELIVERY_MODE " +
+
+               " where PRODUCT_ID = " + Productid + " " +
+               " ORDER BY LEG1_ACCESS_TYPE_NAME,LEG2_ACCESS_TYPE_NAME ";
+
+
+            OracleCommand command8 = new OracleCommand(queryACCessData, connection);
+            OracleDataAdapter adapter8 = new OracleDataAdapter(command8);
+            DataTable dt8 = new DataTable();
+
+            try
+            {
+                connection.Open();
+
+                adapter1.Fill(dt1);
+
+                adapter2.Fill(dt2);
+                adapter3.Fill(dt5);
+
+                adapter4.Fill(dt3);
+                adapter5.Fill(dt6);
+
+                adapter6.Fill(dt4);
+                adapter7.Fill(dt7);
+
+                adapter8.Fill(dt8);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            list.Add(dt1); list.Add(dt2); list.Add(dt3); list.Add(dt4); list.Add(dt5); list.Add(dt6); list.Add(dt7); list.Add(dt8);
+            return list;
+        }
+
+
+
+        public static int SaveSLADetails(int ProductId, List<adminBAL.SLAConfigData> configuration)
+        {
+            int i = 0;
+
+            try
+            {
+                StringBuilder queryBuild = new StringBuilder();
+                OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+                OracleCommand command1 =
+                new OracleCommand("delete from  CSU_SLA_BUILDER where product_cd=" + ProductId + "", connection);
+                command1.CommandType = CommandType.Text;
+                connection.Open();
+                command1.ExecuteNonQuery();
+                string ProductSLAIds = string.Empty;
+                foreach (adminBAL.SLAConfigData configData in configuration)
+                {
+                    ProductSLAIds = ProductSLAIds + "," + configData.ProductSLA;
+                    if (ProductSLAIds.StartsWith(","))
+                    {
+                        ProductSLAIds = ProductSLAIds.ToString().Substring(1);
+                    }
+                    string query = string.Empty;
+                    query =
+                         " Insert into CSU_SLA_BUILDER (RES_TYPE_ID, PRODUCT_CD," +
+                         " SECURE_BAU_POP1, SECURE_REUTERS_POP1, NETWORK_RES, ACCESS_RES_TYPE_ID," +
+                         " ASYM_ACCESS_PROD_TYPE, ASYM_ACCESS_SPEED_TYPE, COM_SEPARACY," +
+                        //" SLA_BUILDER_ID,
+                         "SLA_TYPE_ID , SECURE_BAU_POP2," +
+                         " SECURE_REUTERS_POP2 ," +
+
+                         "NO_COM_POP,CREATED_EMP_ID,UPDATED_EMP_ID,SLA_BUILDER_ID,MULTICAST, CORE_DIVERSITY)" +
+                        // "CREATED_DT, UPDATED_EMP_ID," +
+                        // "UPDATED_DT)" +
+                        //ProeductSLA is notthing but res_type_id
+                         " Values(" + configData.ProductSLA + "," + configData.ProductID + "," + configData.BAUPOP1 + "," +
+                         "" + configData.ReutersPOP1 + "," + configData.networkrel + "," + configData.AccessResiliencyType + "," +
+                         "" + configData.AsymmetricalAccessProductType + "," + configData.AsymmetricalAccessSpeed + "," +
+                         "" + configData.CommericialSeparacyMandatory + "," + configData.MTNISLA + "," + configData.BAUPOP2 + "," +
+                            "" + configData.ReutersPOP2 + "," + configData.NoCommonPOP + " ,'" + configData.CREATED_EMP_ID + "','" + configData.UPDATED_EMP_ID + "',SEQ_SLA_BUILDER.nextval," + configData.MultiCast + "," + configData.Diversity + ")";
+                    OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                    cmdOra.CommandType = CommandType.Text;
+                    int status = cmdOra.ExecuteNonQuery();
+                }
+
+
+                //Updated child tables
+                queryBuild.Append(" BEGIN Delete from ACCESS_TYPE_CONFIGURATION where PRODUCT_ID=" + ProductId + " and PRODUCT_SLA_ID not in ( '" + ProductSLAIds.ToString().Replace(",", "','") + "')");
+                queryBuild.Append(" ; Delete from CSU_PLATFORM_CONFIGURATION where PRODUCT_ID=" + ProductId + " and PRODUCT_SLA_ID not in ( '" + ProductSLAIds.ToString().Replace(",", "','") + "')");
+                queryBuild.Append(" ; Delete from ACCESS_SPEED_CONFIGURATION where PRODUCT_ID=" + ProductId + " and PRODUCT_SLA_ID not in ( '" + ProductSLAIds.ToString().Replace(",", "','") + "') ; END;");
+                OracleCommand commandDel = new OracleCommand(queryBuild.ToString(), connection);
+                commandDel.CommandType = CommandType.Text;
+                int result = commandDel.ExecuteNonQuery();
+                connection.Close();
+                return 1;
+
+            }
+
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+            }
+            return i;
+        }
+
+
+
+        //public static int SaveSLADetails(int ProductId, List<adminBAL.SLAConfigData> configuration)
+        //{
+        //    int i = 0;
+
+        //    try
+        //    {
+        //        OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        //        OracleCommand command1 =
+        //        new OracleCommand("delete from  CSU_SLA_BUILDER where product_cd=" + ProductId + "", connection);
+        //        command1.CommandType = CommandType.Text;
+        //        connection.Open();
+        //        command1.ExecuteNonQuery();
+        //        foreach (adminBAL.SLAConfigData configData in configuration)
+        //        {
+        //            string query = string.Empty;
+        //            query =
+        //                 " Insert into CSU_SLA_BUILDER (RES_TYPE_ID, PRODUCT_CD," +
+        //                 " SECURE_BAU_POP1, SECURE_REUTERS_POP1, NETWORK_RES, ACCESS_RES_TYPE_ID," +
+        //                 " ASYM_ACCESS_PROD_TYPE, ASYM_ACCESS_SPEED_TYPE, COM_SEPARACY," +
+        //                //" SLA_BUILDER_ID,
+        //                 "SLA_TYPE_ID , SECURE_BAU_POP2," +
+        //                 " SECURE_REUTERS_POP2 ," +
+
+        //                 "NO_COM_POP,CREATED_EMP_ID,UPDATED_EMP_ID,SLA_BUILDER_ID,MULTICAST, CORE_DIVERSITY)" +
+        //                // "CREATED_DT, UPDATED_EMP_ID," +
+        //                // "UPDATED_DT)" +
+        //                //ProeductSLA is notthing but res_type_id
+        //                 " Values(" + configData.ProductSLA + "," + configData.ProductID + "," + configData.BAUPOP1 + "," +
+        //                 "" + configData.ReutersPOP1 + "," + configData.networkrel + "," + configData.AccessResiliencyType + "," +
+        //                 "" + configData.AsymmetricalAccessProductType + "," + configData.AsymmetricalAccessSpeed + "," +
+        //                 "" + configData.CommericialSeparacyMandatory + "," + configData.MTNISLA + "," + configData.BAUPOP2 + "," +
+        //                    "" + configData.ReutersPOP2 + "," + configData.NoCommonPOP + " ,'" + configData.CREATED_EMP_ID + "','" + configData.UPDATED_EMP_ID + "',SEQ_SLA_BUILDER.nextval," + configData.MultiCast + "," + configData.Diversity + ")";
+        //            OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+        //            cmdOra.CommandType = CommandType.Text;
+        //            int status = cmdOra.ExecuteNonQuery();
+        //        }
+        //        connection.Close();
+        //        return 1;
+        //    }
+
+        //    catch (Exception ex)
+        //    {
+
+        //    }
+        //    finally
+        //    {
+        //    }
+        //    return i;
+        //}
+
+        public static int saveAccessconfigData(int productId, List<adminBAL.AccessConfigData> configDatas)
+        {
+            try
+            {
+                OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+                OracleCommand command1 = new OracleCommand("delete  from ACCESS_TYPE_CONFIGURATION where product_id = '" + productId + "'", connection);
+                command1.CommandType = CommandType.Text;
+                connection.Open();
+                command1.ExecuteNonQuery();
+
+                foreach (adminBAL.AccessConfigData configdata in configDatas)
+                {
+                    if (configdata.LEG1_DELIVERY_MODE_NAME == "")
+                        configdata.LEG1_DELIVERY_MODE_NAME = "0";
+                    if (configdata.LEG1_SERVICE_VARIANT_NAME == "")
+                        configdata.LEG1_SERVICE_VARIANT_NAME = "0";
+                    if (configdata.LEG2_SERVICE_VARIANT_NAME == "")
+                        configdata.LEG2_SERVICE_VARIANT_NAME = "0";
+                    if (configdata.LEG2_DELIVERY_MODE_NAME == "")
+                        configdata.LEG2_DELIVERY_MODE_NAME = "0";
+                    string query =
+                      " INSERT INTO ACCESS_TYPE_CONFIGURATION (PRODUCT_ID,PRODUCT_SLA_ID,PRODUCT_SLA_NAME,ACCESS_SLA_ID,ACCESS_SLA_NAME, " +
+                      " LEG1_ACCESSTYPE_ID,LEG2_ACCESSTYPE_ID,LEG1_SERVICE_VARIANT,LEG2_SERVICE_VARIANT,LEG1_DELIVERY_MODE,LEG2_DELIVERY_MODE )" +
+                      "values(" + productId + "," + configdata.PRODUCT_SLA_TYPE_ID + ",'" + configdata.PRODUCT_SLA_TYPE_NAME + "'," +
+                       " " + configdata.ACCESS_RES_TYPE_ID + ",'" + configdata.ACCESS_RES_TYPE_VALUE + "'," +
+                      "" + configdata.LEG1_ACCESSTYPE_ID + ",'" + configdata.LEG2_ACCESSTYPE_ID + "','" + configdata.LEG1_SERVICE_VARIANT_NAME + "','" + configdata.LEG2_SERVICE_VARIANT_NAME + "'," +
+                      "'" + configdata.LEG1_DELIVERY_MODE_NAME + "','" + configdata.LEG2_DELIVERY_MODE_NAME + "')";
+                    OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                    cmdOra.CommandType = CommandType.Text;
+                    int status = cmdOra.ExecuteNonQuery();
+                }
+                connection.Close();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+            }
+            return 0;
+        }
+
+        public static List<DataTable> getCountriesData(int productid)
+        {
+            List<DataTable> list = new List<DataTable>();
+
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command1 =
+                new OracleCommand("SELECT DISTINCT COUNTRY_ID, COUNTRY_NAME FROM CSU_COUNTRY ORDER BY COUNTRY_NAME", connection);
+            OracleDataAdapter adapter1 = new OracleDataAdapter(command1);
+            DataTable dt1 = new DataTable();
+
+
+            string query2 = "SELECT DISTINCT A.CHAR_ACTUAL_VALUE || ' ' || A.CHAR_UNIT_OF_MEASURE As leg1_accessspeed_name,B.C_SPEED_ID AS leg1_accessspeed_id " +
+                "FROM CSU_REF_VALID_CHAR A,CAPMAN_ACCESS_SPEED_MAP B WHERE CHAR_TYPE_ID = 27 " +
+                "AND A.CHAR_ID = B.PC_SPEED_ID ORDER BY leg1_accessspeed_name";
+            OracleCommand command2 = new OracleCommand(query2, connection);
+            OracleDataAdapter adapter2 = new OracleDataAdapter(command2);
+            DataTable dt2 = new DataTable();
+
+            string query3 = "SELECT DISTINCT substr(CHAR_NAME,14) As leg2_accessspeed_name,B.C_ACCESS_SPEED_ID AS leg2_accessspeed_id " +
+                            " FROM CSU_REF_VALID_CHAR A,CAPMAN_DSL_ACCESS_SPEED_MAP B " +
+                            "WHERE CHAR_TYPE_ID = 1649 AND A.CHAR_ID = B.PC_ACCESS_SPEED_DU_ID " +
+                            "UNION SELECT DISTINCT A.CHAR_ACTUAL_VALUE || ' ' || A.CHAR_UNIT_OF_MEASURE As ASPEED,B.C_SPEED_ID AS " +
+                            "ASPEED_CODE FROM CSU_REF_VALID_CHAR A,CAPMAN_ACCESS_SPEED_MAP B WHERE CHAR_TYPE_ID = 27 " +
+                            "AND A.CHAR_ID = B.PC_SPEED_ID ORDER BY leg2_accessspeed_name";
+            OracleCommand command3 = new OracleCommand(query3, connection);
+            OracleDataAdapter adapter3 = new OracleDataAdapter(command3);
+            DataTable dt3 = new DataTable();
+
+            try
+            {
+                connection.Open();
+                adapter1.Fill(dt1);
+                adapter2.Fill(dt2);
+                adapter3.Fill(dt3);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            list.Add(dt1); list.Add(dt2); list.Add(dt3);
+            return list;
+        }
+
+        public static DataTable getCountriesDataByProductId(int productid)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            string qeury = " select distinct access_sla_id as ACCESS_RES_TYPE_ID, access_sla_name as ACCESS_RES_TYPE_VALUE, LEG1_ACCESSSPEED_ID, " +
+                             "product_sla_name as PRODUCT_SLA_TYPE_NAME, product_sla_id as PRODUCT_SLA_TYPE_ID , LEG2_ACCESSSPEED_ID, b.country_id AS COUNTRY_ID, " +
+                             "leg1_accessspeed_name as LEG1_ACCESSSPEED_NAME,leg2_accessspeed_name as LEG2_ACCESSSPEED_NAME,decode(a.country_id,-1,'ALL',b.country_name) as COUNTRY_NAME " +
+                             "from access_speed_configuration a left join csu_country b on a.country_id = b.country_id where product_id = " + productid + " " +
+                             "order by COUNTRY_NAME,PRODUCT_SLA_NAME";
+
+            OracleCommand command = new OracleCommand(qeury, connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+            DataTable dt = new DataTable();
+
+            try
+            {
+                connection.Open();
+                adapter.Fill(dt);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return dt;
+        }
+
+
+        public static List<DataTable> PlatformConfiguration(int productId)
+        {
+            //dropdowns data
+            string Platformsquery = "SELECT DISTINCT X.CAPMAN_PLATFORM_ID AS CAPMAN_PLATFORM_ID,CAPMAN_PLATFORM_NAME " +
+             " FROM CAPMAN_PLATFORMS X,CSU_PRODUCT_CAPMANPLATFORM_MAP Y " +
+             " WHERE PRODUCT_CD= " + productId + " AND X.CAPMAN_PLATFORM_ID=Y.CAPMAN_PLATFORM_ID ORDER BY X.CAPMAN_PLATFORM_ID ";
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand command1 = new OracleCommand(Platformsquery, connection);
+            OracleDataAdapter adapter1 = new OracleDataAdapter(command1);
+
+
+
+
+            //table data
+            string tblData = "Select DISTINCT ACCESS_SLA_ID as ACCESS_RES_TYPE_ID,Leg1_Platform_ID as CAPMAN_PLATFORM_ID1, " +
+               "Leg2_Platform_ID as CAPMAN_PLATFORM_ID2, ACCESS_SLA_NAME as " +
+               "ACCESS_RES_TYPE_VALUE,PRODUCT_SLA_ID as PRODUCT_SLA_TYPE_ID ,PRODUCT_SLA_NAME as PRODUCT_SLA_TYPE_NAME, " +
+               "A.capman_platform_name as capman_platform_name1,B.capman_platform_name as capman_platform_name2 from " +
+               "CSU_PLATFORM_CONFIGURATION,capman_platforms A,capman_platforms B where PRODUCT_ID = " + productId + " " +
+               "AND LEG1_platform_ID = A.capman_platform_id " +
+               "AND LEG2_platform_ID = B.capman_platform_id order by capman_platform_name2,capman_platform_name1 ";
+            OracleCommand command2 = new OracleCommand(tblData, connection);
+            OracleDataAdapter adapter2 = new OracleDataAdapter(command2);
+
+            DataTable dt1 = new DataTable();
+            DataTable dt2 = new DataTable();
+
+
+            try
+            {
+                connection.Open();
+                adapter1.Fill(dt1);
+                adapter2.Fill(dt2);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+
+            List<DataTable> tables = new List<DataTable>();
+            tables.Add(dt1); tables.Add(dt2);
+            return tables;
+        }
+
+        public static DataTable AccessTypeExcepetions(int Productid)
+        {
+            // adminBAL.AccessTypeException = new adminBAL.AccessTypeException();
+
+
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+            string query =
+                        "select distinct product_sla_id,product_sla_name, " +
+                        " decode(speed_rule,1,'Leg2 speed should be greater than or equal to leg1 speed.',2,'Leg2 speed should be less than or equal to leg1 speed.','None') " +
+                         " as spd_rul from ACCESS_SPEED_GENERAL_RULE where product_id = " + Productid + "";
+
+            OracleCommand command = new OracleCommand(query, connection);
+            OracleDataAdapter adapter = new OracleDataAdapter(command);
+            DataTable dt = new DataTable();
+            try
+            {
+                connection.Open();
+                adapter.Fill(dt);
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return dt;
+        }
+
+        public static int InsertAccessTypeExcepetions(int Productid, List<AccessTypeException> accesstype)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            try
+            {
+                foreach (AccessTypeException accesstypeEx in accesstype)
+                {
+                    string query = "INSERT INTO ACCESS_SPEED_GENERAL_RULE (PRODUCT_ID,PRODUCT_SLA_ID,PRODUCT_SLA_NAME, ACCESS_SLA_ID, ACCESS_SLA_NAME,SPEED_RULE)" +
+                               "values(" + Productid + "," + accesstypeEx.PRODUCT_SLA_TYPE_ID + ",'" + accesstypeEx.PRODUCT_SLA_TYPE_NAME + "'," +
+                               "" + accesstypeEx.ACCESS_RES_TYPE_ID + ",'" + accesstypeEx.ACCESS_RES_TYPE_VALUE + "'," + accesstypeEx.LegSpeedRdo + ")";
+                    OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                    cmdOra.CommandType = CommandType.Text;
+                    cmdOra.ExecuteNonQuery();
+                }
+                return 1;
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+
+        public static int insertcountrydetails(int productid, List<Country> countriesList)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                connection.Open();
+                string query1 = "delete from ACCESS_SPEED_CONFIGURATION where product_id = " + productid + "";
+                OracleCommand cmdOra1 = new OracleCommand(query1.ToString(), connection);
+                cmdOra1.CommandType = CommandType.Text;
+                cmdOra1.ExecuteNonQuery();
+                foreach (Country country in countriesList)
+                {
+                    string query =
+                        "INSERT INTO ACCESS_SPEED_CONFIGURATION (PRODUCT_ID,PRODUCT_SLA_ID,PRODUCT_SLA_NAME,ACCESS_SLA_ID,ACCESS_SLA_NAME,LEG1_ACCESSSPEED_ID,LEG2_ACCESSSPEED_ID,LEG1_ACCESSSPEED_NAME,LEG2_ACCESSSPEED_NAME,COUNTRY_ID)" +
+                        "values(" + productid + "," + country.PRODUCT_SLA_TYPE_ID + ",'" + country.PRODUCT_SLA_TYPE_NAME + "'," + country.ACCESS_RES_TYPE_ID + ",'" + country.ACCESS_RES_TYPE_VALUE + "'," + country.LEG1_ACCESSSPEED_ID + "," + country.LEG2_ACCESSSPEED_ID + ",'" + country.LEG1_ACCESSSPEED_NAME + "','" + country.LEG2_ACCESSSPEED_NAME + "'," + country.COUNTRY_ID + ") ";
+                    OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                    cmdOra.CommandType = CommandType.Text;
+                    cmdOra.ExecuteNonQuery();
+                }
+                return 1;
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+
+
+
+        public static int DeleteCountryDetailsByIds(int productId, List<Country> CountryData)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            try
+            {
+                foreach (adminBAL.Country configdata in CountryData)
+                {
+                    StringBuilder query = new StringBuilder();
+                    query.Append(" Delete from ACCESS_SPEED_CONFIGURATION where PRODUCT_ID = " + productId + " ");
+                    query.Append(" AND access_sla_id = " + configdata.ACCESS_RES_TYPE_ID + " ");
+                    query.Append(" AND leg1_accessspeed_id = " + configdata.LEG1_ACCESSSPEED_ID + " ");
+                    query.Append(" AND leg2_accessspeed_id = " + configdata.LEG2_ACCESSSPEED_ID + " ");
+                    query.Append(" AND product_sla_id = " + configdata.PRODUCT_SLA_TYPE_ID + " ");
+                    query.Append(" AND country_id = " + configdata.COUNTRY_ID + " ");
+                    OracleCommand command8 = new OracleCommand(query.ToString(), connection);
+                    command8.CommandType = CommandType.Text;
+                    command8.ExecuteNonQuery();
+                }
+                connection.Close();
+                connection.Dispose();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+            }
+            return 0;
+        }
+
+
+
+
+        public static int InsertPlatform(int productId, List<SCAdminDAL.Platform> platformData)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                connection.Open();
+                string query1 = "delete from csu_platform_configuration where product_id = " + productId + "";
+                OracleCommand cmdOra1 = new OracleCommand(query1.ToString(), connection);
+                cmdOra1.CommandType = CommandType.Text;
+                cmdOra1.ExecuteNonQuery();
+
+                foreach (Platform plat in platformData)
+                {
+                    string query = "INSERT INTO csu_platform_configuration (PRODUCT_ID,PRODUCT_SLA_ID,PRODUCT_SLA_NAME,ACCESS_SLA_ID,ACCESS_SLA_NAME,LEG1_platform_ID,LEG2_platform_ID)" +
+                                  " values(" + productId + "," + plat.PRODUCT_SLA_TYPE_ID + ",'" + plat.PRODUCT_SLA_TYPE_NAME + "', " +
+                                  " " + plat.ACCESS_RES_TYPE_ID + ",'" + plat.ACCESS_RES_TYPE_VALUE + "'," + plat.LEG1_PLATFORM_ID + "," + plat.LEG2_PLATFORM_ID + " )";
+                    OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                    cmdOra.CommandType = CommandType.Text;
+                    cmdOra.ExecuteNonQuery();
+                }
+                return 1;
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+
+
+
+
+        public static int DeletePlatformsDetailsByIds(int productId, List<Platform> PlatformsData)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            try
+            {
+                foreach (adminBAL.Platform platformdata in PlatformsData)
+                {
+                    StringBuilder query = new StringBuilder();
+                    query.Append(" Delete from CSU_PLATFORM_CONFIGURATION where PRODUCT_ID = " + productId + " ");
+                    query.Append(" AND LEG2_PLATFORM_ID = " + platformdata.LEG2_PLATFORM_ID + " ");
+
+                    if (platformdata.PRODUCT_SLA_TYPE_ID != 0)
+                    {
+                        query.Append(" AND PRODUCT_SLA_ID = " + platformdata.PRODUCT_SLA_TYPE_ID + " ");
+                    }
+                    if (platformdata.PRODUCT_SLA_TYPE_ID == 0)
+                    {
+                        query.Append(" AND PRODUCT_SLA_NAME = '" + platformdata.PRODUCT_SLA_TYPE_NAME + "' ");
+                    }
+                    if (platformdata.ACCESS_RES_TYPE_ID != 0)
+                    {
+                        query.Append(" AND ACCESS_SLA_ID = " + platformdata.ACCESS_RES_TYPE_ID + " ");
+                    }
+
+                    query.Append(" AND LEG1_PLATFORM_ID = " + platformdata.LEG1_PLATFORM_ID + " ");
+                    OracleCommand command8 = new OracleCommand(query.ToString(), connection);
+                    command8.CommandType = CommandType.Text;
+                    command8.ExecuteNonQuery();
+                }
+                connection.Close();
+                connection.Dispose();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+            }
+            return 0;
+        }
+
+
+
+        public static int InsertSLAMasterData(string CountryName, List<SLAMasterData> masterdata)
+        {
+            try
+            {
+                OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+                //OracleCommand command1 = new OracleCommand("delete  from csu_access_sla_configuration where country_id = '" + CountryName + "'", connection);
+                //command1.CommandType = CommandType.Text;
+                connection.Open();
+                //command1.ExecuteNonQuery();
+                foreach (SLAMasterData master in masterdata)
+                {
+
+                    //if (noofRows == 0)
+                    //{
+                    string[] CountryNames = CountryName.Split(',');
+
+                    for (int i = 0; i < CountryNames.Length; i++)
+                    {
+
+                        string CheckRecord = "select count(*) from ppsr_sla_master where COUNTRY_NAME='" + CountryNames[i] + "'and " +
+                                             "PARTNER_NAME='" + master.PartnerName + "'and RESILIENCE_NAME='" + master.ResiliencyName + "'and " +
+                                             "PRIMARY_ACCESS='" + master.PrimaryAccessaName + "'" +
+                        "and PRIMARY_ACCESS_VARIANT='" + master.PrimaryServiceVariantName + "'" +
+                            "and SECONDARY_ACCESS='" + master.SecondaryAccessName + "'and SECONDARY_ACCESS_VARIANT='" + master.SecondaryServiceVariantName + "'" +
+                        "and (DESCRIPTION='" + master.DescriptionName + "' or DESCRIPTION is null) and SLA_CATEGORY='" + master.SLACategoryName + "'and " +
+                        " (SITE_AVAILABILITY_TARGET='" + master.SiteAvailabilityTargetName + "' or SITE_AVAILABILITY_TARGET is null) and " +
+    "(SEVERITY_1_REPAIR_TARGET='" + master.Service1RepairTargetName + "' or SEVERITY_1_REPAIR_TARGET is null) and (RESILIENCY_REPAIR_TARGET='" + master.ResiliencyRepairTargetName + "' or RESILIENCY_REPAIR_TARGET is null )" +
+                        "and (BAND='" + master.BandName + "' or BAND is null) and (STANDARD_SLA_OR_SBR='" + master.SBRName + "' or STANDARD_SLA_OR_SBR is null) and " +
+
+                        "DEL_MODE_PRI='" + master.PrimaryDeleveryModeName + "'and DEL_MODE_SEC='" + master.SecondaryDeleveryModeName + "'" +
+                        "and PRODUCT='" + master.ProductitemName + "' ";
+
+
+                        OracleCommand command = new OracleCommand(CheckRecord, connection);
+                        // OracleDataAdapter adapter = new OracleDataAdapter(command);
+                        //  object obj = command.ExecuteScalar();
+                        int rows = Convert.ToInt32(command.ExecuteScalar());
+                        DataTable dt = new DataTable();
+                        //adapter.Fill(dt);
+                        // int rows = dt.Rows.Count;
+                        if (rows == 0)
+                        {
+                            string Insertquery = "Insert into ppsr_sla_master(COUNTRY_NAME,PARTNER_NAME,RESILIENCE_NAME,PRIMARY_ACCESS,PRIMARY_ACCESS_VARIANT," +
+                                "SECONDARY_ACCESS,SECONDARY_ACCESS_VARIANT,DESCRIPTION,SLA_CATEGORY,SITE_AVAILABILITY_TARGET," +
+        "SEVERITY_1_REPAIR_TARGET,RESILIENCY_REPAIR_TARGET,BAND,STANDARD_SLA_OR_SBR," +
+                                //'SLA2PLUS','BFG_SLA_ID',
+                            "DEL_MODE_PRI,DEL_MODE_SEC,PRODUCT) " +
+                            "values('" + CountryNames[i] + "','" + master.PartnerName + "','" + master.ResiliencyName + "','" + master.PrimaryAccessaName + "','" + master.PrimaryServiceVariantName + "'," +
+                            "'" + master.SecondaryAccessName + "','" + master.SecondaryServiceVariantName + "','" + master.DescriptionName + "','" + master.SLACategoryName + "','" + master.SiteAvailabilityTargetName + "'," +
+                            "'" + master.Service1RepairTargetName + "','" + master.ResiliencyRepairTargetName + "','" + master.BandName + "','" + master.SBRName + "'," +
+                            "'" + master.PrimaryDeleveryModeName + "','" + master.SecondaryDeleveryModeName + "','" + master.ProductitemName + "')";
+                            OracleCommand cmdOra = new OracleCommand(Insertquery.ToString(), connection);
+
+                            cmdOra.CommandType = CommandType.Text;
+                            int status = cmdOra.ExecuteNonQuery();
+                        }
+                    }
+
+
+                }
+
+                OracleCommand cmd = new OracleCommand("upload_sla_master", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("p_file_id", OracleDbType.Int32).Value = -1;//2;//pproductloclevel;
+                cmd.ExecuteNonQuery();
+                //}
+                connection.Close();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return 0;
+        }
+
+        public static int UpdateMasterDetails(List<SLAMasterData> CurrentItem1, List<SLAMasterData> UpdateItem1)
+        {
+            try
+            {
+                OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+                connection.Open();
+                SLAMasterData CurrentItem = CurrentItem1[0];
+                SLAMasterData UpdateItem = UpdateItem1[0];
+
+                string[] CountryName = CurrentItem.CountryName.Split(',');
+
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < CountryName.Length; i++)
+                {
+                    sb.Append(" delete from ppsr_sla_master ");
+                    sb.Append(" where COUNTRY_NAME='" + CountryName[i] + "' and  PARTNER_NAME ='" + CurrentItem.PartnerName + "'  and  RESILIENCE_NAME = '" + CurrentItem.ResiliencyName + "'");
+                    sb.Append(" and PRIMARY_ACCESS='" + CurrentItem.PrimaryAccessaName + "' and PRIMARY_ACCESS_VARIANT='" + CurrentItem.PrimaryServiceVariantName + "' and SECONDARY_ACCESS='" + CurrentItem.SecondaryAccessName + "'");
+                    sb.Append(" and SECONDARY_ACCESS_VARIANT ='" + CurrentItem.SecondaryServiceVariantName + "' ");
+
+                    StringBuilder DescriptionCurrentItem = CurrentItem.DescriptionName == "" ? sb.Append(" and DESCRIPTION is null ") : sb.Append(" and DESCRIPTION ='" + CurrentItem.DescriptionName + "'");
+                    StringBuilder SLA_CATEGORYItem1 = CurrentItem.SLACategoryName == "" ? sb.Append(" and SLA_CATEGORY is null ") : sb.Append(" and SLA_CATEGORY = '" + CurrentItem.SLACategoryName + "'");
+                    StringBuilder SITE_AVAILABILITY_TARGET1 = CurrentItem.SiteAvailabilityTargetName == "" ? sb.Append(" and SITE_AVAILABILITY_TARGET is null ") : sb.Append(" and SITE_AVAILABILITY_TARGET= '" + CurrentItem.SiteAvailabilityTargetName + "'");
+                    StringBuilder Service1RepairTargetName1 = CurrentItem.Service1RepairTargetName == "" ? sb.Append(" and SEVERITY_1_REPAIR_TARGET is null ") : sb.Append(" and SEVERITY_1_REPAIR_TARGET= '" + CurrentItem.Service1RepairTargetName + "'");
+                    StringBuilder RESILIENCY_REPAIR_TARGET1 = CurrentItem.ResiliencyRepairTargetName == "" ? sb.Append(" and RESILIENCY_REPAIR_TARGET is null ") : sb.Append(" and RESILIENCY_REPAIR_TARGET ='" + CurrentItem.ResiliencyRepairTargetName + "'");
+                    StringBuilder BAND1 = CurrentItem.BandName == "" ? sb.Append(" and BAND is null ") : sb.Append(" and BAND ='" + CurrentItem.BandName + "'");
+
+                    sb.Append("and DEL_MODE_PRI = '" + CurrentItem.PrimaryDeleveryModeName + "'");
+                    sb.Append("and DEL_MODE_SEC = '" + CurrentItem.SecondaryDeleveryModeName + "'");
+                    sb.Append("and PRODUCT = '" + CurrentItem.ProductitemName + "'");
+
+                    OracleCommand cmdOra = new OracleCommand(sb.ToString(), connection);
+
+                    cmdOra.CommandType = CommandType.Text;
+                    int status = cmdOra.ExecuteNonQuery();
+
+
+                    //For inserting the record
+                    string Insertquery = "Insert into ppsr_sla_master(COUNTRY_NAME,PARTNER_NAME,RESILIENCE_NAME,PRIMARY_ACCESS,PRIMARY_ACCESS_VARIANT," +
+                                "SECONDARY_ACCESS,SECONDARY_ACCESS_VARIANT,DESCRIPTION,SLA_CATEGORY,SITE_AVAILABILITY_TARGET," +
+        "SEVERITY_1_REPAIR_TARGET,RESILIENCY_REPAIR_TARGET,BAND,STANDARD_SLA_OR_SBR," +
+                        //'SLA2PLUS','BFG_SLA_ID',
+                            "DEL_MODE_PRI,DEL_MODE_SEC,PRODUCT) " +
+                            "values('" + CountryName[i] + "','" + UpdateItem.PartnerName + "','" + UpdateItem.ResiliencyName + "','" + UpdateItem.PrimaryAccessaName + "','" + UpdateItem.PrimaryServiceVariantName + "'," +
+                            "'" + UpdateItem.SecondaryAccessName + "','" + UpdateItem.SecondaryServiceVariantName + "','" + UpdateItem.DescriptionName + "','" + UpdateItem.SLACategoryName + "','" + UpdateItem.SiteAvailabilityTargetName + "'," +
+                            "'" + UpdateItem.Service1RepairTargetName + "','" + UpdateItem.ResiliencyRepairTargetName + "','" + UpdateItem.BandName + "','" + UpdateItem.SBRName + "'," +
+                            "'" + UpdateItem.PrimaryDeleveryModeName + "','" + UpdateItem.SecondaryDeleveryModeName + "','" + UpdateItem.ProductitemName + "')";
+                    OracleCommand cmdOra1 = new OracleCommand(Insertquery.ToString(), connection);
+
+                    cmdOra1.CommandType = CommandType.Text;
+                    int status1 = cmdOra1.ExecuteNonQuery();
+
+                }
+
+
+                //sb.Append(" update ppsr_sla_master set DESCRIPTION = '" + UpdateItem.DescriptionName + "',SLA_CATEGORY='" + UpdateItem.SLACategoryName + "',SITE_AVAILABILITY_TARGET='" + UpdateItem.SiteAvailabilityTargetName + "', ");
+                //sb.Append("SEVERITY_1_REPAIR_TARGET='" + UpdateItem.Service1RepairTargetName + "',RESILIENCY_REPAIR_TARGET='" + UpdateItem.ResiliencyRepairTargetName + "',BAND='" + UpdateItem.BandName + "'");
+
+                //sb.Append(" where COUNTRY_NAME='" + CountryName[i] + "' and  PARTNER_NAME ='" + CurrentItem.PartnerName + "'  and  RESILIENCE_NAME = '" + CurrentItem.ResiliencyName + "'");
+                //sb.Append(" and PRIMARY_ACCESS='" + CurrentItem.PrimaryAccessaName + "' and PRIMARY_ACCESS_VARIANT='" + CurrentItem.PrimaryServiceVariantName + "' and SECONDARY_ACCESS='" + CurrentItem.SecondaryAccessName + "'");
+                //sb.Append(" and SECONDARY_ACCESS_VARIANT ='" + CurrentItem.SecondaryServiceVariantName + "' ");
+
+                //StringBuilder DescriptioncurrentItem = CurrentItem.DescriptionName == "" ? sb.Append(" and DESCRIPTION is null ") : sb.Append(" and DESCRIPTION ='" + CurrentItem.DescriptionName + "'");
+                //StringBuilder SLA_CATEGORYItem1 = CurrentItem.SLACategoryName == "" ? sb.Append(" and SLA_CATEGORY is null ") : sb.Append(" and SLA_CATEGORY = '" + CurrentItem.SLACategoryName + "'");
+                //StringBuilder SITE_AVAILABILITY_TARGET1 = CurrentItem.SiteAvailabilityTargetName == "" ? sb.Append(" and SITE_AVAILABILITY_TARGET is null ") : sb.Append(" and SITE_AVAILABILITY_TARGET= '" + CurrentItem.SiteAvailabilityTargetName + "'");
+                //StringBuilder Service1RepairTargetName1 = CurrentItem.Service1RepairTargetName == "" ? sb.Append(" and SEVERITY_1_REPAIR_TARGET is null ") : sb.Append(" and SEVERITY_1_REPAIR_TARGET= '" + CurrentItem.Service1RepairTargetName + "'");
+                //StringBuilder RESILIENCY_REPAIR_TARGET1 = CurrentItem.ResiliencyRepairTargetName == "" ? sb.Append(" and RESILIENCY_REPAIR_TARGET is null ") : sb.Append(" and RESILIENCY_REPAIR_TARGET ='" + CurrentItem.ResiliencyRepairTargetName + "'");
+                //StringBuilder BAND1 = CurrentItem.BandName == "" ? sb.Append(" and BAND is null ") : sb.Append(" and BAND ='" + CurrentItem.BandName + "'");
+
+                //sb.Append(" and DEL_MODE_PRI = '" + CurrentItem.PrimaryDeleveryModeName + "'");
+                //sb.Append(" and DEL_MODE_SEC = '" + CurrentItem.SecondaryDeleveryModeName + "'");
+                //sb.Append(" and PRODUCT = '" + CurrentItem.ProductitemName + "'");
+
+                //OracleCommand cmdOra = new OracleCommand(sb.ToString(), connection);
+
+                //cmdOra.CommandType = CommandType.Text;
+                //int status = cmdOra.ExecuteNonQuery();
+                // }
+
+
+                OracleCommand cmd = new OracleCommand("upload_sla_master", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("p_file_id", OracleDbType.Int32).Value = -1;//2;//pproductloclevel;
+                cmd.ExecuteNonQuery();
+                connection.Close();
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return 0;
+
+        }
+
+
+
+        public static int DeleteMasterDetails(List<SLAMasterData> DeleteItem1)
+        {
+            try
+            {
+                OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+                connection.Open();
+                SLAMasterData DeleteItem = DeleteItem1[0];
+                string[] CountryName = DeleteItem.CountryName.Split(',');
+
+                for (int i = 0; i < CountryName.Length; i++)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(" delete from ppsr_sla_master ");
+                    sb.Append(" where COUNTRY_NAME='" + CountryName[i] + "' and  PARTNER_NAME ='" + DeleteItem.PartnerName + "'  and  RESILIENCE_NAME = '" + DeleteItem.ResiliencyName + "'");
+                    sb.Append(" and PRIMARY_ACCESS='" + DeleteItem.PrimaryAccessaName + "' and PRIMARY_ACCESS_VARIANT='" + DeleteItem.PrimaryServiceVariantName + "' and SECONDARY_ACCESS='" + DeleteItem.SecondaryAccessName + "'");
+                    sb.Append(" and SECONDARY_ACCESS_VARIANT ='" + DeleteItem.SecondaryServiceVariantName + "' ");
+
+                    StringBuilder DescriptionDeleteItem = DeleteItem.DescriptionName == "" ? sb.Append(" and DESCRIPTION is null ") : sb.Append(" and DESCRIPTION ='" + DeleteItem.DescriptionName + "'");
+                    StringBuilder SLA_CATEGORYItem1 = DeleteItem.SLACategoryName == "" ? sb.Append(" and SLA_CATEGORY is null ") : sb.Append(" and SLA_CATEGORY = '" + DeleteItem.SLACategoryName + "'");
+                    StringBuilder SITE_AVAILABILITY_TARGET1 = DeleteItem.SiteAvailabilityTargetName == "" ? sb.Append(" and SITE_AVAILABILITY_TARGET is null ") : sb.Append(" and SITE_AVAILABILITY_TARGET= '" + DeleteItem.SiteAvailabilityTargetName + "'");
+                    StringBuilder Service1RepairTargetName1 = DeleteItem.Service1RepairTargetName == "" ? sb.Append(" and SEVERITY_1_REPAIR_TARGET is null ") : sb.Append(" and SEVERITY_1_REPAIR_TARGET= '" + DeleteItem.Service1RepairTargetName + "'");
+                    StringBuilder RESILIENCY_REPAIR_TARGET1 = DeleteItem.ResiliencyRepairTargetName == "" ? sb.Append(" and RESILIENCY_REPAIR_TARGET is null ") : sb.Append(" and RESILIENCY_REPAIR_TARGET ='" + DeleteItem.ResiliencyRepairTargetName + "'");
+                    StringBuilder BAND1 = DeleteItem.BandName == "" ? sb.Append(" and BAND is null ") : sb.Append(" and BAND ='" + DeleteItem.BandName + "'");
+
+                    sb.Append("and DEL_MODE_PRI = '" + DeleteItem.PrimaryDeleveryModeName + "'");
+                    sb.Append("and DEL_MODE_SEC = '" + DeleteItem.SecondaryDeleveryModeName + "'");
+                    sb.Append("and PRODUCT = '" + DeleteItem.ProductitemName + "'");
+
+                    OracleCommand cmdOra = new OracleCommand(sb.ToString(), connection);
+
+                    cmdOra.CommandType = CommandType.Text;
+                    int status = cmdOra.ExecuteNonQuery();
+                }
+
+                OracleCommand cmd = new OracleCommand("upload_sla_master", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("p_file_id", OracleDbType.Int32).Value = -1;
+                cmd.ExecuteNonQuery();
+                connection.Close();
+
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return 0;
+
+        }
+
+
+
+        public static DataTable getDataFromDB(int FiletypeId, int ProductId)
+        {
+            DataTable Dt = new DataTable();
+            try
+            {
+                OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+                connection.Open();
+                string query = string.Empty;
+                switch (FiletypeId)
+                {
+                    case 0:
+                        query = "select * from VW_PRODUCT_BT_BASELINE_BFD where product_cd=" + ProductId + "";
+                        break;
+                    case 1:
+                        query = "select * from vw_cos_table1_data where product_cd=" + ProductId + " ";
+                        break;
+                    case 2:
+                        query = "select * from vw_cos_table4_data where product_cd=" + ProductId + " ";
+                        break;
+                    case 3:
+                        query = "select * from vw_cos_table5_data where product_cd=" + ProductId + " ";
+                        break;
+                    case 4:
+                        query = "select * from vw_product_sla_master where product_cd=" + ProductId + "";
+                        break;
+                    default:
+                        break;
+                }
+                OracleDataAdapter Adp = new OracleDataAdapter(query, connection);
+                Adp.Fill(Dt);
+                connection.Close();
+                return Dt;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return Dt;
+        }
+
+
+    }
+}

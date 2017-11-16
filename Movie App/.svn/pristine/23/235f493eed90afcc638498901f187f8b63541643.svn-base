@@ -1,0 +1,1020 @@
+﻿app.controller("AdminDSLCaseDetailsUpdateCtrl", function ($scope, $filter, $timeout, $http, $rootScope, $stateParams, NgTableParams, HVPNProductPortTypesFactory, CaseAvailabilityFactory, TunnelingNoteFactory, UpdateHVPNPortTypesFactory, CountryAccessDSLPackagesFactory, GPOPInterConnectFactory, VSATCharIdFactory, CasePackageIdFactory, CharLevelcharacteristicsFactory, DSLParentCharacteristicsFactory, HVPNProductParentPortTypesFactory, AdminDetailsPortDropdownDataFactory, PortTypeParentCharacteristicsFactory, PortTypeCharacteristicsFactory, PortTypeParentCharacteristicsParentIdFactory, DSLCharacteristicsFactory, UpdateDSLCharacteristicsFactory, UpdatePortTypeCharacteristicsFactory, CaseDetailsUpdatedDatesFactory, CaseDetailsPortTypesUpdatedDatesFactory) {
+    $(".pageLoaderOverlay").show();
+    $scope.GridsLoadedCount = 0;
+    $scope.PortTypeGridsLoadedCount = 0;
+    $scope.GridsUpdatededCount = 0;
+    $scope.PortTypeGridsUpdatedCount = 0;
+    $scope.HVPNProductPortTypesModal = [];
+    $scope.HVPNProductParentPortTypesModal = [];
+    $scope.HVPNProductParentCharacteristicModal = [];
+    $scope.HVPNProductCharacteristicModal = [];
+    $scope.PortTypeParentCharacteristicsModal = [];
+    $scope.PortTypeCharacteristicsModal = [];
+    $scope.$watchCollection('GridsLoadedCount', function (newNames, oldNames) {
+        if ($scope.GridsLoadedCount == 4) {
+            $scope.GridsLoadedCount = 0;
+            $timeout(function () {
+                //$("tbody tr td select").select2({});
+                $(".pageLoaderOverlay").hide();
+            }, 3000);
+        }
+    });
+
+    $scope.$watchCollection('PortTypeGridsLoadedCount', function (newNames, oldNames) {
+        if ($scope.PortTypeGridsLoadedCount == 2) {
+            $scope.PortTypeGridsLoadedCount = 0;
+            $timeout(function () {
+                //$("tbody tr td select").select2({});
+                $(".pageLoaderOverlay").hide();
+            }, 3000);
+        }
+    });
+
+    $scope.$watchCollection('GridsUpdatededCount', function (newNames, oldNames) {
+        if ($scope.GridsUpdatededCount == 4) {
+            $scope.GridsUpdatededCount = 0;
+            CaseDetailsUpdatedDatesFactory.GetCaseDetailsUpdatedDates($scope.CaseId, $scope.casePkgId).success(function (data) {
+                $scope.CreatedBy = data.d.CreatedBy;
+                $scope.CreatedDate = data.d.CreatedDate;
+                $scope.UpdatedBy = data.d.UpdatedBy;
+                $scope.UpdatedDate = data.d.UpdatedDate;
+                $(".pageLoaderOverlay").hide();
+            });
+            bootbox.alert("Updated Successfully");
+        }
+    });
+
+    $scope.$watchCollection('PortTypeGridsUpdatedCount', function (newNames, oldNames) {
+        if ($scope.PortTypeGridsUpdatedCount == 2) {
+            $scope.PortTypeGridsUpdatedCount = 0;
+            CaseDetailsPortTypesUpdatedDatesFactory.GetCaseDetailsPortTypesUpdatedDates($scope.CaseId, $scope.casePortTypePkgId).success(function (data) {
+                $scope.CreatedBy1 = data.d.CreatedBy;
+                $scope.CreatedDate1 = data.d.CreatedDate;
+                $scope.UpdatedBy1 = data.d.UpdatedBy;
+                $scope.UpdatedDate1 = data.d.UpdatedDate;
+            });
+            $(".pageLoaderOverlay").hide();
+            bootbox.alert("Updated Successfully");
+        }
+    });
+
+    $scope.ProductCd = $stateParams.ProductCd;
+    $scope.Region = $stateParams.Region;
+    $scope.CountryName = $stateParams.CountryName;
+    $scope.CountryId = $stateParams.CountryId;
+    $scope.CaseId = $stateParams.CaseId;
+    if ($stateParams.Validity == "true") {
+        $scope.Validity = 'Y';
+    } else {
+        $scope.Validity = 'N';
+    }
+    $scope.CaseAvailability = $stateParams.CaseAvailability;
+    $scope.SelectedDSLPackage = 22861;
+    $scope.IsHybrid = true;
+    $scope.IsVSAT = false;
+    $scope.ShowCountryAccessCaseList = function () {
+        $scope.GetCasesCountryAccess();
+    }
+
+    TunnelingNoteFactory.GetTunnelingNote($scope.CountryName).success(function (data) {
+        $scope.TunnelingNote = data.d;
+    });
+
+    CaseAvailabilityFactory.GetCaseAvailability().success(function (data) {
+        $scope.CaseAvailabilitylst = data.d;
+
+    });
+
+    //CaseDetailsPortTypesUpdatedDatesFactory.GetCaseDetailsPortTypesUpdatedDates(CaseId: $scope.CaseId, CasePkgId: $scope.casePkgId).success(function (data) { });
+
+    $scope.ResetCaseDetails = function () {
+        $(".pageLoaderOverlay").show();
+        if ($scope.HVPNProductPortTypesData.length != 0) {
+            $scope.HVPNProductPortTypesModal.forEach(function (item, index) {
+                if ($scope.IsHybrid) {
+                    $scope.HVPNProductPortTypesData[index].PortSpeedAvailabilityId = item.PortSpeedAvailabilityId;
+                    $scope.HVPNProductPortTypesData[index].AccessAvailabilityId = item.AccessAvailabilityId;
+                    $scope.HVPNProductPortTypesData[index].IsValid = item.IsValid;
+                }
+                else {
+                    $scope.HVPNProductPortTypesData[index].AccessAvailabilityId = item.AccessAvailabilityId;
+                    $scope.HVPNProductPortTypesData[index].DSLTechnologyTypeId = item.DSLTechnologyTypeId;
+                    $scope.HVPNProductPortTypesData[index].IsValid = item.IsValid;
+                }
+            });
+        }
+        if ($scope.HVPNProductParentPortTypesData.length != 0) {
+            $scope.HVPNProductParentPortTypesModal.forEach(function (item) {
+                //                if ($scope.IsHybrid) {                   
+                $scope.HVPNProductParentPortTypesData[index].IsValid = item.IsValid;
+
+                //                } else {                   
+                //                    $scope.HVPNProductParentPortTypesData[index].IsValid = item.IsValid;
+
+                //                }
+            });
+        }
+        if ($scope.HVPNProductParentCharacteristicData.length != 0) {
+            $scope.HVPNProductParentCharacteristicModal.forEach(function (item) {
+                $scope.HVPNProductParentCharacteristicData[index].MatrixId = item.MatrixId;
+                $scope.HVPNProductParentCharacteristicData[index].IsValid = item.IsValid;
+            });
+        }
+        if ($scope.HVPNProductCharacteristicData.length != 0) {
+            $scope.HVPNProductCharacteristicModal.forEach(function (item) {
+                $scope.HVPNProductCharacteristicData[index].MatrixId = item.MatrixId;
+                $scope.HVPNProductCharacteristicData[index].CharAvailCd = item.CharAvailCd;
+                $scope.HVPNProductCharacteristicData[index].CharacteristicValue = item.CharacteristicValue;
+                $scope.HVPNProductCharacteristicData[index].IsValid = item.IsValid;
+            });
+        }
+        $(".pageLoaderOverlay").hide();
+    }
+
+    $scope.ResetPortTypeChars = function () {
+        $(".pageLoaderOverlay").show();
+        if ($scope.PortTypeCharacteristicsData.length != 0) {
+            $scope.PortTypeCharacteristicsModal.forEach(function (item) {
+                $scope.PortTypeCharacteristicsData[index].MatrixId = item.MatrixId;
+                $scope.PortTypeCharacteristicsData[index].CharAvailCd = item.CharAvailCd;
+                $scope.PortTypeCharacteristicsData[index].CharacteristicValue = item.CharacteristicValue;
+                $scope.PortTypeCharacteristicsData[index].IsValid = item.IsValid;
+            });
+        }
+        if ($scope.PortTypeParentCharacteristicsData.length != 0) {
+            $scope.PortTypeParentCharacteristicsModal = [];
+            $scope.PortTypeParentCharacteristicsModal.forEach(function (item) {
+                $scope.PortTypeParentCharacteristicsData[index].MatrixId = item.MatrixId;
+                $scope.PortTypeParentCharacteristicsData[index].IsValid = item.IsValid;
+            });
+        }
+        $(".pageLoaderOverlay").hide();
+    }
+
+    $scope.Update = function () {
+        bootbox.confirm("Are you sure to update details of case?", function (result) {
+
+            if (result) {
+                $(".pageLoaderOverlay").show();
+                if ($scope.HVPNProductPortTypesData.length != 0) {
+                    $scope.HVPNProductPortTypesModal1 = [];
+                    $scope.HVPNProductPortTypesModal.forEach(function (item, index) {
+                        if ($scope.IsHybrid) {
+                            if (item.PortSpeedAvailabilityId != $scope.HVPNProductPortTypesData[index].PortSpeedAvailabilityId || item.AccessAvailabilityId != $scope.HVPNProductPortTypesData[index].AccessAvailabilityId || item.IsValid != $scope.HVPNProductPortTypesData[index].IsValid) {
+                                $scope.HVPNProductPortTypesModal1.push({ SupplierId: $scope.HVPNProductPortTypesData[index].SupplierId, SupplierProductId: $scope.HVPNProductPortTypesData[index].SupplierProductId, AccessTypeId: $scope.HVPNProductPortTypesData[index].AccessTypeId, PortTypeId: $scope.HVPNProductPortTypesData[index].PortTypeId, GPOPInterconnectId: $scope.HVPNProductPortTypesData[index].GPOPInterconnectId, PortSpeedId: $scope.HVPNProductPortTypesData[index].PortSpeedId, PortSpeedAvailabilityId: $scope.HVPNProductPortTypesData[index].PortSpeedAvailabilityId, AccessAvailabilityId: $scope.HVPNProductPortTypesData[index].AccessAvailabilityId, IsValid: $scope.HVPNProductPortTypesData[index].IsValid });
+                                $scope.HVPNProductPortTypesModal[index].PortSpeedAvailabilityId = $scope.HVPNProductPortTypesData[index].PortSpeedAvailabilityId;
+                                $scope.HVPNProductPortTypesModal[index].AccessAvailabilityId = $scope.HVPNProductPortTypesData[index].AccessAvailabilityId;
+                                $scope.HVPNProductPortTypesModal[index].IsValid = $scope.HVPNProductPortTypesData[index].IsValid;
+                            }
+                        } else {
+                            if (item.DSLTechnologyTypeId != $scope.HVPNProductPortTypesData[index].DSLTechnologyTypeId || item.AccessAvailabilityId != $scope.HVPNProductPortTypesData[index].AccessAvailabilityId || item.IsValid != $scope.HVPNProductPortTypesData[index].IsValid) {
+                                $scope.HVPNProductPortTypesModal1.push({ SupplierId: $scope.HVPNProductPortTypesData[index].SupplierId, SupplierProductId: $scope.HVPNProductPortTypesData[index].SupplierProductId, AccessTypeId: $scope.HVPNProductPortTypesData[index].AccessTypeId, PortTypeId: $scope.HVPNProductPortTypesData[index].PortTypeId, AccessAvailabilityId: $scope.HVPNProductPortTypesData[index].AccessAvailabilityId, DSLTechnologyTypeId: $scope.HVPNProductPortTypesData[index].DSLTechnologyTypeId, IsValid: $scope.HVPNProductPortTypesData[index].IsValid });
+                                $scope.HVPNProductPortTypesModal[index].AccessAvailabilityId = $scope.HVPNProductPortTypesData[index].AccessAvailabilityId;
+                                $scope.HVPNProductPortTypesModal[index].DSLTechnologyTypeId = $scope.HVPNProductPortTypesData[index].DSLTechnologyTypeId;
+                                $scope.HVPNProductPortTypesModal[index].IsValid = $scope.HVPNProductPortTypesData[index].IsValid;
+                            }
+                        }
+                    });
+                    if ($scope.HVPNProductPortTypesModal1.length != 0) {
+                        UpdateHVPNPortTypesFactory.UpdateHVPNPortTypes({ HVPNProductPortTypes: $scope.HVPNProductPortTypesModal1, CaseUpdateIds: { CaseId: $scope.CaseId, CasePkgId: $scope.casePkgId, UserId: $rootScope.User_Id} }, $scope.IsHybrid, false).success(function (data) {
+                            $scope.GridsUpdatededCount++;
+                        });
+                    }
+                    else {
+                        $scope.GridsUpdatededCount++;
+                    }
+                } else {
+                    $scope.GridsUpdatededCount++;
+                }
+                if ($scope.HVPNProductParentPortTypesData.length != 0) {
+                    $scope.HVPNProductParentPortTypesModal1 = [];
+                    $scope.HVPNProductParentPortTypesModal.forEach(function (item, index) {
+                        if (item.IsValid != $scope.HVPNProductParentPortTypesData[index].IsValid) {
+                            if ($scope.IsHybrid) {
+                                $scope.HVPNProductParentPortTypesModal1.push({ SupplierId: $scope.HVPNProductParentPortTypesData[index].SupplierId, SupplierProductId: $scope.HVPNProductParentPortTypesData[index].SupplierProductId, AccessTypeId: $scope.HVPNProductParentPortTypesData[index].AccessTypeId, PortTypeId: $scope.HVPNProductParentPortTypesData[index].PortTypeId, GPOPInterconnectId: $scope.HVPNProductParentPortTypesData[index].GPOPInterconnectId, PortSpeedId: $scope.HVPNProductParentPortTypesData[index].PortSpeedId, IsValid: $scope.HVPNProductParentPortTypesData[index].IsValid });
+                            } else {
+                                $scope.HVPNProductParentPortTypesModal1.push({ SupplierId: $scope.HVPNProductParentPortTypesData[index].SupplierId, SupplierProductId: $scope.HVPNProductParentPortTypesData[index].SupplierProductId, AccessTypeId: $scope.HVPNProductParentPortTypesData[index].AccessTypeId, PortTypeId: $scope.HVPNProductParentPortTypesData[index].PortTypeId, IsValid: $scope.HVPNProductParentPortTypesData[index].IsValid });
+                            }
+                            //$scope.HVPNProductParentPortTypesModal1.push({ IsValid: $scope.HVPNProductParentPortTypesData[index].IsValid });
+                            $scope.HVPNProductParentPortTypesModal[index].IsValid = $scope.HVPNProductParentPortTypesData[index].IsValid;
+                        }
+                    });
+                    if ($scope.HVPNProductParentPortTypesModal1.length != 0) {
+                        UpdateHVPNPortTypesFactory.UpdateHVPNPortTypes({ HVPNProductPortTypes: $scope.HVPNProductParentPortTypesModal1, CaseUpdateIds: { CaseId: $scope.CaseId, CasePkgId: $scope.casePkgId, UserId: $rootScope.User_Id} }, $scope.IsHybrid, false).success(function (data) {
+                            $scope.GridsUpdatededCount++;
+                        });
+                    } else {
+                        $scope.GridsUpdatededCount++;
+                    }
+                } else {
+                    $scope.GridsUpdatededCount++;
+                }
+                if ($scope.HVPNProductParentCharacteristicData.length != 0) {
+                    $scope.HVPNProductParentCharacteristicModal1 = [];
+                    $scope.HVPNProductParentCharacteristicModal1.forEach(function (item, index) {
+                        $scope.HVPNProductParentCharacteristicModal1.push({ MatrixId: $scope.HVPNProductParentCharacteristicData[index].MatrixId, IsValid: $scope.HVPNProductParentCharacteristicData[index].IsValid });
+                        $scope.HVPNProductParentCharacteristicModal[index].MatrixId = $scope.HVPNProductParentCharacteristicData[index].MatrixId;
+                        $scope.HVPNProductParentCharacteristicModal[index].IsValid = $scope.HVPNProductParentCharacteristicData[index].IsValid;
+                    });
+                    if ($scope.HVPNProductParentCharacteristicModal1.length != 0) {
+                        UpdateDSLCharacteristicsFactory.UpdateDSLCharacteristics({ DSLCharacteristics: $scope.HVPNProductParentCharacteristicModal1, CaseUpdateIds: { CaseId: $scope.CaseId, CasePkgId: $scope.casePkgId, UserId: $rootScope.User_Id} }, true).success(function (data) {
+                            $scope.GridsUpdatededCount++;
+                        });
+                    } else {
+                        $scope.GridsUpdatededCount++;
+                    }
+                } else {
+                    $scope.GridsUpdatededCount++;
+                }
+                if ($scope.HVPNProductCharacteristicData.length != 0) {
+                    $scope.HVPNProductCharacteristicModal1 = [];
+                    $scope.HVPNProductCharacteristicModal.forEach(function (item, index) {
+                        $scope.HVPNProductCharacteristicModal1.push({ MatrixId: $scope.HVPNProductCharacteristicData[index].MatrixId, CharAvailCd: $scope.HVPNProductCharacteristicData[index].CharAvailCd, CharacteristicValue: $scope.HVPNProductCharacteristicData[index].CharacteristicValue, IsValid: $scope.HVPNProductCharacteristicData[index].IsValid });
+                        $scope.HVPNProductCharacteristicModal[index].MatrixId = $scope.HVPNProductCharacteristicData[index].MatrixId;
+                        $scope.HVPNProductCharacteristicModal[index].CharAvailCd = $scope.HVPNProductCharacteristicData[index].CharAvailCd;
+                        $scope.HVPNProductCharacteristicModal[index].CharacteristicValue = $scope.HVPNProductCharacteristicData[index].CharacteristicValue;
+                        $scope.HVPNProductCharacteristicModal[index].IsValid = $scope.HVPNProductCharacteristicData[index].IsValid;
+                    });
+                    if ($scope.HVPNProductCharacteristicModal1.length != 0) {
+                        UpdateDSLCharacteristicsFactory.UpdateDSLCharacteristics({ DSLCharacteristics: $scope.HVPNProductCharacteristicModal1, CaseUpdateIds: { CaseId: $scope.CaseId, CasePkgId: $scope.casePkgId, UserId: $rootScope.User_Id} }, false).success(function (data) {
+                            $scope.GridsUpdatededCount++;
+                        });
+                    } else {
+                        $scope.GridsUpdatededCount++;
+                    }
+                } else {
+                    $scope.GridsUpdatededCount++;
+                }
+            }
+        });
+    }
+
+
+    $scope.UpdatePortType = function () {
+
+        bootbox.confirm("Are you sure to update Port Type Characteristics?", function (result) {
+
+            if (result) {
+                $(".pageLoaderOverlay").show();
+                if ($scope.PortTypeParentCharacteristicsData.length != 0) {
+                    $scope.PortTypeParentCharacteristicsModal1 = [];
+                    $scope.PortTypeParentCharacteristicsModal.forEach(function (item, index) {
+                        $scope.PortTypeParentCharacteristicsModal1.push({ MatrixId: $scope.PortTypeParentCharacteristicsData[index].MatrixId, IsValid: $scope.PortTypeParentCharacteristicsData[index].IsValid });
+                        $scope.PortTypeParentCharacteristicsModal[index].MatrixId = $scope.PortTypeParentCharacteristicsData[index].MatrixId;
+                        $scope.PortTypeParentCharacteristicsModal[index].IsValid = $scope.PortTypeParentCharacteristicsData[index].IsValid;
+                    });
+                    if ($scope.PortTypeParentCharacteristicsModal1.length != 0) {
+                        UpdatePortTypeCharacteristicsFactory.UpdatePortTypeCharacteristics({ DSLCharacteristics: $scope.PortTypeParentCharacteristicsModal1, CaseUpdateIds: { CaseId: $scope.CaseId, CasePkgId: $scope.casePortTypePkgId, UserId: $rootScope.User_Id} }, true).success(function (data) {
+                            $scope.PortTypeGridsUpdatedCount++;
+                        });
+                    } else {
+                        $scope.GridsUpdatededCount++;
+                    }
+                } else {
+                    $scope.PortTypeGridsUpdatedCount++;
+                }
+                if ($scope.PortTypeCharacteristicsData.length != 0) {
+                    $scope.PortTypeCharacteristicsModal1 = [];
+                    $scope.PortTypeCharacteristicsModal.forEach(function (item, index) {
+                        $scope.PortTypeCharacteristicsModal1.push({ MatrixId: $scope.PortTypeCharacteristicsData[index].MatrixId, CharAvailCd: $scope.PortTypeCharacteristicsData[index].CharAvailCd, CharacteristicValue: $scope.PortTypeCharacteristicsData[index].CharacteristicValue, IsValid: $scope.PortTypeCharacteristicsData[index].IsValid });
+                        $scope.PortTypeCharacteristicsModal[index].MatrixId = $scope.PortTypeCharacteristicsData[index].MatrixId;
+                        $scope.PortTypeCharacteristicsModal[index].CharAvailCd = $scope.PortTypeCharacteristicsData[index].CharAvailCd;
+                        $scope.PortTypeCharacteristicsModal[index].CharacteristicValue = $scope.PortTypeCharacteristicsData[index].CharacteristicValue;
+                        $scope.PortTypeCharacteristicsModal[index].IsValid = $scope.PortTypeCharacteristicsData[index].IsValid;
+                    });
+                    if ($scope.PortTypeCharacteristicsModal1.length != 0) {
+                        UpdatePortTypeCharacteristicsFactory.UpdatePortTypeCharacteristics({ DSLCharacteristics: $scope.PortTypeCharacteristicsModal1, CaseUpdateIds: { CaseId: $scope.CaseId, CasePkgId: $scope.casePortTypePkgId, UserId: $rootScope.User_Id} }, false).success(function (data) {
+                            $scope.PortTypeGridsUpdatedCount++;
+                        });
+                    } else {
+                        $scope.GridsUpdatededCount++;
+                    }
+                } else {
+                    $scope.PortTypeGridsUpdatedCount++;
+                }
+            }
+        });
+    }
+
+    CountryAccessDSLPackagesFactory.GetCountryAccessDSLPackages($scope.CaseId, $scope.CountryName).success(function (data) {
+        $scope.DLSPackages = data.d;
+        $("#Select1").select2({});
+        data.d.forEach(function (item) {
+            if (item.CharName == "VSAT") {
+                item.CharId = "22861|VSAT";
+            }
+        });
+        if (data.d.length != 0) {
+            $scope.DLSPackagesMod = "22861";
+            $('#divDLSPackages .select2-chosen').html("Hybrid VPN");
+            CharLevelcharacteristicsFactory.GetCharLevelcharacteristics($scope.ProductCd, $scope.IsHybrid).success(function (data) {
+                $scope.PortTypeLevelChars = data.d;
+            });
+
+            $scope.ChangeGridHeaders();
+
+            CasePackageIdFactory.GetCasePackageId($scope.CaseId, $scope.DLSPackagesMod).success(function (data) {
+                $scope.casePkgId = data.d;
+                CaseDetailsUpdatedDatesFactory.GetCaseDetailsUpdatedDates($scope.CaseId, $scope.casePkgId).success(function (data) {
+                    $scope.CreatedBy = data.d.CreatedBy;
+                    $scope.CreatedDate = data.d.CreatedDate;
+                    $scope.UpdatedBy = data.d.UpdatedBy;
+                    $scope.UpdatedDate = data.d.UpdatedDate;
+                });
+//                if ($scope.ProductCd == 21) {
+                    VSATCharIdFactory.GetVSATCharId().success(function (data) {
+                        $scope.vsatCharId = data.d;
+                        GPOPInterConnectFactory.GetGPOPInterConnect($scope.CaseId, $scope.SelectedDSLPackage, $scope.vsatCharId, $scope.casePkgId, $scope.CountryId, false).success(function (data) {
+                            $scope.GPOPInterconnect = data.d;
+                            $scope.GPOPInterConnectMod = data.d[0].HubSiteId;
+                            //$("#Select2").select2({});
+                            $("#Select2").select2({ width: '100%' });
+                            $('#divGPOPInterconnect .select2-chosen').html(data.d[0].HubSiteName);
+                            $scope.LoadGrids();
+                        });
+                    });
+//                } else {
+//                    $scope.LoadGrids();
+//                }
+            });
+        } else {
+            $(".pageLoaderOverlay").hide();
+        }
+    });
+
+    $scope.DSLPkgChange = function () {
+        $(".pageLoaderOverlay").show();
+        var dlsPkg = $scope.DLSPackagesMod.split("|");
+        if (dlsPkg.length == 2) {
+            $scope.SelectedDSLPackage = dlsPkg[0];
+            $scope.IsHybrid = true;
+            $scope.IsVSAT = true;
+        } else {
+            if ($scope.DLSPackagesMod == 22861) {
+                $scope.IsHybrid = true;
+            } else {
+                $scope.IsHybrid = false;
+            }
+            $scope.SelectedDSLPackage = $scope.DLSPackagesMod;
+            $scope.IsVSAT = false;
+        }
+
+        $scope.ChangeGridHeaders();
+
+        CharLevelcharacteristicsFactory.GetCharLevelcharacteristics($scope.ProductCd, $scope.IsHybrid).success(function (data) {
+            $scope.PortTypeLevelChars = data.d;
+        });
+
+        CasePackageIdFactory.GetCasePackageId($scope.CaseId, $scope.SelectedDSLPackage).success(function (data) {
+            $scope.casePkgId = data.d;
+            if ($scope.IsVSAT) {
+                GPOPInterConnectFactory.GetGPOPInterConnect($scope.CaseId, $scope.SelectedDSLPackage, $scope.vsatCharId, $scope.casePkgId, $scope.CountryId, $scope.IsVSAT).success(function (data) {
+                    $scope.GPOPInterconnect = data.d;
+                    $scope.GPOPInterConnectMod = data.d[0].HubSiteId;
+                    $("#Select2").select2({});
+                    $('#divGPOPInterconnect .select2-chosen').html(data.d[0].HubSiteName);
+
+                    HVPNProductPortTypesFactory.GetHVPNProductPortTypes($scope.CaseId, $scope.casePkgId, $scope.CountryId, $rootScope.User_Id, $scope.SelectedDSLPackage, $scope.GPOPInterConnectMod, $scope.IsHybrid, $scope.IsVSAT).success(function (data) {
+                        $scope.HVPNProductPortTypesData = data.d;
+                        //$scope.HVPNProductPortTypesModalIndex = 0;
+                        $scope.PortTypeGridLoaded = 0;
+                        $scope.HVPNProductPortTypes = new NgTableParams({}, { total: $scope.HVPNProductPortTypesData.length, getData:
+                            function ($defer, params) {
+                                //$scope.HVPNProductPortTypesModalIndex = (params.page() - 1) * params.count();
+                                if ($scope.PortTypeGridLoaded == 1) {
+                                    $(".pageLoaderOverlay").show();
+                                }
+                                $scope.data = params.sorting() ? $filter('orderBy')($scope.HVPNProductPortTypesData, params.orderBy()) : $scope.HVPNProductPortTypesData;
+                                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                                params.total($scope.data.length);
+                                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                                $defer.resolve($scope.data);
+                                $timeout(function () {
+                                    $("#HVPNProductPortTypesTbl tbody tr td select").select2({});
+                                    if ($scope.PortTypeGridLoaded == 1) {
+                                        $(".pageLoaderOverlay").hide();
+                                    }
+                                    $scope.PortTypeGridLoaded = 1;
+                                }, 100);
+                            }
+                        });
+                        $scope.HVPNProductPortTypesModal = [];
+                        data.d.forEach(function (item) {
+                            if ($scope.IsHybrid) {
+                                $scope.HVPNProductPortTypesModal.push({ SupplierId: item.SupplierId, SupplierProductId: item.SupplierProductId, AccessTypeId: item.AccessTypeId, PortTypeId: item.PortTypeId, GPOPInterconnectId: item.GPOPInterconnectId, PortSpeedId: item.PortSpeedId, PortSpeedAvailabilityId: item.PortSpeedAvailabilityId, AccessAvailabilityId: item.AccessAvailabilityId, IsValid: item.IsValid });
+                            } else {
+                                $scope.HVPNProductPortTypesModal.push({ SupplierId: item.SupplierId, SupplierProductId: item.SupplierProductId, AccessTypeId: item.AccessTypeId, PortTypeId: item.PortTypeId, AccessAvailabilityId: item.AccessAvailabilityId, DSLTechnologyTypeId: item.DSLTechnologyTypeId, IsValid: item.IsValid });
+                            }
+                        });
+                        $(".pageLoaderOverlay").hide();
+                    });
+                });
+            } else {
+                $scope.LoadGrids();
+            }
+        });
+    }
+
+    $scope.LoadGrids = function () {
+        var gpop = 0;
+        if ($scope.GPOPInterConnectMod == '' || angular.isUndefined($scope.GPOPInterConnectMod) || $scope.GPOPInterConnectMod == null) {
+            gpop = 0;
+        } else {
+            gpop = $scope.GPOPInterConnectMod;
+        }
+        HVPNProductPortTypesFactory.GetHVPNProductPortTypes($scope.CaseId, $scope.casePkgId, $scope.CountryId, $rootScope.User_Id, $scope.SelectedDSLPackage, gpop, $scope.IsHybrid, $scope.IsVSAT).success(function (data) {
+            $scope.HVPNProductPortTypesData = data.d;
+            //$scope.HVPNProductPortTypesModalIndex = 0;
+            $scope.PortTypeGridLoaded = 0;
+            $scope.HVPNProductPortTypes = new NgTableParams({}, { total: $scope.HVPNProductPortTypesData.length, getData:
+            function ($defer, params) {
+                //$scope.HVPNProductPortTypesModalIndex = (params.page() - 1) * params.count();
+                if ($scope.PortTypeGridLoaded == 1) {
+                    $(".pageLoaderOverlay").show();
+                }
+                $scope.data = params.sorting() ? $filter('orderBy')($scope.HVPNProductPortTypesData, params.orderBy()) : $scope.HVPNProductPortTypesData;
+                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                params.total($scope.data.length);
+                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                $defer.resolve($scope.data);
+                $timeout(function () {
+                    $("#HVPNProductPortTypesTbl tbody tr td select").select2({});
+                    if ($scope.PortTypeGridLoaded == 1) {
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    $scope.PortTypeGridLoaded = 1;
+                }, 100);
+            }
+            });
+
+            $scope.HVPNProductPortTypesModal = [];
+            data.d.forEach(function (item) {
+                if ($scope.IsHybrid) {
+                    $scope.HVPNProductPortTypesModal.push({ SupplierId: item.SupplierId, SupplierProductId: item.SupplierProductId, AccessTypeId: item.AccessTypeId, PortTypeId: item.PortTypeId, GPOPInterconnectId: item.GPOPInterconnectId, PortSpeedId: item.PortSpeedId, PortSpeedAvailabilityId: item.PortSpeedAvailabilityId, AccessAvailabilityId: item.AccessAvailabilityId, IsValid: item.IsValid });
+                } else {
+                    $scope.HVPNProductPortTypesModal.push({ SupplierId: item.SupplierId, SupplierProductId: item.SupplierProductId, AccessTypeId: item.AccessTypeId, PortTypeId: item.PortTypeId, AccessAvailabilityId: item.AccessAvailabilityId, DSLTechnologyTypeId: item.DSLTechnologyTypeId, IsValid: item.IsValid });
+                }
+            });
+            $scope.GridsLoadedCount++;
+        });
+
+        HVPNProductParentPortTypesFactory.GetHVPNProductParentPortTypes($scope.CaseId, $scope.casePkgId, $scope.CountryId, $scope.ProductCd, $rootScope.User_Id, $scope.SelectedDSLPackage, $scope.IsHybrid).success(function (data) {
+            $scope.HVPNProductParentPortTypesData = data.d;
+            //$scope.HVPNProductParentPortTypesModalIndex = 0;
+            $scope.ParentPortTypeGridLoaded = 0;
+            $scope.HVPNProductParentPortTypes = new NgTableParams({}, { total: $scope.HVPNProductParentPortTypesData.length, getData:
+            function ($defer, params, pages) {
+                //$scope.HVPNProductParentPortTypesModalIndex = (params.page() - 1) * params.count();
+                if ($scope.ParentPortTypeGridLoaded == 1) {
+                    $(".pageLoaderOverlay").show();
+                }
+                $scope.data = params.sorting() ? $filter('orderBy')($scope.HVPNProductParentPortTypesData, params.orderBy()) : $scope.HVPNProductParentPortTypesData;
+                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                params.total($scope.data.length);
+                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                $defer.resolve($scope.data);
+                $timeout(function () {
+                    $("#HVPNProductParentPortTypesTbl tbody tr td select").select2({});
+                    if ($scope.ParentPortTypeGridLoaded == 1) {
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    $scope.ParentPortTypeGridLoaded = 1;
+                }, 100);
+            }
+            });
+            $scope.HVPNProductParentPortTypesModal = [];
+            data.d.forEach(function (item) {
+                if ($scope.IsHybrid) {
+                    $scope.HVPNProductParentPortTypesModal.push({ SupplierId: item.SupplierId, SupplierProductId: item.SupplierProductId, AccessTypeId: item.AccessTypeId, PortTypeId: item.PortTypeId, GPOPInterconnectId: item.GPOPInterconnectId, PortSpeedId: item.PortSpeedId, IsValid: item.IsValid });
+                } else {
+                    $scope.HVPNProductParentPortTypesModal.push({ SupplierId: item.SupplierId, SupplierProductId: item.SupplierProductId, AccessTypeId: item.AccessTypeId, PortTypeId: item.PortTypeId, IsValid: item.IsValid });
+                }
+            });
+            $scope.GridsLoadedCount++;
+        });
+
+        DSLParentCharacteristicsFactory.GetDSLParentCharacteristics($scope.CaseId, $scope.casePkgId, $scope.CountryId, $scope.ProductCd, $rootScope.User_Id, $scope.SelectedDSLPackage, $scope.IsHybrid).success(function (data) {
+            $scope.HVPNProductParentCharacteristicData = data.d;
+            //$scope.HVPNProductParentCharacteristicModalIndex = 0;
+            $scope.ParentCharacteristicGridLoaded = 0;
+            $scope.HVPNProductParentCharacteristic = new NgTableParams({}, { total: $scope.HVPNProductParentCharacteristicData.length, getData:
+            function ($defer, params) {
+                //$scope.HVPNProductParentCharacteristicModalIndex = (params.page() - 1) * params.count();
+                if ($scope.ParentCharacteristicGridLoaded == 1) {
+                    $(".pageLoaderOverlay").show();
+                }
+                $scope.data = params.sorting() ? $filter('orderBy')($scope.HVPNProductParentCharacteristicData, params.orderBy()) : $scope.HVPNProductParentCharacteristicData;
+                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                params.total($scope.data.length);
+                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                $defer.resolve($scope.data);
+                $timeout(function () {
+                    $("#HVPNProductParentCharacteristicTbl tbody tr td select").select2({});
+                    if ($scope.ParentCharacteristicGridLoaded == 1) {
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    $scope.ParentCharacteristicGridLoaded = 1;
+                }, 100);
+            }
+            });
+            $scope.HVPNProductParentCharacteristicModal = [];
+            data.d.forEach(function (item) {
+                $scope.HVPNProductParentCharacteristicModal.push({ MatrixId: item.MatrixId, IsValid: item.IsValid });
+            });
+            $scope.GridsLoadedCount++;
+        });
+
+        DSLCharacteristicsFactory.GetDSLCharacteristics($scope.CaseId, $scope.casePkgId, $rootScope.User_Id, $scope.IsHybrid).success(function (data) {
+            $scope.HVPNProductCharacteristicData = data.d;
+            //$scope.HVPNProductCharacteristicModalIndex = 0;
+            $scope.CharacteristicGridLoaded = 0;
+            $scope.HVPNProductCharacteristic = new NgTableParams({}, { total: $scope.HVPNProductCharacteristicData.length, getData:
+            function ($defer, params) {
+                //$scope.HVPNProductParentCharacteristicModalIndex = (params.page() - 1) * params.count();
+                if ($scope.CharacteristicGridLoaded == 1) {
+                    $(".pageLoaderOverlay").show();
+                }
+                $scope.data = params.sorting() ? $filter('orderBy')($scope.HVPNProductCharacteristicData, params.orderBy()) : $scope.HVPNProductCharacteristicData;
+                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                params.total($scope.data.length);
+                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                $defer.resolve($scope.data);
+                $timeout(function () {
+                    $("#HVPNProductCharacteristicTbl tbody tr td select").select2({});
+                    if ($scope.CharacteristicGridLoaded == 1) {
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    $scope.CharacteristicGridLoaded = 1;
+                }, 100);
+            }
+            });
+            $scope.HVPNProductCharacteristicModal = [];
+            data.d.forEach(function (item) {
+                $scope.HVPNProductCharacteristicModal.push({ MatrixId: item.MatrixId, CharAvailCd: item.CharAvailCd, CharacteristicValue: item.CharacteristicValue, IsValid: item.IsValid });
+            });
+            $scope.GridsLoadedCount++;
+        });
+    }
+
+    $scope.ChangeGridHeaders = function () {
+        if ($scope.IsHybrid) {
+            $("#HVPNProductPortTypesTbl tr th:nth-child(1)").show();
+            $("#HVPNProductPortTypesTbl tr th:nth-child(2)").show();
+
+            $("#HVPNProductPortTypesTbl tr th:nth-child(3)").hide();
+            $("#HVPNProductPortTypesTbl tr th:nth-child(4)").hide();
+
+            //$("#HVPNProductPortTypesTbl tr th:nth-child(4)").hide();
+
+            $("#HVPNProductPortTypesTbl tr th:nth-child(6)").hide();
+
+            //$("#HVPNProductPortTypesTbl tr th:nth-child(6)").hide();
+            //$("#HVPNProductPortTypesTbl tr th:nth-child(7)").hide();
+
+            $("#HVPNProductPortTypesTbl tr th:nth-child(9)").show();
+            $("#HVPNProductPortTypesTbl tr th:nth-child(10)").hide();
+            $("#HVPNProductPortTypesTbl tr th:nth-child(11)").show();
+            //------------------------------------------------------
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(1)").show();
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(2)").show();
+
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(3)").hide();
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(4)").hide();
+
+            //$("#HVPNProductParentPortTypesTbl tr th:nth-child(4)").hide();
+
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(6)").hide();
+
+            //$("#HVPNProductParentPortTypesTbl tr th:nth-child(6)").hide();
+            //$("#HVPNProductParentPortTypesTbl tr th:nth-child(7)").hide();
+
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(9)").show();
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(10)").hide();
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(11)").show();
+        } else {
+            $("#HVPNProductPortTypesTbl tr th:nth-child(1)").hide();
+            $("#HVPNProductPortTypesTbl tr th:nth-child(2)").hide();
+
+            $("#HVPNProductPortTypesTbl tr th:nth-child(3)").show();
+            $("#HVPNProductPortTypesTbl tr th:nth-child(4)").show();
+
+            //$("#HVPNProductPortTypesTbl tr th:nth-child(4)").hide();
+
+            $("#HVPNProductPortTypesTbl tr th:nth-child(6)").show();
+
+            //$("#HVPNProductPortTypesTbl tr th:nth-child(6)").hide();
+            //$("#HVPNProductPortTypesTbl tr th:nth-child(7)").hide();
+
+            $("#HVPNProductPortTypesTbl tr th:nth-child(9)").hide();
+            $("#HVPNProductPortTypesTbl tr th:nth-child(10)").show();
+            $("#HVPNProductPortTypesTbl tr th:nth-child(11)").hide();
+            //------------------------------------------------------
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(1)").hide();
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(2)").hide();
+
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(3)").show();
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(4)").show();
+
+            //$("#HVPNProductParentPortTypesTbl tr th:nth-child(4)").hide();
+
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(6)").show();
+
+            //$("#HVPNProductParentPortTypesTbl tr th:nth-child(6)").hide();
+            //$("#HVPNProductParentPortTypesTbl tr th:nth-child(7)").hide();
+
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(9)").hide();
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(10)").show();
+            $("#HVPNProductParentPortTypesTbl tr th:nth-child(11)").hide();
+        }
+
+    }
+
+    $scope.LoadPortTypeGrids = function () {
+
+        PortTypeCharacteristicsFactory.GetPortTypeCharacteristics($scope.CaseId, $scope.AdminDetailsPortDropdownDataMod.PortTypeId, $scope.AdminDetailsPortDropdownDataMod.AccessSetId, $rootScope.User_Id, $scope.IsHybrid).success(function (data) {
+            $scope.PortTypeCharacteristicsData = [];
+            $scope.PortTypeCharacteristicsData1 = [];
+
+            data.d.forEach(function (item, index) {
+
+                if (item.CharTypeValueCount == 3 || item.CharTypeValueCount == 4) {
+                    $scope.PortTypeCharacteristicsData1.push(item);
+                } else {
+                    $scope.PortTypeCharacteristicsData.push(item);
+                }
+            });
+
+            var lookup = {};
+            var result = [];
+            var tempArray = [];
+            var selectedArray = [];
+            var selectedId = 0;
+            $scope.PortTypeCharacteristicsData1.forEach(function (item, index) {
+                var CharacteristicType = item.CharacteristicType;
+                tempArray.push({ 'Characteristic': item.Characteristic, 'MatrixId': item.MatrixId, 'IsValid': item.IsValid });
+
+                if (!(CharacteristicType in lookup)) {
+                    lookup[CharacteristicType] = 1;
+                    if (index != 0) {
+                        result[result.length - 1].List = tempArray;
+                        tempArray.forEach(function (item) {
+                            if (item.IsValid) {
+                                selectedId = item.MatrixId;
+                                return false;
+                            }
+                        });
+                        result[result.length - 1].selectedId = selectedId;
+                        selectedId = 0;
+                        tempArray = [];
+                    }
+                    result.push({ 'CharacteristicType': item.CharacteristicType.split("/").join(" / "), 'CharTypeValueCount': item.CharTypeValueCount, 'MatrixId': item.MatrixId, 'IsValid': item.IsValid, 'selectedId': selectedId });
+                }
+                if (index == $scope.PortTypeCharacteristicsData1.length - 1) {
+                    result[result.length - 1].List = tempArray;
+                    tempArray.forEach(function (item) {
+                        if (item.IsValid) {
+                            selectedId = item.MatrixId;
+                            return false;
+                        }
+                    });
+                    result[result.length - 1].selectedId = selectedId;
+                }
+            });
+            $scope.PortTypeCharacteristicsDataTemp = result;
+            //$scope.PortTypeCharacteristicsModalIndex = 0;
+            $scope.PortTypeCharacteristicsGridLoaded = 0;
+            $scope.PortTypeCharacteristics = new NgTableParams({}, { total: $scope.PortTypeCharacteristicsData.length, getData:
+            function ($defer, params) {
+                //$scope.PortTypeCharacteristicsModalIndex = (params.page() - 1) * params.count();
+                if ($scope.PortTypeCharacteristicsGridLoaded == 1) {
+                    $(".pageLoaderOverlay").show();
+                }
+                $scope.data = params.sorting() ? $filter('orderBy')($scope.PortTypeCharacteristicsData, params.orderBy()) : $scope.PortTypeCharacteristicsData;
+                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                params.total($scope.data.length);
+                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                $defer.resolve($scope.data);
+                $timeout(function () {
+                    $("#PortTypeCharacteristicsTbl tbody tr td select").select2({});
+                    if ($scope.PortTypeCharacteristicsGridLoaded == 1) {
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    $scope.PortTypeCharacteristicsGridLoaded = 1;
+                }, 100);
+            }
+            });
+            $scope.PortTypeCharacteristicsModal = [];
+            data.d.forEach(function (item) {
+                $scope.PortTypeCharacteristicsModal.push({ MatrixId: item.MatrixId, CharAvailCd: item.CharAvailCd, CharacteristicValue: item.CharacteristicValue, IsValid: item.IsValid });
+            });
+
+            $scope.PortTypeGridsLoadedCount++;
+        });
+
+        PortTypeParentCharacteristicsParentIdFactory.GetPortTypeParentCharacteristicsParentId($scope.CaseId, $scope.AdminDetailsPortDropdownDataMod.AccessSetId, $scope.AdminDetailsPortDropdownDataMod.PortTypeId).success(function (data) {
+            $scope.PortTypeParentCharacteristicsParentId = data.d;
+            PortTypeParentCharacteristicsFactory.GetPortTypeParentCharacteristics($scope.CaseId, $scope.AdminDetailsPortDropdownDataMod.PortTypeId, $scope.AdminDetailsPortDropdownDataMod.AccessSetId, $scope.PortTypeParentCharacteristicsParentId, $rootScope.User_Id, $scope.IsHybrid).success(function (data1) {
+                $scope.PortTypeParentCharacteristicsData = data1.d;
+                $scope.PortTypeParentCharacteristicsModalIndex = 0;
+                $scope.PortTypeParentCharacteristicsGridLoaded = 0;
+                $scope.PortTypeParentCharacteristics = new NgTableParams({}, { total: $scope.PortTypeParentCharacteristicsData.length, getData:
+            function ($defer, params) {
+                $scope.PortTypeParentCharacteristicsModalIndex = (params.page() - 1) * params.count();
+                if ($scope.PortTypeParentCharacteristicsGridLoaded == 1) {
+                    $(".pageLoaderOverlay").show();
+                }
+                $scope.data = params.sorting() ? $filter('orderBy')($scope.PortTypeParentCharacteristicsData, params.orderBy()) : $scope.PortTypeParentCharacteristicsData;
+                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                params.total($scope.data.length);
+                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                $defer.resolve($scope.data);
+                $timeout(function () {
+                    $("#PortTypeParentCharacteristicsTbl tbody tr td select").select2({});
+                    if ($scope.PortTypeParentCharacteristicsGridLoaded == 1) {
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    $scope.PortTypeParentCharacteristicsGridLoaded = 1;
+                }, 100);
+            }
+                });
+                //                $scope.PortTypeParentCharacteristicsModal = [];
+                //                data1.d.forEach(function (item) {
+                //                    $scope.PortTypeParentCharacteristicsModal.push({ MatrixId: item.MatrixId, IsValid: item.IsValid });
+                //                });
+                $scope.PortTypeGridsLoadedCount++;
+            });
+        });
+
+    }
+
+    $scope.GetSelectedValue = function () {
+        $(".pageLoaderOverlay").show();
+        CasePackageIdFactory.GetPortTypeCasePackageId($scope.CaseId, $scope.AdminDetailsPortDropdownDataMod.PortTypeId, $scope.AdminDetailsPortDropdownDataMod.AccessSetId).success(function (data) {
+            $scope.casePortTypePkgId = data.d;
+        });
+        $scope.LoadPortTypeGrids();
+    }
+
+    $scope.GetData = function () {
+        $(".pageLoaderOverlay").show();
+        AdminDetailsPortDropdownDataFactory.GetAdminDetailsPortDropdownData($scope.CaseId, $scope.casePkgId, $scope.CountryId, $scope.SelectedDSLPackage, $scope.IsHybrid).success(function (data) {
+            $scope.AdminDetailsPortDropdownData = data.d;
+            $scope.AdminDetailsPortDropdownDataMod = data.d[0];
+            $("#Select6").select2({});
+            $('#divDSLAccessSetPortTypes .select2-chosen').html(data.d[0].CharName);
+            CasePackageIdFactory.GetPortTypeCasePackageId($scope.CaseId, $scope.AdminDetailsPortDropdownDataMod.PortTypeId, $scope.AdminDetailsPortDropdownDataMod.AccessSetId).success(function (data) {
+                $scope.casePortTypePkgId = data.d;
+                CaseDetailsPortTypesUpdatedDatesFactory.GetCaseDetailsPortTypesUpdatedDates($scope.CaseId, $scope.casePortTypePkgId).success(function (data) {
+                    $scope.CreatedBy1 = data.d.CreatedBy;
+                    $scope.CreatedDate1 = data.d.CreatedDate;
+                    $scope.UpdatedBy1 = data.d.UpdatedBy;
+                    $scope.UpdatedDate1 = data.d.UpdatedDate;
+                });
+            });
+            $scope.LoadPortTypeGrids();
+        });
+    }
+
+    $scope.GPOPChange = function () {
+        $(".pageLoaderOverlay").show();
+        HVPNProductPortTypesFactory.GetHVPNProductPortTypes($scope.CaseId, $scope.casePkgId, $scope.CountryId, $rootScope.User_Id, $scope.SelectedDSLPackage, $scope.GPOPInterConnectMod, $scope.IsHybrid, $scope.IsVSAT).success(function (data) {
+            $scope.HVPNProductPortTypesData = data.d;
+            //$scope.HVPNProductPortTypesModalIndex = 0;
+            $scope.PortTypeGridLoaded = 0;
+            $scope.HVPNProductPortTypes = new NgTableParams({}, { total: $scope.HVPNProductPortTypesData.length, getData:
+            function ($defer, params) {
+                //$scope.HVPNProductPortTypesModalIndex = (params.page() - 1) * params.count();
+                if ($scope.PortTypeGridLoaded == 1) {
+                    $(".pageLoaderOverlay").show();
+                }
+                $scope.data = params.sorting() ? $filter('orderBy')($scope.HVPNProductPortTypesData, params.orderBy()) : $scope.HVPNProductPortTypesData;
+                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                params.total($scope.data.length);
+                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                $defer.resolve($scope.data);
+                $timeout(function () {
+                    $("#HVPNProductPortTypesTbl tbody tr td select").select2({});
+                    if ($scope.PortTypeGridLoaded == 1) {
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    $scope.PortTypeGridLoaded = 1;
+                }, 100);
+            }
+            });
+
+            $scope.HVPNProductPortTypesModal = [];
+            data.d.forEach(function (item) {
+                if ($scope.IsHybrid) {
+                    $scope.HVPNProductPortTypesModal.push({ SupplierId: item.SupplierId, SupplierProductId: item.SupplierProductId, AccessTypeId: item.AccessTypeId, PortTypeId: item.PortTypeId, GPOPInterconnectId: item.GPOPInterconnectId, PortSpeedId: item.PortSpeedId, PortSpeedAvailabilityId: item.PortSpeedAvailabilityId, AccessAvailabilityId: item.AccessAvailabilityId, IsValid: item.IsValid });
+                } else {
+                    $scope.HVPNProductPortTypesModal.push({ SupplierId: item.SupplierId, SupplierProductId: item.SupplierProductId, AccessTypeId: item.AccessTypeId, PortTypeId: item.PortTypeId, AccessAvailabilityId: item.AccessAvailabilityId, DSLTechnologyTypeId: item.DSLTechnologyTypeId, IsValid: item.IsValid });
+                }
+            });
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+    $scope.EditRecord = function (Id) {
+        $('#' + Id).find('td').last().find('span').first().hide();
+        $('#' + Id).find('td').last().find('span').first().next().show();
+    }
+
+    $scope.UpdateRecord = function (item) {
+        bootbox.confirm("Are you sure to update?", function (result) {
+
+            if (result) {
+                $(".pageLoaderOverlay").show();
+                $scope.HVPNProductPortTypesModal = [];
+                if ($scope.IsHybrid) {
+                    $scope.HVPNProductPortTypesModal.push({ SupplierId: item.SupplierId, SupplierProductId: item.SupplierProductId, AccessTypeId: item.AccessTypeId, PortTypeId: item.PortTypeId, GPOPInterconnectId: item.GPOPInterconnectId, PortSpeedId: item.PortSpeedId, PortSpeedAvailabilityId: item.PortSpeedAvailabilityId, AccessAvailabilityId: item.AccessAvailabilityId, IsValid: item.IsValid });
+                } else {
+                    $scope.HVPNProductPortTypesModal.push({ SupplierId: item.SupplierId, SupplierProductId: item.SupplierProductId, AccessTypeId: item.AccessTypeId, PortTypeId: item.PortTypeId, AccessAvailabilityId: item.AccessAvailabilityId, DSLTechnologyTypeId: item.DSLTechnologyTypeId, IsValid: item.IsValid });
+                }
+                UpdateHVPNPortTypesFactory.UpdateHVPNPortTypes({ HVPNProductPortTypes: $scope.HVPNProductPortTypesModal, CaseUpdateIds: { CaseId: $scope.CaseId, CasePkgId: $scope.casePkgId, UserId: $rootScope.User_Id} }, $scope.IsHybrid, false).success(function (data) {
+                    bootbox.alert("Updated Successfully");
+                    $(".pageLoaderOverlay").hide();
+                });
+            }
+        });
+    }
+
+});
+
+app.factory('CountryAccessDSLPackagesFactory', function ($http) {
+
+    var CountryAccessDSLPackagesFactory = {};
+
+    CountryAccessDSLPackagesFactory.GetCountryAccessDSLPackages = function (CaseId, CountryName) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetCountryAccessDSLPackages', { CaseId: CaseId, CaseValidCD: true, PackageType: 'DSL PACKAGE', CountryName: CountryName });
+    }
+    return CountryAccessDSLPackagesFactory;
+});
+
+app.factory('HVPNProductPortTypesFactory', function ($http) {
+
+    var HVPNProductPortTypesFactory = {};
+
+    HVPNProductPortTypesFactory.GetHVPNProductPortTypes = function (CaseId, CasePackageId, CountryId, UserId, PackageId, GPOP, IsHybrid, IsVsat) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetHVPNProductPortTypes', { CaseId: CaseId, CasePackageId: CasePackageId, CountryId: CountryId, UserId: UserId, PackageId: PackageId, GPOP: GPOP, IsHybrid: IsHybrid, IsVsat: IsVsat });
+    }
+    return HVPNProductPortTypesFactory;
+});
+
+app.factory('HVPNProductParentPortTypesFactory', function ($http) {
+
+    var HVPNProductParentPortTypesFactory = {};
+
+    HVPNProductParentPortTypesFactory.GetHVPNProductParentPortTypes = function (CaseId, CasePackageId, CountryId, childproductcd, UserId, PackageId, IsHybrid) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetHVPNProductParentPortTypes', { CaseId: CaseId, CasePackageId: CasePackageId, CountryId: CountryId, childproductcd: childproductcd, UserId: UserId, PackageId: PackageId, IsHybrid: IsHybrid });
+    }
+    return HVPNProductParentPortTypesFactory;
+});
+
+app.factory('TunnelingNoteFactory', function ($http) {
+
+    var TunnelingNoteFactory = {};
+
+    TunnelingNoteFactory.GetTunnelingNote = function (Country) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetTunnelingNote', { CountryName: Country });
+    }
+    return TunnelingNoteFactory;
+});
+
+app.factory('UpdateHVPNPortTypesFactory', function ($http) {
+
+    var UpdateHVPNPortTypesFactory = {};
+
+    UpdateHVPNPortTypesFactory.UpdateHVPNPortTypes = function (Data, IsHybrid, IsParent) {
+        return $http.post('SingleCaseCountryAccess.aspx/UpdateHVPNPortTypes', { HVPNProductPortTypesData: Data, IsHybrid: IsHybrid, IsParent: IsParent });
+    }
+    return UpdateHVPNPortTypesFactory;
+});
+
+app.factory('GPOPInterConnectFactory', function ($http) {
+
+    var GPOPInterConnectFactory = {};
+    GPOPInterConnectFactory.GetGPOPInterConnect = function (CaseId, PackageId, VSATCharId, CasePackageId, CountryId, IsVSAT) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetGPOPInterConnect', { CaseId: CaseId, PackageId: PackageId, VSATCharId: VSATCharId, CasePackageId: CasePackageId, CountryId: CountryId, IsVSAT: IsVSAT });
+    }
+    return GPOPInterConnectFactory;
+});
+
+app.factory('VSATCharIdFactory', function ($http) {
+
+    var VSATCharIdFactory = {};
+    VSATCharIdFactory.GetVSATCharId = function () {
+        return $http.post('SingleCaseCountryAccess.aspx/GetVSATCharId', {});
+    }
+    return VSATCharIdFactory;
+});
+app.factory('CasePackageIdFactory', function ($http) {
+
+    var CasePackageIdFactory = {};
+    CasePackageIdFactory.GetCasePackageId = function (CaseId, PackageId) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetCasePackageId', { CaseId: CaseId, PackageId: PackageId });
+    }
+
+    CasePackageIdFactory.GetPortTypeCasePackageId = function (CaseId, PortTypeId, AccessSetId) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetPortTypeCasePackageId', { CaseId: CaseId, PortTypeId: PortTypeId, AccessSetId: AccessSetId });
+    }
+    return CasePackageIdFactory;
+});
+
+app.factory('CharLevelcharacteristicsFactory', function ($http) {
+
+    var CharLevelcharacteristicsFactory = {};
+    CharLevelcharacteristicsFactory.GetCharLevelcharacteristics = function (ProductCD, IsHybrid) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetCharLevelcharacteristics', { ProductCD: ProductCD, IsHybrid: IsHybrid });
+    }
+    return CharLevelcharacteristicsFactory;
+});
+
+app.factory('DSLParentCharacteristicsFactory', function ($http) {
+
+    var DSLParentCharacteristicsFactory = {};
+    DSLParentCharacteristicsFactory.GetDSLParentCharacteristics = function (CaseId, CasePackageId, CountryId, childproductcd, UserId, PackageId, IsHybrid) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetDSLParentCharacteristics', { CaseId: CaseId, CasePackageId: CasePackageId, CountryId: CountryId, childproductcd: childproductcd, UserId: UserId, PackageId: PackageId, IsHybrid: IsHybrid });
+    }
+    return DSLParentCharacteristicsFactory;
+});
+
+app.factory('DSLCharacteristicsFactory', function ($http) {
+
+    var DSLCharacteristicsFactory = {};
+    DSLCharacteristicsFactory.GetDSLCharacteristics = function (CaseId, CasePackageId, UserId, IsHybrid) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetDSLCharacteristics', { CaseId: CaseId, CasePackageId: CasePackageId, UserId: UserId, IsHybrid: IsHybrid });
+    }
+    return DSLCharacteristicsFactory;
+});
+
+app.factory('AdminDetailsPortDropdownDataFactory', function ($http) {
+
+    var AdminDetailsPortDropdownDataFactory = {};
+    AdminDetailsPortDropdownDataFactory.GetAdminDetailsPortDropdownData = function (CaseId, CasePackageId, CountryId, PackageId, IsHybrid) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetAdminDetailsPortDropdownData', { CaseId: CaseId, CasePackageId: CasePackageId, CountryId: CountryId, PackageId: PackageId, IsHybrid: IsHybrid });
+    }
+    return AdminDetailsPortDropdownDataFactory;
+});
+
+app.factory('PortTypeCharacteristicsFactory', function ($http) {
+
+    var PortTypeCharacteristicsFactory = {};
+    PortTypeCharacteristicsFactory.GetPortTypeCharacteristics = function (CaseId, PortTypeId, AccessSetId, UserId, IsHybrid) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetPortTypeCharacteristics', { CaseId: CaseId, PortTypeId: PortTypeId, AccessSetId: AccessSetId, UserId: UserId, IsHybrid: IsHybrid });
+    }
+    return PortTypeCharacteristicsFactory;
+});
+
+app.factory('PortTypeParentCharacteristicsFactory', function ($http) {
+
+    var PortTypeParentCharacteristicsFactory = {};
+    PortTypeParentCharacteristicsFactory.GetPortTypeParentCharacteristics = function (CaseId, PortTypeId, AccessSetId, ParentId, UserId, IsHybrid) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetPortTypeParentCharacteristics', { CaseId: CaseId, PortTypeId: PortTypeId, AccessSetId: AccessSetId, ParentId: ParentId, UserId: UserId, IsHybrid: IsHybrid });
+    }
+    return PortTypeParentCharacteristicsFactory;
+});
+
+app.factory('PortTypeParentCharacteristicsParentIdFactory', function ($http) {
+
+    var PortTypeParentCharacteristicsParentIdFactory = {};
+    PortTypeParentCharacteristicsParentIdFactory.GetPortTypeParentCharacteristicsParentId = function (CaseId, AccessSetId, PortTypeId) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetPortTypeParentCharacteristicsParentId', { CaseId: CaseId, AccessSetId: AccessSetId, PortTypeId: PortTypeId });
+    }
+    return PortTypeParentCharacteristicsParentIdFactory;
+});
+
+app.factory('UpdateDSLCharacteristicsFactory', function ($http) {
+
+    var UpdateDSLCharacteristicsFactory = {};
+    UpdateDSLCharacteristicsFactory.UpdateDSLCharacteristics = function (DSLCharacteristicsData, IsParent) {
+        return $http.post('SingleCaseCountryAccess.aspx/UpdateDSLCharacteristics', { DSLCharacteristicsData: DSLCharacteristicsData, IsParent: IsParent });
+    }
+    return UpdateDSLCharacteristicsFactory;
+});
+
+app.factory('UpdatePortTypeCharacteristicsFactory', function ($http) {
+
+    var UpdatePortTypeCharacteristicsFactory = {};
+    UpdatePortTypeCharacteristicsFactory.UpdatePortTypeCharacteristics = function (DSLCharacteristicsData, IsParent) {
+        return $http.post('SingleCaseCountryAccess.aspx/UpdatePortTypeCharacteristics', { DSLCharacteristicsData: DSLCharacteristicsData, IsParent: IsParent });
+    }
+    return UpdatePortTypeCharacteristicsFactory;
+});
+
+app.factory('CaseDetailsUpdatedDatesFactory', function ($http) {
+
+    var CaseDetailsUpdatedDatesFactory = {};
+    CaseDetailsUpdatedDatesFactory.GetCaseDetailsUpdatedDates = function (CaseId, CasePkgId) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetCaseDetailsUpdatedDates', { CaseId: CaseId, CasePkgId: CasePkgId });
+    }
+    return CaseDetailsUpdatedDatesFactory;
+});
+
+app.factory('CaseDetailsPortTypesUpdatedDatesFactory', function ($http) {
+
+    var CaseDetailsPortTypesUpdatedDatesFactory = {};
+    CaseDetailsPortTypesUpdatedDatesFactory.GetCaseDetailsPortTypesUpdatedDates = function (CaseId, CasePkgId) {
+        return $http.post('SingleCaseCountryAccess.aspx/GetCaseDetailsPortTypesUpdatedDates', { CaseId: CaseId, CasePkgId: CasePkgId });
+    }
+    return CaseDetailsPortTypesUpdatedDatesFactory;
+});

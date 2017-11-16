@@ -1,0 +1,35 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+  public  class AdminNotesDAL
+    {
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+     
+
+      public DataTable GetGridAdminAddressDAL()
+      {
+          GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+          string str = string.Empty;
+
+          str = @"Select b.Service_Type_Desc, a.Product_cd, a.product_name, Product_Loc_Level_cd from CSU_PRODUCT a, CSU_REF_SERVICE_TYPE b WHERE a.Service_type_cd = b.Service_Type_cd ORDER BY b.Service_type_desc, UPPER(a.Product_name) ";
+
+          OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+          return objGetDataFromDB.GetDataTable(str.ToString());
+
+      }
+
+    }
+}

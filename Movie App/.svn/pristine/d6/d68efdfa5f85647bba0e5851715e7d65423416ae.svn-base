@@ -1,0 +1,62 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+
+namespace SCAdminBAL
+{
+    public class CpeLeadTimeBAL
+    {
+        CpeLeadTimeDAL objCpeLeadTimeDAL = new CpeLeadTimeDAL();
+
+        public List<SLAAccSupp> GetAllSupplier()
+        {
+            List<SLAAccSupp> supplierList = new List<SLAAccSupp>();
+            try
+            {
+                DataTable dtSupplier = objCpeLeadTimeDAL.GetAllSupplier();
+
+                foreach (DataRow dr in dtSupplier.Rows)
+                {
+                    SLAAccSupp objSupplier = new SLAAccSupp();
+                    objSupplier.supplierId = Convert.ToString(dr["CHAR_ID"]);
+                    objSupplier.supplierName = Convert.ToString(dr["CHAR_Name"]);
+                    supplierList.Add(objSupplier);
+                }
+            }
+            catch (Exception ex) { throw ex; }
+            return supplierList;
+        }
+
+        public List<CPELeadTime> BindAllSupplier()
+        {
+            List<CPELeadTime> leadTimeList = new List<CPELeadTime>();
+            try
+            {
+                DataTable dtBindSuppliers = objCpeLeadTimeDAL.BindAllSupplier();
+                foreach (DataRow dr in dtBindSuppliers.Rows)
+                {
+                    CPELeadTime objBindSupplier = new CPELeadTime();
+                    objBindSupplier.countryName = Convert.ToString(dr["COUNTRY_NAME"]);
+                    objBindSupplier.manufacturerName = Convert.ToString(dr["MANUFACTURER_NAME"]);
+                    objBindSupplier.cpeAvailability = Convert.ToString(dr["CPE_AVAILABILITY"]);
+                    objBindSupplier.cpeCeaseLeadTime = Convert.ToString(dr["CPE_CEASE_LEADTIME"]);
+                    objBindSupplier.cpeCeaseLeadTimeStatus = Convert.ToString(dr["CPE_CEASE_LEADTIME_Status"]);
+                    objBindSupplier.leadTime = Convert.ToString(dr["CPE_LEAD_TIME"]);
+                    objBindSupplier.leadTimeStatus = Convert.ToString(dr["CPE_LEAD_TIME_STATUS"]);
+                    objBindSupplier.endOfContractDate =dr["EOC"].ToString().Replace("30-DEC-4712",@"");
+                    objBindSupplier.endOfMigrationDate =dr["EOM"].ToString().Replace("30-DEC-4712",@"");
+                    objBindSupplier.supplierName = Convert.ToString(dr["CHAR_NAME"]);
+                    objBindSupplier.color = dr["Passed"].ToString().Replace("Red", @"red");
+                    leadTimeList.Add(objBindSupplier);
+                }
+            }
+            catch (Exception ex) { throw ex; }
+            return leadTimeList;
+        }
+
+    }
+}

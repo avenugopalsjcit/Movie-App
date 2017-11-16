@@ -1,0 +1,129 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+  public  class AdminCallerAccessSupplierBAL
+    {
+
+      private AdminCallerAccessSupplierDAL objSRD = new AdminCallerAccessSupplierDAL();
+      public List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierView()
+        {
+
+
+            List<CallerAccessSupplier> lstOrg = new List<CallerAccessSupplier>();
+            DataTable dtGridDistributor = objSRD.GetGridAdminCallerAccessSupplier();
+            
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                CallerAccessSupplier objOrg = new CallerAccessSupplier();
+
+                objOrg.OptionMatrixId = Convert.ToInt32(dr["option_matrix_id"]);
+                objOrg.CharName = Convert.ToString(dr["char_name"]);
+               
+
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+
+      public List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierDropdown()
+      {
+
+
+          List<CallerAccessSupplier> lstOrg = new List<CallerAccessSupplier>();
+          DataTable dtGridDistributor = objSRD.GetGridAdminCallerAccessSupplierDropdown();
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              CallerAccessSupplier objOrg = new CallerAccessSupplier();
+
+              objOrg.AvailCD = Convert.ToInt32(dr["avail_cd"]);
+              objOrg.AvailDesc = Convert.ToString(dr["avail_desc"]);
+              objOrg.AvailAbbr = Convert.ToString(dr["avail_abbr"]);
+
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+
+      public List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierMatrix()
+      {
+
+
+          List<CallerAccessSupplier> lstOrg = new List<CallerAccessSupplier>();
+          DataTable dtGridDistributor = objSRD.GetGridAdminCallerAccessSupplierMatrix();
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              CallerAccessSupplier objOrg = new CallerAccessSupplier();
+
+              objOrg.OptionMatrixId = Convert.ToInt32(dr["option_matrix_id"]);
+              
+                objOrg.CharName = Convert.ToString(dr["char_name"]);
+                objOrg.CharActualValue = Convert.ToString(dr["char_actual_value"]);
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+      public List<CallerAccessSupplier> SetDropdownAdminCallerAccessSupplierMatrix(string OptmatrixId)
+      {
+
+
+          List<CallerAccessSupplier> lstOrg = new List<CallerAccessSupplier>();
+          DataTable dtGridDistributor = objSRD.SetDropdownAdminCallerAccessSupplierMatrix(OptmatrixId);
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              CallerAccessSupplier objOrg = new CallerAccessSupplier();
+
+              objOrg.OptionMatrixId = Convert.ToInt32(dr["char_opt_matrix_id"]);
+
+              objOrg.AvailCD = Convert.ToInt32(dr["avail_cd"]);
+
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+    }
+}

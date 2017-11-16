@@ -1,0 +1,153 @@
+﻿
+app.factory("Userdatafactory",["$http", function ($http) {
+    var Userdatafactory = {};
+    Userdatafactory.GetDetails = function () {
+
+        return $http.post("GlobalReference.aspx/GetUserDetails", {});
+    }
+
+    return Userdatafactory;
+
+}]);
+
+app.controller("AdminAccessMapCntrl", ["Userdatafactory", "$scope", "$http", "$rootScope", function (Userdatafactory, $scope, $http, $rootScope) {
+
+    $(".pageLoaderOverlay").show();
+
+
+
+    $http.post("GlobalReference.aspx/MapAccessProductsForPoP", {}).success(function (data) {
+
+        $scope.AccessProductsForPoP = data.d;
+
+        $http.post("GlobalReference.aspx/MapAccessProductsForCountry", {}).success(function (data) {
+
+            $scope.AccessProductsForCntry = data.d;
+            Userdatafactory.GetDetails().success(function (data) {
+
+                $scope.Userdetails = data.d;
+                $(".pageLoaderOverlay").hide();
+            });
+
+
+        });
+    }).error(function (error) {
+        alert(" Problem occured while loading data" + error);
+    });
+
+    $scope.EditAccessMap = function () {
+
+        $(".pageLoaderOverlay").show();
+
+        $http.post("GlobalReference.aspx/PoPLevelMapping", {}).success(function (data) {
+
+            $scope.PoPLevelMappingData = data.d;
+
+
+            $http.post("GlobalReference.aspx/CountryLevelMapping", {}).success(function (data) {
+
+                $scope.CountryLevelMappingData = data.d;
+
+                $(".pageLoaderOverlay").hide();
+            });
+        });
+
+    }
+
+    $scope.SaveAccessMap = function () {
+        $(".pageLoaderOverlay").show();
+
+        var list = "";
+        var PoPList = "";
+        var PoPAccessTypeIDs = [];
+        var present = false;
+        $("#CountryLevelMapping li").each(function (index) {
+            list += $(this).children('p').text() + ",";
+        });
+
+        if (list != "") {
+            list = list.substring(0, list.length - 1);
+            var AccessProductIDs = [];
+            AccessProductIDs = list.split(',');
+        }
+
+        $("#PoPLevelMapping li").each(function (index) {
+            PoPList += $(this).children('p').text() + ",";
+        });
+
+
+        if (PoPList != "") {
+            PoPList = PoPList.substring(0, PoPList.length - 1);
+            var PoPIDs = [];
+
+
+            $.each(PoPList.split(','), function () {
+                PoPIDs.push(Number($.trim(this)));
+            });
+
+            PoPAccessTypeIDs = PoPIDs;
+        }
+
+
+
+        if ($scope.PoPLevelMappingData.length == PoPAccessTypeIDs.length) {
+
+            $.each($scope.PoPLevelMappingData, function (index, element) {
+
+
+                if (jQuery.inArray(element.CharId, PoPAccessTypeIDs) == -1) {
+                    present = true;
+                    return false;
+                }
+            });
+
+        }
+        else {
+
+            present = true;
+
+        }
+
+        if (present == true) {
+            $http.post("GlobalReference.aspx/SaveAccessProductLevelMapping", { "AccessProductIDs": AccessProductIDs, "User_id": $rootScope.User_Id }).success(function (data) {
+
+
+                $http.post("GlobalReference.aspx/MapAccessProductsForPoP", {}).success(function (data) {
+
+                    $scope.AccessProductsForPoP = data.d;
+
+                    $http.post("GlobalReference.aspx/MapAccessProductsForCountry", {}).success(function (data) {
+
+                        $scope.AccessProductsForCntry = data.d;
+                        Userdatafactory.GetDetails().success(function (data) {
+
+                            $scope.Userdetails = data.d;
+                           
+                        });
+                    });
+
+
+                }).error(function (error) {
+                    alert(" Problem occured while loading data" + error);
+                });
+
+
+                bootbox.alert("PoP / Country level mapping completed successfully");
+                //                $("#divEditAccessMap").hide();
+                //                $(".modal-backdrop").hide();
+                $(".pageLoaderOverlay").hide();
+
+            }).error(function (error) {
+
+                alert("Problem occured while saving Access Types" + error);
+                $(".pageLoaderOverlay").hide();
+            });
+        }
+        else {
+            bootbox.alert("Select PoP / Country Access Types for mapping / un-mapping");
+            $(".pageLoaderOverlay").hide();
+        }
+    }
+
+} ]);
+

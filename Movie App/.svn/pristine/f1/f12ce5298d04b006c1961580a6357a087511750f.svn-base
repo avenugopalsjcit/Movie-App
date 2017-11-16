@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+namespace SCAdminDAL
+{
+    public class CPEOnlyCaseDefDAL
+    {
+        OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        public DataSet GetCPEOnlyPorductCaseDetails(string CaseId)
+        {
+            StringBuilder strQry = new StringBuilder();
+            strQry.Append("select xx.product_name, case_id, a.option_matrix_id, a.char_type_id, a.char_id,");
+            strQry.Append("char_type_name, char_name, char_actual_value, char_unit_of_measure,");
+            strQry.Append("a.char_value, c.char_type_value_count,a.char_avail_cd, (select AVAIL_DESC from csu_ref_availability where AVAIL_CD = a.char_avail_cd) as Availability, a.char_value_2,to_char(a.char_avail_dt,'dd-mon-yyyy') char_avail_dt, ");
+            strQry.Append("a.char_value, a.case_detail_valid_cd, b.char_num_value,xx.product_cd as cpe_product_map from csu_case_details a, ");
+            strQry.Append("csu_ref_valid_char b, csu_ref_char_type c, 	csu_ref_product_opt_matrix d, cpe_product xx where case_id = " + CaseId);
+            strQry.Append(" and a.char_type_id = b.char_type_id and a.char_id = b.char_id and a.char_type_id = c.char_type_id and a.char_type_id = 926");
+            strQry.Append(" and  d.cpe_product_map=xx.product_map_id(+) and a.OPTION_MATRIX_ID = d.OPTION_MATRIX_ID and d.OPTION_MATRIX_VALID_CD = 1");
+            strQry.Append(" and d.char_level = 'POP' 	 order by cpe_product_map, upper(char_type_name), char_num_value, upper(char_name), upper(a.char_value)");
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+        }
+    }
+}

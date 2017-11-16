@@ -1,0 +1,52 @@
+﻿<div ng-controller="Controller.MCUCntrl">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 Arrow">
+        <h3>
+            Mass Case Update
+        </h3>
+        <br />
+        <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+            <div class="row">
+                <b>Product</b>
+            </div>
+            <div class="row" ng-show="hasSubproduct" style="margin-top:11px">
+                <b>Sub Product</b>
+            </div>
+        </div>
+        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 center-block">
+            <div class="row">
+                <select ng-change="showAccessLevel()" id="ddlProduct" style="width: 33%; margin-bottom: 5px" ng-model="modProduct" ng-options="option.PRODUCT_NAME for option in lstProduct | orderBy:'PRODUCT_NAME' track by option.PRODUCT_CD">
+                    <option value="">--Select--</option>
+                </select>
+            </div>
+            <div class="row" ng-show="hasSubproduct">
+                <select id="ddlsubprod" ng-model="modSubProduct" ng-change="getValidAccessType()" ng-options="item.SubProductName for item in SubProductsList | orderBy:'SubProductName' track by item.SubProductId"
+                    style="width: 33%; margin-bottom: 5px">
+                    <option value="">-- Please Select --</option>
+                </select>
+            </div>
+            <div class="row" ng-show="showAccessRadionButton" class="">
+                <label class="radio-inline col-xs-2 col-sm-2 col-md-2 col-lg-2 center-block">
+                    <input ng-model='accessType' ng-value="0" type="radio" ng-change="GotoEthernetMCU()">
+                    <b>PoP Level Cases</b>
+                </label>
+                <label class="radio-inline col-xs-3 col-sm-3 col-md-3 col-lg-3 center-block">
+                    <input ng-model='accessType' ng-value="1" type="radio" ng-change="GotoEthernetMCU()">
+                    <b>Country Level Cases</b>
+                </label>
+            </div>
+        </div>
+        <br />
+        <br />
+        <br />
+        <a ui-sref=".Poplevel" hidden="hidden" id="poplevellink"></a><a ui-sref=".CountryLevel"
+            hidden="hidden" id="CountryLevel"></a><a ui-sref=".Multipop" hidden="hidden" id="Multipop">
+            </a><a ui-sref=".CityLevel" hidden="hidden" id="CityLevel"></a><a ui-sref=".MCUAccess"
+                hidden="hidden" id="MCUAccess"></a>
+        <!--<div ng-include="ethernetTemplate">
+            </div>-->
+        <div ui-view>
+        </div>
+        <div class="pageLoaderOverlay">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,208 @@
+﻿(function (ng, app) {
+    app.controller('Controllers.StandardReportsCtrl', function ($scope, $http, NgTableParams, $rootScope, GetReportfactory, AddNewStandardReport, UpdateStandardReport, DeleteStandardReport) {
+        var self = this;
+
+        $(".pageLoaderOverlay").show();
+
+        // $rootScope.ServiceType = 2;
+
+        GetReportfactory.GetStandardReports($rootScope.AccessLevel, $rootScope.User_Id, '').success(function (data) {
+            $(".pageLoaderOverlay").hide();
+            $scope.StandardReportData = true;
+            $scope.StandardReportTable = new NgTableParams({}, { 'dataset': data.d });
+
+        });
+
+        $scope.AddNewReport = function () {
+
+            $("#DivDescError").hide();
+            $("#DivDescriptionError").hide();
+            if ($scope.ProdDescription != "") {
+                var selProdID = $scope.ProductID
+                AddNewStandardReport.addNewReport(selProdID, $scope.ProdDescription, $scope.Abbreviation, $scope.ValidCheck, $rootScope.User_Id).success(function (data) {
+                    $('.pageLoaderOverlay').show();
+                    if (data.d == 1) {
+                        GetReportfactory.GetStandardReports($rootScope.AccessLevel, $rootScope.User_Id, '').success(function (data) {
+                            bootbox.alert("Report added successfully");
+                            $scope.StandardReportData = true;
+                            $scope.StandardReportTable = new NgTableParams({}, { 'dataset': data.d });
+                            $('.pageLoaderOverlay').hide();
+                            $('#addNewReportModal').modal('hide');
+                        });
+                    }
+                });
+            }
+            else {
+                $("#DivDescriptionError").show();
+            }
+        }
+        $scope.ResetReport = function () {
+            $scope.ReportDesc = "";
+            $scope.reportAbbr = "";
+            $scope.Abbreviation = "";
+            $scope.ProdDescription = "";
+            $scope.ValidCheck = false;
+            $scope.reportValidCD = false;
+            var selProdID = $scope.ProductID
+            var ReportIds = $scope.ReportId;
+
+
+        }
+        $scope.DeleteReport = function () {
+            var reportDescription = $scope.ReportDesc;
+            var ReportIds = $scope.ReportId;
+            bootbox.confirm("Are you sure to delete report " + reportDescription + "?", function (result) {
+
+                if (result) {
+                    DeleteStandardReport.deleteReport(ReportIds).success(function (data) {
+
+                        if (data.d == 1) {
+                            GetReportfactory.GetStandardReports($rootScope.AccessLevel, $rootScope.User_Id, '').success(function (data) {
+                                $(".pageLoaderOverlay").hide();
+                                $scope.StandardReportData = true;
+                                $scope.StandardReportTable = new NgTableParams({}, { 'dataset': data.d });
+
+                            });
+                            $('#editReportModal').modal('hide');
+                        }
+                    });
+                }
+            });
+
+        }
+        $scope.updateReport = function () {
+            $("#DivDescError1").hide();
+            $("#DivDescriptionError1").hide();
+            if ($scope.ReportDesc != "") {
+                if ($scope.Default_desc != $scope.ReportDesc || $scope.Default_abbr != $scope.reportAbbr || $scope.Default_checkedValue != $scope.reportValidCD) {
+                    var selProdID = $scope.ProductID
+                    var ReportIds = $scope.ReportId;
+                    UpdateStandardReport.updateReport(ReportIds, selProdID, $scope.ReportDesc, $scope.reportAbbr, $scope.reportValidCD, $rootScope.User_Id).success(function (data) {
+                        $('.pageLoaderOverlay').show();
+                        if (data.d == 1) {
+                            GetReportfactory.GetStandardReports($rootScope.AccessLevel, $rootScope.User_Id, '').success(function (data) {
+                                bootbox.alert("Report updated successfully");
+                                $scope.StandardReportData = true;
+                                $scope.StandardReportTable = new NgTableParams({}, { 'dataset': data.d });
+                                $('.pageLoaderOverlay').hide();
+                                $('#editReportModal').modal('hide');
+                            });
+
+                        }
+                    });
+                }
+                else {
+                    bootbox.alert("Data remains the  same and hence there is no update");
+                }
+            }
+            else {
+                $("#DivDescriptionError1").show();
+            }
+
+        }
+        $scope.OpenAddNewReportpopup = function (Id, RecordId) {
+            $scope.userForm1.$setPristine();
+            $scope.Abbreviation = "";
+            $scope.ProdDescription = "";
+            $scope.ValidCheck = false;
+            var TableDesc = ($('#' + Id).find('td').first().html());
+            $scope.ProductName = TableDesc;
+            $scope.ProductID = RecordId;
+            $('#addNewReportModal').modal('show');
+        }
+
+        $scope.keyupevt = function () {
+            $("#DivDescriptionError").hide();
+            $("#DivDescriptionError1").hide();
+            if ($scope.ReportDesc == "") {
+                $("#DivDescError1").show();
+                $("#DivDescError").show();
+            }
+            if ($scope.ProdDescription == "") {
+                $("#DivDescError1").show();
+                $("#DivDescError").show(); ;
+            }
+        };
+
+
+        $scope.OpenEditReportPopUp = function (prodId, Productname, ReportId, ReportDesc, reportLocLevelCD, reportPathDesc, reportValidCD, reportAbbr) {
+            $scope.userForm.$setPristine();
+            $scope.ReportDesc = ReportDesc;
+            $scope.ProductID = prodId;
+            $scope.Productname = Productname;
+            $scope.ReportId = ReportId;
+            $scope.reportLocLevelCD = reportLocLevelCD;
+            $scope.reportPathDesc = reportPathDesc;
+            $scope.reportValidCD = reportValidCD;
+            $scope.reportAbbr = reportAbbr;
+            $('#editReportModal').modal('show');
+
+
+            $scope.Default_desc = ReportDesc;
+            $scope.Default_abbr = reportAbbr;
+            $scope.Default_checkedValue = reportValidCD
+        }
+
+        $scope.OpenPopup = function (user) {
+            var selTabText = $('.nav-tabs .active').text();
+
+            var HeaderText = 'Edit ' + selTabText;
+            $scope.prodOwner = 0;
+            $scope.UserName = user.UserName;
+            $scope.UserCategory = user.UserCategoryCD;
+            $scope.UserStatus = user.UserStatusId;
+            $scope.EmpID = user.EmpID;
+            $scope.UserEmailID = "";
+            $scope.HeaderText = HeaderText;
+            if (selTabText == 'End User') {
+                $scope.UserEmailID = user.UserEmailID;
+            }
+            if (user.UserEmail == 0) {
+                $scope.email = false;
+            }
+            else {
+                $scope.email = true;
+            }
+        }
+
+    });
+
+    app.factory('GetReportfactory', function ($http) {
+        var GetReportfactory = {};
+        GetReportfactory.GetStandardReports = function (userType, userid, strServiceType) {
+
+            return $http.post("StandardReports.aspx/GetStandardProductDetails", { 'userType': userType, 'userid': userid, 'strServiceType': strServiceType });
+        }
+        return GetReportfactory;
+    });
+
+    app.factory('AddNewStandardReport', function ($http) {
+
+        var AddNewStandardReport = {};
+        AddNewStandardReport.addNewReport = function (ProdID, ProdDescription, Abbreviation, ValidCheck, userID) {
+
+            return $http.post("StandardReports.aspx/AddNewReport", { 'ProdID': ProdID, 'ProdDescription': ProdDescription, 'Abbreviation': Abbreviation, 'ValidCheck': ValidCheck, 'userID': userID });
+        }
+        return AddNewStandardReport;
+    });
+
+    app.factory('UpdateStandardReport', function ($http) {
+
+        var UpdateStandardReport = {};
+        UpdateStandardReport.updateReport = function (ReportID, ProdID, ProdDescription, Abbreviation, ValidCheck, userID) {
+
+            return $http.post("StandardReports.aspx/UpdateReport", { 'ReportID': ReportID, 'ProdID': ProdID, 'ProdDescription': ProdDescription, 'Abbreviation': Abbreviation, 'ValidCheck': ValidCheck, 'userID': userID });
+        }
+        return UpdateStandardReport;
+    });
+    app.factory('DeleteStandardReport', function ($http) {
+
+        var DeleteStandardReport = {};
+        DeleteStandardReport.deleteReport = function (ReportID) {
+
+            return $http.post("StandardReports.aspx/DeleteReport", { 'ReportID': ReportID });
+        }
+        return DeleteStandardReport;
+    });
+
+} (angular, app));

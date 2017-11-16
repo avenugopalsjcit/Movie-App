@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="appModule">
+<head>
+    <title></title>
+</head>
+<body ng-controller="CISAccReportCntrl">
+    <div>
+        <button type="button" class="close" ng-click="$dismiss()">
+            &times;</button><br />
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title text-center">
+                Caller Access Types in the Region - {{regName}}
+            </h3>
+        </div>
+        <div class="panel-body" style="height:600px;overflow:scroll">
+            <table class="table table-bordered">
+                <tr>
+                    <th>
+                        Originating Country
+                    </th>
+                    <th>
+                        Originating City
+                    </th>
+                    <th ng-repeat="item in HeaderChar">
+                        {{item}}
+                    </th>
+                </tr>
+                <tr ng-repeat="item in countryCharAvail">
+                    <td>
+                        {{item.orgCountry}}
+                    </td>
+                    <td>
+                        {{item.orgCity}}
+                    </td>
+                    <td ng-repeat="charAbbr in item.charAvailability track by $index">
+                        {{charAbbr}}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+</body>
+</html>

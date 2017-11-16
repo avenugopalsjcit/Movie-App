@@ -1,0 +1,710 @@
+﻿<style>
+    lable
+    {
+        font-size: 12px;
+    }
+</style>
+<div ng-controller="Controllers.DefineProductCtrl as vm">
+    <!--<div style="text-align: center">
+        <h4>
+            <a><u>Define Product</u></a>
+        </h4>
+    </div>-->
+    <div class="container">
+        <h2>
+            <span style="float: left; cursor: default">Define Product</span></h2>
+    </div>
+    <br />
+    <div>
+        <div style="margin-left: 1%" class="form-group col-md-12">
+            <div class="col-md-3">
+                <label class="control-label" for="drpAdminValidCharView">
+                    Select the ProductType
+                </label>
+            </div>
+            <div class="col-md-6">
+                <select class="clsdefineproduct" style="width: 70%">
+                    <option>AC VPN ENCORE </option>
+                    <option>Access </option>
+                    <option>Assure Managed Devices </option>
+                    <option>BT Bandwidth Services </option>
+                    <option>BT Business Voice Select </option>
+                    <option>BT Business Voice VoicePort </option>
+                    <option>BT CCS Direct </option>
+                    <option>BT Contact Centre Service </option>
+                    <option>BT CPE </option>
+                    <option>BT Etherflow Global </option>
+                    <option>BT Finance Extranet </option>
+                    <option>BT Generic Voice Information </option>
+                    <option>BT GS Portfolio Database </option>
+                    <option>BT Internet Connect Global </option>
+                    <option>BT IP Sec </option>
+                    <option>BT iVPN </option>
+                    <option>BT LAN SAN Extension Service </option>
+                    <option>BT Managed Firewall </option>
+                    <option>BT Media and Broadcast </option>
+                    <option>BT MessageScan </option>
+                    <option>BT MFS </option>
+                    <option>BT MobileXpress Mobile IPsec VPN </option>
+                    <option>BT MPLS </option>
+                    <option>BT MPLS8 </option>
+                    <option>BT Onevoice </option>
+                    <option>BT WAS </option>
+                    <option>Connect Acceleration </option>
+                    <option>Connect Intelligence </option>
+                    <option>Connect Optimisation </option>
+                    <option>Customer Service </option>
+                    <option>DSL-HVPN Access </option>
+                    <option>Etherflow Capability </option>
+                    <option>Generic CPE </option>
+                    <option>Internet Connect Reach </option>
+                    <option>IP Connect Web-VPN </option>
+                    <option>IP Video VPN - Encore </option>
+                    <option>IP Voice VPN - Encore </option>
+                    <option>IP VPN Offnet </option>
+                    <option>IP VPN Secure - Encore </option>
+                    <option>MobileXpress </option>
+                    <option>MPLS Capability </option>
+                    <option>Radianz Ethernet </option>
+                    <option>Special Bid </option>
+                    <option>SWIFT - Encore </option>
+                    <option>TDM Voice </option>
+                    <option>Test Product </option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <a data-target="#addDefineProductModal" data-toggle="modal" class="btn btn-primary">
+                    <span class="">Add New product type</span></a>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div style="margin-left: 1%" class="form-group col-md-12">
+            <div class="col-md-3">
+                <label class="control-label" for="drpAdminValidCharView">
+                    Select the Sub product Type
+                </label>
+            </div>
+            <div class="col-md-6">
+                <select class="clsdefinesubproduct" style="width: 70%">
+                    <option>11</option>
+                    <option>1234</option>
+                    <option>ada </option>
+                    <option>xxx</option>
+                </select>
+            </div>
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </div>
+    <div style="margin-left: 4%">
+        <div class="panel panel-primary" style="cursor: pointer">
+            <div class="panel-heading  collapsed" data-toggle="collapse" data-target="#ProductPopLevel">
+                <h3 class="panel-title">
+                    PoP Level</h3>
+                <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+            </div>
+            <div class="panel-body" id="ProductPopLevel">
+                <div class="form-horizontal">
+                    <div class="row">
+                        <div class="col-md-11" style="text-align: left">
+                            <table ng-table="vm.tableParams" class="table" show-filter="true">
+                                <tr ng-repeat="user in $data">
+                                    <td title="'Pop Level Name'" filter="{ Name: 'text'}" sortable="'name'">
+                                        <a data-target="#updatePoPViewModal" data-toggle="modal">{{user.Name}} </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in" id="addDefineProductModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add To Product Definition
+                        </h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="inputDescription">
+                                        Product</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="control-label" for="inputDescription">
+                                        AC VPN ENCORE</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="Textarea1">
+                                        Feature</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="control-label" for="inputDescription">
+                                        11</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="comment1">
+                                        Chararacteristic Type
+                                    </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <select class="clsCharastricType" style="width: 100%">
+                                        <option>7 x 24 Access Circuit Restoration </option>
+                                        <option>A/B End Sales </option>
+                                        <option>Access </option>
+                                        <option>Access Connector Type </option>
+                                        <option>Access Display Interface </option>
+                                        <option>Access Framing Type </option>
+                                        <option>Access Interface </option>
+                                        <option>Access Method </option>
+                                        <option>Access Model </option>
+                                        <option>ACCESS MODEL BASELINE </option>
+                                        <option>Access Number </option>
+                                        <option>Access Provider </option>
+                                        <option>Access Provider Service Name </option>
+                                        <option>Access Restriction </option>
+                                        <option>Access Speed </option>
+                                        <option>Access Speed (D/U) </option>
+                                        <option>Access Supplier </option>
+                                        <option>Access Supplier Product Restrictions </option>
+                                        <option>Access Type </option>
+                                        <option>Application Letter Required </option>
+                                        <option>Application Software </option>
+                                        <option>Application Software - One Touch Dial Solution </option>
+                                        <option>Application Version </option>
+                                        <option>Application Version - One Touch Dial Solution </option>
+                                        <option>Availability </option>
+                                        <option>Basic Service </option>
+                                        <option>BT Supported PBXs </option>
+                                        <option>Call Restrictions </option>
+                                        <option>Caller Access Type </option>
+                                        <option>Carrier </option>
+                                        <option>Carrier Pre-Select </option>
+                                        <option>Carrier Select </option>
+                                        <option>Check for URL </option>
+                                        <option>CIR </option>
+                                        <option>Circuit Maintenance Support </option>
+                                        <option>Class of Service </option>
+                                        <option>Class of Service Supported ( DSCP 6 CoS Model) </option>
+                                        <option>CLI </option>
+                                        <option>Closure Notice </option>
+                                        <option>Competitive Offerings </option>
+                                        <option>Concert IAS Availability </option>
+                                        <option>Contention Ratio </option>
+                                        <option>Core Features </option>
+                                        <option>COS ASSIGNMENT </option>
+                                        <option>Country Level Access Provider </option>
+                                        <option>Country Level Port Types </option>
+                                        <option>CPE </option>
+                                        <option>CPE Access Types </option>
+                                        <option>CPE Bundles </option>
+                                        <option>CPE Country Parts </option>
+                                        <option>CPE Hardware </option>
+                                        <option>CPE Maintenance Options </option>
+                                        <option>CPE Notes </option>
+                                        <option>CPE Part Families </option>
+                                        <option>CPE Part Subfamilies </option>
+                                        <option>CPE Parts </option>
+                                        <option>CPE Pricing Types </option>
+                                        <option>CPE RESILIENCE </option>
+                                        <option>CPE Routers </option>
+                                        <option>CPE Splitter </option>
+                                        <option>CPE Supplier Types </option>
+                                        <option>CPE Suppliers </option>
+                                        <option>CS Fallback Center </option>
+                                        <option>Customer Service Hours </option>
+                                        <option>Customer Service Language </option>
+                                        <option>Customer Service Provider </option>
+                                        <option>Data </option>
+                                        <option>Devise Functionality </option>
+                                        <option>Devise Functionality - Automatic Dial Solution </option>
+                                        <option>Dial Speed </option>
+                                        <option>Dialing Format </option>
+                                        <option>Display Placeholder </option>
+                                        <option>Display Placeholder 2 </option>
+                                        <option>Display Placeholder 3 </option>
+                                        <option>Distributor </option>
+                                        <option>Distributor Type </option>
+                                        <option>DNS and News </option>
+                                        <option>DSL Access </option>
+                                        <option>DSL Checker Availability </option>
+                                        <option>DSL Notes </option>
+                                        <option>DSL Notes(SP+) </option>
+                                        <option>DSL Package </option>
+                                        <option>DSL Supply Type </option>
+                                        <option>Encapsulation </option>
+                                        <option>Encryption </option>
+                                        <option>Encryption Regulation </option>
+                                        <option>End To End Relationship </option>
+                                        <option>Fast Turn Up </option>
+                                        <option>Field Service </option>
+                                        <option>Global/National/Domestic </option>
+                                        <option>Homing GPOP </option>
+                                        <option>Installation </option>
+                                        <option>Interconnect Design </option>
+                                        <option>Interconnect Type </option>
+                                        <option>Interface </option>
+                                        <option>Internet Connect Transit </option>
+                                        <option>IPL Availability </option>
+                                        <option>IPL CPE </option>
+                                        <option>ISDN Around the Cloud </option>
+                                        <option>ISDN Dial Back-Up </option>
+                                        <option>LAN SAN Service </option>
+                                        <option>Lead Time </option>
+                                        <option>Letter Type </option>
+                                        <option>Local Loop Type </option>
+                                        <option>Location </option>
+                                        <option>Micro 20 Features </option>
+                                        <option>Mobile Access </option>
+                                        <option>Mobile Access Number with Announcement </option>
+                                        <option>Mobile Access Number without Announcement </option>
+                                        <option>N*E1/T1 IMA Access </option>
+                                        <option>Node Type </option>
+                                        <option>NOTE </option>
+                                        <option>NOTE with value </option>
+                                        <option>Number Retention </option>
+                                        <option>Offer Availability </option>
+                                        <option>On-Site Support </option>
+                                        <option>One Stop Shopping Options </option>
+                                        <option>One Voice Anywhere </option>
+                                        <option>One Voice global VPN </option>
+                                        <option>One Voice global VPN - hVPN </option>
+                                        <option>One Voice SIP trunking </option>
+                                        <option>One Voice SIP trunking - hVPN </option>
+                                        <option>Port Speed </option>
+                                        <option>Port Speeds(Down/Up) </option>
+                                        <option>Portability in Foreign Country </option>
+                                        <option>Pricing Availability </option>
+                                        <option>Primary DVB POP </option>
+                                        <option>Primary Terra POP </option>
+                                        <option>Product Availability via BT Internet Connect Global </option>
+                                        <option>Product Feature </option>
+                                        <option>PVC Options </option>
+                                        <option>Regulatory </option>
+                                        <option>Regulatory Information </option>
+                                        <option>Resiliency Types </option>
+                                        <option>ROUTING TYPE </option>
+                                        <option>RSA </option>
+                                        <option>Secondary DVB POP </option>
+                                        <option>Secondary Terra POP </option>
+                                        <option>Security Enhancements </option>
+                                        <option>Service Availability </option>
+                                        <option>Service Delivery </option>
+                                        <option>Service Provider </option>
+                                        <option>Services Supported </option>
+                                        <option>Signaling </option>
+                                        <option>SIP Trunking </option>
+                                        <option>SLA BAND </option>
+                                        <option>SLA Category </option>
+                                        <option>SLA TYPE </option>
+                                        <option>Sla2+ Site Availability </option>
+                                        <option>SLAs </option>
+                                        <option>Software Supported </option>
+                                        <option>Supplier </option>
+                                        <option>Supplier Product Name </option>
+                                        <option>Support Region </option>
+                                        <option>Switch </option>
+                                        <option>Telephone Number </option>
+                                        <option>Termination </option>
+                                        <option>Tertiary DVB POP </option>
+                                        <option>test chartype </option>
+                                        <option>Test Mpls 7 </option>
+                                        <option>test1 </option>
+                                        <option>TestFileUpload </option>
+                                        <option>Test_Char1 </option>
+                                        <option>test_WD1 </option>
+                                        <option>Text Field </option>
+                                        <option>TIR Value </option>
+                                        <option>Transport Medium </option>
+                                        <option>URL link for "BT GS Portfolio Database" product </option>
+                                        <option>Voice Class (EF) Supported Speeds </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="actualValueId">
+                                        Characteristic</label>
+                                </div>
+                                <div class="col-md-7" id="Div1">
+                                    <input class="form-control col-md-5" type="text" value="">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label">
+                                        Valid</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <input type="checkbox" checked="true" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="inputDescription">
+                                        Characteristic Level</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="radio">
+                                        <input name="CharacteristicLevel" type="radio" value="option1">
+                                        Range of Values
+                                    </div>
+                                    <div class="radio">
+                                        <input type="radio" name="CharacteristicLevel" />
+                                        CountryLevel
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="inputDescription">
+                                        Select Access Technology</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <select id="selectAccessTechId" style="width: 100%">
+                                        <option selected value="1">DSL (Package Level)</option>
+                                        <option value="2">DSL (PortType Level)</option>
+                                        <option value="3">HVPN (Package Level)</option>
+                                        <option value="4">HVPN (PortType Level)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div style="font-size: 13px">
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-3">
+                                        <u><b><span>Created by</span></b></u><br />
+                                        <span>MacGamwell,John</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Created Date</span></b></u><br />
+                                        <span>21-MAY-1999 09:58:12 AM&nbsp;GMT</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Updated by</span></b></u><br />
+                                        <span>Prasad, Achutha</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Date Last Updated</span></b></u><br />
+                                        <span>18-DEC-2003 06:47:38 PM&nbsp;GMT</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-primary btn-sm " value="Update" />
+                        <input type="button" class="btn btn-primary btn-sm" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in" id="updatePoPViewModal" role="dialog" aria-hidden="true"
+        aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H1">
+                            Edit PoPView Definition
+                        </h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="inputDescription">
+                                        Product</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="control-label" for="inputDescription">
+                                        AC VPN ENCORE</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="Textarea1">
+                                        Chararacteristic Type</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="control-label" for="inputDescription">
+                                        Display Placeholder 3</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="comment1">
+                                        Characteristic
+                                    </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="control-label" for="inputDescription">
+                                        CPE Maintenance Options</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="actualValueId">
+                                        Specification Value</label>
+                                </div>
+                                <div class="col-md-7" id="Div3">
+                                    <label class="control-label" for="inputDescription">
+                                        N/A</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label">
+                                        Valid</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <input type="checkbox" checked="checked" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="inputDescription">
+                                        Characteristic Level</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="radio">
+                                        <input name="CharacteristicLevel" type="radio" value="option1">
+                                        Range of Values
+                                    </div>
+                                    <div class="radio">
+                                        <input type="radio" name="CharacteristicLevel" />
+                                        CountryLevel
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12" ng-show="showpopModal=='poplevel'">
+                                <div class="col-md-5">
+                                    <label class="control-label" for="inputDescription">
+                                        Select Access Technology</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <select>
+                                        <option selected value="1">DSL (Package Level)</option>
+                                        <option value="2">DSL (PortType Level)</option>
+                                        <option value="3">HVPN (Package Level)</option>
+                                        <option value="4">HVPN (PortType Level)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div style="font-size: 13px">
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-3">
+                                        <u><b><span>Created by</span></b></u><br />
+                                        <span>MacGamwell,John</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Created Date</span></b></u><br />
+                                        <span>21-MAY-1999 09:58:12 AM&nbsp;GMT</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Updated by</span></b></u><br />
+                                        <span>Prasad, Achutha</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Date Last Updated</span></b></u><br />
+                                        <span>18-DEC-2003 06:47:38 PM&nbsp;GMT</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-primary btn-sm " value="Update" />
+                        <input type="button" class="btn btn-primary btn-sm" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-controller="Controllers.DefinecountryProductCtrl as vm">
+    <div style="margin-left: 4%">
+        <div tabindex="-1" class="modal fade in" id="updateCountryViewModal" role="dialog"
+            aria-hidden="true" aria-labelledby="myModalLabel">
+            <div class="vertical-alignment-helper">
+                <div class="modal-dialog vertical-align-center" style="width: 75%">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button class="close" type="button" data-dismiss="modal">
+                                <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="H2">
+                                Edit Country Product Definition
+                            </h4>
+                        </div>
+                        <div class="container">
+                            <div class="modal-body">
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="inputDescription">
+                                            Product</label>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <label class="control-label" for="inputDescription">
+                                            AC VPN ENCORE</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="Textarea1">
+                                            Chararacteristic Type</label>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <label class="control-label" for="inputDescription">
+                                            Display Placeholder 3</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-lab   el" for="comment1">
+                                            Characteristic
+                                        </label>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <label class="control-label" for="inputDescription">
+                                            CPE Maintenance Options</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="actualValueId">
+                                            SpecificationValue</label>
+                                    </div>
+                                    <div class="col-md-7" id="Div4">
+                                        <label class="control-label" for="inputDescription">
+                                            N/A</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label">
+                                            Valid</label>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <input type="checkbox" checked="checked" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="inputDescription">
+                                            Characteristic Level</label>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="radio">
+                                            <input name="CharacteristicLevel" type="radio" value="option1">
+                                            Range of Values
+                                        </div>
+                                        <div class="radio">
+                                            <input type="radio" name="CharacteristicLevel" />
+                                            CountryLevel
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="inputDescription">
+                                            Select Access Technology</label>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <select name="ddlAccTypes" id="ddlAccTypes" style="width: 100%">
+                                            <option selected value="1">DSL (Package Level)</option>
+                                            <option value="2">DSL (PortType Level)</option>
+                                            <option value="3">HVPN (Package Level)</option>
+                                            <option value="4">HVPN (PortType Level)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div style="font-size: 13px">
+                                <div class="form-group col-md-12">
+                                </div>
+                                <div class="col-md-3">
+                                    <u><b><span>Created by</span></b></u><br />
+                                    <span>MacGamwell,John</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <u><b><span>Created Date</span></b></u><br />
+                                    <span>21-MAY-1999 09:58:12 AM&nbsp;GMT</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <u><b><span>Updated by</span></b></u><br />
+                                    <span>Prasad, Achutha</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <u><b><span>Date Last Updated</span></b></u><br />
+                                    <span>18-DEC-2003 06:47:38 PM&nbsp;GMT</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="button" class="btn btn-primary btn-sm " value="Update" />
+                            <input type="button" class="btn btn-primary btn-sm" value="Reset" />
+                            <button class="btn btn-default" type="button" data-dismiss="modal">
+                                Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary" style="cursor: pointer">
+        <div class="panel-heading  collapsed" data-toggle="collapse" data-target="#coutryLevel">
+            <h3 class="panel-title">
+                Country Level</h3>
+            <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+        </div>
+        <div class="panel-body" id="coutryLevel">
+            <div class="form-horizontal">
+                <div class="row">
+                    <div class="col-md-11" style="text-align: left">
+                        <table ng-table="vm.tableParams" class="table" show-filter="true">
+                            <tr ng-repeat="user in $data">
+                                <td title="'Country Level Name'" filter="{ Name: 'text'}" sortable="'name'">
+                                    <a data-target="#updateCountryViewModal" data-toggle="modal">{{user.Name}} </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+  public  class OrderAccessSpeedBAL
+    {
+      private OrderAccessSpeedDAL objSRD = new OrderAccessSpeedDAL();
+      public List<OrderAccessSpeed> GetGridAdminBtgfrView()
+      {
+
+
+          List<OrderAccessSpeed> lstOrg = new List<OrderAccessSpeed>();
+          DataTable dtGridDistributor = objSRD.GetGridAdminBtgfr();
+
+
+
+
+            
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              OrderAccessSpeed objOrg = new OrderAccessSpeed();
+
+              objOrg.CharId = Convert.ToInt32(dr["CHAR_ID"]);
+              objOrg.CharName = Convert.ToString(dr["CHAR_NAME"]);
+              objOrg.CharActualValue = Convert.ToString(dr["CHAR_ACTUAL_VALUE"]);
+              objOrg.CharNumValue = Convert.ToString(dr["CHAR_NUM_VALUE"]);
+
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+      public int UpdateAdminAccessSpeed(string User_Id, string charid, string charNumValue)
+      {
+
+          int count = objSRD.UpdateGridAdminOrderAccessSpeed(User_Id, charid, charNumValue);
+
+
+
+          return count;
+      }
+    }
+}

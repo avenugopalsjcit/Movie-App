@@ -1,0 +1,449 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+   public class AdminAddressViewDAL
+    {
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+        public DataTable GetGridAdminAddressDAL()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"Select address_id, a.agent_id, address_desc x_name  ,
+                    (select User_name from CSU_USER where EMP_Id = a.Created_emp_id) Created_By, to_char(a.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt, (select User_name from CSU_USER where EMP_Id = a.Updated_emp_id) Updated_By," +
+                                        "to_char(a.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt   from csu_address a, csu_ref_agent b where a.agent_id = b.agent_id  order by upper(address_desc) ";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+
+        public DataTable GetAdminAddressProductDAL()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @" SELECT char_id,
+                      char_name
+                      || ' - '
+                      || char_actual_value x_name
+                    FROM csu_ref_valid_char
+                    WHERE char_type_id = 201
+                    AND char_valid_cd  = 1
+                    ORDER BY upper(x_name)";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public DataTable GetAdminAddressRegionDAL()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @" SELECT region_id,
+                      region_name
+                    FROM CSU_REGION
+                    WHERE region_valid_cd = 1
+                    AND region_id        <> 0
+                    ORDER BY upper(region_name) ";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+         public DataTable GetAdminAddressCountryDAL(string Areavalue)
+                {
+                    GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+                    string str = string.Empty;
+
+                    str = @" SELECT country_id,
+                              country_name
+                            FROM CSU_COUNTRY
+                            WHERE 
+                             country_valid_cd = 1
+                            AND country_id      <> 0
+                            AND region_id = " + Areavalue + " ORDER BY upper(country_name) ";
+
+                    OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+                    return objGetDataFromDB.GetDataTable(str.ToString());
+
+                }
+
+         public DataTable GetAdminAddressCityDAL(string countryvalue, string Areavalue, string alpha)
+                {
+                    GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+                    string str = string.Empty;
+                    if (alpha == "Other")
+                    {
+
+                        str = @" SELECT *
+                            FROM
+                              (SELECT city_id,
+                                region_id,
+                                country_id,
+                                state_province_id,
+                                city_name,
+                                row_number() over (order by city_name) R
+                              FROM CSU_CITY
+                              WHERE region_id   =" + Areavalue + "  AND city_id      <> 0  AND country_id =" + countryvalue + " AND city_valid_cd = 1 and regexp_like( city_name, '^[`''!@~#$%&)*(-+=}{|/:;><]')) ";
+                    }
+                    else
+                    {
+                        str = @" SELECT *
+                            FROM
+                              (SELECT city_id,
+                                region_id,
+                                country_id,
+                                state_province_id,
+                                city_name,
+                                row_number() over (order by city_name) R
+                              FROM CSU_CITY
+                              WHERE region_id   =" + Areavalue + "  AND city_id      <> 0  AND country_id =" + countryvalue + " AND city_valid_cd = 1 and city_name like '" + alpha + "%' ) ";
+
+                    }
+                    OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+                    return objGetDataFromDB.GetDataTable(str.ToString());
+
+                }
+
+
+
+
+
+          public DataSet GetAdminAddressDetails(string Addressid)
+            {
+
+            OracleCommand cmd = new OracleCommand("GetAdminAddressView", oConn);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("PARAM", OracleDbType.Varchar2).Value = ""; //3967;// pcityid;
+            cmd.Parameters.Add("paramint", OracleDbType.Int32).Value = Addressid; //3465;// phub_site_id;
+            cmd.Parameters.Add("p_recordset1", OracleDbType.RefCursor, ParameterDirection.Output);
+            cmd.Parameters.Add("p_recordset2", OracleDbType.RefCursor, ParameterDirection.Output);
+            cmd.Parameters.Add("p_recordset3", OracleDbType.RefCursor, ParameterDirection.Output);
+            cmd.Parameters.Add("p_recordset4", OracleDbType.RefCursor, ParameterDirection.Output);
+            DataSet dsgeneral = new DataSet();
+            dad = new OracleDataAdapter(cmd);
+            dsgeneral = new DataSet();
+            dad.Fill(dsgeneral);
+            return dsgeneral;
+
+
+            }
+
+      
+
+
+
+
+
+
+        public int AdminAvailInsert(string strAgentId, string strCharId, 
+            string strCharTypeId, string strAgentName,
+            string strSupportTransWeekDays,string strSupportTransHours,
+            string strSupportBusinessHours,string strSupportLanguages,
+            string strSupportLanguages724,string strAgentValidCd,string User_id, 
+            string strAddressId,string strAddressDesc, string strRegionId,string strCountryId,
+            string strCityId,string strStateProvinceId,string strTollFreeAccInCNo1,string strTollFreeAccInCNo2,
+            string strTollFreeAccInCNo3,string strDirDialAccNo1,string strDirDialAccNo2,string strDirDialAccNo3,
+            string strFaxNo1,string strFaxNo2,string strFaxNo3,string strAddressValidCd )
+        {
+            int validbool = 0;
+            DateTime date = DateTime.ParseExact(DateTime.Now.Date.ToShortDateString(), "dd/MM/yyyy", null);
+            string end_date = String.Format("{0:dd-MMM-yyyy}", date);
+
+            
+            int strAgent = Convert.ToInt32(strAgentId);
+            int strChar = Convert.ToInt32(strCharId);
+            int strCharType = Convert.ToInt32(strCharTypeId);
+            if (Convert.ToBoolean(strAgentValidCd) == true)
+            {
+                validbool = 1;
+            }
+            else
+            {
+                validbool = 0;
+            }
+            string str = @"Insert into csu_ref_agent  
+               ( 
+	            agent_id, 
+	            char_id, 
+	            char_type_id, 
+	            agent_name, 
+	            support_trans_week_days, 
+	            support_trans_hours, 
+	            support_business_hours, 
+	            support_languages, 
+	            support_languages_7_24, 
+	            agent_valid_cd, 
+	            created_emp_id, 
+	            created_dt,             
+	            updated_emp_id, 
+	            updated_dt 
+               )
+                VALUES 
+               (" + strAgent + "," + strChar + " ," + strCharType + ",'', '" + strSupportTransWeekDays + "', '" + strSupportTransHours + "',   '',  '" + strSupportLanguages + "',  '" + strSupportLanguages724 + "',   " + validbool + ",   	'" + User_id + "', sysdate, '" + User_id + "',sysdate )";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+
+
+            if (Convert.ToBoolean(strAddressValidCd) == true)
+            {
+                validbool = 1;
+            }
+            else
+            {
+                validbool = 0;
+            }
+            //int StateId = Convert.ToInt32(strStateProvinceId);
+            int CityId = Convert.ToInt32(strCityId);
+            int CountryId = Convert.ToInt32(strCountryId);
+            int RegionId = Convert.ToInt32(strRegionId);
+            int AddressId = Convert.ToInt32(strAddressId);
+           
+
+             str = @"Insert into csu_address 
+                    ( 
+                    address_id, 
+                    char_id, 
+                    agent_id, 
+                    address_desc, 
+                    region_id, 
+                    country_id, 
+                    city_id, 
+                    state_province_id, 
+                    toll_free_acc_in_c_no_1, 
+                    toll_free_acc_in_c_no_2, 
+                    toll_free_acc_in_c_no_3, 
+                    dir_dial_acc_no_1, 
+                    dir_dial_acc_no_2, 
+                    dir_dial_acc_no_3, 
+                    fax_no_1, 
+                    fax_no_2, 
+                    fax_no_3, 
+                    address_valid_cd, 
+                    created_emp_id, 
+                    created_dt, 
+                    updated_emp_id, 
+                    updated_dt 
+                    )
+                     VALUES 
+                    (" + AddressId + ",  " + strChar + "," + strAgent  +", '"  +strAddressDesc + "',  " + RegionId + ","
+                       + CountryId + ", " + CityId + ",0  , '"
+                       + strTollFreeAccInCNo1 + "',  '" 
+                       + strTollFreeAccInCNo2 + "',  '" + strTollFreeAccInCNo3 
+                       + "', '" + strDirDialAccNo1 + "', '" + strDirDialAccNo2
+                       + "', '" + strDirDialAccNo3 + "',   '" + strFaxNo1 + "', '" 
+                       + strFaxNo2 + "',  '" + strFaxNo3 + "', " + validbool + ", 	'"
+                       + User_id + "', sysdate, '" + User_id + "', sysdate  )";
+            OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+             status = cmd1.ExecuteNonQuery();
+
+
+
+            oConn.Close();
+            return status;
+        }
+
+
+
+
+
+
+        public int AdminAvailUpdate(string strAgentName, string strSupportTransWeekDays, 
+            string strSupportTransHours, string User_id, string strSupportBusinessHours, 
+            string strSupportLanguages, string strSupportLanguages724, string strAgentValidCd, 
+            string strAgentId,
+             string strAddressId,string strAddressDesc, string strRegionId,string strCountryId,
+            string strCityId,string strStateProvinceId,string strTollFreeAccInCNo1,string strTollFreeAccInCNo2,
+            string strTollFreeAccInCNo3,string strDirDialAccNo1,string strDirDialAccNo2,string strDirDialAccNo3,
+            string strFaxNo1,string strFaxNo2,string strFaxNo3,string strAddressValidCd )
+        {
+
+            int validbool = 0;
+            DateTime date = DateTime.ParseExact(DateTime.Now.Date.ToShortDateString(), "dd/MM/yyyy", null);
+            string end_date = String.Format("{0:dd-MMM-yyyy}", date);
+
+            if (Convert.ToBoolean(strAgentValidCd) == true)
+            {
+                validbool = 1;
+            }
+            else
+            {
+                validbool = 0;
+            }
+            if (Convert.ToBoolean(strAddressValidCd) == true)
+            {
+                validbool = 1;
+            }
+            else
+            {
+                validbool = 0;
+            }
+            int id = Convert.ToInt32(strAgentId);
+            int AddressId = Convert.ToInt32(strAddressId);
+
+            int StateId = Convert.ToInt32(strStateProvinceId);
+            int CityId = Convert.ToInt32(strCityId);
+            int CountryId = Convert.ToInt32(strCountryId);
+            int RegionId = Convert.ToInt32(strRegionId);
+            
+            string str = @"update csu_ref_agent 
+                    set 
+                    agent_name = '" + strAgentName + "', support_trans_week_days = '" 
+                    + strSupportTransWeekDays + "',  support_trans_hours = '"
+                    + strSupportTransHours + "', support_business_hours = '"
+                    + strSupportBusinessHours + "',  support_languages = '" 
+                    + strSupportLanguages + "', support_languages_7_24 = '"
+                    + strSupportLanguages724 + "', agent_valid_cd = " + validbool
+                    + ", updated_emp_id = '" + User_id + "',updated_dt = sysdate   where agent_id = " + id;
+    
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+
+
+
+
+            str = @"update csu_address set   address_desc = '"
+                + strAddressDesc + "',  region_id = " + RegionId + ", country_id = "
+                + CountryId + ",     city_id = " + CityId + ",     state_province_id = "
+                + StateId + ",     toll_free_acc_in_c_no_1 = '"
+                + strTollFreeAccInCNo1 + "',      toll_free_acc_in_c_no_2 = '"
+                + strTollFreeAccInCNo2 + "',      toll_free_acc_in_c_no_3 = '"
+                + strTollFreeAccInCNo3 + "',      dir_dial_acc_no_1 = '"
+                + strDirDialAccNo1 + "',      dir_dial_acc_no_2 = '"
+                + strDirDialAccNo2 + "',      dir_dial_acc_no_3 = '"
+                + strDirDialAccNo3 + "',      fax_no_1 = '"
+                + strFaxNo1 + "',      fax_no_2 = '"
+                + strFaxNo2 + "',      fax_no_3 = '"
+                + strFaxNo3 + "',      address_valid_cd = "
+                + validbool + ", 	 updated_emp_id = '"
+                + User_id + "',	 updated_dt = sysdate      where address_id = "
+                + AddressId + "     and agent_id = " + id;
+
+            OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+            //oConn.Open();
+             status = cmd1.ExecuteNonQuery();
+
+
+
+
+            oConn.Close();
+            return status;
+        }
+
+
+
+
+
+        public int AdminAddressDelete(string strAddressId, string strAgentId, string Role)
+        {
+            string str = string.Empty;
+            int status = 0;
+            if (Role == "1")
+            {
+
+                 str = @" Delete from csu_address 
+	            where address_id = " + strAddressId + "	and agent_id = " + strAgentId;
+
+                OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+                oConn.Open();
+                 status = cmd.ExecuteNonQuery();
+
+
+
+                str = @" Delete from csu_ref_agent 	 where agent_id = " + strAgentId;
+
+                OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+               // oConn.Open();
+                status = cmd1.ExecuteNonQuery();
+                oConn.Close();
+            }
+            else
+            {
+
+
+                str = @" update csu_address set 		address_valid_cd = 0 	 where address_id = " + strAddressId + "		 and agent_id = " + strAgentId;
+
+                OracleCommand cmd2 = new OracleCommand(str.ToString(), oConn);
+                oConn.Open();
+                status = cmd2.ExecuteNonQuery();
+                oConn.Close();
+
+                str = @" update csu_ref_agent set 		agent_valid_cd = 0 	 where agent_id = " + strAgentId;
+
+                OracleCommand cmd3 = new OracleCommand(str.ToString(), oConn);
+                //oConn.Open();
+                status = cmd3.ExecuteNonQuery();
+                oConn.Close();
+            }
+
+
+            return status;
+        }
+        //public DataTable AdminAvailPopupGrid(string strAvailCd)
+        //{
+        //    GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+        //    string str = @"select CREATED_EMP_ID,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT from CSU_REF_AVAILABILITY where avail_cd =" + strAvailCd;
+        //    //OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+        //    OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+        //    return objGetDataFromDB.GetDataTable(str.ToString());
+        //}
+
+        public int MaxCsuAddress()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"Select CSU_ADDRESS_ID_S.NEXTVAL   from DUAL ";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str));
+        }
+
+        public int MaxCsuAgent()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"Select CSU_AGENT_ID_S.NEXTVAL  from DUAL ";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str));
+        }
+        public int GetMaxChartypeCD(string CharId)
+                {
+                    GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+                    string str = @"select char_type_id from csu_ref_valid_char where char_id ="+CharId;
+                    OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+                    return Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str));
+                }
+
+    }
+}

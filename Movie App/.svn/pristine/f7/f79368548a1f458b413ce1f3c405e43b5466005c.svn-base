@@ -1,0 +1,34 @@
+﻿<div ng-controller="PopCaseListCtrl">
+    <div id="CaseList">
+        <!--ng-show="CaseData!=null && CaseData!='' && editcase==0 && !CountryAccess"-->
+        <a style="font-weight: bold; color: Blue; text-decoration: underline" ng-click="AddCaseDetails()">
+            Add Case</a>
+        <table ng-table="CaseData" class="table table-bordered" show-filter="true">
+            <tr ng-repeat="case in $data">
+                <td data-title="'Case'" filter="{ 'CaseName': 'text'}">
+                    <b><a ng-show="case.ShowValid=='INVALID' &&  Product != 63" style="color: Black"
+                        ng-click="EditCaseDetails(case)">{{case.CaseName}}</a></b> <b><a ng-show="case.ShowValid=='VALID'  && Product != 63"
+                            style="color: Green" ng-click="EditCaseDetails(case)">{{case.CaseName}}</a></b>
+                    <b><a ng-show="case.ShowValid=='INVALID' && Product == 63" style="color: Black" ng-click="EditCPECaseDetails(case.CaseID)">
+                        {{case.CaseName}}</a></b> <b><a ng-show="case.ShowValid=='VALID'  && Product == 63"
+                            style="color: Green" ng-click="EditCPECaseDetails(case.CaseID)">{{case.CaseName}}</a></b>
+                </td>
+                <td data-title="'Details'">
+                    <a ng-click="ShowCaseDetails(case)">Details</a>
+                </td>
+                <td data-title="'Valid / Invalid'">
+                    {{case.ShowValid}}
+                </td>
+            </tr>
+        </table>
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12 col-xs-12">
+                <p class="red">
+                    <span class="color-black">Note:</span>Case In Green Color
+                    indicates Valid Case and Case In 
+                        Black Color indicates Invalid Case.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

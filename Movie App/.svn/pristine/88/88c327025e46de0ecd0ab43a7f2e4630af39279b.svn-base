@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Services;
+using SCAdmin.GetUserDetailsService;
+
+
+namespace SCSearch.Admin
+{
+    public partial class UserDetails : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+  
+
+        [WebMethod]
+        public static SCAdmin.GetUserDetailsService.UserDetails GetUserDetails(string EIN, string UserName, string Password)
+        {
+            SCAdmin.GetUserDetailsService.Service userDetailsService = new SCAdmin.GetUserDetailsService.Service();
+            SCAdmin.GetUserDetailsService.UserDetails objUserDetails = userDetailsService.GetUserDtls(EIN, UserName, Password);
+            return objUserDetails;
+        }
+    }
+
+}

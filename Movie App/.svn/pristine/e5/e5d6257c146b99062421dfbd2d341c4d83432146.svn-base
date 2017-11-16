@@ -1,0 +1,303 @@
+﻿app.factory('AvailabilityGridFactory', function ($http) {
+
+    var AvailabilityGridFactory = {};
+
+    AvailabilityGridFactory.GetAvailabilityGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAvailabilityDetails', {});
+
+    }
+
+    return AvailabilityGridFactory;
+});
+app.factory('AvailabilityMaxValidFactory', function ($http) {
+
+    var AvailabilityMaxValidFactory = {};
+
+    AvailabilityMaxValidFactory.GetAvailabilityMaxValid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxAvailCD', {});
+
+    }
+
+    return AvailabilityMaxValidFactory;
+});
+
+app.factory('AvailabilityInsertFactory', function ($http) {
+
+    var AvailabilityInsertFactory = {};
+
+    AvailabilityInsertFactory.GetAvailabilityInsert = function () {
+        $(".pageLoaderOverlay").show();
+       return $http.post('GlobalReference.aspx/InsertAdminAvail', { 'strAvailCd': strAvailCd, 'strAvailDesc': strAvailDesc, 'strAvailAbbr': strAvailAbbr, 'strAvailValidCd': strAvailValidCd, 'User_id': User_id });
+
+    }
+
+    return AvailabilityInsertFactory;
+});
+
+app.factory('AvailabilityUpdateFactory', function ($http) {
+
+    var AvailabilityUpdateFactory = {};
+
+    AvailabilityUpdateFactory.GetAvailabilityUpdate = function () {
+        $(".pageLoaderOverlay").show();
+       return $http.post('GlobalReference.aspx/UpdateAdminAvail', { 'strAvailDesc': strAvailDesc, 'strAvailAbbr': strAvailAbbr, 'strAvailValidCd': strAvailValidCd, 'User_id': User_id, 'strAvailCd': strAvailCd });
+
+    }
+
+    return AvailabilityUpdateFactory;
+});
+
+
+app.factory('AvailabilityDeleteFactory', function ($http) {
+
+    var AvailabilityDeleteFactory = {};
+
+    AvailabilityDeleteFactory.GetAvailabilityDelete = function () {
+        $(".pageLoaderOverlay").show();
+     return   $http.post('GlobalReference.aspx/DeleteAdminAvail', { 'strAvailCd': strAvailCd });
+
+    }
+
+    return AvailabilityDeleteFactory;
+});
+
+app.factory('AvailabilityPopupGrid', function ($http) {
+
+    var AvailabilityPopupGrid = {};
+
+    AvailabilityPopupGrid.GetAvailabilityPopup = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/PopupGridAdminAvail', { 'AvailValidCd': AvailValidCd });
+
+    }
+
+    return AvailabilityPopupGrid;
+});
+
+app.controller('AvailabilityCtrl', ['$scope', 'AvailabilityGridFactory', 'NgTableParams', 'AvailabilityMaxValidFactory', 'AvailabilityInsertFactory', 'AvailabilityUpdateFactory', 'AvailabilityDeleteFactory', 'AvailabilityPopupGrid', function ($scope, AvailabilityGridFactory, NgTableParams, AvailabilityMaxValidFactory, AvailabilityInsertFactory, AvailabilityUpdateFactory, AvailabilityDeleteFactory, AvailabilityPopupGrid) {
+
+
+
+ 
+
+
+
+
+    AvailabilityGridFactory.GetAvailabilityGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+        $scope.AvailabilityGrid = data;
+
+
+       
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+    //$(".pageLoaderOverlay").hide();
+
+    var availAbbr, availDesc, availValid = "";
+
+    $scope.EditRecord = function (category) {
+        AvailValidCd = category.AvailValidCd;
+        $scope.AvailabilityAbbr = category.AvailabilityAbbr;
+        $scope.Description = category.AvailabilityDesc;
+        $scope.Valid = category.AvailabilityValid;
+        availAbbr = category.AvailabilityAbbr;
+        availDesc = category.AvailabilityDesc;
+        availValid = category.AvailabilityValid;
+        $scope.Reset = 1;
+        AvailabilityPopupGrid.GetAvailabilityPopup(AvailValidCd).success(function (data) {
+            $scope.usersTable2 = data.d;
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+
+
+    $scope.addNewTask = function () {
+        $scope.AvailabilityAbbr = $scope.Description = $scope.Valid = "";
+        $scope.Reset = 0;
+    }
+
+
+
+    $scope.ResetRecord = function () {
+
+        $scope.AvailabilityAbbr = availAbbr;
+        $scope.Description = availDesc;
+        $scope.Valid = availValid;
+    }
+
+
+
+    $scope.SaveAdminAvail = function () {
+        // debugger;
+        strAvailDesc = $scope.Description;
+
+        strAvailAbbr = $scope.AvailabilityAbbr;
+        User_id = $scope.User_Id;
+        if ($('#inputValid')[0].checked == true) {
+            strAvailValidCd = true;
+        }
+        else {
+            strAvailValidCd = false;
+        }
+        //            $http.post('GlobalReference.aspx/GetMaxAvailCD', {}).success(function (data) {
+        //                strAvailCd = data;
+
+        //            });
+
+        if (strAvailAbbr == "" && strAvailAbbr == "") {
+        }
+        else {
+            AvailabilityMaxValidFactory.GetAvailabilityMaxValid().success(function (data) {
+
+
+                strAvailCd = data.d;
+                strAvailCd = strAvailCd + 1;
+                AvailabilityInsertFactory.GetAvailabilityInsert().success(function (data) {
+                    //alert("hi");
+                    // str = data.d;
+                    AvailabilityGridFactory.GetAvailabilityGrid().success(function (data) {
+
+                        $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                        $(".pageLoaderOverlay").hide();
+                        bootbox.alert({
+                            "message": "Availability Added Successfully",
+                            "className": "my-custom-class",
+                            "callback": function () {
+                                console.log("Success callback");
+                            }
+                        });
+                    });
+
+
+                });
+            });
+
+
+        }
+
+    }
+
+
+
+    $scope.UpdateAdminAvail = function () {
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to update Availability?",
+            callback: function (result) {
+                if (result) {
+                    strAvailDesc = $scope.Description;
+                    strAvailCd = AvailValidCd;
+                    strAvailAbbr = $scope.AvailabilityAbbr;
+                    User_id = $scope.User_Id;
+                    if ($('#inputValid')[0].checked == true) {
+                        strAvailValidCd = true;
+                    }
+                    else {
+                        strAvailValidCd = false;
+                    }
+                    // strAvailValidCd = $scope.Valid;
+
+                    AvailabilityUpdateFactory.GetAvailabilityUpdate().success(function (data) {
+                        AvailabilityGridFactory.GetAvailabilityGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert({
+                                "message": "Availability Updated Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+                    });
+                }
+            }
+        });
+
+    }
+
+
+    $scope.DeleteAdminAvail = function (category) {
+        strAvailCd = category.AvailValidCd;
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Availability " + category.AvailabilityDesc+ "?",
+            callback: function (result) {
+                if (result) {
+                    $(".pageLoaderOverlay").hide();
+                    AvailabilityDeleteFactory.GetAvailabilityDelete(strAvailCd).success(function (data) {
+                       
+
+
+                        AvailabilityGridFactory.GetAvailabilityGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert({
+                                "message": "Availability Deleted Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+
+                    });
+
+                }
+            }
+
+
+        });
+
+
+    }
+
+
+
+
+
+
+
+
+
+} ]);
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

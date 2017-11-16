@@ -1,0 +1,552 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Bootstrap -->
+    <link href="BootStrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="BootStrap/css/styles.css" rel="stylesheet" type="text/css" />
+    <script src="Scripts/angular.min.js"></script>
+    <script src="Scripts/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="Scripts/app/CollapsiblePanel.js" type="text/javascript"></script>
+    <script src="Scripts/app/SLAInfoHome.js"></script>
+</head>
+<body ng-app="appModule1">
+    <header>
+        <div role="navigation" class="navbar navbarAndLogo">
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 logo-txt text-left Arrow">
+                        BT Internal SLA Information</div>
+                    <div>
+                        <a class="logo-close pull-right newclass" href="#" onclick="javascript:var win = window.open('', '_self');win.close();return false;">
+                            Close</a></div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div ng-controller="SLAInfoCntrl" style="margin: 15px;">
+        <div class="panel panel-primary">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label">
+                            Country</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" ng-change="ddlSLACountry()" ng-model="modSLACountry"
+                                ng-options="option.CountryId as option.CountryName for option in CountryList">
+                                <option value="">---Select---</option>
+                            </select>
+                        </div>
+                        <label for="" class="col-sm-3 control-label">
+                            Access Supplier</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" ng-change="ddlSLAAccSupp()" ng-model="modAccSupp" ng-options="option.supplierId as option.supplierName for option in AccSuppList">
+                                <option value="">---Select---</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="suppProdPanel" class="form-group" style="display: none">
+                        <label for="" class="col-sm-2 control-label">
+                            Access Type</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" ng-change="ddlSLACCType()" ng-model="modAccType" ng-options=" option.acctypeId as option.acctypeName for option in AccTypeList">
+                                <option value="">---Select---</option>
+                            </select>
+                        </div>
+                        <label for="" class="col-sm-3 control-label">
+                            Access Supplier Product</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" ng-change="ddlSLASupProd()" ng-model="modSuppProd" ng-options="option.AccSuppProdId as option.AccSuppProdName for option in SuppPordList">
+                                <option value="">---Select---</option>
+                            </select>
+                        </div>
+                       
+                    </div>
+                     <div class="col-sm-11 text-center">
+                            <input type="button" ng-click="reset()" value="Reset" class="btn btn-sc text-center" />
+                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-primary bg1 InfoCat">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label">
+                            Information Category</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" ng-model='modInfocategory' ng-options='option.value as option.name for option in Infocategory'
+                                ng-change="displaySLA()">
+                            </select>
+                        </div>
+                        <!-- <input type="button" ng-click="GetSLAInformation()" value="Go" class="btn btn-sc" />-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="ServiceDeleveryOverview">
+            <div class="panel panel-primary">
+                <div class="panel-heading Arrow">
+                    <h3 class="panel-title">
+                        Service Delivery Overview
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                Service Credits for Late Delivery
+                            </td>
+                            <td width="60%" class="Arrow">
+                                {{strServiceCredits}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                Special Notice
+                            </td>
+                            <td width="60%" class="Arrow">
+                                {{strSpecialNotice}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                Quote Validity Period
+                            </td>
+                            <td width="60%" class="Arrow">
+                                {{strQuoteValidity}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                Acknowledgement of Receipt of Order
+                            </td>
+                            <td width="60%" class="Arrow">
+                                {{strAckReceipt}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                Minimum Contract Term
+                            </td>
+                            <td width="60%" class="Arrow">
+                                {{strMinContractTerm}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                Cancellation Pre Installation
+                            </td>
+                            <td width="60%" class="Arrow">
+                                {{strCanPreinstall}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                Cancellation During Contract Term
+                            </td>
+                            <td width="60%" class="Arrow">
+                                {{strCanDurConTerm}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                Circuit Handover Test Criteria / Data
+                            </td>
+                            <td width="60%" class="Arrow">
+                                {{strCircuitHandoverTestCrit}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                Supplier Escalation Info
+                            </td>
+                            <td width="60%" class="Arrow">
+                                <a href="http://connection.concert.com/glopro/bt-abcde.asp" target="_blank">http://connection.concert.com/glopro/bt-abcde.asp
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading Arrow">
+                    <h3 class="panel-title text-left">
+                        Contracted Lead Times
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="bodyText Arrow">
+                                    Speed
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Order Acceptance
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Order Confirmation
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Contracted Lead time
+                                </th>
+                                <th class="bodyText Arrow">
+                                    BT Circuit Acceptance Period
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Expedite Delivery
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Expedite Delivery Terms
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Access Cease Lead Time
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in ContLeadTimeList">
+                                <td class="bodyText Arrow">
+                                    {{item.AccSpeed}}
+                                </td>
+                                <td class="bodyText Arrow">
+                                   {{item.OrdAccep}}
+                                </td>
+                                <td class="bodyText Arrow">
+                                    {{item.OrdConfirmation}}
+                                </td>
+                                <td class="bodyText Arrow">
+                                  {{item.ContractLeadTime}}
+                                </td>
+                                <td class="bodyText Arrow">
+                                    {{item.BTCircuitAccep}}
+                                </td>
+                                <td class="bodyText Arrow">
+                                    {{item.ExpedieDelivery}}
+                                </td>
+                                <td class="bodyText Arrow">
+                                    {{item.ExpedieDeliveryTerm}}
+                                </td>
+                                <td class="bodyText Arrow">
+                                    {{item.AccCeaseLeadTime}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="serviceAssuraneOverview" style="display: none">
+            <div class="panel panel-primary">
+                <div class="panel-heading Arrow">
+                    <h3 class="panel-title text-left">
+                        Service Assurance Overview
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <!--<table width="60%" border="0" id="Table2" cellpadding="0" class="table table-bordered">
+                        <tr>
+
+                            <td>
+                                &nbsp;
+                            </td>
+                            <td class="bodyText Arrow" width="30%" align="center">
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Hours of Operation If
+                                    not 24x7</b>
+                            </td>
+                            <td width="40%" valign="centre" nowrap class="bodyText Arrow">
+                                <b>Trouble Ticket Updates</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="15%" class="Arrow">
+                                <table>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            24x7 Fault Reception
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            24x7 Fault Repair
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td width="15%" nowrap class="bodyText Arrow">
+                                <table>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            <input type="text" value="{{str247FaultReception}}" readonly size="6" maxlength="6"
+                                                class="bodyText">
+                                            <input type="text" value="{{str247FaultReceptionName}}" readonly size="25" maxlength="25"
+                                                class="bodyText">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            <input type="text" value="{{str247FaultRepair}}" readonly size="6" maxlength="6"
+                                                class="bodyText">
+                                            <input type="text" value="{{str247FaultRepairName}}" readonly size="25" maxlength="25"
+                                                class="bodyText">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td width="30%" class="bodyText Arrow">
+                                <textarea rows="3" readonly class="bodyText" cols="41">{{strTroubleTicket}}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="bodyText Arrow">
+                                Maintenance Window Planned Works
+                            </td>
+                            <td class="bodyText Arrow">
+                                &nbsp;<textarea readonly class="bodyText" cols="41">{{strMaintenanceWindow}}</textarea>
+                            </td>
+                            <td width="60%" nowrap class="bodyText Arrow">
+                                <b>Service Credits (Repair and Availability)</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="35%">
+                                <table>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            Planned Works (Advance Notice Period)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            Special Notice
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            <textarea readonly class="bodyText" cols="41">{{strPlanWorkNotice}}</textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            <textarea rows="2" readonly class="bodyText" cols="41">{{strSpecialNoticeSA}}</textarea>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="bodyText Arrow">
+                                <textarea rows="5" readonly class="bodyText" cols="41">{{strServiceCreditsSA}}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="bodyText Arrow">
+                                Supplier Escalation Info &nbsp;&nbsp;&nbsp;<a href="http://connection.concert.com/glopro/bt-abcde.asp" target="_blank">
+                                    http://connection.concert.com/glopro/bt-abcde.asp</a>
+                            </td>
+                        </tr>
+                    </table>-->
+                    <table id="Table2" cellpadding="0" cellspacing="0" class="table table-bordered">
+                        <tr>
+                            <td width="40%">
+                                &nbsp;<br />
+                                <table>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            24x7 Fault Reception
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            24x7 Fault Repair
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="bodyText Arrow" width="60%">
+                                <b>Hours of Operation If not 24x7</b><br />
+                                <table>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            {{str247FaultReception}}&nbsp;&nbsp;&nbsp; {{str247FaultReceptionName}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bodyText Arrow">
+                                            {{str247FaultRepair}}&nbsp;&nbsp;&nbsp; {{str247FaultRepairName}}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="Arrow" width="40%">
+                                Maintenance Window Planned Works
+                            </td>
+                            <td class="Arrow" width="60%">
+                                {{strMaintenanceWindow}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="Arrow" width="40%">
+                                Trouble Ticket Updates
+                            </td>
+                            <td class="Arrow" width="60%">
+                                {{strTroubleTicket}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="Arrow" width="40%">
+                                Service Credits (Repair and Availability)
+                            </td>
+                            <td class="Arrow" width="60%">
+                                {{strServiceCreditsSA}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="Arrow" width="40%">
+                                Planned Works (Advance Notice Period)
+                            </td>
+                            <td class="Arrow" width="60%">
+                                {{strPlanWorkNotice}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="Arrow" width="40%">
+                                Special Notice
+                            </td>
+                            <td class="Arrow" width="60%">
+                                {{strSpecialNoticeSA}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="Arrow" width="40%">
+                                Supplier Escalation Info
+                            </td>
+                            <td class="Arrow" width="60%">
+                               <a href="http://connection.concert.com/glopro/bt-abcde.asp"> http://connection.concert.com/glopro/bt-abcde.asp </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <br />
+            <div class="panel panel-primary">
+                <div class="panel-heading Arrow">
+                    <h3 class="panel-title text-left">
+                        Access Line Availability
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <table border="0" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="bodyText Arrow">
+                                    Speed
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Access Line Availability
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Fault Response Time Severity 1
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Fault Repair Time Severity 1
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Fault Response Time Severity 2
+                                </th>
+                                <th class="bodyText Arrow">
+                                    Fault Repair Time Severity 2
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in ContLeadTimeList">
+                                <td class="bodyText Arrow">
+                                    <!--<input type="text" readonly value="{{AccSpeedSLA}}" size="19" maxlength="19" class="bodyText">-->
+                                    {{item.AccSpeed}}
+                                </td>
+                                <td class="bodyText Arrow">
+                                    {{item.AccessLineAvail}}
+                                        
+                                </td>
+                                <td class="bodyText Arrow">
+                                    {{item.FaultRespSeverity1}}
+                                       
+                                </td>
+                                <td class="bodyText Arrow">
+                                    {{item.FaultRepairSeverity1}}
+                                        
+                                </td>
+                                <td class="bodyText Arrow">
+                                    {{item.FaultRespSeverity2}}
+                                        
+                                </td>
+                                <td class="bodyText Arrow">
+                                    {{item.FaultRepairSeverity2}}
+                                   
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="downpanel">
+            <table border="0" class="table">
+                <tr>
+                    <td colspan="2" class="bodyText Arrow">
+                        <b>Information Source</b>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="text" value="Supply Management" readonly class="bodyText" />
+                    </td>
+                    <td>
+                        <b>Contact: </b><a href="https://office.bt.com/sites/PandSC/Public/Forms/AllItems.aspx"
+                            target="_blank">Supply managers country responsibility</a> ****
+                    </td>
+                </tr>
+            </table>
+            <table class="table">
+                <tr>
+                    <td colspan="5" class="bodyText Arrow">
+                        <b>****This is a link that will take users to the BT Global Supply Management workspace
+                            on the BT Share Point Portal.</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="bodyText">
+                       <!-- <b>Once users have workspace access, you can click on the Contact Link above or click
+                           <a href="https://office.bt.com/sites/PandSC/Public/List%20of%20Telco%20Suppliers%20and%20Associated%20P%20and%20SC%20Contacts%204th%20Nov%2011.xls">
+                                here</a> to download the document</b>-->
+                                <!--Anchor tag commented, can uncomment the same once the file is uploaded and revert the changes-->
+                        <b>Once users have workspace access, you can click on the Contact Link above or click
+
+                           <a href="https://office.bt.com/sites/PandSC/Public/List%20of%20Telco%20Suppliers%20and%20Associated%20Procurement%20Contacts.xls">
+                                here</a> to download the document</b>
+
+                           
+
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="bodyText Arrow">
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+</body>
+</html>

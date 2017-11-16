@@ -1,0 +1,116 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+namespace SCAdminDAL
+{
+  public  class AdminNotesPriorityDAL
+    {
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+        public DataTable GetNotesPriorityDetails()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+              
+            string str = string.Empty;
+
+            str = @"select note_priority_cd, note_priority_desc, (select User_name from CSU_USER where EMP_Id = a.Created_emp_id) Created_By, to_char(a.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt, (select User_name from CSU_USER where EMP_Id = a.Updated_emp_id) Updated_By," +
+                                        "to_char(a.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt from CSU_REF_NOTES_PRIORITY a order by upper(note_priority_desc) ";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public DataTable GetGridAdminBtgfr()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"select btgfr,description from csu_btgfr where btgfr > '0' order by btgfr asc,description";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public int MaxAvailCD()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"SELECT MAX(note_priority_cd) MaxCd FROM CSU_REF_NOTES_PRIORITY";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str));
+        }
+
+        public int AdminAvailInsert(string strAvailCd, string strPriorityDesc, string User_id)
+        {
+           
+            int id = Convert.ToInt32(strAvailCd);
+
+            string str = @"Insert into CSU_REF_NOTES_PRIORITY
+                        (
+                      note_Priority_cd, 
+                       note_Priority_desc, 
+                        created_emp_id, 
+                        created_dt, 
+                       updated_emp_id, 
+                        updated_dt 
+                        )
+                         VALUES  (" + id + ",'" + strPriorityDesc + "' ,'"
+                        + User_id + "',sysdate,'" + User_id + "',sysdate)";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+
+        public int AdminAvailUpdate(string strPriorityDesc, string User_id, string strAvailCd)
+        {
+
+            
+            int id = Convert.ToInt32(strAvailCd);
+            string str = @" update  CSU_REF_NOTES_PRIORITY   set  
+                        note_priority_desc='" + strPriorityDesc + "', updated_emp_id ='" + User_id + "',updated_dt=sysdate where note_Priority_cd =" + id;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+
+        public int AdminAvailDelete(string strAvailCd)
+        {
+
+            string str = @"Delete from CSU_REF_NOTES_PRIORITY where note_Priority_cd = " + strAvailCd;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+        public DataTable AdminAvailPopupGrid(string strAvailCd)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = @"    SELECT CREATED_EMP_ID,  TO_CHAR(CREATED_DT,'DD-MON-YYYY HH24:MI') AS CREATED_DT,
+  UPDATED_EMP_ID, TO_CHAR(UPDATED_DT,'DD-MON-YYYY HH24:MI') AS UPDATED_DT
+FROM CSU_REF_NOTES_PRIORITY WHERE note_Priority_cd =" + strAvailCd;
+            //OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+        }
+    }
+}

@@ -1,0 +1,100 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="FileDownload.aspx.cs" Inherits="SCAdmin.FileDownload" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+      <div>
+    
+     <asp:GridView ID="gvExceptions" runat="server" Visible ="false"  AutoGenerateColumns="False" BackColor="White"
+        BorderColor="#CC9966" BorderStyle="None" BorderWidth="1px" CellPadding="4">
+        <Columns>
+           <asp:BoundField DataField="COUNTRY" HeaderText="COUNTRY" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="BT_PACKAGE" HeaderText="BT_PACKAGE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="DSL_TYPE" HeaderText="DSL_TYPE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="CONTENTION" HeaderText="CONTENTION" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="SPEED" HeaderText="SPEED" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="WIZARD_PRICING_AVAILABLE" HeaderText="WIZARD_PRICING_AVAILABLE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="CURRENT_MARKETING_SPEED" HeaderText="CURRENT_MARKETING_SPEED" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ORION_DSL_PORT_SPEED" HeaderText="ORION_DSL_PORT_SPEED" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="PE_CE_CONFIG_SPEED" HeaderText="PE_CE_CONFIG_SPEED" ItemStyle-Width="150px" />
+				<asp:BoundField DataField="SUPPLIER" HeaderText="SUPPLIER" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="SUPPLIER_OFFER_NAME" HeaderText="SUPPLIER_PRODUCT_NAME" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="DSL_SUPPLY_TYPE" HeaderText="DSL_SUPPLY_TYPE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="FAULT_CLEAR_TIME_OBJECTIVE" HeaderText="FAULT_CLEAR_TIME_OBJECTIVE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="SLA2_SITE_AVAILABILITY" HeaderText="SLA2_SITE_AVAILABILITY" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="DSL_TO_BT_MPLS" HeaderText="DSL_TO_BT_MPLS" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="DSL_MPLS_LOCAL_LOOP_ACCESS" HeaderText="DSL_MPLS_LOCAL_LOOP_ACCESS" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="BT_MANAGED" HeaderText="BT_MANAGED" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="CUSTOMER_MANAGED" HeaderText="CUSTOMER_MANAGED" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="CPE_MODELS_SUPPORTED" HeaderText="CPE_MODELS_SUPPORTED" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="PSTN" HeaderText="PSTN" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="ISDN" HeaderText="ISDN" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="TIR_VALUE" HeaderText="TIR_VALUE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="COS2_SUPPORTED_SPEEDS" HeaderText="COS2_SUPPORTED_SPEEDS" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="VOICE_EF_SUPP_SPEEDS" HeaderText="VOICE_EF_SUPP_SPEEDS" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="ASSURED_AF_SUPP_SPEEDS" HeaderText="ASSURED_AF_SUPP_SPEEDS" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="DESIGN" HeaderText="DESIGN" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="SERVICE_VARIANT" HeaderText="SERVICE_VARIANT" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="BT_LOCAL_LOOP" HeaderText="BT_LOCAL_LOOP" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ENCAPSULATION" HeaderText="ENCAPSULATION" ItemStyle-Width="100px" />
+                   <asp:BoundField DataField="CUSTOMER_LOCATION_TERMINATION" HeaderText="CUSTOMER_LOCATION_TERMINATION" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ACCESS_MODEL" HeaderText="ACCESS_MODEL" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="CE_VPI_VCI" HeaderText="CE_VPI_VCI" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="LOCAL_LOOP_TYPE" HeaderText="LOCAL_LOOP_TYPE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ACCESS_LINE_TYPE_XDSL" HeaderText="ACCESS_LINE_TYPE_XDSL" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="OFFER_NAME" HeaderText="OFFER_NAME" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="BT_LOCAL_LOOP_PROVIDER" HeaderText="BT_LOCAL_LOOP_PROVIDER" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ACCESS_SUPPLIER_NAME" HeaderText="ACCESS_SUPPLIER_NAME" ItemStyle-Width="100px" />
+                
+                <asp:BoundField DataField="DSL_PROVIDER_OFFER" HeaderText="DSL_PROVIDER_OFFER" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="PRODUCT_CODE" HeaderText="PRODUCT_CODE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ISDN_DIAL_BACKUP" HeaderText="ISDN_DIAL_BACKUP" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ISDN_DIAL_BACKUP_NUMBER" HeaderText="ISDN_DIAL_BACKUP_NUMBER" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="DSL_SPLITTER_1" HeaderText="DSL_SPLITTER_1" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="DSL_SPLITTER_2" HeaderText="DSL_SPLITTER_2" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="DSL_SPLITTER_3" HeaderText="DSL_SPLITTER_3" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ACCESS_TYPE_TECH_ELEMENT" HeaderText="ACCESS_TYPE_TECH_ELEMENT" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ACCESS_TYPE_ATTRIBUTE_VALUE" HeaderText="ACCESS_TYPE_ATTRIBUTE_VALUE" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="VPN_CONNECTION" HeaderText="VPN_CONNECTION" ItemStyle-Width="100px" />
+                
+                
+                
+                 <asp:BoundField DataField="CONNECTION1" HeaderText="CONNECTION1" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="CONNECTION2" HeaderText="CONNECTION2" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="INTERCONNECT_TYPE" HeaderText="INTERCONNECT_TYPE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="XDSL_NTE_ELECTRICAL_INTERFACE" HeaderText="XDSL_NTE_ELECTRICAL_INTERFACE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="XDSL_NTE_FRAMING_STRUCTURE" HeaderText="XDSL_NTE_FRAMING_STRUCTURE" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="RATIO" HeaderText="RATIO" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="AUTHENTICATION_VALUE" HeaderText="AUTHENTICATION_VALUE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="GLOBAL_NATIONAL_DOMESTIC" HeaderText="GLOBAL_NATIONAL_DOMESTIC" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="DSL_ANNEX" HeaderText="DSL_ANNEX" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="NUMERIC_SPEED" HeaderText="NUMERIC_SPEED" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ACCESS_TYPE" HeaderText="ACCESS_TYPE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="CONNECTOR_TYPE" HeaderText="CONNECTOR_TYPE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="COUNTRY_ISO_ALPHA2_CODE" HeaderText="COUNTRY_ISO_ALPHA2_CODE" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="ACCESS_AND_CPE_BUNDLE" HeaderText="ACCESS_AND_CPE_BUNDLE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="MANUFACTURER" HeaderText="MANUFACTURER" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ACCESS_BASED_CPE_SUPPLIER_TYPE" HeaderText="ACCESS_BASED_CPE_SUPPLIER_TYPE" ItemStyle-Width="150px" />
+                
+                
+                 <asp:BoundField DataField="COS_PROFILE_ID" HeaderText="COS_PROFILE_ID" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="INSTALLATION_HOURS" HeaderText="INSTALLATION_HOURS" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="SITE_SURVEY" HeaderText="SITE_SURVEY" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="AVAILABILITY_CHECK_TYPE" HeaderText="AVAILABILITY_CHECK_TYPE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="CENTRAL_AVAILABILITY_SUPPORTED" HeaderText="CENTRAL_AVAILABILITY_SUPPORTED" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="CUSTOMER_LOCATION_TYPE" HeaderText="CUSTOMER_LOCATION_TYPE" ItemStyle-Width="100px" />
+        </Columns>
+        <FooterStyle BackColor="#FFFFCC" ForeColor="#330099" />
+        <PagerStyle BackColor="#FFFFCC" ForeColor="#330099" HorizontalAlign="Center" />
+        <SelectedRowStyle BackColor="#FFCC66" Font-Bold="True" ForeColor="#663399" />
+        <HeaderStyle BackColor="#990000" Font-Bold="True" ForeColor="#FFFFCC" />
+    </asp:GridView>
+    </div>
+    </form>
+</body>
+</html>

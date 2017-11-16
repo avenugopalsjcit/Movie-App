@@ -1,0 +1,210 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+  public  class AdminCallerAccessSupplierBAL
+    {
+
+      private AdminCallerAccessSupplierDAL objSRD = new AdminCallerAccessSupplierDAL();
+      public List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierView()
+        {
+
+
+            List<CallerAccessSupplier> lstOrg = new List<CallerAccessSupplier>();
+            DataTable dtGridDistributor = objSRD.GetGridAdminCallerAccessSupplier();
+            
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                CallerAccessSupplier objOrg = new CallerAccessSupplier();
+
+                objOrg.OptionMatrixId = Convert.ToInt32(dr["option_matrix_id"]);
+                objOrg.CharName = Convert.ToString(dr["char_name"]);
+               
+
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+
+      public List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierDropdown()
+      {
+
+
+          List<CallerAccessSupplier> lstOrg = new List<CallerAccessSupplier>();
+          DataTable dtGridDistributor = objSRD.GetGridAdminCallerAccessSupplierDropdown();
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              CallerAccessSupplier objOrg = new CallerAccessSupplier();
+
+              objOrg.AvailCD = Convert.ToInt32(dr["avail_cd"]);
+              objOrg.AvailDesc = Convert.ToString(dr["avail_desc"]);
+              objOrg.AvailAbbr = Convert.ToString(dr["avail_abbr"]);
+
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+
+      public List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierMatrix()
+      {
+
+
+          List<CallerAccessSupplier> lstOrg = new List<CallerAccessSupplier>();
+          DataTable dtGridDistributor = objSRD.GetGridAdminCallerAccessSupplierMatrix();
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              CallerAccessSupplier objOrg = new CallerAccessSupplier();
+
+              objOrg.OptionMatrixId = Convert.ToInt32(dr["option_matrix_id"]);
+              objOrg.DepCharTypeID = Convert.ToInt32(dr["char_type_id"]);
+              objOrg.DepCharID = Convert.ToInt32(dr["CHAR_ID"]);
+                objOrg.CharName = Convert.ToString(dr["char_name"]);
+                objOrg.CharActualValue = Convert.ToString(dr["char_actual_value"]);
+                objOrg.DepSubproductCD = Convert.ToInt32(dr["subproduct_cd"]);
+                   objOrg.DepProductCD=Convert.ToInt32(dr["product_cd"]);
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+      public List<CallerAccessSupplier> SetDropdownAdminCallerAccessSupplierMatrix(string OptmatrixId)
+      {
+
+
+          List<CallerAccessSupplier> lstOrg = new List<CallerAccessSupplier>();
+          DataTable dtGridDistributor = objSRD.SetDropdownAdminCallerAccessSupplierMatrix(OptmatrixId);
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              CallerAccessSupplier objOrg = new CallerAccessSupplier();
+
+              objOrg.OptionMatrixId = Convert.ToInt32(dr["char_opt_matrix_id"]);
+
+              objOrg.AvailCD = Convert.ToInt32(dr["avail_cd"]);
+              objOrg.DepId = Convert.ToInt32(dr["depend_id"]);
+              objOrg.DepProductCD = Convert.ToInt32(dr["depend_product_cd"]);
+              objOrg.DepValidCD = Convert.ToInt32(dr["depend_valid_cd"]);
+              objOrg.CharTypeID = Convert.ToInt32(dr["char_type_id"]);
+              objOrg.DepSubproductCD = Convert.ToInt32(dr["depend_subproduct_cd"]);
+              objOrg.DepCharTypeID = Convert.ToInt32(dr["depend_char_type_id"]);
+              objOrg.DepCharID = Convert.ToInt32(dr["depend_char_id"]);
+              objOrg.DepOptionMatrixId = Convert.ToInt32(dr["depend_option_matrix_id"]);
+              if (dr["product_cd"] != DBNull.Value)
+              {
+                  objOrg.ProductCd = Convert.ToInt32(dr["product_cd"]);
+              }
+              if (dr["subproduct_cd"] != DBNull.Value)
+              {
+                  objOrg.SubProductCd = Convert.ToInt32(dr["subproduct_cd"]);
+              }
+              objOrg.CharId = Convert.ToInt32(dr["char_id"]);
+
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+      public List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierCharids(string OptmatrixId)
+      {
+
+
+          List<CallerAccessSupplier> lstOrg = new List<CallerAccessSupplier>();
+          DataTable dtGridDistributor = objSRD.GetGridAdminCallerAccessSupplierCharids(OptmatrixId);
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              CallerAccessSupplier objOrg = new CallerAccessSupplier();
+
+          
+              objOrg.DepCharTypeID = Convert.ToInt32(dr["char_type_id"]);
+              objOrg.DepCharID = Convert.ToInt32(dr["CHAR_ID"]);
+             
+
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+      public int InsertAdminCallerSupplier(string depend_ID, string depend_OptionmatrixID, string depend_productCD,
+                                            string depend_subproductCD, string depend_chartypeID, string depend_charID, string availCD, string charOptionMatrixID,
+                                            string productCD, string subproductCD, string charTypeID, string charID, string dependvalidCD, string User_id)
+      {
+
+          int count = objSRD.AdminCallerSupplierInsert(depend_ID, depend_OptionmatrixID, depend_productCD, depend_subproductCD, 
+                                                        depend_chartypeID, depend_charID, availCD, charOptionMatrixID, null, 
+                                                        null, charTypeID, charID, dependvalidCD, User_id);
+
+
+
+          return count;
+      }
+
+      public int DeleteAdminCallerSupplier(string ProductCD, string SubproductCD, string OptionmatrixID)
+      {
+
+          int count = objSRD.AdminCallerSupplierDelete( ProductCD,  SubproductCD,  OptionmatrixID);
+
+
+
+          return count;
+      }
+
+      public int GetMaxCallerSuppCD()
+      {
+          //AvailabilityGrid objOrg = new AvailabilityGrid();
+          return objSRD.MaxCallerSupplierCD();
+
+      }
+
+
+    }
+}

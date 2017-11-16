@@ -1,0 +1,533 @@
+// -----------------------------------------------------------------------------------------------------------------
+// Version     Date            Modified by            Comments
+//             DD/MM/YY        Infosys ID
+// -----------------------------------------------------------------------------------------------------------------
+// 1.8         19/03/08        pawannarayan_rudgi       Parent Ports Speeds Issue:Check Platform for Displaying Parent Speeds 
+// 1.7         18/02/08        madhav_shenoy            Performance fix for Bandwidth
+// 1.6         07/08/08        madhav_shenoy            Changed getCity case and iscontainscity for cpe-suplier defect
+// 1.5         23/08/07        binnya_joseph            To deselect POP
+// 1.4         23/08/07        akshita_saxena           To Add multipoint cases
+// 1.3         06/08/07        akshita_saxena           To get access cases
+// 1.2         15/06/07        madhav_shenoy            Modified get popselected
+// 1.1         11/06/07        akshita_saxena           Added functions pertaining to portspeed,made class serializable
+// 1.0         08/06/07        madhav_shenoy            Created
+// -----------------------------------------------------------------------------------------------------------------
+
+#region Imported Namespaces
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+
+using System.Collections;
+using PCDataAccess;
+#endregion
+namespace SCAdminBAL.MCU
+{
+    /// <summary>
+    /// Summary description for CaseDataCollection
+    /// </summary>
+    [Serializable]
+    public class CaseDataCollection : CollectionBase
+    {
+        public CaseDataCollection()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
+
+        #region Public Methods
+        //1.4 Add Begins
+        public int AddMultiPointCase(CaseData oCase)
+        {
+            if (!this.IsContainsMultiPoint(oCase))
+            {
+                this.List.Add(oCase);
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public void RemoveMultiPointCase(CaseData oCase)
+        {
+            //1.5 Begins
+            if (this.IsContainsMultiPoint(oCase))
+            {
+                this.List.Remove(oCase);
+            }
+            //1.5 Ends
+        }
+        public Boolean IsContainsMultiPoint(CaseData oCase)
+        {
+            foreach (CaseData obj in this.List)
+            {
+                if (oCase.CaseId == 0)
+                {
+                    if ((obj.Pop.PopSiteId == oCase.Pop.PopSiteId) && (obj.AccessSpeedCharId == oCase.AccessSpeedCharId))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (obj.CaseId == oCase.CaseId)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        //1.4 Add Ends
+        public int Add(CaseData oCase)
+        {
+            if (!this.IsContains(oCase))
+            {
+                this.List.Add(oCase);
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public int AddHvpn(CaseData oCase)
+        {
+            if (!this.IsContainsHvpn(oCase))
+            {
+                this.List.Add(oCase);
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+        public int AddCountry(CaseData oCase)
+        {
+            if (!this.IsContainsCountry(oCase))
+            {
+                this.List.Add(oCase);
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public Boolean IsContainsCountry(CaseData oCase)
+        {
+            foreach (CaseData obj in this.List)
+            {
+                if ((obj.CountrySite.CountryId == oCase.CountrySite.CountryId && obj.CaseId == oCase.CaseId))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public int AddCity(CaseData oCase)
+        {
+            if (!this.IsContainsCity(oCase))
+            {
+                this.List.Add(oCase);
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public Boolean IsContainsCity(CaseData oCase)
+        {
+            foreach (CaseData obj in this.List)
+            {
+                //1.6 Modify BEGINS  
+                //if ((obj.CitySite.CityId == oCase.CitySite.CityId && obj.CaseId == oCase.CaseId))
+                if ((obj.CitySite.CityId == oCase.CitySite.CityId && obj.CaseId == oCase.CaseId && obj.CitySite.AccessSupplierCharId == oCase.CitySite.AccessSupplierCharId))
+                //1.6 Modify ends  
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public Boolean IsContains(CaseData oCase)
+        {
+            foreach (CaseData obj in this.List)
+            {
+
+                if (oCase.CaseId == 0)
+                {
+                    if ((obj.Pop.PopSiteId == oCase.Pop.PopSiteId) && (obj.Pop.oCapmanPlatform.CapmanPlatformId == oCase.Pop.oCapmanPlatform.CapmanPlatformId))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (obj.CaseId == oCase.CaseId)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public Boolean IsContainsHvpn(CaseData oCase)
+        {
+            foreach (CaseData obj in this.List)
+            {
+
+                if (oCase.CaseId == 0)
+                {
+                    if ((obj.Pop.PopSiteId == oCase.Pop.PopSiteId))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        public int GetCount()
+        {
+            return this.List.Count;
+        }
+
+        public void Remove(CaseData oCase)
+        {
+            if (this.IsContains(oCase))
+            {
+                this.List.Remove(oCase);
+            }
+        }
+
+        public void RemoveCity(CaseData oCase)
+        {
+            if (this.IsContainsCity(oCase))
+            {
+                this.List.Remove(oCase);
+            }
+        }
+
+        public void RemoveCountry(CaseData oCase)
+        {
+            if (this.IsContainsCountry(oCase))
+            {
+                this.List.Remove(oCase);
+            }
+        }
+
+        public CaseData GetCountryCase(Int32 CountryId, Int32 ProductCd, Int32 SubProductCd)
+        {
+            foreach (CaseData oCase in this.List)
+            {
+                if (((oCase.CountrySite.CountryId == CountryId)
+                           && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd)))
+                {
+                    return oCase;
+                }
+            }
+            return null;
+        }
+
+        public CaseData GetCountryCase(Int32 CountryId, Int32 iCaseid, Int32 ProductCd, Int32 SubProductCd)
+        {
+            foreach (CaseData oCase in this.List)
+            {
+                if (((oCase.CountrySite.CountryId == CountryId) && (oCase.CaseId == iCaseid)
+                           && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd)))
+                {
+                    return oCase;
+                }
+            }
+            return null;
+        }
+
+        //1.6 Modify Begins
+        //public CaseData GetCityCase(Int32 CityId, Int32 ProductCd, Int32 SubProductCd)
+        public CaseData GetCityCase(Int32 CityId, Int32 iCaseId, Int32 ProductCd, Int32 SubProductCd)
+        //1.6 Modify ends  
+        {
+            foreach (CaseData oCase in this.List)
+            {
+                //1.6 Modify Begins
+                //if (((oCase.CitySite.CityId == CityId)
+                //            && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd)))
+                if (((oCase.CitySite.CityId == CityId && oCase.CaseId == iCaseId)
+                            && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd)))
+                //1.6 Modify ends  
+                {
+                    return oCase;
+                }
+            }
+            return null;
+        }
+        public CaseData GetCase(Int32 PopId, Int32 CapmanPlatformId, Int32 ProductCd, Int32 SubProductCd)
+        {
+            foreach (CaseData oCase in this.List)
+            {
+                if (((oCase.Pop.PopSiteId == PopId)
+                            && ((oCase.Pop.oCapmanPlatform.CapmanPlatformId == CapmanPlatformId)
+                            && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd))))
+                {
+                    return oCase;
+                }
+            }
+            return null;
+        }
+
+        public CaseData GetCaseBandwidth(Int32 AccessSpeedId, Int32 iCaseId, Int32 iPopId, Int32 ProductCd, Int32 SubProductCd)
+        {
+            foreach (CaseData oCase in this.List)
+            {
+                //Infosys - kiruthika - Drop 3.8 - Begins - update - 11/12/2007
+                if (oCase.CaseId <= 0)
+                //Infosys - kiruthika - Drop 3.8 - Begins - update - 11/12/2007
+                {
+                    if (((oCase.AccessSpeedCharId == AccessSpeedId) && (oCase.Pop.PopSiteId == iPopId)
+                                && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd)))
+                    {
+                        return oCase;
+                    }
+                }
+                else
+                {
+                    if (((oCase.CaseId == iCaseId)
+                                && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd)))
+                    {
+                        return oCase;
+                    }
+                }
+            }
+            return null;
+        }
+        public CaseData GetCase(Int32 PopId, Int32 iCaseId, Int32 CapmanPlatformId, Int32 ProductCd, Int32 SubProductCd)
+        {
+            foreach (CaseData oCase in this.List)
+            {
+                if (oCase.CaseId == 0)
+                {
+                    if (((oCase.Pop.PopSiteId == PopId)
+                                && ((oCase.Pop.oCapmanPlatform.CapmanPlatformId == CapmanPlatformId)
+                                && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd))))
+                    {
+                        return oCase;
+                    }
+                }
+                else
+                {
+                    if (((oCase.CaseId == iCaseId)
+                                && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd)))
+                    {
+                        return oCase;
+                    }
+                }
+            }
+            return null;
+        }
+        //1.3 begins
+        public CaseData GetCase(Int32 PopId, Int32 Productcd)
+        {
+            foreach (CaseData oC in this.List)
+            {
+                if ((oC.Pop.PopSiteId == PopId) && (oC.ProductCd == Productcd))
+                {
+                    return oC;
+
+                }
+            }
+            return null;
+        }
+
+        //1.3 ends
+        //1.2 Add Begins
+        public int CheckVPOPs()
+        {
+            foreach (CaseData oCase in this.List)
+            {
+                if (oCase.Pop.PopType == "VPOP")
+                {
+                    return 1;
+                }
+
+            }
+
+            return 0;
+        }
+
+        //1.2 Add ends  
+        //1.1
+        public int[] getSelectedPOPs()
+        {
+            int[] SelectedPOPs;
+            SelectedPOPs = new int[this.List.Count];
+            int count = 0;
+            foreach (CaseData oCase in this.List)
+            {
+                SelectedPOPs[count] = Convert.ToInt32(oCase.Pop.PopSiteId);
+                count = count + 1;
+            }
+            return SelectedPOPs;
+        }
+
+        //1.8 Begins: Function to Get both POp and Platform in when Parent Speeds 
+        //is Selected
+        public object[,] getPopPlatforms()
+        {
+            object[,] alSelPopPlat = new object[1, 2];
+
+            int[] aiPop = null;
+            int[] aiPlatform = null;
+
+            aiPop = new int[this.List.Count];
+            aiPlatform = new int[this.List.Count];
+
+            int icount = 0;
+            foreach (CaseData oCase in this.List)
+            {
+                aiPop[icount] = Convert.ToInt32(oCase.Pop.PopSiteId);
+                aiPlatform[icount] = Convert.ToInt32(oCase.Pop.oCapmanPlatform.CapmanPlatformId);
+                icount = icount + 1;
+
+            }
+            alSelPopPlat[0, 0] = aiPop;
+            alSelPopPlat[0, 1] = aiPlatform;
+
+            return alSelPopPlat;
+        }
+        //1.8 Ends
+
+        //1.1 ends    
+        public void RemoveAll()
+        {
+
+            foreach (CaseData oCase in this.List)
+            {
+                Remove(oCase);
+            }
+        }
+
+        public int[] getSelectedCases()
+        {
+            int[] SelectedCases;
+            SelectedCases = new int[this.List.Count];
+            int count = 0;
+            foreach (CaseData oCase in this.List)
+            {
+                SelectedCases[count] = Convert.ToInt32(oCase.CaseId);
+                count = count + 1;
+            }
+            return SelectedCases;
+        }
+        //1.7 Add begins
+        public int[] getSelectedCases(MCUSession oMcuSessionData)
+        {
+            if (oMcuSessionData.AllPOPFlag > -1)
+            {
+                return getMultipointCaseData(oMcuSessionData.ProductCd, oMcuSessionData.SubProductCd);
+            }
+            else
+            {
+                return getSelectedCases();
+            }
+        }
+
+        private int[] getMultipointCaseData(Int32 iProductCd, Int32 iSubproductCd)
+        {
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            int[] iSelectedCases = null;
+            Int32 iCount = 0;
+            try
+            {
+                dsData = oDataAccess.GetMultipointCaseData(getSelectedPOPs(), iProductCd, iSubproductCd);
+            }
+            catch
+            {
+                throw;
+            }
+            iSelectedCases = new int[dsData.Tables[0].Rows.Count];
+            foreach (DataRow dr in dsData.Tables[0].Rows)
+            {
+                iSelectedCases[iCount] = Convert.ToInt32(dr["case_id"].ToString());
+                iCount++;
+            }
+            return iSelectedCases;
+
+        }
+        //1.7 Add ends
+
+        //Added GSCE-85484 
+        public CaseData GetCaseHvpn(Int32 PopId, Int32 iCaseId, Int32 ProductCd, Int32 SubProductCd)
+        {
+            foreach (CaseData oCase in this.List)
+            {
+                if (oCase.CaseId == 0)
+                {
+                    if (((oCase.Pop.PopSiteId == PopId)
+                                && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd)))
+                    {
+                        return oCase;
+                    }
+                }
+                else
+                {
+                    if (((oCase.CaseId == iCaseId) && (oCase.Pop.PopSiteId == PopId)
+                                && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd)))
+                    {
+                        return oCase;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public int[] getSelectedCountry(MCUSession oMcuSessionData)
+        {
+            if (oMcuSessionData.AllPOPFlag > -1)
+            {
+                return getMultipointCaseData(oMcuSessionData.ProductCd, oMcuSessionData.SubProductCd);
+            }
+            else
+            {
+                return getSelectedCasesCountry();
+            }
+        }
+
+        public int[] getSelectedCasesCountry()
+        {
+            int[] SelectedCases;
+            SelectedCases = new int[this.List.Count];
+            int count = 0;
+            foreach (CaseData oCase in this.List)
+            {
+                SelectedCases[count] = Convert.ToInt32(oCase.Pop.CountryId);
+                count = count + 1;
+            }
+            return SelectedCases;
+        }
+
+        public CaseData GetCaseHvpn(Int32 PopId, Int32 ProductCd, Int32 SubProductCd)
+        {
+            foreach (CaseData oCase in this.List)
+            {
+                if (((oCase.Pop.PopSiteId == PopId)
+                            && (oCase.ProductCd == ProductCd) && (oCase.SubProductCd == SubProductCd)))
+                {
+                    return oCase;
+                }
+            }
+            return null;
+        }
+        //Ended GSCE-85484 
+        #endregion
+    }
+}

@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Search</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Bootstrap -->
+    <link href="BootStrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="BootStrap/css/styles.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak
+        {
+            display: none;
+        }
+        
+        ng\:form
+        {
+            display: block;
+        }
+    </style>
+
+</head>
+<body ng-app="appModule">
+    <header>
+		<div role="navigation" class="navbar navbarAndLogo">
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 logo-txt text-left Arrow">Sales Catalogue</div>
+                    <div class="col-sm-3 text-right howtosearch"><a  style="color:White" href="Documents/SC_ProductAvailability.docx">How to use new search?</a></div>
+                    <div ><a class="logo-close pull-right newclass" href="#" onclick="javascript:var win = window.open('', '_self');win.close();return false;">Close</a></div>
+				</div>
+			</div>
+		</div>
+	</header>
+    <section>
+
+		<div  ng-clock class="container" ng-controller="appCntrl">
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="panel panel-primary">
+						<div class="panel-heading Arrow">Search</div>
+						<div class="panel-body">
+							<div class="form-horizontal">
+								<div class="form-group">
+									<label for="" class="col-sm-2 control-label">Product &nbsp; <span style="color:Red">*</span>  </label>
+									<div class="col-sm-3">	
+										<select id="prodname" ng-change="GetRegionCountries(modproduct,modregion)" ng-model="modproduct" ng-options="prod.ProductID as prod.ProductName for prod in productdata" class="form-control">
+
+											<option value="">--- Select ---</option>
+										</select>
+										
+                                        <select id="oprodname" style="display: none" class="form-control">
+                                        <option value="">{{OnevoiceName}}</option>
+										</select>
+                                       <!-- <label class="oprodname" style="display: none"> {{OnevoiceName}}</label>-->
+                                        
+                                        <span style="display: none;color:Red;" id="ValidateProduct" class="Arrow"> Please Select Product</span><br />
+
+                                      <span  style="display:none" id="spnProductNotes" ng-hide="ProductNote==0"><a ng-click="openProductNotes()" class="clickable1"  >View Product Notes</a></span>
+
+                                     
+									</div>
+                                  
+                                    <label ng-hide="modproduct=='58' || modproduct=='72'" for="" class="col-sm-2 control-label">
+                                    Country  &nbsp; <span style="color:Red">*</span> </label>
+									<div class="col-sm-3">
+										<select id="ddlcountry" ng-hide="modproduct=='58' || modproduct=='72'" ng-change="GetCountryRegions()" ng-model="modcountry" ng-options="cntry.CountryID as cntry.CountryName for cntry in CountryData" class="form-control">
+											<option value="">--- Select ---</option>
+										</select>
+                                        <span style="display: none;color:Red;" id="ValidateCountry" class="Arrow"> Please Select Country</span><br />
+
+                                        <span style="display:none" id="spnCountryNotes" ng-hide="CountryNote==0"><a ng-click="openCountryNotes(0)" class="clickable1 " >View Country Notes<br /></a></span>
+                                        <span  style="display:none" id="spnRegionNotes" ng-hide="RegionNote==0"><a ng-click="openRegionNotes()" class="clickable1 " >View Region Notes</a></span>
+
+                                        
+
+									</div>
+								</div>
+                        
+                        
+                        
+                        
+                               <div style="display:none" id="btLanNotes" ng-show="modproduct=='58' || modproduct=='72'" class="form-group">
+                                <div class="col-md-8 col-lg-8 " >
+                                   
+                                     <label for="" ng-show="modproduct=='72'"  class="col-sm-8 control-label"><b>BT LAN SAN Extension Service - International Availability Search</b> </label>
+                                    
+                                     <label for="" ng-show="modproduct=='58'"  class="col-sm-8 control-label"><b>BT Bandwidth Services - International Availability Search</b> </label>
+                                    </div>
+                                    
+                                </div>
+								
+								<div class="form-group" style="display:none" >
+									<label for="" class="col-sm-2 control-label">Region  &nbsp; <span style="color:Red">*</span> </label>
+									<div class="col-sm-3">
+										<select id="ddlreg" ng-change="GetCountries(modproduct,modregion)" ng-model="modregion" ng-options="reg.RegionID as reg.RegionName for reg in RegionData" class="form-control">
+											<option value="">--- Select ---</option>
+
+										</select>
+                                        <span style="display: none;color:Red;" id="ValidateRegion" class="Arrow">Please Select Region</span>
+									</div>
+									
+								</div>
+
+                                <div style="display:none" class="form-group" id="divSpeeds" ng-show="modproduct=='58'  || modproduct=='72'">
+									<label for="" class="col-sm-2 control-label">Speed(s) &nbsp; <span style="color:Red">*</span> </label>
+									<div class="col-sm-3">
+										<select ng-change="GetRegionsBySpeed(modproduct,modCountry1,modSpeed)"  ng-model="modSpeed" id="ddlSpeed"
+                                        ng-options="item.SpeedID as item.SpeedName for item in SpeedsData" class="form-control">
+											<option value="">--- Select ---</option>
+										</select>
+										<span style="display: none;color:Red;" id="spnSpeed"> Please Select Speed</span>
+									</div>
+								</div>
+
+								<div style="display:none" class="form-group" id="Country12" ng-show="modproduct=='58' || modproduct=='72'">
+								
+                                	<label for="" class="col-sm-2 control-label">Country 1 &nbsp; <span style="color:Red">*</span> </label>
+		                                <div class="col-sm-3">
+										<select id="ddlCountry1" ng-change="GetCities1(modproduct,0,modCountry1,0,modSpeed)" ng-model="modCountry1"
+                                         ng-options="cntry.CountryID as cntry.CountryName for cntry in CountryData" class="form-control">
+											<option value="">--- Select ---</option>
+										</select>
+										<span style="display: none;color:Red;" id="spnCountry1" class="Arrow"> Please Select Country 1</span><br />
+                                        <span style="display:none" id="spnCountryNotes1" ng-hide="Country1Note==0"><a ng-click="openCountryNotes(1)" class="clickable1 " >View Country Notes<br /></a></span>
+									</div>
+									<label for="" class="col-sm-2 control-label">Country 2 &nbsp; <span style="color:Red">*</span> </label>
+									<div class="col-sm-3">
+										<select id="ddlCountry2" ng-change="GetCities2(modproduct,0,modCountry2,0,modSpeed)" ng-model="modCountry2" ng-options="cntry.CountryID as cntry.CountryName for cntry in CountryData" class="form-control">
+											<option value="">--- Select ---</option>
+										</select>
+										<span style="display: none;color:Red;" id="spnCountry2" class="Arrow"> Please Select Country 2</span><br />
+                                        <span style="display:none" id="spnCountryNotes2" ng-hide="Country2Note==0"><a ng-click="openCountryNotes(2)" class="clickable1 " >View Country Notes<br /></a></span>
+									</div>
+								</div>
+								
+                                
+                                
+                                <div  style="display:none"  id="divCity" class="form-group ddlDispCity">
+                                    <label for="" class="col-sm-2 control-label">&nbsp; </label>
+                                    <div class="col-sm-3">
+                                        &nbsp;
+                                    </div> 
+
+									<label for="" class="col-sm-2 control-label">City &nbsp; <span style="color:Red">*</span> </label>
+									<div class="col-sm-3">
+										<select id="Select1" ng-model="modCity" ng-options="city.CityID as city.CityName for city in CityData" class="form-control" ng-change="HideCityAlert()">
+											<option value="">--- Select ---</option>
+										</select>
+                                        <span style="display: none;color:Red;" id="ValidateCity" class="Arrow" >Please Select City</span>
+										<!-- <select ng-model="modCity1" name="Cities1">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='city in CityData1' value="{{city.CityID}}">{{city.CityName}}</option>
+                        </select>-->
+									</div>
+								</div>
+								
+								<div style="display:none"  class="form-group" id="City12" >
+									<label for="" ng-show="modCountry1!='' && modCountry1!=null" class="col-sm-2 control-label">City 1 &nbsp; <span style="color:Red">*</span> </label>
+									<div ng-show="modCountry1!='' && modCountry1!=null" class="col-sm-3">  <!--ng-change="GetSpeeds1(modCountry1,modCity1)"-->
+										<select id="ddlCity1" ng-model="modCity1" ng-change="RemoveCityAlert1()"  ng-options="city.CityID as city.CityName for city in CityData1" class="form-control">
+											<option value="">--- Select ---</option>
+										</select>
+										<span style="display: none;color:Red;" id="spnCity1"> Please Select City 1</span>
+									</div>
+									
+                                    <label ng-class="modCountry1==null || modCountry1=='' ? 'col-sm-7 text-right' : 'col-sm-2 control-label'"  ng-show="modCountry2!='' && modCountry2!=null" >City 2 &nbsp; <span style="color:Red">*</span> </label>
+									<div ng-show="modCountry2!='' && modCountry2!=null" class="col-sm-3">  <!--ng-change="GetSpeeds2(modCountry2,modCity2)" -->
+										<select id="ddlCity2" ng-selected="selCity2" ng-change="RemoveCityAlert2()" ng-model="modCity2" ng-options="city.CityID as city.CityName for city in CityData2" class="form-control">
+											<option value="">--- Select ---</option>
+										</select>
+										<span style="display: none;color:Red;" id="spnCity2"> Please Select City 2</span>
+									</div>
+								</div>
+								
+
+								<!--<div style="display:none" class="form-group" id="divSpeeds" ng-show="modproduct=='58'  || modproduct=='72'">
+									<label for="" class="col-sm-2 control-label">Speeds &nbsp; <span style="color:Red">*</span> </label>
+									<div class="col-sm-3">
+										<select ng-change="GetCitiesBySpeed(modproduct,modCountry1,modSpeed)"  ng-model="modSpeed" id="ddlSpeed"
+                                        ng-options="item.SpeedID as item.SpeedName for item in SpeedsData" class="form-control">
+											<option value="">--- Select ---</option>
+										</select>
+										<span style="display: none;color:Red;" id="spnSpeed"> Please Select Speed</span>
+									</div>
+								</div>-->
+
+								<div class="form-group">
+									<div class="col-sm-3"></div>
+									<label for="" class="col-sm-2 control-label">&nbsp;</label>
+									<div class="col-sm-5">
+										<input type="button" ng-click="GetCaseDetails()" value="Search" class="btn btn-sc sc_search" />
+										<button ng-click="resetForm()" class="btn btn-sc">Show all Countries/Product</button>
+									</div>
+								</div>
+                                <div class="row">
+                               <p class="red"><span style="color:Black">Note:</span>&nbsp;No restriction on order of selection for the above filter criteria. Please choose either Country or Product based on which the other gets auto filtered.</p>
+                                </div>
+                                </div>
+							</div>
+                            </div>
+						
+						<!--<div class="panel-footer"></div>-->
+					<div ng-view></div>
+                    </div>
+                    </div>
+				</div>
+			
+	</section>
+    <footer>&nbsp;</footer>
+    <div class="pageLoaderOverlay">
+    </div>
+
+
+
+    <script src="Scripts/angular.js" type="text/javascript"></script>
+    <script src="Scripts/angular-ui/ui-bootstrap.min.js" type="text/javascript"></script>
+    <script src="Scripts/angular-ui/ui-bootstrap-tpls.min.js" type="text/javascript"></script>
+    <script src="Scripts/angular-route.js" type="text/javascript"></script>
+    <script src="Scripts/angular-resource.min.js" type="text/javascript"></script>
+    <script src="Scripts/app/ApplRouter.js" type="text/javascript"></script>
+    <script src="Scripts/app/ProductCase.js" type="text/javascript"></script>
+    <script src="Scripts/app/HVPNCntrl.js" type="text/javascript"></script>
+    <script src="Scripts/app/DSLCntrl.js" type="text/javascript"></script>
+    <script src="Scripts/app/VSATCntrl.js" type="text/javascript"></script>
+    <script src="Scripts/app/PrivateLineCntrl.js" type="text/javascript"></script>
+    <script src="Scripts/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="Scripts/app/BTCPEProduct.js" type="text/javascript"></script>
+    <script src="Scripts/app/BTOneVoice.js" type="text/javascript"></script>
+    <script src="Scripts/app/DispSubProduct.js" type="text/javascript"></script>
+    <script src="Scripts/app/SLAInformation.js" type="text/javascript"></script>
+    <script src="Scripts/app/LeveltwoProduct.js" type="text/javascript"></script>
+    <script src="Scripts/app/DispAccessDetails.js" type="text/javascript"></script>
+    <script src="Scripts/app/Documents.js" type="text/javascript"></script>
+    <script src="Scripts/app/IPConnect.js" type="text/javascript"></script>
+    <script src="Scripts/app/CollapsiblePanel.js" type="text/javascript"></script>
+    <script src="Scripts/app/DispHVPNpkgDet.js" type="text/javascript"></script>
+    <script src="Scripts/app/Notes.js" type="text/javascript"></script>
+    <script src="Scripts/app/CISReport.js"></script>
+    <script src="Scripts/app/DispCISAccessType.js"></script>
+    <!-- Bootstrap -->
+    <script src="BootStrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $('.clsremovewhitespace').html(function (i, el) {
+            return el.replace(/>\s*</g, '><');
+        });
+
+    </script>    
+
+
+
+
+
+
+</body>
+</html>

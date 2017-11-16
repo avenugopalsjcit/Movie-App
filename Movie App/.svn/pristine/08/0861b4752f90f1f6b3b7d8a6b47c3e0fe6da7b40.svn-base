@@ -1,0 +1,75 @@
+﻿<div ng-controller="NotesAuditReportCtrl" class="container">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                Notes Audit Information
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            
+                <!--<h4 style="text-align:left">Notes Audit Information</h4>-->
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label cus-text-left" for="ServiceType">
+                            Service Type
+                        </label>
+                        <div class="col-sm-3" style="margin-left:-50px">
+                            <select id="Select1" ng-model="modServiceType" ng-change="GetProducts()" ng-options="item as item for item in ServiceTypes"
+                                style="width: 90%;">
+                                <option value="">-- Select Service Type --</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label cus-text-left" ng-show="modServiceType!='' && modServiceType != null"
+                            for="">
+                            Product
+                        </label>
+                        <div class="col-sm-3" id="ProductDiv" style="margin-left:-70px">
+                            <select id="Select2" ng-show="modServiceType!='' && modServiceType != null" ng-model="modProduct"
+                                ng-change="GetNotesAuditReport()" ng-options="product.ProductId as product.ProductName for product in Products"
+                                style="width: 90%;">
+                                <option value="">-- Select Product --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="NotesAuditData.length==0 && DisplayMessage" class="alert alert-danger Arrow"
+                    role="alert">
+                    No Notes Audit Info present.
+                </div>
+                <div ng-show="NotesAuditData.length!=0">
+                    <table ng-table="NotesAuditData" class="table table-striped" show-filter="true" width="500px">
+                        <tr ng-repeat="notes in $data">
+                            <td data-title="'Note Id'" filter="{ NoteId: 'text'}" sortable="'NoteId'" class="Arrow">
+                                {{notes.NoteId}}
+                            </td>
+                            <td data-title="'Note Title'" filter="{ NoteTitle: 'text'}" sortable="'NoteTitle'"
+                                class="Arrow">
+                                {{notes.NoteTitle}}
+                            </td>
+                            <td data-title="'Created User Name'" filter="{ CreatedBy: 'text'}" sortable="'CreatedBy'"
+                                class="Arrow">
+                                {{notes.CreatedBy}}
+                            </td>
+                            <td data-title="'Created On'" filter="{ CreatedDate: 'text'}" sortable="'CreatedDate'"
+                                class="Arrow">
+                                {{notes.CreatedDate}}
+                            </td>
+                            <td data-title="'Updated User Name'" filter="{ UpdatedBy: 'text'}" sortable="'UpdatedBy'"
+                                class="Arrow">
+                                {{notes.UpdatedBy}}
+                            </td>
+                            <td data-title="'Updated On'" filter="{ UpdatedDate: 'text'}" sortable="'UpdatedDate'"
+                                class="Arrow">
+                                {{notes.UpdatedDate}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="pageLoaderOverlay">
+                </div>
+          
+        </div>
+    </div>
+</div>

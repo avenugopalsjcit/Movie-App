@@ -1,0 +1,241 @@
+// -----------------------------------------------------------------------------------------------------------------
+// Version     Date            Modified by            Comments
+//             DD/MM/YY        Infosys ID
+// -----------------------------------------------------------------------------------------------------------------
+// 1.1         01/07/08        akshita_Saxena          CR 3 - Location display hierachically
+// 1.0         06/06/07        madhav_shenoy           Created
+// -----------------------------------------------------------------------------------------------------------------
+
+#region Imported Namespaces
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+
+#endregion
+namespace SCAdminBAL.MCU
+{
+    /// <summary>
+    /// Summary description for POPsite
+    /// </summary>
+    [Serializable]
+    public class Popsite
+    {
+        #region Private Variables
+        private Int32 _POP_SITE_ID = -1;
+        private Int32 _CITY_ID = -1;
+        private String _CITY_NAME = String.Empty;
+        private String _POP_SITE_NAME = String.Empty;
+        private Int32 _COUNTRY_ID = -1;
+        private String _COUNTRY_NAME = String.Empty;
+        private Int32 _REGION_ID = -1;
+        private String _REGION_NAME = String.Empty;
+        private Int32 _POP_SITE_VALID_CD = -1;
+        private String _CREATED_EMP_ID = String.Empty;
+        private DateTime _CREATED_DT = DateTime.Now;
+        private String _UPDATED_EMP_ID = String.Empty;
+        private DateTime _UPDATED_DT = DateTime.Now;
+        private String _POP_TYPE = String.Empty;
+        private CapmanPlatform _CapmanPlatform = new CapmanPlatform();
+        //1.1 begins
+        private Int32 _STATE_PROVINCE_ID = -1;
+        private String _STATE_PROVINCE_NAME = String.Empty;
+        //1.1 begins
+        #endregion
+
+        #region Public Properties
+        public String CityName
+        {
+            get
+            {
+                return _CITY_NAME;
+            }
+            set
+            {
+                _CITY_NAME = value;
+            }
+        }
+        public String CountryName
+        {
+            get
+            {
+                return _COUNTRY_NAME;
+            }
+            set
+            {
+                _COUNTRY_NAME = value;
+            }
+        }
+        public String RegionName
+        {
+            get
+            {
+                return _REGION_NAME;
+            }
+            set
+            {
+                _REGION_NAME = value;
+            }
+        }
+        public CapmanPlatform oCapmanPlatform
+        {
+            get
+            {
+                return _CapmanPlatform;
+            }
+            set
+            {
+                _CapmanPlatform = value;
+            }
+        }
+        public String PopType
+        {
+            get
+            {
+                return _POP_TYPE;
+            }
+            set
+            {
+                _POP_TYPE = value;
+            }
+        }
+        public DateTime UpdatedDt
+        {
+            get
+            {
+                return _UPDATED_DT;
+            }
+            set
+            {
+                _UPDATED_DT = value;
+            }
+        }
+        public DateTime CreatedDt
+        {
+            get
+            {
+                return _CREATED_DT;
+            }
+            set
+            {
+                _CREATED_DT = value;
+            }
+        }
+        public String UpdatedEmpId
+        {
+            get
+            {
+                return _UPDATED_EMP_ID;
+            }
+            set
+            {
+                _UPDATED_EMP_ID = value;
+            }
+        }
+        public String CreatedEmpId
+        {
+            get
+            {
+                return _CREATED_EMP_ID;
+            }
+            set
+            {
+                _CREATED_EMP_ID = value;
+            }
+        }
+        public Int32 PopSiteValidCd
+        {
+            get
+            {
+                return _POP_SITE_VALID_CD;
+            }
+            set
+            {
+                _POP_SITE_VALID_CD = value;
+            }
+        }
+        public Int32 RegionId
+        {
+            get
+            {
+                return _REGION_ID;
+            }
+            set
+            {
+                _REGION_ID = value;
+            }
+        }
+        public Int32 PopSiteId
+        {
+            get
+            {
+                return _POP_SITE_ID;
+            }
+            set
+            {
+                _POP_SITE_ID = value;
+            }
+        }
+        public Int32 CityId
+        {
+            get
+            {
+                return _CITY_ID;
+            }
+            set
+            {
+                _CITY_ID = value;
+            }
+        }
+        public String PopSiteName
+        {
+            get
+            {
+                return _POP_SITE_NAME;
+            }
+            set
+            {
+                _POP_SITE_NAME = value;
+            }
+        }
+        public Int32 CountryId
+        {
+            get
+            {
+                return _COUNTRY_ID;
+            }
+            set
+            {
+                _COUNTRY_ID = value;
+            }
+        }
+        //1.1 begins
+        public Int32 StateID
+        {
+            get
+            {
+                return _STATE_PROVINCE_ID;
+            }
+            set
+            {
+                _STATE_PROVINCE_ID = value;
+            }
+        }
+        public String Statename
+        {
+            get
+            {
+                return _STATE_PROVINCE_NAME;
+            }
+            set
+            {
+                _STATE_PROVINCE_NAME = value;
+            }
+        }
+
+        //1.1 ends
+
+        #endregion
+
+    }
+}

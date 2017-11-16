@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+namespace SCAdminDAL
+{
+   public class CpeSupplierReportDAL
+    {
+        private StringBuilder strQuery = new StringBuilder();
+        private GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+     
+
+        public DataTable BindAllSupplierReport()
+        {
+            try
+            {
+                strQuery.Clear();
+                strQuery.Append("select a.country, a.country_name, a.manufacturer_name, a.supplier,a.supp_name, a.supplier_type, a.country_availability_desc,a.maint_opt, a.cpe_lead_time, a.cpe_lead_time_status, a.country_supplier_validity,  ");
+                strQuery.Append("  a.eoc_date,a.eom_date,a.eom_passed,a.cpe_cease_leadtime,a.cpe_cease_leadtime_status,");
+                strQuery.Append(" CASE ");
+                strQuery.Append("  WHEN a.product_id IN (-1, 0) ");
+                strQuery.Append(" THEN 'All'");
+                strQuery.Append("  ELSE c.product_name ");
+                strQuery.Append("   END product_name");
+                strQuery.Append(" FROM vw_cpe_data_report a, csu_product c WHERE a.product_id = c.product_cd and c.product_valid_cd =1 AND a.country_availability_desc <> 'Not Available' ");
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+            }
+
+            catch (Exception ex) { throw ex; }
+
+        }
+    }
+}

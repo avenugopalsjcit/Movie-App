@@ -1,0 +1,223 @@
+﻿
+    <div >
+     
+     
+            <div id="divAnnouncements"  ng-controller="MainCntl" >
+             
+               <div >
+                       
+                        <div id="Div6">
+                         
+                      <div class="row text-left Arrow ">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                               Availability
+                            </h3>
+                        </div>
+                    </div>
+                           <div class="col-md-12 Arrow pull-left" id="divAddButton"  style="padding-bottom:20px">
+                      <button  class="btn btn-primary" id="Addbtn" data-toggle="modal" data-target="#basicModal" ng-click="addNewTask()">
+                            <span class="glyphicon glyphicon-plus" title="Add Availability"></span>
+                        </button>
+                   </div>
+                       <!-- <div class="col-md-12"  style="padding-bottom:20px" >
+                        <button class="btn btn-default btn-sm pull-left" id="Addbtn" data-toggle="modal" data-target="#basicModal" ng-click="addNewTask()" >Add Availability</button>
+                         </div>-->
+                        
+                            
+                            <div >
+                              <table ng-table="usersTable" id="tblAvailability" show-filter="true"   class="table table-striped Arrow">
+                                <tr ng-repeat="category in $data" id="usersTable{{$index}}">
+                                       <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                                        <td data-title="' Availability'" filter="{ 'AvailabilityDesc': 'text' }"  sortable="'AvailabilityDesc'" class="Arrow">
+                                       <!-- <input type="text" value = "{{category.AvailabilityDesc}}" ng-show="Reset==1"/>-->
+                                        <div>
+                                            {{category.AvailabilityDesc}}
+                                            </div>
+                                        </td>
+                                        <td data-title="' Abbreviation'" filter="{ 'AvailabilityAbbr': 'text' }"  sortable="'AvailabilityDesc'" class="Arrow">
+                                         <div >
+                                            {{category.AvailabilityAbbr}}  
+                                            </div>
+                                             <!--<input type="text" value = "{{category.AvailabilityAbbr}}" ng-show="Reset==1"/>-->
+                                        </td>
+                                        <td data-title="' Valid'"    class="Arrow">
+                                         <div >
+                                            <input type="checkbox" ng-model="Availabilityvalid[PageIndex+$index]"  />
+                                            </div>
+                                             <!--<input type="text" value = "{{category.AvailabilityAbbr}}" ng-show="Reset==1"/>-->
+                                        </td>
+                                           <td data-title="' Created By / Created Date (GMT)'" filter="{ 'Created_Emp_Id': 'text' }"   class="Arrow">
+                                         <div >
+                                            {{category.Created_Emp_Id}}<br /> {{category.Created_Dt}}
+                                            </div>
+                                             <!--<input type="text" value = "{{category.AvailabilityAbbr}}" ng-show="Reset==1"/>-->
+                                        </td>
+                                           <td data-title="' Updated By / Updated Date (GMT)'" filter="{ 'Updated_Emp_Id': 'text' }"   class="Arrow">
+                                         <div >
+                                            {{category.Updated_Emp_Id}} <br /> {{category.Updated_Dt}}
+                                            </div>
+                                             <!--<input type="text" value = "{{category.AvailabilityAbbr}}" ng-show="Reset==1"/>-->
+                                        </td>
+                                        <td data-title="' Actions'">
+                                       <span>
+                                      
+                                        <button class="btn btn-default btn-sm" id="Editbtn"  ng-click="EditRecord('usersTable'+$index)" ><span class="glyphicon glyphicon-pencil" ></span></button>
+                                        
+                                        <button value="Delete" class="btn btn-sm btn-danger" id="AnnouncementId" class="chkAnnounmence" data-ng-click="DeleteAdminAvail(category)" > <span class="glyphicon glyphicon-trash"></span></button></span>
+                                   
+
+                                     <span style="display:none;"><button class="btn btn-primary btn-sm" ng-click="UpdateRecord('usersTable'+$index,$index,category)"><span class="glyphicon glyphicon-ok"></span></button>
+           <button class="btn btn-default btn-sm" ng-click="CancelUpdate('usersTable'+$index,$index,category.AvailabilityDesc,category.AvailabilityAbbr,category.AvailabilityValid)"><span class="glyphicon glyphicon-remove"></span></button></span>
+                                        </td>
+                                    </tr>
+                                   
+                                </table>
+                            </div>
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+
+               
+
+               
+            <!--   <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true" style="background: transparent; box-shadow: none;   border-style: none;  display: block; width: 900px;  margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;" >-->
+              <div class="modal fade" id="basicModal" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" >
+                <div class="modal-content">
+                    <div class="modal-header" ng-show="Reset==0">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add Availability</h4>
+                    </div>
+                    <div class="modal-header" ng-show="Reset==1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Edit  Availability</h4>
+                    </div>
+                    <div class="modal-body">
+                         <form class="form-horizontal" name="Availabilityform" novalidate>
+                        
+                        
+                        <div class="control-group" >
+                            <label class="control-label" for="inputtitle" >
+                                Abbreviation <span style="color:Red">*</span></label>
+                            <div class="controls" >
+                                <input type="text" id="inputAbbr" ng-model="AvailabilityAbbr" style="font-weight:normal" ng-minlength="1" placeholder="" required >
+                            </div>
+                            <div>
+                                        <p style="margin-left: 132px; color: Red" ng-show="Availabilityform.inputAbbr.$invalid && !Availabilityform.inputAbbr.$pristine"
+                                            class="help-block">
+                                            Please Enter AvailabilityAbbrevation.</p>
+                                    </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="inputDescription" >
+                                Description  <span style="color:Red">*</span></label>
+                            <div class="controls" >
+                                <input type="text" style="font-weight:normal" id="inputDescription" ng-model="Description" placeholder=""  required >
+                            </div>
+                            <div>
+                                        <p style="margin-left: 132px; color: Red" ng-show="Availabilityform.inputDescription.$invalid && !Availabilityform.inputDescription.$pristine"
+                                            class="help-block">
+                                            Please Enter AvailabilityDescription.</p>
+                                    </div>
+                        </div>
+
+                          <div class="control-group">
+                            <label class="control-label" for="inputDescription" >
+                                Valid</label>
+                            <div class="controls" >
+                                <input type="checkbox" id="inputValid" ng-model="Valid" placeholder="Valid" >
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                    <div>
+                    
+                    
+                              <table ng-show="Reset==1" id="Table1"  class="table table-striped Arrow">
+                              <tbody >
+                              <thead>
+                              <tr>
+                              <th style="background-color:transparent;color:Black">
+                              Created by
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Created Date
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Updated by
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Date Last Updated
+                              </th>
+                              </tr>
+                              </thead>
+                                <tr ng-repeat="category2 in usersTable2">
+                                
+                                       
+                                        <td    class="Arrow">
+                                            {{category2.Created_Emp_Id}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.Created_Dt}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.Updated_Emp_Id}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.Updated_Dt}}
+                                        </td>
+                                    </tr>
+                                   </tbody>
+                                </table>
+                    </div>
+                    <div class="modal-footer" style="background-color:none">
+                   
+                        <button type="button" id="Resetbtn" ng-show="Reset==1" class="btn btn-default"  ng-click="ResetRecord()">
+                            Reset</button>
+                        
+                           <button type="button" id="closebtn" data-dismiss="modal"  class="btn btn-default"  >
+                            Close </button>
+                        <button type="button" class="btn btn-primary" ng-show="Reset==0" data-dismiss="modal"   ng-disabled="Availabilityform.$invalid"  ng-click="SaveAdminAvail()">
+                            Add</button>
+                             <button type="button" class="btn btn-primary" ng-show="Reset==1"  data-dismiss="modal"   ng-disabled="Availabilityform.$invalid"  ng-click="UpdateAdminAvail(AvailValidCd)">
+                            Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+               
+
+               </div>
+               
+            </div>
+            
+       
+        
+        
+        
+    </div>
+   
+    <div>
+        
+    
+   
+       
+
+       
+   <div class="pageLoaderOverlay">
+    </div>
+  
+    </div>
+

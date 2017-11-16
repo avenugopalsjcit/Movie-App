@@ -1,0 +1,377 @@
+﻿app.factory('AdminCallerAccessSupplierGridFactory', function ($http) {
+
+    var AdminCallerAccessSupplierGridFactory = {};
+
+    AdminCallerAccessSupplierGridFactory.GetAdminCallerAccessSupplierGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminCallerAccessSupplierView', { });
+
+    }
+
+    return AdminCallerAccessSupplierGridFactory;
+});
+
+
+app.factory('AdminCallerAccessDropdownFactory', function ($http) {
+
+    var AdminCallerAccessDropdownFactory = {};
+
+    AdminCallerAccessDropdownFactory.GetAdminCallerAccessSupplierDropdownGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminCallerAccessSupplierDropdown', {  });
+
+    }
+
+    return AdminCallerAccessDropdownFactory;
+});
+
+app.factory('AdminCallerAccessMatrixFactory', function ($http) {
+
+    var AdminCallerAccessMatrixFactory = {};
+
+    AdminCallerAccessMatrixFactory.GetCallerAccessSupplier = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminCallerAccessSupplierMatrix', {  });
+
+    }
+
+    return AdminCallerAccessMatrixFactory;
+});
+
+app.factory('SetDropdownProductsFactory', function ($http) {
+
+    var SetDropdownProductsFactory = {};
+
+    SetDropdownProductsFactory.SetProductsDetails = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/SetDropdownAdminCallerAccessSupplierMatrix', { 'OptionMatrixId': OptionMatrixId });
+
+    }
+
+    return SetDropdownProductsFactory;
+});
+
+
+
+app.factory('DocumentationMaxVal', function ($http) {
+
+    var DocumentationMaxVal = {};
+
+    DocumentationMaxVal.GetDocumentMaxval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxDocumentationCD', {});
+
+    }
+
+    return DocumentationMaxVal;
+});
+
+app.factory('DocumentationLocLevelVal', function ($http) {
+
+    var DocumentationLocLevelVal = {};
+
+    DocumentationLocLevelVal.GetDocumentLocLevelval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetProductLevelCDDocumentationCD', { "ProductId": ProductId });
+
+    }
+
+    return DocumentationLocLevelVal;
+});
+app.factory('GlossaryPopupGrid', function ($http) {
+
+    var GlossaryPopupGrid = {};
+
+    GlossaryPopupGrid.GetGlossaryPopup = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/PopupGridAdminGlossary', { 'TermId': TermId });
+
+    }
+
+    return GlossaryPopupGrid;
+});
+
+app.controller('CallerAccessSupplierCtrl', ['$scope', 'AdminCallerAccessSupplierGridFactory', 'AdminCallerAccessDropdownFactory', 'AdminCallerAccessMatrixFactory', 'NgTableParams', 'SetDropdownProductsFactory', function ($scope, AdminCallerAccessSupplierGridFactory, AdminCallerAccessDropdownFactory, AdminCallerAccessMatrixFactory, NgTableParams, SetDropdownProductsFactory) {
+
+
+
+
+
+
+
+
+
+   
+
+
+    AccessLevel = User_id = ""
+    AccessLevel = $scope.AccessLevel;
+    User_id = $scope.User_Id;
+
+
+   
+
+    AdminCallerAccessSupplierGridFactory.GetAdminCallerAccessSupplierGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+        $scope.GlossaryGrid = data;
+
+
+       
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+    //$(".pageLoaderOverlay").hide();
+    lblGlossaryTerm = GlossaryProduct = GlossaryDesc = TermId = ""
+    //CategoryDescription = "", CategoryId = "";
+    $scope.addNewTask = function () {
+
+
+        $scope.GlossaryTerm = "";
+        $scope.GlossaryDesc = "";
+
+        AccessLevel = $scope.AccessLevel;
+        User_id = $scope.User_Id;
+        AdminGlossaryProductsGridFactory.GetAdminGlossaryProductGrid().success(function (data) {
+            $scope.Products = data.d;
+            if (data.d.length == 0) {
+
+
+                $scope.showNodata = true;
+                $('#tblAnnouncements').hide();
+                $scope.Nodata = "There are no Announcement(s).";
+            }
+            else {
+                $scope.showNodata = false;
+                $scope.usersTable1 = new NgTableParams({}, { 'dataset': data.d });
+                $(".pageLoaderOverlay").hide();
+
+                //$("div[ng-table-pagination = 'params']").remove();
+            }
+            $(".pageLoaderOverlay").hide();
+        });
+        $scope.Reset = 0;
+    }
+
+
+    $scope.EditRecord = function (category) {
+        
+        OptionMatrixId = category.OptionMatrixId;
+        $scope.Reset = 1;
+
+
+        $scope.CaseAvailability = [];
+        AdminCallerAccessMatrixFactory.GetCallerAccessSupplier().success(function (data) {
+            $(".Select1").select2({});
+            $scope.usersTable1 = data.d;
+            SetDropdownProductsFactory.SetProductsDetails().success(function (data) {
+
+                $scope.SetDropdown = data.d;
+                for (var j = 0; j <= $scope.SetDropdown.length - 1; j++) {
+                    for (var i = 0; i <= $scope.Avalability.length - 1; i++) {
+                        if ($scope.SetDropdown[j].AvailCD == $scope.Avalability[i].AvailCD) {
+                            // $scope.
+                            $scope.CaseAvailability.push($scope.Avalability[i].AvailCD);
+                            // $('table > tbody > tr > td > div > select')[j].selected = $scope.Avalability[i].AvailCD
+                        }
+
+
+
+                    }
+
+                }
+                if ($scope.SetDropdown.length == 0) {
+                    for (var i = 0; i <= 8; i++) {
+                        $scope.Avalability[j].AvailCD = 16;
+                        $scope.CaseAvailability.push($scope.Avalability[j].AvailCD);
+                    }
+                }
+
+
+                $(".pageLoaderOverlay").hide();
+            });
+
+        });
+        $(".pageLoaderOverlay").hide();
+
+
+       
+
+
+
+        AccessLevel = $scope.AccessLevel;
+        User_id = $scope.User_Id;
+
+
+    }
+
+    AdminCallerAccessDropdownFactory.GetAdminCallerAccessSupplierDropdownGrid().success(function (data) {
+
+        $scope.Avalability = data.d;
+
+
+
+    });
+
+
+
+   
+
+
+
+    $scope.ResetRecord = function () {
+
+
+
+        $scope.GlossaryDesc = GlossaryDesc;
+
+        
+    }
+
+
+
+    $scope.SaveAdminAvail = function (DocumentId) {
+        // debugger;
+
+
+        productID = productId;
+
+        ProductLocLevelCd = $scope.ProductLocLevelCD;
+        Title = $scope.Title;
+        Description = $scope.Description;
+        DocumentURL = $scope.DocumentURL;
+        strAvailCd = $scope.DocumentId;
+        //        strAvailAbbr = $scope.AvailabilityAbbr;
+        User_id = $scope.User_Id;
+       
+        if (productID == 0 || $scope.Title == "" || $scope.DocumentURL == "" || $scope.Description == "") {
+        }
+        else {
+            DocumentationMaxVal.GetDocumentMaxval().success(function (data) {
+
+                // debugger;
+                strAvailCd = data.d;
+                ProductId = productID;
+                DocumentationLocLevelVal.GetDocumentLocLevelval().success(function (data) {
+                    //$http.post('GlobalReference.aspx/GetProductLevelCDDocumentationCD', { "ProductId": ProductId }).success(function (data) {
+
+                    ProductLocLevelCd = data.d;
+                    // });
+                    //strAvailCd = strAvailCd + 1;
+                    productID = productID;
+                    GlossaryInsertFactory.GetGlossaryInsert().success(function (data) {
+                        //alert("hi");
+                        // str = data.d;
+                        AdminDocumentationGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                        });
+
+                    });
+                });
+            });
+
+
+        }
+
+    }
+
+    $scope.change = function (ProductId) {
+        productId = $scope.ProductName;
+        $(".pageLoaderOverlay").hide();
+    }
+
+
+    $scope.UpdateAdminAvail = function (DocumentId) {
+
+        //DocumentId = category.DocumentId;
+        productID = productId;
+
+        ProductLocLevelCd = ProductLocLevelCD;
+        Title = $scope.Title;
+        Description = $scope.Description;
+        DocumentURL = $scope.DocumentURL;
+        strAvailCd = $scope.DocumentId;
+        //        strAvailAbbr = $scope.AvailabilityAbbr;
+        User_id = $scope.User_Id;
+      
+
+        DocumentUpdateFactory.GetDocUpdate().success(function (data) {
+            AdminDocumentationGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                $(".pageLoaderOverlay").hide();
+            });
+        });
+
+    }
+
+
+    $scope.DeleteAdminAvail = function (category) {
+        strAvailCd = category.DocumentId;
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Notes Category? " + category.DocumentDesc,
+            callback: function (result) {
+                if (result) {
+                    $(".pageLoaderOverlay").hide();
+                    GlossaryDeleteFactory.GetGlossaryDelete(strAvailCd).success(function (data) {
+
+
+
+                        AdminDocumentationGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                        });
+                    });
+                }
+
+            }
+        });
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+} ]);
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

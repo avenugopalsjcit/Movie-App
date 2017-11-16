@@ -1,0 +1,816 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+namespace SCAdminDAL
+{
+    public class CountryAccessCaseDefDAL
+    {
+        OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        public int UpdateCountryAccessCase(string CaseId, bool CaseValidCD, int CaseAvailCD, string UserId)
+        {
+            StringBuilder strQry = new StringBuilder();
+            int caseValid = 0;
+            if (CaseValidCD)
+            {
+                caseValid = 1;
+            }
+            strQry.Append("update cla_product_cases set case_avail_cd = " + CaseAvailCD + ", case_valid_cd = " + caseValid + ", updated_emp_id = " + UserId + ", updated_dt = sysdate where case_id = " + CaseId);
+
+            return OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+        }
+
+        public DataSet GetCountryAccessCasesByCaseId(string CaseId)
+        {
+            string Sql = "Select a.case_id,a.country_id, a.case_avail_cd, (select AVAIL_DESC from csu_ref_availability where AVAIL_CD = a.case_avail_cd) as CaseAvailability,DECODE(case_valid_cd,1,'Valid','Invalid') ShowValid, region_name, country_name, case_avail_cd," +
+                            "(select User_name from CSU_USER where EMP_Id = a.created_emp_id) AS Created_user," +
+                        "TO_CHAR(a.created_dt,'DD-MON-YYYY HH24:MI') as created_dt," +
+                        "(select User_name from CSU_USER where EMP_Id = a.updated_emp_id) AS Updated_user," +
+                        "TO_CHAR(a.updated_dt,'DD-MON-YYYY HH24:MI') as updated_dt" +
+                        " from CLA_PRODUCT_CASES a, CSU_REGION b, CSU_COUNTRY c where a.case_id = " + CaseId + " and a.region_id = b.region_id  and a.country_id = c.country_id order by country_name";
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, Sql);
+        }
+
+        public int DeleteCountryAccessCase(int CaseId, int AccessLevel, int UserId)
+        {
+            StringBuilder strQry = new StringBuilder();
+            int rowsAffected = 0;
+            if (AccessLevel == 1)
+            {
+                strQry.Append("Delete from cla_product_port_types where case_id = " + CaseId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+                strQry.Clear();
+                strQry.Append("Delete from cla_parent_port_types where case_id = " + CaseId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+                strQry.Clear();
+                strQry.Append("Delete from cla_product_case_details where case_id = " + CaseId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+                strQry.Clear();
+                strQry.Append("Delete from cla_parent_case_details where case_id = " + CaseId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+                strQry.Clear();
+                strQry.Append("Delete from cla_product_access_set where case_id = " + CaseId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+                strQry.Clear();
+                strQry.Append("Delete from cla_product_packages where case_id = " + CaseId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+                strQry.Clear();
+                strQry.Append("Delete from cla_product_cases where case_id = " + CaseId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+            }
+            else
+            {
+                strQry.Append("update cla_product_cases set case_valid_cd = 0, updated_emp_id = '" + UserId + "' updated_dt = sysdate where case_id = " + CaseId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+                strQry.Clear();
+                strQry.Append("update cla_product_case_details set case_detail_valid_cd = 0, updated_emp_id = '" + UserId + "' updated_dt = sysdate where case_id = " + CaseId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+            }
+            return rowsAffected;
+        }
+
+        public DataSet GetCountryAccessDSLPackages(string CaseId, bool CaseValidCD, string PackageType)
+        {
+            StringBuilder strQry = new StringBuilder();
+            int caseValid = 0;
+            if (CaseValidCD)
+            {
+                caseValid = 1;
+            }
+
+            strQry.Append("SELECT B.CHAR_NAME,B.CHAR_ID,A.CASE_PKG_ID FROM CLA_PRODUCT_PACKAGES A , CSU_REF_VALID_CHAR B, CSU_REF_CHAR_TYPE C,  CSU_CONFIG_TBL D WHERE A.PACKAGE_ID = B.CHAR_ID AND B.CHAR_TYPE_ID = C.CHAR_TYPE_ID AND C.CHAR_TYPE_ID = D.FIELDVALUE AND A.CASE_ID = " + CaseId + " AND A.VALID_CD =" + caseValid + "  AND upper(D.FIELDNAME) = '" + PackageType + "' ORDER BY B.CHAR_NAME,B.CHAR_ID ");
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+        }
+
+        public int GetVSATPackage(string CountryName)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            strQry.Append("select count(*) as Count from v_pc_supplier_product where upper(countryname) = upper('" + CountryName + "') and supplieraccesstype_name = 'VSAT'");
+
+            DataSet ds = OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+            int Count = 0;
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                Count = Convert.ToInt32(dr["Count"]);
+            }
+
+            return Count;
+        }
+
+        public DataSet GetTunnelingNote(string CountryName)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            strQry.Append("select decode(split_tunneling,'Yes','Available','Not Available') as split_tunneling from v_pc_hvpn_service_gateway WHERE country = '" + CountryName + "'");
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+        }
+
+        public DataSet GetCountryAccessParentCD(int ProductId, int CountryId)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            strQry.Append("SELECT  case_id  as parent_cd FROM cla_product_cases a, csu_product b WHERE a.country_id = " + CountryId + " AND b.product_cd = " + ProductId + " AND b.parent_product_cd = a.product_cd");
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+
+        }
+
+        public DataSet GetCasePackageId(int CaseId, int PackageId)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            strQry.Append("SELECT a.case_pkg_id FROM cla_product_packages a WHERE a.case_id = " + CaseId + " AND a.package_id = " + PackageId);
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+
+        }
+
+        public DataSet GetVSATCharId()
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            strQry.Append("select char_id from csu_ref_valid_char where char_name = 'VSAT' and char_type_id in(select char_type_id from csu_ref_char_type where char_type_name = 'Access Type')");
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+
+        }
+
+        public DataSet GetGPOPInterConnect(int CaseId, int PackageId, int VSATCharId, int CasePackageId, int CountryId, bool IsVSAT)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            strQry.Append("SELECT hub_site_id, hub_site_name FROM csu_hub_site b");
+            strQry.Append(" WHERE EXISTS (SELECT 'X' FROM cla_product_port_types a,cla_access_set x,cla_port_types y,cla_product_cases z,csu_config_tbl w where a.case_id=" + CaseId);
+            if (IsVSAT)
+            {
+                strQry.Append(" AND a.access_product_type_id in(" + VSATCharId + ")");
+            }
+            else
+            {
+                strQry.Append(" AND a.access_product_type_id not in(" + VSATCharId + ")");
+            }
+            strQry.Append(" and a.case_pkg_id = '" + CasePackageId + "' AND w.fieldname = 'DSL ACCESS'AND z.product_cd = w.fieldvalue AND z.country_id = " + CountryId);
+            strQry.Append(" and z.case_id = x.case_id AND x.case_detail_valid_cd = 1 AND x.package_id = " + PackageId + "  AND x.case_id = y.case_id  AND y.port_type_valid_cd = 1");
+            strQry.Append(" and x.case_access_set_id = y.case_access_set_id AND x.access_supplier_char_id = a.access_supplier_char_id AND x.access_supplier_name_id = a.access_supplier_name_id");
+            strQry.Append(" and x.access_product_type_id = a.access_product_type_id AND x.gpop_interconnect = a.gpop_interconnect AND y.port_type_id = a.port_type_id and b.hub_site_id = a.gpop_interconnect)");
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+
+        }
+
+        public DataSet GetCharLevelcharacteristics(int ProductCD, bool IsHybrid)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            if (IsHybrid)
+            {
+                strQry.Append("SELECT count(1) as count from  csu_ref_product_opt_matrix a");
+                strQry.Append(" WHERE a.product_cd = " + ProductCD);
+                strQry.Append(" and a.char_level = 'HVPN_PORTTYPE' ");
+            }
+            else
+            {
+                strQry.Append("SELECT count(1) as count from  csu_ref_product_opt_matrix a");
+                strQry.Append(" WHERE a.product_cd = " + ProductCD);
+                strQry.Append(" and a.char_level = 'COUNTRYPORTTYPE' ");
+            }
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+
+        }
+
+        public DataSet GetDSLCharacteristics(int CaseId, int CasePackageId, string UserId, string IsHybrid)
+        {
+            DataSet ds = new DataSet();
+            OracleCommand cmdOra = new OracleCommand("pkg_dsl.stp_dsldetailupdate", con);
+
+            cmdOra.CommandType = CommandType.StoredProcedure;
+            OracleParameter pCaseId = new OracleParameter("incase_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCaseId.Value = CaseId;
+
+
+            OracleParameter pCasePackageId = new OracleParameter("incase_pkg_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCasePackageId.Value = CasePackageId;
+
+            OracleParameter pUserId = new OracleParameter("inuserid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pUserId.Value = UserId;
+
+            OracleParameter pIsHybrid = new OracleParameter("in_Is_Hybrid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pIsHybrid.Value = IsHybrid;
+
+            OracleParameter pProductPortTypes = new OracleParameter("portresult", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            cmdOra.Parameters.Add(pCaseId);
+            cmdOra.Parameters.Add(pCasePackageId);
+            cmdOra.Parameters.Add(pUserId);
+            cmdOra.Parameters.Add(pIsHybrid);
+            cmdOra.Parameters.Add(pProductPortTypes);
+
+            //create a dataAdapter
+            OracleDataAdapter daProductPortTypes = new OracleDataAdapter(cmdOra);
+            try
+            {
+                //open the connection
+                con.Open();
+                //Fill the dataset
+                daProductPortTypes.Fill(ds);
+            }
+            // catch (OracleException ex)
+            // {
+            // rethrow the exception to the next level
+            // throw;
+            // }
+            finally
+            {
+                //close the connections
+                con.Close();
+                con.Dispose();
+            }
+
+
+            return ds;
+        }
+
+
+        public DataSet GetHVPNProductPortTypes(int CaseId, int CasePackageId, int CountryId, string UserId, int PackageId, int GPOP, string IsHybrid, string IsVsat)
+        {
+            DataSet ds = new DataSet();
+            OracleCommand cmdOra = new OracleCommand("pkg_dsl.stp_dslporttypes", con);
+
+            cmdOra.CommandType = CommandType.StoredProcedure;
+            OracleParameter pCaseId = new OracleParameter("incase_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCaseId.Value = CaseId;
+
+
+            OracleParameter pCasePackageId = new OracleParameter("incase_pkg_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCasePackageId.Value = CasePackageId;
+
+            OracleParameter pCountryId = new OracleParameter("incountryid", OracleDbType.Int32, ParameterDirection.Input);
+            pCountryId.Value = CountryId;
+
+            OracleParameter pUserId = new OracleParameter("inuserid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pUserId.Value = UserId;
+
+            OracleParameter pPackageId = new OracleParameter("inpackageid", OracleDbType.Int32, ParameterDirection.Input);
+            pPackageId.Value = PackageId;
+
+            OracleParameter pGPOP = new OracleParameter("ingpop", OracleDbType.Int32, ParameterDirection.Input);
+            pGPOP.Value = GPOP;
+
+            OracleParameter pIsHybrid = new OracleParameter("in_Is_Hybrid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pIsHybrid.Value = IsHybrid;
+
+            OracleParameter pIsVsat = new OracleParameter("in_is_VSAT", OracleDbType.Varchar2, ParameterDirection.Input);
+            pIsVsat.Value = IsVsat;
+
+            OracleParameter pProductPortTypes = new OracleParameter("portresult", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            cmdOra.Parameters.Add(pCaseId);
+            cmdOra.Parameters.Add(pCasePackageId);
+            cmdOra.Parameters.Add(pCountryId);
+            cmdOra.Parameters.Add(pUserId);
+            cmdOra.Parameters.Add(pPackageId);
+            cmdOra.Parameters.Add(pGPOP);
+            cmdOra.Parameters.Add(pIsHybrid);
+            cmdOra.Parameters.Add(pIsVsat);
+            cmdOra.Parameters.Add(pProductPortTypes);
+
+            //create a dataAdapter
+            OracleDataAdapter daProductPortTypes = new OracleDataAdapter(cmdOra);
+            try
+            {
+                //open the connection
+                con.Open();
+                //Fill the dataset
+                daProductPortTypes.Fill(ds);
+            }
+            // catch (OracleException ex)
+            // {
+            // rethrow the exception to the next level
+            // throw;
+            // }
+            finally
+            {
+                //close the connections
+                con.Close();
+                con.Dispose();
+            }
+
+
+            return ds;
+        }
+
+        public DataSet GetInterconnectDesignName(int PackageId, int SupplierProdId)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+
+            strQry.Append("SELECT NVL (interconnect_design_name, ' ') desgname FROM csu_supplier_product_xdsl cspl,");
+            strQry.Append(" capman_dsl_package_map cdpm,capman_supplier_prod_name_map cspnm WHERE cspl.supplierproductid = cspnm.c_access_supplier_name_id");
+            strQry.Append(" AND cspl.dsl_package_id = cdpm.c_package_id AND cspnm.pc_access_supplier_name_id = " + SupplierProdId + " AND cdpm.pc_package_id = " + PackageId);
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+        }
+
+
+
+        public DataSet GetDSLParentCharacteristics(int CaseId, int CasePackageId, int CountryId, int childproductcd, string UserId, int PackageId, string IsHybrid)
+        {
+            DataSet ds = new DataSet();
+            OracleCommand cmdOra = new OracleCommand("pkg_dsl.stp_dslparentdetails", con);
+
+            cmdOra.CommandType = CommandType.StoredProcedure;
+            OracleParameter pCaseId = new OracleParameter("incase_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCaseId.Value = CaseId;
+
+
+            OracleParameter pCasePackageId = new OracleParameter("incase_pkg_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCasePackageId.Value = CasePackageId;
+
+            OracleParameter pCountryId = new OracleParameter("incountryid", OracleDbType.Int32, ParameterDirection.Input);
+            pCountryId.Value = CountryId;
+
+            OracleParameter pchildproductcd = new OracleParameter("inchildproductcd", OracleDbType.Int32, ParameterDirection.Input);
+            pchildproductcd.Value = childproductcd;
+
+            OracleParameter pUserId = new OracleParameter("inuserid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pUserId.Value = UserId;
+
+            OracleParameter pPackageId = new OracleParameter("inpackageid", OracleDbType.Int32, ParameterDirection.Input);
+            pPackageId.Value = PackageId;
+
+            OracleParameter pIsHybrid = new OracleParameter("in_Is_Hybrid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pIsHybrid.Value = IsHybrid;
+
+            OracleParameter pProductPortTypes = new OracleParameter("parentresult", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            cmdOra.Parameters.Add(pCaseId);
+            cmdOra.Parameters.Add(pCasePackageId);
+            cmdOra.Parameters.Add(pCountryId);
+            cmdOra.Parameters.Add(pchildproductcd);
+            cmdOra.Parameters.Add(pUserId);
+            cmdOra.Parameters.Add(pPackageId);
+            cmdOra.Parameters.Add(pIsHybrid);
+            cmdOra.Parameters.Add(pProductPortTypes);
+
+            //create a dataAdapter
+            OracleDataAdapter daProductPortTypes = new OracleDataAdapter(cmdOra);
+
+            try
+            {
+                //open the connection
+                con.Open();
+                //Fill the dataset                
+                daProductPortTypes.Fill(ds);
+            }
+            // catch (OracleException ex)
+            // {
+            // rethrow the exception to the next level
+            // throw;
+            // }
+            finally
+            {
+                //close the connections
+                con.Close();
+                con.Dispose();
+            }
+
+
+            return ds;
+        }
+
+
+        public DataSet GetHVPNProductParentPortTypes(int CaseId, int CasePackageId, int CountryId, int childproductcd, string UserId, int PackageId, string IsHybrid)
+        {
+            DataSet ds = new DataSet();
+            OracleCommand cmdOra = new OracleCommand("pkg_dsl.stp_dslparentporttype", con);
+
+            cmdOra.CommandType = CommandType.StoredProcedure;
+            OracleParameter pCaseId = new OracleParameter("incase_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCaseId.Value = CaseId;
+
+
+            OracleParameter pCasePackageId = new OracleParameter("incase_pkg_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCasePackageId.Value = CasePackageId;
+
+            OracleParameter pCountryId = new OracleParameter("incountryid", OracleDbType.Int32, ParameterDirection.Input);
+            pCountryId.Value = CountryId;
+
+            OracleParameter pchildproductcd = new OracleParameter("inchildproductcd", OracleDbType.Int32, ParameterDirection.Input);
+            pchildproductcd.Value = childproductcd;
+
+            OracleParameter pUserId = new OracleParameter("inuserid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pUserId.Value = UserId;
+
+            OracleParameter pPackageId = new OracleParameter("inpackageid", OracleDbType.Int32, ParameterDirection.Input);
+            pPackageId.Value = PackageId;
+
+            OracleParameter pIsHybrid = new OracleParameter("in_Is_Hybrid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pIsHybrid.Value = IsHybrid;
+
+            OracleParameter pProductPortTypes = new OracleParameter("parentresult", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            cmdOra.Parameters.Add(pCaseId);
+            cmdOra.Parameters.Add(pCasePackageId);
+            cmdOra.Parameters.Add(pCountryId);
+            cmdOra.Parameters.Add(pchildproductcd);
+            cmdOra.Parameters.Add(pUserId);
+            cmdOra.Parameters.Add(pPackageId);
+            cmdOra.Parameters.Add(pIsHybrid);
+            cmdOra.Parameters.Add(pProductPortTypes);
+
+            //create a dataAdapter
+            OracleDataAdapter daProductPortTypes = new OracleDataAdapter(cmdOra);
+
+            try
+            {
+                //open the connection
+                con.Open();
+                //Fill the dataset                
+                daProductPortTypes.Fill(ds);
+            }
+            // catch (OracleException ex)
+            // {
+            // rethrow the exception to the next level
+            // throw;
+            // }
+            finally
+            {
+                //close the connections
+                con.Close();
+                con.Dispose();
+            }
+
+
+            return ds;
+        }
+
+        public DataSet GetPortTypeCharacteristics(int CaseId, int PortTypeId, int AccessSetId, string UserId, string IsHybrid)
+        {
+            DataSet ds = new DataSet();
+            OracleCommand cmdOra = new OracleCommand("pkg_dslporttype.stp_dslportdetail", con);
+
+            cmdOra.CommandType = CommandType.StoredProcedure;
+            OracleParameter pCaseId = new OracleParameter("incaseid", OracleDbType.Int32, ParameterDirection.Input);
+            pCaseId.Value = CaseId;
+
+
+            OracleParameter pCasePackageId = new OracleParameter("inporttypeid", OracleDbType.Int32, ParameterDirection.Input);
+            pCasePackageId.Value = PortTypeId;
+
+            OracleParameter pCountryId = new OracleParameter("inaccesssetid", OracleDbType.Int32, ParameterDirection.Input);
+            pCountryId.Value = AccessSetId;
+
+            OracleParameter pUserId = new OracleParameter("inuserid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pUserId.Value = UserId;
+
+            OracleParameter pIsHybrid = new OracleParameter("in_Is_Hybrid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pIsHybrid.Value = IsHybrid;
+
+            OracleParameter pProductPortTypes = new OracleParameter("portresult", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            cmdOra.Parameters.Add(pCaseId);
+            cmdOra.Parameters.Add(pCasePackageId);
+            cmdOra.Parameters.Add(pCountryId);
+            cmdOra.Parameters.Add(pUserId);
+            cmdOra.Parameters.Add(pIsHybrid);
+            cmdOra.Parameters.Add(pProductPortTypes);
+
+            //create a dataAdapter
+            OracleDataAdapter daProductPortTypes = new OracleDataAdapter(cmdOra);
+            try
+            {
+                //open the connection
+                con.Open();
+                //Fill the dataset
+                daProductPortTypes.Fill(ds);
+            }
+            // catch (OracleException ex)
+            // {
+            // rethrow the exception to the next level
+            // throw;
+            // }
+            finally
+            {
+                //close the connections
+                con.Close();
+                con.Dispose();
+            }
+
+
+            return ds;
+        }
+
+        public DataSet GetPortTypeParentCharacteristics(int CaseId, int PortTypeId, int AccessSetId, int ParentId, string UserId, string IsHybrid)
+        {
+            DataSet ds = new DataSet();
+            OracleCommand cmdOra = new OracleCommand("pkg_dslporttype.stp_dslparentportdetail", con);
+
+            cmdOra.CommandType = CommandType.StoredProcedure;
+            OracleParameter pCaseId = new OracleParameter("incase_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCaseId.Value = ParentId;
+
+
+            OracleParameter pCasePackageId = new OracleParameter("inporttypeid", OracleDbType.Int32, ParameterDirection.Input);
+            pCasePackageId.Value = PortTypeId;
+
+            OracleParameter pCountryId = new OracleParameter("inaccesssetid", OracleDbType.Int32, ParameterDirection.Input);
+            pCountryId.Value = AccessSetId;
+
+            OracleParameter pchildproductcd = new OracleParameter("inchildcaseid", OracleDbType.Int32, ParameterDirection.Input);
+            pchildproductcd.Value = CaseId;
+
+            OracleParameter pUserId = new OracleParameter("inuserid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pUserId.Value = UserId;
+
+            OracleParameter pIsHybrid = new OracleParameter("in_Is_Hybrid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pIsHybrid.Value = IsHybrid;
+
+            OracleParameter pProductPortTypes = new OracleParameter("parentresult", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            cmdOra.Parameters.Add(pCaseId);
+            cmdOra.Parameters.Add(pCasePackageId);
+            cmdOra.Parameters.Add(pCountryId);
+            cmdOra.Parameters.Add(pchildproductcd);
+            cmdOra.Parameters.Add(pUserId);
+            cmdOra.Parameters.Add(pIsHybrid);
+            cmdOra.Parameters.Add(pProductPortTypes);
+
+            //create a dataAdapter
+            OracleDataAdapter daProductPortTypes = new OracleDataAdapter(cmdOra);
+
+            try
+            {
+                //open the connection
+                con.Open();
+                //Fill the dataset                
+                daProductPortTypes.Fill(ds);
+            }
+            // catch (OracleException ex)
+            // {
+            // rethrow the exception to the next level
+            // throw;
+            // }
+            finally
+            {
+                //close the connections
+                con.Close();
+                con.Dispose();
+            }
+
+
+            return ds;
+        }
+
+        public DataSet GetPortTypeParentCharacteristicsParentId(int CaseId, int AccessSetId, int PortTypeId)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+
+            strQry.Append("SELECT c.case_id as parent_cd FROM cla_product_cases a, csu_product b, cla_product_cases c, cla_product_access_set d");
+            strQry.Append(" WHERE a.product_cd = b.product_cd AND b.parent_product_cd = c.product_cd AND a.country_id = c.country_id AND c.case_id = d.case_id");
+            strQry.Append(" AND a.case_id = " + CaseId + " AND d.access_set_id = " + AccessSetId + " AND d.port_type_id = " + PortTypeId);
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+
+
+        }
+
+        public DataSet GetAdminDetailsPortDropdownData(int CaseId, int CasePackageId, int CountryId, int PackageId, string IsHybrid)
+        {
+            DataSet ds = new DataSet();
+            OracleCommand cmdOra = new OracleCommand("pkg_dslporttype.stp_dslaccessport", con);
+
+            cmdOra.CommandType = CommandType.StoredProcedure;
+            OracleParameter pCaseId = new OracleParameter("incase_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCaseId.Value = CaseId;
+
+
+            OracleParameter pCasePackageId = new OracleParameter("incase_pkg_id", OracleDbType.Int32, ParameterDirection.Input);
+            pCasePackageId.Value = CasePackageId;
+
+            OracleParameter pCountryId = new OracleParameter("incountryid", OracleDbType.Int32, ParameterDirection.Input);
+            pCountryId.Value = CountryId;
+
+            OracleParameter pPackageId = new OracleParameter("inpkgid", OracleDbType.Int32, ParameterDirection.Input);
+            pPackageId.Value = PackageId;
+
+            OracleParameter pIsHybrid = new OracleParameter("in_Is_Hybrid", OracleDbType.Varchar2, ParameterDirection.Input);
+            pIsHybrid.Value = IsHybrid;
+
+            OracleParameter pProductPortTypes = new OracleParameter("parentresult", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            cmdOra.Parameters.Add(pCaseId);
+            cmdOra.Parameters.Add(pCasePackageId);
+            cmdOra.Parameters.Add(pCountryId);
+            cmdOra.Parameters.Add(pPackageId);
+            cmdOra.Parameters.Add(pIsHybrid);
+            cmdOra.Parameters.Add(pProductPortTypes);
+
+            //create a dataAdapter
+            OracleDataAdapter daProductPortTypes = new OracleDataAdapter(cmdOra);
+
+            try
+            {
+                //open the connection
+                con.Open();
+                //Fill the dataset                
+                daProductPortTypes.Fill(ds);
+            }
+            // catch (OracleException ex)
+            // {
+            // rethrow the exception to the next level
+            // throw;
+            // }
+            finally
+            {
+                //close the connections
+                con.Close();
+                con.Dispose();
+            }
+
+
+            return ds;
+        }
+
+        public int UpdateDSLCharacteristics(DSLCharacteristicsUpdate DSLCharacteristicsData, bool IsParent)
+        {
+            StringBuilder strQry = new StringBuilder();
+            int rowsAffected = 0;
+            int caseId = DSLCharacteristicsData.CaseUpdateIds.CaseId;
+            int casePkgId = DSLCharacteristicsData.CaseUpdateIds.CasePkgId;
+            int UserId = DSLCharacteristicsData.CaseUpdateIds.UserId;
+            foreach (DSLCharacteristics record in DSLCharacteristicsData.DSLCharacteristics)
+            {
+                strQry.Clear();
+                int Valid = 0;
+                if (record.IsValid)
+                {
+                    Valid = 1;
+                }
+                strQry.Append("	UPDATE cla_product_case_details Set case_detail_valid_cd = " + Valid + ", char_value = '" + record.CharacteristicValue + "', char_avail_cd = " + record.CharAvailCd + ", updated_emp_id = " + UserId + ", updated_dt = sysdate WHERE case_id = " + caseId);
+                strQry.Append(" AND case_pkg_id = " + casePkgId + " AND option_matrix_id = " + record.MatrixId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+            }
+            return rowsAffected;
+        }
+
+        public int UpdatePortTypeCharacteristics(DSLCharacteristicsUpdate DSLCharacteristicsData, bool IsParent)
+        {
+            StringBuilder strQry = new StringBuilder();
+            int rowsAffected = 0;
+            int caseId = DSLCharacteristicsData.CaseUpdateIds.CaseId;
+            int casePkgId = DSLCharacteristicsData.CaseUpdateIds.CasePkgId;
+            int UserId = DSLCharacteristicsData.CaseUpdateIds.UserId;
+            foreach (DSLCharacteristics record in DSLCharacteristicsData.DSLCharacteristics)
+            {
+                strQry.Clear();
+                int Valid = 0;
+                if (record.IsValid)
+                {
+                    Valid = 1;
+                }
+                strQry.Append("	UPDATE cla_product_case_details Set case_detail_valid_cd = " + Valid + ", char_value = '" + record.CharacteristicValue + "', char_avail_cd = " + record.CharAvailCd + ", updated_emp_id = " + UserId + ", updated_dt = sysdate WHERE case_id = " + caseId);
+                strQry.Append(" AND case_pkg_id = " + casePkgId + " AND option_matrix_id = " + record.MatrixId);
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+            }
+            return rowsAffected;
+        }
+
+        public int UpdateHVPNPortTypes(HVPNProductPortTypesUpdate HVPNProductPortTypesData, bool IsHybrid, bool IsParent)
+        {
+            StringBuilder strQry = new StringBuilder();
+            int rowsAffected = 0;
+            int caseId = HVPNProductPortTypesData.CaseUpdateIds.CaseId;
+            int casePkgId = HVPNProductPortTypesData.CaseUpdateIds.CasePkgId;
+            int UserId = HVPNProductPortTypesData.CaseUpdateIds.UserId;
+            foreach (HVPNProductPortTypes record in HVPNProductPortTypesData.HVPNProductPortTypes)
+            {
+                strQry.Clear();
+                int Valid = 0;
+                if (record.IsValid)
+                {
+                    Valid = 1;
+                }
+                if (IsHybrid)
+                {
+                    if (IsParent)
+                    {
+                        strQry.Append("UPDATE cla_product_port_types Set port_type_valid_cd = " + Valid + ", port_type_avail_cd = " + record.AccessAvailabilityId + ", port_speed_avail_cd = " + record.PortSpeedAvailabilityId + ", updated_emp_id = " + UserId + ", updated_dt = sysdate");
+                        strQry.Append(" WHERE case_id = " + caseId + "	AND case_pkg_id = " + casePkgId + " AND access_supplier_char_id = " + record.SupplierId + "	AND access_supplier_name_id = " + record.SupplierProductId + "	AND access_product_type_id = " + record.AccessTypeId + " AND gpop_interconnect = " + record.GPOPInterconnectId + " AND port_speed_char_id = " + record.PortSpeedId + " AND port_type_id = " + record.PortTypeId);
+                    }
+                    else
+                    {
+                        strQry.Append("UPDATE cla_product_port_types Set port_type_valid_cd = " + Valid + ", updated_emp_id = " + UserId + ", updated_dt = sysdate");
+                        strQry.Append(" WHERE case_id = " + caseId + "	AND case_pkg_id = " + casePkgId + " AND access_supplier_char_id = " + record.SupplierId + "	AND access_supplier_name_id = " + record.SupplierProductId + "	AND access_product_type_id = " + record.AccessTypeId + " AND gpop_interconnect = " + record.GPOPInterconnectId + " AND port_speed_char_id = " + record.PortSpeedId + " AND port_type_id = " + record.PortTypeId);
+                    }
+                }
+                else
+                {
+                    if (IsParent)
+                    {
+                        strQry.Append("UPDATE cla_product_port_types Set port_type_valid_cd = " + Valid + ", port_type_avail_cd = " + record.AccessAvailabilityId + ", DSL_TECHNOLOGY_TYPE = '" + record.DSLTechnologyTypeId + "', updated_emp_id = " + UserId + ", updated_dt = sysdate");
+                        strQry.Append(" WHERE case_id = " + caseId + "	AND case_pkg_id = " + casePkgId + " AND access_supplier_char_id = " + record.SupplierId + "	AND access_supplier_name_id = " + record.SupplierProductId + "	AND access_product_type_id = " + record.AccessTypeId + " AND port_type_id = " + record.PortTypeId);
+                    }
+                    else
+                    {
+                        strQry.Append("UPDATE cla_product_port_types Set port_type_valid_cd = " + Valid + ", updated_emp_id = " + UserId + ", updated_dt = sysdate");
+                        strQry.Append(" WHERE case_id = " + caseId + "	AND case_pkg_id = " + casePkgId + " AND access_supplier_char_id = " + record.SupplierId + "	AND access_supplier_name_id = " + record.SupplierProductId + "	AND access_product_type_id = " + record.AccessTypeId + " AND port_type_id = " + record.PortTypeId);
+                    }
+                }
+                rowsAffected = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQry.ToString());
+            }
+            return rowsAffected;
+        }
+        public DataSet GetCaseDetailsUpdatedDates(int CaseId, int CasePkgId)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            strQry.Append("Select a.Created_Emp_id, (select User_name from CSU_USER where EMP_Id = a.created_emp_id) AS Created_user,  to_char(a.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt,a.Updated_emp_id, (select User_name from CSU_USER where EMP_Id = a.updated_emp_id) AS Updated_user, to_char(a.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt from CLA_PRODUCT_PORT_TYPES a WHERE Case_id=" + CaseId + " and CASE_PKG_ID=" + CasePkgId + " order by a.updated_dt desc");
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+        }
+
+        public DataSet GetCaseDetailsPortTypesUpdatedDates(int CaseId, int CasePkgId)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            strQry.Append("Select a.Created_Emp_id, (select User_name from CSU_USER where EMP_Id = a.created_emp_id) AS Created_user,  to_char(a.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt,a.Updated_emp_id, (select User_name from CSU_USER where EMP_Id = a.updated_emp_id) AS Updated_user, to_char(a.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt from CLA_PRODUCT_CASE_DETAILS a WHERE Case_id=" + CaseId + " and CASE_PKG_ID=" + CasePkgId + " order by a.updated_dt desc");
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+        }
+
+        public DataSet GetCaseUpdateDates(int CaseId)
+        {
+            StringBuilder strQry = new StringBuilder();
+
+            strQry.Append("Select a.Created_Emp_id, (select User_name from CSU_USER where EMP_Id = a.created_emp_id) AS Created_user,  to_char(a.Created_dt,'DD-MON-YYYY HH24:MI') as Created_dt,a.Updated_emp_id, (select User_name from CSU_USER where EMP_Id = a.updated_emp_id) AS Updated_user, to_char(a.Updated_dt,'DD-MON-YYYY HH24:MI') as Updated_dt from CLA_PRODUCT_CASES a WHERE Case_id=" + CaseId + " order by a.updated_dt desc");
+
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, strQry.ToString());
+        }
+    }
+    public class DSLCharacteristics
+    {
+        public string CharacteristicType { get; set; }
+        public string Characteristic { get; set; }
+        public int CharAvailCd { get; set; }
+        public int CharTypeValueCount { get; set; }
+        public string Availability { get; set; }
+        public string CharacteristicValue { get; set; }
+        public bool IsValid { get; set; }
+        public int MatrixId { get; set; }
+    }
+
+    public class DSLCharacteristicsUpdate
+    {
+        public List<DSLCharacteristics> DSLCharacteristics { get; set; }
+        public CaseUpdate CaseUpdateIds { get; set; }
+    }
+    public class CaseUpdate
+    {
+        public int CaseId { get; set; }
+        public int CasePkgId { get; set; }
+        public int UserId { get; set; }
+    }
+    public class HVPNProductPortTypes
+    {
+        public string CharacteristicType { get; set; }
+        public string DSLTechnologyType { get; set; }
+        public int DSLTechnologyTypeId { get; set; }
+        public string PortSpeed { get; set; }
+        public int PortSpeedId { get; set; }
+        public int PortTypeId { get; set; }
+        public int PortSpeedAvailabilityId { get; set; }
+        public string PortSpeedAvailability { get; set; }
+        public string AccessType { get; set; }
+        public int AccessTypeId { get; set; }
+        public string Supplier { get; set; }
+        public int SupplierId { get; set; }
+        public string SupplierProduct { get; set; }
+        public int SupplierProductId { get; set; }
+        public string GPOPInterconnect { get; set; }
+        public int GPOPInterconnectId { get; set; }
+        public int AccessAvailabilityId { get; set; }
+        public string AccessAvailability { get; set; }
+        public string InterconnectDesign { get; set; }
+        public string AccessSpeed { get; set; }
+        public string Interface { get; set; }
+        public string Framing { get; set; }
+        public string Connector { get; set; }
+        public bool IsValid { get; set; }
+    }
+    public class HVPNProductPortTypesUpdate
+    {
+        //public int PortSpeedAvailabilityId { get; set; }
+        //public int AccessAvailabilityId { get; set; }
+        //public bool IsValid { get; set; }
+        public List<HVPNProductPortTypes> HVPNProductPortTypes { get; set; }
+        public CaseUpdate CaseUpdateIds { get; set; }
+    }
+}

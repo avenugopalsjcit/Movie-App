@@ -1,0 +1,126 @@
+﻿<style>
+    .bootbox-body
+    {
+        font-weight: bold;
+    }
+</style>
+<div ng-controller="Controllers.ServicetypeCtrl as vm">
+    <div class="container">
+        <h3>
+            <span style="float: left; cursor: default">Service type</span></h3>
+        <br />
+        <div class="row">
+            <div style="margin-left: 87%">
+                <a data-target="#addNewServiceModal" data-toggle="modal" class="btn btn-primary btn-sm">
+                    Add Service type</a>
+            </div>
+        </div>
+        </br>
+        <table ng-table="vm.tableParams" class="table" show-filter="true" class="table table-striped table-bordered">
+
+
+
+
+
+            <tr ng-repeat="ServiceType in $data" id="ServiceType{{$index}}">
+                <td  data-title="'Service'" filter="{ SERVICE_TYPE_DESC: 'text'}" sortable="'name'" style="width:25em">
+                    {{ServiceType.SERVICE_TYPE_DESC}}
+                </td>
+                <td data-title="'Valid'" sortable="'name'">
+                    <input type="checkbox" ng-checked="ServiceType.SERVICE_VALID_CD" />
+                </td>
+                <td data-title="'Created'" filter="{ CREATED_EMP_ID: 'text'}" sortable="'name'">
+                    {{ServiceType.CREATED_EMP_ID}} {{ServiceType.CREATED_DT}}
+                </td>
+                <td data-title="'Updated'" filter="{ UPDATED_EMP_ID : 'text'}" sortable="'name'">
+                    {{ServiceType.UPDATED_EMP_ID}} {{ServiceType.UPDATED_DT}}
+                </td>
+                
+                
+                <td>
+                    <div ng-show="Edit">
+                        <button class="btn btn-default btn-sm" ng-click="ServiceEdit('ServiceType'+$index,ServiceType);Edit=false;Delete=false;Cancel=true;Save=true">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                    </div>
+                    <div ng-show="Save">
+                        <button class="btn btn-primary btn-sm" ng-click="UpdateRecord('ServiceType'+$index,ServiceType);Save=false;Edit=true;Delete=true;Cancel=false">
+                            <span class="glyphicon glyphicon-ok"></span>
+                        </button>
+                    </div>
+                </td>
+
+                <td data-title="'Delete'" style="width: 8%">
+                    <button ng-show="Delete" class="btn btn-sm btn-danger" ng-click="DeleteServiceType($index,ServiceType.SERVICE_TYPE_CD);"
+                        data-toggle="modal">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                    <button ng-show="Cancel" class="btn btn-default btn-sm" ng-click="CancelRecord($index,$event,item);Edit=true;Delete=true;Cancel=false;Save=false">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </td>
+
+
+            </tr>
+        </table>
+
+          <div tabindex="-1" class="modal fade in modalalign" id="addNewServiceModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add Service Type</h4>
+                    </div>
+                    <div class="container" style="margin-right: 74px">
+                        <div class="modal-body">
+                          <form class="form-horizontal" name="userForm1" ng-submit="submitForm()" novalidate>
+                            <div class="form-group col-md-10"  ng-class="{ 'has-error' : userForm1.inputDescription.$invalid && !userForm1.inputDescription.$pristine }">
+                                <div class="col-md-3">
+                                    <label class="control-label" for="inputDescription">
+                                        Description<span style="color: red">&nbsp;*</span></label>
+                                </div>
+                                <div class="col-md-7">
+                                    <input class="form-control" id="inputDescription" name="inputDescription" ng-model="service.ServicetypeDesc" type="text" value="" ng-minlength="1"  required />
+                                    <div>
+                                        <p style="margin-left: 109px; color: Red" ng-show="userForm1.inputDescription.$invalid && !userForm1.inputDescription.$pristine"
+                                            class="help-block">
+                                            Enter Service Type!</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <div class="col-md-3">
+                                    <label class="control-label" for="inputValid">
+                                        Valid</label>
+                                </div>
+                                <div class="col-md-5">
+                                    <input id="inputValid" type="checkbox" ng-model="service.Valid" ng-checked="service.Isvalid"/>
+                                </div>
+                            </div>
+                            </form>
+                      
+                            
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" ng-click="InsertServiceType(service)" class="btn btn-sm btn-primary"
+                            value="Add" data-dismiss="modal" ng-disabled="userForm1.$invalid" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal" >
+                            Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+     
+          <div class="pageLoaderOverlay" style="display:none"></div>
+
+     
+    </div>
+  
+  

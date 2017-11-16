@@ -1,0 +1,151 @@
+﻿app.controller("AdminDSLCaseCtrl", function ($scope, $http, $rootScope, $stateParams, $location, NgTableParams, CountryAccessCasesFactory, CaseAvailabilityFactory, CountryAccessCaseUpdateFactory, CountryAccessCaseDeleteFactory) {
+    $(".pageLoaderOverlay").show();
+    $scope.ProductCd = $stateParams.ProductCd;
+    $scope.Region = $stateParams.Region;
+    CountryAccessCasesFactory.GetCountryAccessCases($scope.ProductCd, $scope.Region).success(function (data) {
+        $scope.CountryAccessCases = new NgTableParams({}, { 'dataset': data.d });
+        $scope.CountryAccessCasesData = data.d;
+        $(".pageLoaderOverlay").hide();
+    });
+
+    CaseAvailabilityFactory.GetCaseAvailability().success(function (data) {
+        $scope.CaseAvailability = data.d;
+
+    });
+
+    $scope.OpenPopUp = function (CaseData) {        
+        $scope.modCaseAvailability = CaseData.CaseAvailCd;
+        $scope.modCaseAvailabilityOld = CaseData.CaseAvailCd;
+        if (CaseData.Validity == 'Valid') {
+            $scope.CaseValidity = true;
+        }
+        else {
+            $scope.CaseValidity = false;
+        }
+        $scope.CaseValidityOld = $scope.CaseValidity;
+        $scope.CaseId = CaseData.CaseId;
+        $scope.CreatedBy = CaseData.CreatedBy;
+        $scope.CreatedDate = CaseData.CreatedDate;
+        $scope.UpdatedBy = CaseData.UpdatedBy;
+        $scope.UpdatedDate = CaseData.UpdatedDate;
+        $scope.CaseAvailableOld = CaseData.CaseAvailability
+        $("#ddlCaseAvailability").select2({});
+        $('#divCaseAvailability .select2-chosen').html(CaseData.CaseAvailability);
+    }
+
+    $scope.ResetCase = function () {
+        $scope.modCaseAvailability = $scope.modCaseAvailabilityOld;
+        $scope.CaseValidity = $scope.CaseValidityOld;
+        $('#divCaseAvailability .select2-chosen').html($scope.CaseAvailableOld);
+    }
+
+    $scope.OpenCaseDetails = function () {
+        var url = "Views/AdminDSLCaseUpdate.htm";
+
+        window.open(url, "_blank", "toolbar=yes, scrollbars=yes, resizable=yes");
+    }
+
+    $scope.GetCasesCountryAccess = function () {
+        $location.path('/CaseDefinition/AdminDSLCase/AdminDSLCaseDetailsUpdate').search({ 'ProductCd': $scope.ProductCd, 'Region': $scope.Region });
+
+    }
+
+    $scope.ShowCaseDetails = function (CountryName, CaseAvailability, Validity, CaseId, CountryId) {
+        $location.path('/CaseDefinition/AdminDSLCase/AdminDSLCaseDetailsUpdate').search({ 'ProductCd': $scope.ProductCd, 'Region': $scope.Region, 'CountryName': CountryName, 'CaseAvailability': CaseAvailability, 'Validity': Validity, 'CaseId': CaseId, 'CountryId': CountryId });
+        $scope.changeCountryAccessCaseDetails(true);
+    }
+
+    $scope.ShowCaseList = function () {
+        $scope.changeCountryAccessCaseDetails(false);
+    }
+
+    $scope.UpdateCase = function () {
+        bootbox.confirm("Are you sure to update case:" + $scope.CaseId + "?", function (result) {
+
+            if (result) {
+                CountryAccessCaseUpdateFactory.UpdateCountryAccessCase($scope.CaseId, $scope.CaseValidity, $scope.modCaseAvailability, $rootScope.User_Id).success(function (data) {                    
+                    $("#btnCaseUpdate").click();
+                    $scope.CountryAccessCasesData.forEach(function (item) {
+                        if (item.CaseId == $scope.CaseId) {
+
+                            if ($scope.CaseValidity == 0) {
+                                item.Validity = "Invalid";
+                            }
+                            else {
+                                item.Validity = "Valid";
+                            }
+                            item.CaseAvailCd = $scope.modCaseAvailability;
+                            item.CaseAvailability = $("#ddlCaseAvailability option:selected").text();
+                            item.UpdatedBy = data.d.UpdatedBy;
+                            item.UpdatedDate = data.d.UpdatedDate;
+                        }
+                    });
+                    $scope.CountryAccessCases = new NgTableParams({}, { 'dataset': $scope.CountryAccessCasesData });
+                    bootbox.alert("Updated Successfully");
+                });
+            }
+        });
+    }
+
+    $scope.DeleteCase = function () {
+        $scope.changeCountryAccessCaseDetails(false);
+
+        bootbox.confirm("Are you sure to delete case" + $scope.CaseId + "?", function (result) {
+
+            if (result) {
+                CountryAccessCaseDeleteFactory.DeleteCountryAccessCase($scope.CaseId, $rootScope.AccessLevel, $rootScope.User_Id).success(function (data) {
+                    alert(data.d);
+                    if ($rootScope.AccessLevel == 1) {
+                        bootbox.alert("Case Deleted Successfully");
+                    } else {
+                        bootbox.alert("case being marked 'INVALID'");
+                    }
+                });
+            }
+
+        });
+
+    }
+});
+
+
+
+app.factory('CountryAccessCasesFactory', function ($http) {
+
+    var CountryAccessCasesFactory = {};
+
+    CountryAccessCasesFactory.GetCountryAccessCases = function (ProductID, Region) {
+        return $http.post('SingleCase.aspx/GetCountryAccessCases', { 'ProductCd': ProductID, 'Region': Region });
+    }
+    return CountryAccessCasesFactory;
+});
+
+app.factory('CountryAccessCaseUpdateFactory', function ($http) {
+
+    var CountryAccessCaseUpdateFactory = {};
+
+    CountryAccessCaseUpdateFactory.UpdateCountryAccessCase = function (CaseId, CaseValidCD, CaseAvailCD, UserId) {
+        return $http.post('SingleCaseCountryAccess.aspx/UpdateCountryAccessCase', { 'CaseId': CaseId, 'CaseValidCD': CaseValidCD, 'CaseAvailCD': CaseAvailCD, 'UserId': UserId });
+    }
+    return CountryAccessCaseUpdateFactory;
+});
+
+app.factory('CountryAccessCaseDeleteFactory', function ($http) {
+
+    var CountryAccessCaseDeleteFactory = {};
+
+    CountryAccessCaseDeleteFactory.DeleteCountryAccessCase = function (CaseId, AccessLevel, UserId) {
+        return $http.post('SingleCaseCountryAccess.aspx/DeleteCountryAccessCase', { 'CaseId': CaseId, 'AccessLevel': AccessLevel, 'UserId': UserId });
+    }
+    return CountryAccessCaseDeleteFactory;
+});
+
+app.factory('CaseAvailabilityFactory', function ($http) {
+
+    var CaseAvailabilityFactory = {};
+
+    CaseAvailabilityFactory.GetCaseAvailability = function () {
+        return $http.post('SingleCase.aspx/GetCaseAvailability', {});
+    }
+    return CaseAvailabilityFactory;
+});

@@ -1,0 +1,106 @@
+﻿
+app.controller('Controllers.ServicetypeCtrl', function ($scope, NgTableParams, $http, $rootScope, $compile, $parse) {
+
+    var self = this;
+    $scope.ServiceTypes = [];
+
+
+    $scope.service = {};
+    $scope.service.CreatedBy = $rootScope.User_Id;
+    $scope.service.UpdatedBy = $rootScope.User_Id;
+
+
+
+
+    $http.post('ProductDefination.aspx/getServicetype', {}).success(function (data) {
+        $('.pageLoaderOverlay').hide();
+        $scope.ServiceTypes = angular.fromJson(data.d).getServiceTypes;
+        self.tableParams = new NgTableParams({},
+             { dataset: $scope.ServiceTypes });
+    }).error(function () { })
+
+
+    $scope.Edit = true;
+    $scope.Delete = true;
+    $scope.Save = false;
+    $scope.Cancel = false;
+    //  $rootScope.User_Id = "609645343";
+    $('.pageLoaderOverlay').show();
+
+
+
+    $scope.DeleteServiceType = function (Index, Id) {
+        $http.post('ProductDefination.aspx/DeleteServiceType', { 'ServiceTypeId': Id }).success(function () {
+            $scope.ServiceTypes.splice(Index, 1)
+            $('.pageLoaderOverlay').show();
+            self.tableParams = new NgTableParams({},
+             { dataset: $scope.ServiceTypes });
+            $('.pageLoaderOverlay').hide();
+
+        }).error(function (data) {
+            if (data.Message.indexOf("CSU_PRODUCT_SERVICE_CD_FK") > 0) {
+                alert("Can't delete the Data")
+            }
+        });
+    };
+
+
+
+
+    $scope.UpdateRecord = function (index, serviceType, Userid) {
+        debugger;
+        serviceType.CreatedBy = $rootScope.User_Id;
+        serviceType.UpdatedBy = $rootScope.User_Id;
+        $rootScope.User_Id = "609682300";
+        serviceType.Valid = true ? 1 : 0;
+        serviceType.ServicetypeDesc = $("#" + index + " td:eq(0) input[type='text']").val().trim();
+        $http.post('ProductDefination.aspx/InsertSeviceTypes', { "Userid": $rootScope.User_Id, 'service': angular.toJson(serviceType), 'UpdateId': 1, 'InsertId': 0 }).success(function () { })
+        .error(function () { });
+    }
+
+
+
+
+
+    $scope.ServiceEdit = function (Id, servicetype) {
+        debugger;
+        if ($.trim($('#' + Id).find('td:eq(0)')) != '') {
+            //$('#' + Id).find('td:eq(0)').html("<input style='width:26em;height:32px' type='text'  value='" + $.trim($('#' + Id).find('td:eq(0)').text()) + "'></input>");
+            var html = $('#' + Id).find('td:eq(0)').html("<input style='width:26em;height:32px' type='text' value='" + servicetype.SERVICE_TYPE_DESC + "'></input>");
+            // $parse(servicetype.SERVICE_TYPE_DESC)($scope);
+        }
+    }
+
+    $scope.InsertServiceType = function (serviceType1) {
+        debugger;
+       
+
+     
+            $scope.service = [];
+            $('.pageLoaderOverlay').show();
+            serviceType1.CreatedBy = $rootScope.User_Id;
+            serviceType1.UpdatedBy = $rootScope.User_Id;
+            $rootScope.User_Id = "609682300";
+            serviceType1.Valid = true ? 1 : 0;
+
+            $http.post('ProductDefination.aspx/InsertSeviceTypes', { "Userid": $rootScope.User_Id, 'service': angular.toJson(serviceType1), 'UpdateId': 0, 'InsertId': 1 })
+            .success(function (data) {
+                //Math.max.apply(Math,$scope.ServiceTypes.map(function(item){return item.SERVICE_TYPE_CD;}));
+
+                $http.post('ProductDefination.aspx/getServicetype', {}).success(function (data) {
+                    $('.pageLoaderOverlay').hide();
+                    $scope.ServiceTypes = angular.fromJson(data.d).getServiceTypes;
+                    self.tableParams = new NgTableParams({},
+            { dataset: $scope.ServiceTypes });
+                }).error(function () { })('.pageLoaderOverlay').hide();
+            })
+
+.error(function () { });
+        };
+
+   
+
+
+
+
+});

@@ -1,0 +1,104 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Services;
+using SCAdminBAL;
+using System.Web.Script.Services;
+
+
+namespace SCAdmin
+{
+    public partial class SupplierRestriction : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+        [WebMethod]
+        public static List<DistributorRestrictionDropDown> GetDistributorLstDetails(string Distributer)
+        {
+            if (Distributer == "Distributor")
+            {
+                SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+                return objSLAInfoBAL.GetDistributorDetails(Distributer);
+            }
+            return null;
+        }
+        [WebMethod]
+        public static List<BTGFRRestrictionDropDown> GetBTGFRLstDetails(string Distributer)
+        {
+            SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+            return objSLAInfoBAL.GetBTGFRDetails(Distributer);
+        }
+
+        [WebMethod]
+        public static List<OrganizationRestrictionDropDown> GetOrganizationLstDetails(string Distributer)
+        {
+            SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+            return objSLAInfoBAL.GetOrganizationDetails(Distributer);
+        }
+
+        [WebMethod]
+        public static List<SupplierRestrictionDropDown> GetSupplierLstDetails(string Supplier)
+        {
+            SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+            return objSLAInfoBAL.GetSupplierDetails();
+        }
+
+        [WebMethod]
+        public static List<SupplierRestrictionGrid> GetSupplierGridDetails(string Distributer)
+        {
+            SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+            return objSLAInfoBAL.GetDistributorGridDetails(Distributer);
+        }
+
+        [WebMethod]
+        public static List<BTGFRRestrictionGrid> GetBTGFRGridDetails(string Distributer)
+        {
+            SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+            return objSLAInfoBAL.GetBTGFRGridDetails(Distributer);
+        }
+
+        [WebMethod]
+        public static List<OrganizationRestrictionGrid> GetOrganizationGridDetails(string Distributer)
+        {
+            SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+            return objSLAInfoBAL.GetOrganizationGridDetails(Distributer);
+        }
+        [WebMethod]
+        public static List<CountryRestrictionDropDown> GetCountryLstDetails(string Country)
+        {
+            SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+            return objSLAInfoBAL.GetLstCountryDetails();
+        }
+
+        [WebMethod]
+        public static int SaveAndDelete(string btnvalue, string DistributerValues, string CountryValues, string SupplierValues)
+        {
+            SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+            return objSLAInfoBAL.SaveDeleteItems(btnvalue, DistributerValues, CountryValues, SupplierValues);
+             
+        }
+
+        [WebMethod]
+        public static int PostBGFROrg(string btnvalue, string DistributerValues, string CountryValues, string SupplierValues, string tab)
+        {
+           
+            SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+           return objSLAInfoBAL.PostBGFROrg(btnvalue, DistributerValues, CountryValues, SupplierValues, tab);
+            
+            
+        }
+
+        [WebMethod]
+        public static int DeleteBGFROrg(string btnvalue, string DistributerValues, string CountryValues, string SupplierValues, string tab)
+        {
+            SupplierRestrictionBAL objSLAInfoBAL = new SupplierRestrictionBAL();
+            return objSLAInfoBAL.DeleteBGFROrg(btnvalue, DistributerValues, CountryValues, SupplierValues, tab);
+
+        }
+    }
+}

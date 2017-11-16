@@ -1,0 +1,305 @@
+﻿app.factory('AdminCategoryGridFactory', function ($http) {
+
+    var AdminCategoryGridFactory = {};
+
+    AdminCategoryGridFactory.GetAdminAddressGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridNotesCategoryDetails', {});
+
+    }
+
+    return AdminCategoryGridFactory;
+});
+app.factory('CategoryDetailsFactory', function ($http) {
+
+    var CategoryDetailsFactory = {};
+
+    CategoryDetailsFactory.GetUMODetails = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxCategoryCD', {});
+
+
+    }
+
+    return CategoryDetailsFactory;
+});
+
+app.factory('CategoryInsertFactory', function ($http) {
+
+    var CategoryInsertFactory = {};
+
+    CategoryInsertFactory.GetAvailabilityInsert = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/InsertAdminNotesCategory', { 'strAvailCd': strAvailCd, 'CategoryDescription': CategoryDescription, 'User_id': User_id });
+
+    }
+
+    return CategoryInsertFactory;
+});
+
+app.factory('CategoryUpdateFactory', function ($http) {
+
+    var CategoryUpdateFactory = {};
+
+    CategoryUpdateFactory.GetAvailabilityUpdate = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/UpdateAdminNotesCategory', { 'CategoryDescription': CategoryDescription, 'User_id': User_id, 'strAvailCd': strAvailCd });
+
+    }
+
+    return CategoryUpdateFactory;
+});
+
+
+app.factory('CategoryDeleteFactory', function ($http) {
+
+    var CategoryDeleteFactory = {};
+
+    CategoryDeleteFactory.GetAvailabilityDelete = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/DeleteAdminNotesCategory', { 'strAvailCd': strAvailCd });
+
+    }
+
+    return CategoryDeleteFactory;
+});
+
+app.factory('CategoryPopupGrid', function ($http) {
+
+    var CategoryPopupGrid = {};
+
+    CategoryPopupGrid.GetAvailabilityPopup = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/PopupGridAdminNotesCategory', { 'CategoryId': CategoryId });
+
+    }
+
+    return CategoryPopupGrid;
+});
+
+app.controller('AdminNotesCategoryCtrl', ['$scope', 'AdminCategoryGridFactory', 'NgTableParams', 'CategoryDetailsFactory', 'CategoryInsertFactory', 'CategoryUpdateFactory', 'CategoryDeleteFactory', 'CategoryPopupGrid', function ($scope, AdminCategoryGridFactory, NgTableParams, CategoryDetailsFactory, CategoryInsertFactory, CategoryUpdateFactory, CategoryDeleteFactory, CategoryPopupGrid) {
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+    AdminCategoryGridFactory.GetAdminAddressGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+        $scope.AddressGrid = data;
+
+
+      
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+    //$(".pageLoaderOverlay").hide();
+
+    CategoryDescription = "", CategoryId = "";
+
+    $scope.EditRecord = function (category) {
+        CategoryId = category.NotesCategoryCD;
+        $scope.CategoryDesc = category.NotesCategoryDesc;
+        CategoryDescription = category.NotesCategoryDesc;
+       
+        $scope.Reset = 1;
+        CategoryPopupGrid.GetAvailabilityPopup(CategoryId).success(function (data) {
+            $scope.usersTable2 = data.d;
+            $(".pageLoaderOverlay").hide();
+        });
+
+        AdminAddressDetailsFactory.GetAdminAddressDetails().success(function (data) {
+
+
+            strAvailCd = data.d;
+         
+            strAvailCd = strAvailCd + 1;
+            AvailabilityInsertFactory.GetAvailabilityInsert().success(function (data) {
+                //alert("hi");
+                // str = data.d;
+                AdminCategoryGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                    $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                    $(".pageLoaderOverlay").hide();
+                });
+
+
+            });
+        });
+    }
+
+
+
+    $scope.addNewTask = function () {
+        $scope.CategoryDesc = "";
+        $scope.Reset = 0;
+    }
+
+
+
+    $scope.ResetRecord = function () {
+
+        $scope.CategoryDesc = CategoryDescription;
+     
+    }
+
+
+
+    $scope.SaveAdminAvail = function () {
+        // debugger;
+
+        CategoryDescription = $scope.CategoryDesc;
+        //        strAvailAbbr = $scope.AvailabilityAbbr;
+        User_id = $scope.User_Id;
+      
+        if (CategoryDescription == "") {
+        }
+        else {
+            CategoryDetailsFactory.GetUMODetails().success(function (data) {
+
+
+                strAvailCd = data.d;
+                strAvailCd = strAvailCd + 1;
+                CategoryInsertFactory.GetAvailabilityInsert(strAvailCd, CategoryDescription, User_id).success(function (data) {
+                    //alert("hi");
+                    // str = data.d;
+                    AdminCategoryGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                        $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                        $(".pageLoaderOverlay").hide();
+                        bootbox.alert({
+                            "message": "Notes Category Added Successfully",
+                            "className": "my-custom-class",
+                            "callback": function () {
+                                console.log("Success callback");
+                            }
+                        });
+                    });
+
+
+                });
+            });
+
+
+        }
+
+    }
+
+
+
+    $scope.UpdateAdminAvail = function () {
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to update Notes Category?",
+            callback: function (result) {
+                if (result) {
+                    CategoryDescription = $scope.CategoryDesc;
+                    strAvailCd = CategoryId;
+                    //        strAvailAbbr = $scope.AvailabilityAbbr;
+                    User_id = $scope.User_Id;
+                   
+
+                    CategoryUpdateFactory.GetAvailabilityUpdate().success(function (data) {
+                        AdminCategoryGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert({
+                                "message": "Notes Category Updated Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+                    });
+                }
+            }
+        });
+    }
+
+
+    $scope.DeleteAdminAvail = function (category) {
+        strAvailCd = category.NotesCategoryCD;
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Notes Category <b> " + category.NotesCategoryDesc + "</b>?",
+            callback: function (result) {
+                if (result) {
+                    $(".pageLoaderOverlay").hide();
+                    CategoryDeleteFactory.GetAvailabilityDelete(strAvailCd).success(function (data) {
+
+
+
+                        AdminCategoryGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert({
+                                "message": "Notes Category Deleted Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+
+                    });
+                }
+            }
+
+        });
+
+
+    }
+
+
+
+
+
+
+
+
+
+} ]);
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

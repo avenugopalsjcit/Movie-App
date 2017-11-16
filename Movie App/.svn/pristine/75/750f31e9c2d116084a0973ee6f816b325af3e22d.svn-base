@@ -1,0 +1,553 @@
+﻿<style>
+    /*.modal {
+    new custom width 
+    width: 560px;
+   must be half of the width, minus scrollbar on the left (30px) 
+   /*
+}
+</style>
+<div ng-controller="distributorProductMappingCtrl as vm">
+    <div class="form-horizontal">
+        <div class="container" style="margin-left: 5px">
+            <h2>
+                <span style="cursor: default">Distributor Product Mapping</span></h2>
+        </div>
+    </div>
+    <br />
+    <br />
+    <table ng-table="vm.tableParams" class="table" show-filter="true">
+        <tr ng-repeat="user in $data">
+            <td title="'Product'" filter="{ Country: 'text'}" sortable="'Country'" groupable="'Country'">
+                <a data-toggle="modal" data-target="#ProductMappingModal">{{user.Country}} </a>
+            </td>
+            <td title="'Distributor'" filter="{ ManufacturerName: 'text'}" sortable="'ManufacturerName'">
+                <a data-toggle="modal" data-target="#DistributorMappingModal">{{user.ManufacturerName}}
+                </a>
+            </td>
+        </tr>
+    </table>
+    <div tabindex="-1" class="modal fade in modalalign" id="ProductMappingModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Product &nbsp;&nbsp;&nbsp; BT Business Voice Select
+                        </h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <table id="Table2" width="100%" border="0">
+                                <tbody>
+                                    <tr width="100%">
+                                        <td class="bodyTextBold" width="40%" align="center">
+                                            Un-Assigned Distributor/Ops Entity List
+                                        </td>
+                                        <td width="20%" align="center">
+                                        </td>
+                                        <td class="bodyTextBold" width="40%" align="center">
+                                            <font color="#ff0000" size="+2" face="Arial">*</font>Assigned Distributor/Ops Entities
+                                        </td>
+                                    </tr>
+                                    <tr width="100%">
+                                        <td width="40%">
+                                            <select id="Select1" class="chartAnswer" multiple size="35" name="UnAssignedDists">
+                                                <option value="4679">2CONNECT WLL (2CONNECT WLL)</option>
+                                                <option value="5562">3C KFT (3C KFT)</option>
+                                                <option value="6799">Abtec (Abtec)</option>
+                                                <option value="5082">Accenture (SI-Accenture)</option>
+                                                <option value="13601">ADISTA (ADISTA)</option>
+                                                <option value="5402">Advacom Sociedad Anonima (Advacom Sociedad Anonima)</option>
+                                                <option value="5459">Advanced Communications Services LLC (Advanced Communications Services
+                                                    LLC)</option>
+                                                <option value="9300">AIRCEL (AIRCEL)</option>
+                                                <option value="12299">ALESTRA-BTA (ALESTRA-BTA)</option>
+                                                <option value="11600">ALUI Test DIS (ALUI Test DIS)</option>
+                                                <option value="1043">AT&amp;T (vbc173)</option>
+                                                <option value="142">AT&amp;T (International Offer Management) (vbc152)</option>
+                                                <option value="1968">AT&amp;T GLOBAL NETWORK SERVICES (AGNS)</option>
+                                                <option value="5083">Atos Origin (SI-AtosOrigin)</option>
+                                                <option value="5166">AVANTEL (AVANTEL)</option>
+                                                <option value="1964">BEIJING TELECOM (BEIJING)</option>
+                                                <option value="6099">Belgacom (Belgacom)</option>
+                                                <option value="12599">BELGACOM-BTA (BELGACOM-BTA)</option>
+                                                <option value="5500">Bell Canada (Bell Canada)</option>
+                                                <option value="12699">BELLTECH-BTA (BELLTECH-BTA)</option>
+                                                <option value="5125">BEZEQ INTERNATIONAL LTD (BT-IS)</option>
+                                                <option value="10700">BEZEQ INTERNATIONAL-BTA (BEZEQ INTERNATIONAL-BTA)</option>
+                                                <option value="11099">BEZEQ INTL-BTA (BEZEQ INTL-BTA)</option>
+                                                <option value="9301">BHARTI AIRTEL (BHARTI AIRTEL)</option>
+                                                <option value="9199">Billing Analysis Tool Download (Billing Analysis Tool Download)</option>
+                                                <option value="5046">Billing Distributor (Billing Distributor)</option>
+                                                <option value="5071">Billing test (Billing test)</option>
+                                                <option value="11601">Billing_Testing (Billing_Testing)</option>
+                                                <option value="1640">Broadwing (vbc222)</option>
+                                                <option value="5507">BT Al Saudia (BT Al Saudia)</option>
+                                                <option value="107">BT Americas (BT-NA)</option>
+                                                <option value="8099">BT Apparatus Supply Business (BT Apparatus Supply Business)</option>
+                                                <option value="5462">BT Argentina (BT Argentina)</option>
+                                                <option value="131">BT ASIA PACIFIC (Ignite Asia Pacific)</option>
+                                                <option value="132">BT Australasia (BT Australasia)</option>
+                                                <option value="5136">BT Austria (BT Austria)</option>
+                                                <option value="5482">BT Bahrain (BT Bahrain)</option>
+                                                <option value="5602">BT Barbados (BT Barbados)</option>
+                                                <option value="101">BT Belgium (BT-BE)</option>
+                                                <option value="5057">BT Benelux (BT Benelux)</option>
+                                                <option value="1639">BT Bid Teams (BT Bid Teams)</option>
+                                                <option value="5603">BT Bolivia (BT Bolivia)</option>
+                                                <option value="5137">BT Brazil (BT Brazil)</option>
+                                                <option value="5465">BT Bulgaria (BT Bulgaria)</option>
+                                                <option value="9601">BT CANADA (BT CANADA)</option>
+                                                <option value="5138">BT Canada Inc (BT Canada Inc)</option>
+                                                <option value="599">BT Carrier Services (Internal) (BT Carrier Services (Internal))</option>
+                                                <option value="144">BT Channel Team for AT&amp;T (BT Channel Team for AT&amp;T)</option>
+                                                <option value="5466">BT Chile (BT Chile)</option>
+                                                <option value="5400">BT China (BT China)</option>
+                                                <option value="117">BT CNS (CONCERT)</option>
+                                                <option value="5467">BT Colombia (BT Colombia)</option>
+                                                <option value="5468">BT Costa Rica (BT Costa Rica)</option>
+                                                <option value="439">BT CZECH REPUBLIC (BTIGNTE-CZ)</option>
+                                                <option value="9600">BT DENMARK (BT DENMARK)</option>
+                                                <option value="5469">BT Dominican Republic (BT Dominican Republic)</option>
+                                                <option value="5470">BT Ecuador (BT Ecuador)</option>
+                                                <option value="5471">BT El Salvador (BT El Salvador)</option>
+                                                <option value="19421">BT EMERGING MARKETS (BT-PO)</option>
+                                                <option value="6800">BT Engage (BT Engage)</option>
+                                                <option value="5599">BT Estonia (BT Estonia)</option>
+                                                <option value="479">BT Exact (BT Exact)</option>
+                                                <option value="12999">BT Federal (BT Federal)</option>
+                                                <option value="9602">BT FINLAND (BT FINLAND)</option>
+                                                <option value="259">BT FRANCE (BT FRANCE)</option>
+                                                <option value="1976">BT GB&amp;S - Schlumberger (BT GB&amp;S - Schlumberger)</option>
+                                                <option value="123">BT GERMANY (BT GERMANY)</option>
+                                                <option value="1978">BT Global Business &amp; Services (BT Global Business &amp; Services)</option>
+                                                <option value="1062">BT Global Business Finance (BT Global Business Finance)</option>
+                                                <option value="1799">BT Global Communications India (BT Global Communications India)</option>
+                                                <option value="10500">BT GLOBAL SERVICES - SUPPLIER ONLY (BT GLOBAL SERVICES - SUPPLIER
+                                                    ONLY)</option>
+                                                <option value="1399">BT Global Services Europe (BT Global Services Europe)</option>
+                                                <option value="1045">BT Global Services Finland (vbc175)</option>
+                                                <option value="899">BT Global Services Network Advocacy (BT Global Services Network
+                                                    Advocacy)</option>
+                                                <option value="125">BT Global Telecom Markets (ICS)</option>
+                                                <option value="5604">BT Greece (BT Greece)</option>
+                                                <option value="5197">BT GS WHOLESALE (BT GS WHOLESALE)</option>
+                                                <option value="5472">BT Guatemala (BT Guatemala)</option>
+                                                <option value="5473">BT Honduras (BT Honduras)</option>
+                                                <option value="102">BT HONG KONG (BT-HK)</option>
+                                                <option value="440">BT Hungary (BTIGNTE-HU)</option>
+                                                <option value="137">BT IGNITE (BT IGNITE)</option>
+                                                <option value="219">BT Ignite BSOC EMEA (BT Ignite BSOC EMEA)</option>
+                                                <option value="140">BT Ignite Global Business (BT Ignite Global Business)</option>
+                                                <option value="5129">BT INDIA (BT INDIA)</option>
+                                                <option value="1939">BT INDONESIA (BT INDONESIA)</option>
+                                                <option value="5123">BT iNet (BT iNet)</option>
+                                                <option value="103">BT Ireland (BT-IE)</option>
+                                                <option value="99">BT Italy (BT Italy)</option>
+                                                <option value="339">BT JAPAN (vbc160)</option>
+                                                <option value="5128">BT KOREA (BT-KS)</option>
+                                                <option value="5463">BT Latam Argentina (BT Latam Argentina)</option>
+                                                <option value="5464">BT Latam Brazil (BT Latam Brazil)</option>
+                                                <option value="5608">BT Latam Colombia (BT Latam Colombia)</option>
+                                                <option value="5460">BT Latam Mexico (BT Latam Mexico)</option>
+                                                <option value="5477">BT Latam Peru (BT Latam Peru)</option>
+                                                <option value="5480">BT Latam Venezuela (BT Latam Venezuela)</option>
+                                                <option value="5601">BT Lithuania (BT Lithuania)</option>
+                                                <option value="1957">BT Luxembourg (BT-LU)</option>
+                                                <option value="322">BT Malaysia (BT-MY)</option>
+                                                <option value="5401">BT Mexico (BT Mexico)</option>
+                                                <option value="5483">BT Morocco (BT Morocco)</option>
+                                                <option value="122">BT Netherlands (TELFORT)</option>
+                                                <option value="6300">BT New Zealand (BT New Zealand)</option>
+                                                <option value="5474">BT Nicaragua (BT Nicaragua)</option>
+                                                <option value="112">BT Nordics (BT Nordics)</option>
+                                                <option value="5139">BT Nordics Denmark (BT Nordics Denmark)</option>
+                                                <option value="959">BT Nordics Finland (FIN)</option>
+                                                <option value="5140">BT Nordics Norway (BT Nordics Norway)</option>
+                                                <option value="5141">BT Nordics Sweden (BT Nordics Sweden)</option>
+                                                <option value="9599">BT NORWAY (BT NORWAY)</option>
+                                                <option value="5419">BT Openreach (BT Openreach)</option>
+                                                <option value="5475">BT Pakistan (BT Pakistan)</option>
+                                                <option value="5476">BT Panama (BT Panama)</option>
+                                                <option value="5605">BT Paraguay (BT Paraguay)</option>
+                                                <option value="5478">BT Peru (BT Peru)</option>
+                                                <option value="1958">BT POLAND (BT-PL)</option>
+                                                <option value="1948">BT PORTUGAL (BT PORTUGAL)</option>
+                                                <option value="1699">BT Radianz (BT-RAD)</option>
+                                                <option value="106">BT Retail (BT-MNSS)</option>
+                                                <option value="1539">BT Retail - Vanco (BT Retail - Vanco)</option>
+                                                <option value="5484">BT Romania (BT Romania)</option>
+                                                <option value="5142">BT Russia (BT Russia)</option>
+                                                <option value="5119">BT Secure Messaging Service (BT Secure Messaging Service)</option>
+                                                <option value="110">BT Singapore (BT-SN)</option>
+                                                <option value="1955">BT SLOVAKIA (BT-SL)</option>
+                                                <option value="124">BT Solutions - Europe (BT-EUR2)</option>
+                                                <option value="5189">BT SOLUTIONS UK (BT SOLUTIONS UK)</option>
+                                                <option value="1839">BT South Africa (BT South Africa)</option>
+                                                <option value="111">BT Spain (BT-SP)</option>
+                                                <option value="9604">BT SWEDEN (BT SWEDEN)</option>
+                                                <option value="133">BT Switzerland (BT Switzerland)</option>
+                                                <option value="130">BT Syntegra (SYNTEGRA)</option>
+                                                <option value="114">BT TAIWAN (BT-TW)</option>
+                                                <option value="113">BT THAILAND (BT-TH)</option>
+                                                <option value="5606">BT Trinidad Tobago (BT Trinidad Tobago)</option>
+                                                <option value="5461">BT Turkey (BT Turkey)</option>
+                                                <option value="11899">BT UAE Dubai (BT UAE Dubai)</option>
+                                                <option value="5167">BT UAE Dubai Branch (BT UAE Dubai Branch)</option>
+                                                <option value="5999">BT UK - Networks Internal Acc (BT UK - Networks Internal Acc)</option>
+                                                <option value="5607">BT Uruguay (BT Uruguay)</option>
+                                                <option value="5481">BT Venezuela (BT Venezuela)</option>
+                                                <option value="9603">BT WHOLESALE (BT WHOLESALE)</option>
+                                                <option value="419">BT Wholesale Markets (BT-WMKTS)</option>
+                                                <option value="19401">BT-GULF (BT-GULF)</option>
+                                                <option value="10399">BTA PARTNER ONE (BTA PARTNER ONE)</option>
+                                                <option value="11299">BTA QUOTING CHANNEL (BTA QUOTING CHANNEL)</option>
+                                                <option value="9399">BTB (BTB)</option>
+                                                <option value="7099">BTGS Luxembourg (BTGS Luxembourg)</option>
+                                                <option value="1239">BTGS Operations (BTGS Operations)</option>
+                                                <option value="115">BTGS UK (BTGS UK)</option>
+                                                <option value="659">BTNA - Marketing (BTNA - Marketing)</option>
+                                                <option value="5064">Cameron (Cameron)</option>
+                                                <option value="12701">CAP GEMINI-BTA (CAP GEMINI-BTA)</option>
+                                                <option value="5084">Capgemini (SI-Capgemini)</option>
+                                                <option value="5143">CCNET SA Computacion Comunicaciones y Redes (CCNET SA Computacion
+                                                    Comunicaciones y Redes)</option>
+                                                <option value="116">CEGETEL (CEGETEL)</option>
+                                                <option value="5559">CESKY TELECOM (CESKY TELECOM)</option>
+                                                <option value="10899">CGNS Ltd (CGNS Ltd)</option>
+                                                <option value="5066">ChgeDistributor (ChgeDistributor)</option>
+                                                <option value="5118">China Telecom Americas (CHINA-US)</option>
+                                                <option value="10999">CHINA TELECOM GLOBAL LIMITED (CHINA TELECOM GLOBAL LIMITED)</option>
+                                                <option value="1963">CHUNGHWA TELECOM (CHT-I)</option>
+                                                <option value="6599">Cincinnati Bell USA (Cincinnati Bell USA)</option>
+                                                <option value="7599">Citrix Online LLC (Citrix Online LLC)</option>
+                                                <option value="10199">COLIN_TEST_DIST (COLIN_TEST_DIST)</option>
+                                                <option value="5339">Comfone AG (Comfone AG)</option>
+                                                <option value="5091">Computacenter (SI-Computacenter)</option>
+                                                <option value="126">CONCERT GLOBAL ACCOUNTS (CONCERT-GA)</option>
+                                                <option value="135">Concert Product Management (BT Ignite Product Management)</option>
+                                                <option value="10699">CPE Supplier (CPE Supplier)</option>
+                                                <option value="5074">CSC (SI-CSC)</option>
+                                                <option value="9799">CSP TEST SANDBOX (CSP TEST SANDBOX)</option>
+                                                <option value="5109">Dashboard Test Dist (Dashboard Test Dist)</option>
+                                                <option value="5144">Datek Telecom SA (Datek Telecom SA)</option>
+                                                <option value="5145">Datos Y Comunicaciones Cia Ltda (Datos Y Comunicaciones Cia Ltda)</option>
+                                                <option value="100">DIS (Telkom Austria) (BT-AU)</option>
+                                                <option value="8700">DistLive (DistLive)</option>
+                                                <option value="8299">distributorlive (distributorlive)</option>
+                                                <option value="8399">du (du)</option>
+                                                <option value="6801">Du Pre (Du Pre)</option>
+                                                <option value="13405">DualMockDist (DualMockDist)</option>
+                                                <option value="13499">DualTest01 (DualTest01)</option>
+                                                <option value="12499">EARTHLINK-BTA (EARTHLINK-BTA)</option>
+                                                <option value="5565">EASYNET (EASYNET)</option>
+                                                <option value="5092">EDS (SI-EDS)</option>
+                                                <option value="5146">Elion Ettevotted Aktsiaselts (Elion Ettevotted Aktsiaselts)</option>
+                                                <option value="1950">Etisalat (ETISLAT-TC)</option>
+                                                <option value="6600">Exatel (Exatel)</option>
+                                                <option value="5299">FCE (FCEDistributor)</option>
+                                                <option value="5359">fcedist (fcedist)</option>
+                                                <option value="5063">FIAT GROUP (FIAT GROUP)</option>
+                                                <option value="5067">Fiat test Dist (Fiat Test Dist)</option>
+                                                <option value="5073">Fujitsu (SI-Fujitsu)</option>
+                                                <option value="10800">FUJITSU LIMITED-BTA (FUJITSU LIMITED-BTA)</option>
+                                                <option value="300">Gateway (Gateway)</option>
+                                                <option value="6802">Getech (Getech)</option>
+                                                <option value="5086">Getronics N V (SI-Getronics)</option>
+                                                <option value="5899">Global Crossing Telecommunications Inc. (Global Crossing Telecommunications
+                                                    Inc.)</option>
+                                                <option value="5080">GloPro (GloPro)</option>
+                                                <option value="7499">Green (Green)</option>
+                                                <option value="5040">GS Global Services (GS Global Services)</option>
+                                                <option value="12100">GTM QUOTING CHANNEL (GTM QUOTING CHANNEL)</option>
+                                                <option value="5000">GTS Novera (GTS Novera)</option>
+                                                <option value="6499">GTS Novera Slovakia (GTS Novera Slovakia)</option>
+                                                <option value="5078">Hewlett Packard Alliance (SI-HP)</option>
+                                                <option value="6601">HGC (HGC)</option>
+                                                <option value="11399">HGC LIMITED (HGC LIMITED)</option>
+                                                <option value="10799">HITACHI SYSTEMS LTD-BTA (HITACHI SYSTEMS LTD-BTA)</option>
+                                                <option value="13500">HP Enterprise BE-BTA (HP Enterprise BE-BTA)</option>
+                                                <option value="13199">HP Enterprise DE-BTA (HP Enterprise DE-BTA)</option>
+                                                <option value="13099">HP ENTERPRISE UK-BTA (HP ENTERPRISE UK-BTA)</option>
+                                                <option value="12700">HP-BTA (HP-BTA)</option>
+                                                <option value="12101">IBM UK LTD-BTA (IBM UK LTD-BTA)</option>
+                                                <option value="5079">IBM United Kingdom Ltd (SI-IBM)</option>
+                                                <option value="7899">IDM (IDM)</option>
+                                                <option value="13600">IE11 Test Dist (IE11 Test Dist)</option>
+                                                <option value="19461">IMPSAT ARGENTINA (IMPSAT-AR)</option>
+                                                <option value="1040">IMPSAT Brazil (IMPSAT-BR)</option>
+                                                <option value="1954">IMPSAT-USA (IMPSAT-USA)</option>
+                                                <option value="8999">Indirect Channel (Indirect Channel)</option>
+                                                <option value="5147">Infocom GmbH (Infocom GmbH)</option>
+                                                <option value="5148">Infonet (Thailand) Limited (Infonet (Thailand) Limited)</option>
+                                                <option value="5149">Infonet Chile SA (Infonet Chile SA)</option>
+                                                <option value="7799">Infonet Distributor (Infonet Distributor)</option>
+                                                <option value="4759">Infonet Enterprise SA (Infonet Enterprise S.A.)</option>
+                                                <option value="5132">Infonet Enterprise SA - DRT (Infonet Enterprise SA - DRT)</option>
+                                                <option value="5150">Infonet Nederland BV (Infonet Nederland BV)</option>
+                                                <option value="5568">Infonet Portugal (Infonet Portugal)</option>
+                                                <option value="5151">Infonet Primalliance Co Ltd (Infonet Primalliance Co Ltd)</option>
+                                                <option value="5133">Infonet Servicios de Comunicaciones SA de CV (Infonet Servicios
+                                                    de Comunicaciones SA de CV)</option>
+                                                <option value="9699">Intelsat (Intelsat Corporation)</option>
+                                                <option value="5155">Intralink Concept SNB BHD (Intralink Concept SNB BHD)</option>
+                                                <option value="8699">IX Telecom (IX Telecom)</option>
+                                                <option value="5072">KDDI &amp; BT GLOBAL SOLUTIONS CORPORATION (KDDI &amp; BT GLOBAL
+                                                    SOLUTIONS CORPORATION)</option>
+                                                <option value="10299">KDDI CORPORATION (KDDI CORPORATION)</option>
+                                                <option value="1899">KDDI CORPORATION (FOR JAPAN) (KDDI CORPORATION (FOR JAPAN))</option>
+                                                <option value="4632">KEYSTONE (KEYSTONE)</option>
+                                                <option value="105">Korea Telecom (Korea Telecom)</option>
+                                                <option value="6803">Koris (Koris)</option>
+                                                <option value="9999">KPN INTERNATIONAL (KPN INTERNATIONAL)</option>
+                                                <option value="1041">KT Corporation (KOREA-TEL)</option>
+                                                <option value="4977">Lattelekom SIA (Lattelekom SIA)</option>
+                                                <option value="5068">LG Dacom (LG Dacom)</option>
+                                                <option value="9299">LG Uplus (LG Uplus)</option>
+                                                <option value="5097">Liberata (SI-Liberata)</option>
+                                                <option value="5560">Linkdotnet (Linkdotnet)</option>
+                                                <option value="8899">livedist (livedist)</option>
+                                                <option value="329">LOGIC (ROMANIA) (vbc159)</option>
+                                                <option value="5087">LogicaCMG (SI-LogicaCMG)</option>
+                                                <option value="12899">MANAGED SERVICES FROM BT (MANAGED SERVICES FROM BT)</option>
+                                                <option value="5519">Mapatel SA (Mapatel SA)</option>
+                                                <option value="4919">McGraw Communications Inc (MCGRAW-US)</option>
+                                                <option value="118">MCI/WORLDCOM (MCI)</option>
+                                                <option value="13400">MI Migration-Parallel-8AUG (MI Migration-Parallel-8AUG)</option>
+                                                <option value="13402">MIMigration PDT_29AUg (MI Migration PDT_29AUg)</option>
+                                                <option value="5105">MobileDistrib (MobileDistrib)</option>
+                                                <option value="1099">MPLS Network Reports (MPLS Network Reports)</option>
+                                                <option value="679">MRTG Product (MRTG Product)</option>
+                                                <option value="141">MSC Programme (MSC Programme)</option>
+                                                <option value="12399">MTN-BTA (MTN-BTA)</option>
+                                                <option value="1079">MTS Allstream (MTS Allstream)</option>
+                                                <option value="9099">my_account (my_account)</option>
+                                                <option value="5108">N3 Distributor (N3 Distributor)</option>
+                                                <option value="5564">Naukowa I Akademicka Siec Komputerowa (Naukowa I Akademicka Siec
+                                                    Komputerowa)</option>
+                                                <option value="5499">Neterra (Neterra)</option>
+                                                <option value="7999">NHS Distributor (NHS Distributor)</option>
+                                                <option value="5567">NOUR COMMUNICATIONS CO LTD (NOUR COMMUNICATIONS CO LTD)</option>
+                                                <option value="5511">NTT America (NTT America)</option>
+                                                <option value="8499">NTT Com (NTT Com)</option>
+                                                <option value="5579">O2 TELEFONICA (O2 TELEFONICA)</option>
+                                                <option value="1061">Oi (Oi)</option>
+                                                <option value="7299">One Source Networks (One Source Networks)</option>
+                                                <option value="6806">Oni Plc (Oni Plc)</option>
+                                                <option value="129">ONI SOLUTIONS (ONI-PO)</option>
+                                                <option value="1159">Orient Networks Telecommunications (XA-TMI)</option>
+                                                <option value="5561">OTE International Solutions SA (OTE International Solutions SA)</option>
+                                                <option value="5506">PAK DATACOM (PAK DATACOM)</option>
+                                                <option value="5088">Perot Systems Corp (SI-Perot)</option>
+                                                <option value="5563">PERUSAHAAN PERSEROAN PT TELEKOMUNIKASI INDONESIA (PERUSAHAAN PERSEROAN
+                                                    PT TELEKOMUNIKASI INDONESIA)</option>
+                                                <option value="5582">PLDT (PLDT)</option>
+                                                <option value="7199">Portal DataCleanse - Do not use (Portal DataCleanse - Do not use)</option>
+                                                <option value="5065">PortalTestDist (PortalTestDist)</option>
+                                                <option value="13404">Prod-HW Distributor (Prod-HW Distributor)</option>
+                                                <option value="19411">PT INDOSAT (BT-ID)</option>
+                                                <option value="121">PT Prime (TELEPAC)</option>
+                                                <option value="7399">QC1 (QC1)</option>
+                                                <option value="139">QWEST COMMUNICATIONS GROUP (QWEST)</option>
+                                                <option value="699">Qwest Program Management (Qwest Program Management)</option>
+                                                <option value="759">REACH (REACH)</option>
+                                                <option value="8199">Rochdale Migration (Rochdale Migration)</option>
+                                                <option value="6804">Rocom (Rocom)</option>
+                                                <option value="1901">Sas Telecom Ltd (Sas Telecom Ltd)</option>
+                                                <option value="5512">Savvis (Savvis)</option>
+                                                <option value="12199">Security_testing (Security_testing)</option>
+                                                <option value="5159">Sedeco Networks SA (Sedeco Networks SA)</option>
+                                                <option value="5160">Servicios de Transmision de Datos Setradat CA (Servicios de Transmision
+                                                    de Datos Setradat CA)</option>
+                                                <option value="6805">Servo (Servo)</option>
+                                                <option value="11599">SFR-BTA (SFR-BTA)</option>
+                                                <option value="10099">Sharon Test (Sharon Test)</option>
+                                                <option value="5089">Siemens PLC (SI-Siemens)</option>
+                                                <option value="1042">SINGAPORE TELECOMMUNICATIONS LTD (SING-TEL)</option>
+                                                <option value="119">SOFTBANK TELECOM (NIS)</option>
+                                                <option value="328">Space Hellas (Space Hellas)</option>
+                                                <option value="5513">Sprint (Sprint)</option>
+                                                <option value="5103">SSOTestingDistributor (SSOTestingDistributor)</option>
+                                                <option value="138">Starhub (BT-STARHUB)</option>
+                                                <option value="11199">STARHUB LTD-BTA (STARHUB LTD-BTA)</option>
+                                                <option value="5090">Steria UK Limited (SI-Steria)</option>
+                                                <option value="8799">STP Migration Test (Do not use) (STP Migration Test (Do not use))</option>
+                                                <option value="120">SUNRISE (SUNRISE)</option>
+                                                <option value="5183">SUNRISE NETCOM SERVICES (SUNRISE NETCOM SERVICES)</option>
+                                                <option value="7699">SuperOnline (SuperOnline)</option>
+                                                <option value="11799">SWIFT SALES CHANNEL (SWIFT SALES CHANNEL)</option>
+                                                <option value="5508">Swisscom (Swisscom)</option>
+                                                <option value="5439">Taiwan Fixed Networks TFN (Taiwan Fixed Networks TFN)</option>
+                                                <option value="5509">Taiwan Telecommunication Network Services Co Ltd (Taiwan Telecommunication
+                                                    Network Services Co Ltd)</option>
+                                                <option value="5580">TDC (TDC)</option>
+                                                <option value="11499">TDC AS (TDC AS)</option>
+                                                <option value="5161">Tecapro Internacional SA (Tecapro Internacional SA)</option>
+                                                <option value="11999">TECH MAHINDRA LIMITED (TECH MAHINDRA LIMITED)</option>
+                                                <option value="127">TELECOM ARGENTINA (TELECOM-AR)</option>
+                                                <option value="1965">TELECOM NEW ZEALAND INTERNATIONAL (TNZI)</option>
+                                                <option value="1060">TELEFONICA (TELEFONICA)</option>
+                                                <option value="5208">Telekom Austria (Telekom Austria)</option>
+                                                <option value="12600">TELEKOM AUSTRIA-BTA (TELEKOM AUSTRIA-BTA)</option>
+                                                <option value="1974">TELEKOM MALAYSIA (TELEKOM MALAYSIA)</option>
+                                                <option value="1059">Telekom South Africa (Telekom South Africa)</option>
+                                                <option value="108">TELENOR (BT-NO)</option>
+                                                <option value="12099">TELENOR-BTA (TELENOR-BTA)</option>
+                                                <option value="5502">TELIASONERA (TELIASONERA)</option>
+                                                <option value="11699">TELIASONERA-BTA (TELIASONERA-BTA)</option>
+                                                <option value="5566">Telstra Corporation Limited (Telstra Corporation Limited)</option>
+                                                <option value="10599">TELSTRA CORPORATION-BTA (TELSTRA CORPORATION-BTA)</option>
+                                                <option value="5510">Telstra Europe (Telstra Europe)</option>
+                                                <option value="10499">TELSTRA INCORPORATED (TELSTRA INCORPORATED)</option>
+                                                <option value="6999">Temp_holding_distributor (Temp_holding_distributor)</option>
+                                                <option value="5503">TEO (TEO)</option>
+                                                <option value="13599">Test Dis (Test SSA Dis)</option>
+                                                <option value="9899">Test Distributor 20062012 (Test Distributor 20062012)</option>
+                                                <option value="6699">Test Distributor_test (test_distributor_200609)</option>
+                                                <option value="12801">Test Service (Test Service)</option>
+                                                <option value="12800">Test SSA (Test SSA)</option>
+                                                <option value="5212">testBU (testBU)</option>
+                                                <option value="13300">TestPDTJUL11 distributor (TestPDTJUL11 distributor)</option>
+                                                <option value="13299">Test_Change (Test_Change)</option>
+                                                <option value="5095">The Capita Group PLC (SI-Capita)</option>
+                                                <option value="12799">TSIC-BTA (TSIC-BTA)</option>
+                                                <option value="5075">Unisys (SI-Unisys)</option>
+                                                <option value="5122">Unisys NNG (Unisys NNG)</option>
+                                                <option value="5076">Vanco (SI-Vanco)</option>
+                                                <option value="5799">Virgin Media (Virgin Media)</option>
+                                                <option value="10900">Viva Bahrain B.S.C. (Viva Bahrain B.S.C.)</option>
+                                                <option value="5581">VODAFONE DATA (VODAFONE DATA)</option>
+                                                <option value="1047">VSNL (vbc177)</option>
+                                                <option value="1439">VTX Services SA (VTX-SZ)</option>
+                                                <option value="13401">VVTDist (VVTDist)</option>
+                                                <option value="13399">VVTDistest (VVTDistest)</option>
+                                                <option value="13403">VVTtest-3Sep (VVTtest-3Sep)</option>
+                                                <option value="9100">webcrf (webcrf)</option>
+                                                <option value="12702">WIPRO-BTA (WIPRO-BTA)</option>
+                                                <option value="1947">ZAJIL (ZAJIL)</option>
+                                                <option value="5242">ZZ - 3i Group Plc (ZZ - 3i Group Plc)</option>
+                                            </select>
+                                        </td>
+                                        <td width="20%">
+                                            <a class="btn btn-primary btn-sm"><span>Assign &gt;&gt;</span></a><br>
+                                            <a class="btn btn-primary btn-sm"><span>&lt;&lt; De-Assign</span></a><br>
+                                        </td>
+                                        <td width="40%">
+                                            <select id="AssignedDists" class="chartAnswer" multiple size="35" name="AssignedDists">
+                                                <option value="6199">BT GLOBAL SERVICES (BT GLOBAL SERVICES)</option>
+                                                <option value="1800">BT Indirect - Partner Services (BT Indirect - Partner Services)</option>
+                                                <option value="1600">BT Infonet (vbc201)</option>
+                                                <option value="5053">GS Global Solutions (GS Global Solutions)</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="button" class="btn btn-sm btn-primary" value="Save" />
+                            <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                            <button class="btn btn-default" type="button" data-dismiss="modal">
+                                Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="DistributorMappingModal"
+        role="dialog" aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H1">
+                            Distributor &nbsp;&nbsp;&nbsp;&nbsp; BT Global Services
+                        </h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <table id="Table1" width="100%" border="0">
+                                <tbody>
+                                    <tr width="100%">
+                                        <td class="bodyTextBold" width="40%" align="center">
+                                            Un-Assigned Products
+                                        </td>
+                                        <td width="20%" align="center">
+                                        </td>
+                                        <td class="bodyTextBold" width="40%" align="center">
+                                            <font color="#ff0000" size="+2" face="Arial">*</font>Assigned Products
+                                        </td>
+                                    </tr>
+                                    <tr width="100%">
+                                        <td width="40%">
+                                            <select id="Select2" class="chartAnswer" multiple size="26" name="UnAssignedProducts">
+                                                <option value="128">Assure Managed Devices</option>
+                                                <option value="78">BT Finance Extranet</option>
+                                                <option value="122">Connect Acceleration</option>
+                                                <option value="125">Connect Intelligence</option>
+                                                <option value="96">DSL-HVPN Access</option>
+                                                <option value="121">Etherflow Capability</option>
+                                                <option value="130">MCU Test City Level Product</option>
+                                                <option value="131">MCU Test Region Product</option>
+                                                <option value="127">Radianz Ethernet</option>
+                                                <option value="129">Special Bid ICG</option>
+                                            </select>
+                                        </td>
+                                        <td width="20%">
+                                            <a class="btn btn-primary btn-sm"><span>Assign &gt;&gt;</span></a><br>
+                                            <a class="btn btn-primary btn-sm"><span>&lt;&lt; De-Assign</span></a><br>
+                                        </td>
+                                        <td width="40%">
+                                            <select id="Select4" class="chartAnswer" multiple size="26" name="AssignedProducts">
+                                                <option value="25">Access</option>
+                                                <option value="58">BT Bandwidth Services</option>
+                                                <option value="62">BT Business Voice Select</option>
+                                                <option value="31">BT Business Voice VoicePort</option>
+                                                <option value="98">BT CCS Direct</option>
+                                                <option value="63">BT CPE</option>
+                                                <option value="15">BT Contact Centre Service</option>
+                                                <option value="100">BT Etherflow Global</option>
+                                                <option value="101">BT GS Portfolio Database</option>
+                                                <option value="16">BT Generic Voice Information</option>
+                                                <option value="32">BT IP Sec</option>
+                                                <option value="11">BT Internet Access</option>
+                                                <option value="108">BT Internet Connect Global</option>
+                                                <option value="72">BT LAN SAN Extension Service</option>
+                                                <option value="76">BT MPLS</option>
+                                                <option value="126">BT Media and Broadcast</option>
+                                                <option value="30">BT MessageScan</option>
+                                                <option value="102">BT MobileXpress Mobile IPsec VPN</option>
+                                                <option value="79">BT Onevoice</option>
+                                                <option value="75">BT iVPN</option>
+                                                <option value="105">Connect Optimisation</option>
+                                                <option value="123">IP Connect Web-VPN</option>
+                                                <option value="124">Internet Connect Reach</option>
+                                                <option value="21">MPLS Capability</option>
+                                                <option value="85">Special Bid</option>
+                                                <option value="97">TDM Voice</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="button" class="btn btn-sm btn-primary" value="Save" />
+                            <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                            <button class="btn btn-default" type="button" data-dismiss="modal">
+                                Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

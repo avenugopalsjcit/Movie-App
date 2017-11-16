@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+
+namespace SCAdminDAL
+{
+   public  class CpeCountryAvailibityDAL
+    {
+
+       public DataTable GetCountryDetails()
+       {
+           GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+           StringBuilder strQuery = new StringBuilder();
+           strQuery.Append(@"SELECT  H.country_name,S.char_name,d.product_name,NVL(F.ACTIVITY_NAME,'') AS ACTIVITY_NAME, A.CPE_AVAILABILITY_STATUS AS CPE_AVAILABILITY_STATUS
+                                    FROM CPE_AVAILABILITY_MATRIX A
+                                    INNER JOIN csu_country H ON A.COUNTRY_ID=H.COUNTRY_ID
+                                    LEFT JOIN
+                                    (
+                                    SELECT 'All' as char_name,-1 as char_id from dual
+                                    UNION
+                                    SELECT char_name, char_id FROM csu_ref_valid_char WHERE char_type_id = 925 
+                                     AND char_id IN (SELECT DISTINCT supplier_char_id FROM csu_cpe_country_suppliers)
+                                    ) S ON NVL(a.supplier_id,0)=NVL(S.char_id,0)
+                                    LEFT JOIN 
+                                    (
+                                    SELECT 'All' as PRODUCT_NAME,-1 as PRODUCT_CD from dual
+                                    UNION
+                                    SELECT PRODUCT_NAME,PRODUCT_CD FROM CSU_PRODUCT 
+                                    ) D ON NVL(a.product_id,0)= NVL(d.product_cd,0) 
+                                    LEFT JOIN CPE_CAT_ACTIVITY_ACTION_MAP F ON LTRIM(RTRIM(F.ACTION_TYPE))=LTRIM(RTRIM(A.ACTIVITY_TYPE))" +
+               //@"WHERE (A.COUNTRY_ID='" + CountryId + "' OR '" + CountryId + "'='-1') and (A.supplier_id=" + SupplierId + " or " + SupplierId + "=-1)" +
+                                   @"ORDER BY H.COUNTRY_NAME,S.char_name,d.product_name");
+
+           return objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+       }
+
+       public DataTable GetCPEMaintSupplierReport()
+       {
+           GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+           StringBuilder strQry = new StringBuilder();
+           try
+           {
+               strQry.Append(" SELECT DISTINCT c.country_id,c.country_name, product_id, NVL (b.product_name, 'All') product, ");
+               strQry.Append(" a.manufacturer_name, distributor_name,  pricing_type, supplier_id,  d.char_name AS Installer, ");
+               strQry.Append(" supp_type, e.char_name AS Maintainer,case when lower(a.SMART_SERVICE_AVAIL) = 'no' then 'No' when lower(a.SMART_SERVICE_AVAIL) = 'yes' then 'Yes' else 'NA' end as SMART_SERVICE_AVAIL");
+               strQry.Append(" FROM CSU_CPE_CNTRY_SUPP a, csu_product b, csu_country c, ");
+               strQry.Append("  csu_ref_valid_char d, csu_ref_valid_char e, csu_cpe_country_suppliers f ");
+               strQry.Append(" WHERE a.product_id  = b.product_cd(+) ");
+               strQry.Append(" AND a.country_id    = c.country_id ");
+               strQry.Append(" AND d.char_id       = a.supplier_id ");
+               strQry.Append(" AND e.char_id       = f.supplier_char_id ");
+               strQry.Append(" AND f.supplier_char_id = a.maintainer_id ");
+               strQry.Append(" AND e.char_id        = a.maintainer_id ");
+               strQry.Append(" AND c.country_id     = a.COUNTRY_ID ");
+               strQry.Append(" ORDER BY Country_name,product,  manufacturer_name, distributor_name,d.char_name,");
+               strQry.Append(" e.char_name, supp_type, pricing_type ");
+               
+
+           }
+           catch(Exception ex)
+           {
+               throw ex;
+           }
+
+           return objGetDataFromDB.GetDataTable(strQry.ToString());
+       }
+    }
+}

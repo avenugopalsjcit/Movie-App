@@ -1,0 +1,313 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="appModule">
+<head>
+    <title></title>
+</head>
+<body>
+    <div class="container" ng-controller="HVPNPkgCntrl">
+        <div class="col-md-6 col-lg-6">
+            &nbsp;</div>
+        <div class="col-md-6 col-lg-6 text-right PaddingBottomforModalPops">
+            <button type="button" class="close" ng-click="$dismiss()">
+                &times;</button><br />
+        </div>
+        <div class="row marTop25">
+            <div class="panel panel-primary">
+                <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                    data-target="#panelDSLhVPNDetails">
+                    <h3 class="panel-title text-left">
+                        DSL / hVPN Details</h3>
+                    <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                </div>
+                <div id="panelDSLhVPNDetails" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td class="text-left Arrow">
+                                    BT Package
+                                </td>
+                                <td class="text-left Arrow">
+                                    {{BTPackage}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-left Arrow">
+                                    Access Type
+                                </td>
+                                <td class="text-left Arrow">
+                                    {{AccessType}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-left Arrow">
+                                    Supplier
+                                </td>
+                                <td class="text-left Arrow">
+                                    {{Supplier}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-left Arrow">
+                                    Supplier Product
+                                </td>
+                                <td class="text-left Arrow">
+                                    {{SupplierProduct}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-left Arrow">
+                                    Port Type
+                                </td>
+                                <td class="text-left Arrow">
+                                    {{PortType}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="{{hvpnInfo}}">
+                <div class="panel panel-primary">
+                    <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                        data-target="#panelSecondaryhVPNInformation">
+                        <h3 class="panel-title text-left">
+                            Secondary hVPN Information</h3>
+                        <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                    </div>
+                    <div id="panelSecondaryhVPNInformation" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table border="1" id="Table1" ng-hide="{{nohvpndata}}" class="table table-bordered">
+                                <tr>
+                                    <th class="text-left Arrow" style="width: 15%">
+                                        hVPN Attributes
+                                    </th>
+                                    <th class="text-left Arrow">
+                                        Value
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td class="text-left Arrow">
+                                        ISP Addressing
+                                    </td>
+                                    <td class="Arrow">
+                                        {{ISP_ADDRESSING}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left Arrow">
+                                        Other Service Notes
+                                    </td>
+                                    <td class="Arrow">
+                                        {{OTHER_SERVICE_NOTES}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left Arrow">
+                                        Product Code
+                                    </td>
+                                    <td class="Arrow">
+                                        {{PRODUCT_CODE}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left Arrow">
+                                        Access Provider Name
+                                    </td>
+                                    <td class="Arrow">
+                                        {{AGGREGATOR}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left Arrow">
+                                        Copper Details
+                                    </td>
+                                    <td class="Arrow">
+                                        <!--{{COPPER_SERVICE_ID}}-->
+                                        {{COPPER_DETAILS}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left Arrow">
+                                        Pricing Notes
+                                    </td>
+                                    <td class="Arrow">
+                                        {{PRICING_NOTES}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left Arrow">
+                                        RFA Notes
+                                    </td>
+                                    <td class="Arrow">
+                                        {{RFA_NOTES}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left Arrow">
+                                        RFO Notes
+                                    </td>
+                                    <td class="Arrow">
+                                        {{RFO_NOTES}}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table table-bordered" id="Table3" ng-hide="DSLPckNoData==1">
+                                
+                                <tr ng-show="PackageLevel==1">
+                                    <td colspan="2" align="left" class="Arrow">
+                                        <b>Package Level Characteristics</b>
+                                    </td>
+                                </tr>
+                                <tr ng-show="PackageLevel==1" ng-repeat="item in DSLPackageData">
+                                    <td class="Arrow">
+                                        {{ item.charName }}
+                                    </td>
+                                    <td class="Arrow">
+                                        {{item.charValue }}
+                                    </td>
+                                </tr>
+                                <tr ng-show="PortTypeLevel==1">
+                                    <td colspan="2" align="left" class="Arrow">
+                                        <b>Port Type Level</b>
+                                    </td>
+                                </tr>
+                                <tr ng-show="PortTYpe==1" ng-repeat="item in DSLCountryPackageData">
+                                    <td class="Arrow">
+                                        {{ item.charName }}
+                                    </td>
+                                    <td class="Arrow">
+                                        {{ item.charValue }}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table id="Table4" ng-show='DSLPckNoData==1'>
+                                <tr>
+                                    <td class="Arrow">
+                                        <b>No Valid Package Details Present</b>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div ng-show="{{nohvpndata}}" class="alert alert-danger Arrow" role="alert" style="display: none">
+                                No Data Found</div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="panel panel-primary">
+                    <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" ng-click="getCPESupplierCoverage()"
+                        data-target="#panelCustomerProvidedAccess">
+                        <h3 class="panel-title text-left">
+                            Customer Provided Access and CPE Supplier Coverage</h3>
+                        <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                    </div>
+                    <div id="panelCustomerProvidedAccess" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table id="Table2" ng-hide="{{noCPEData}}" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left Arrow">
+                                            Country
+                                        </th>
+                                        <th class="text-left Arrow">
+                                            CPE Supplier Type
+                                        </th>
+                                        <th align="center" class="bodyTextBold Arrow">
+                                            Customer Provided Access (Yes / No)?
+                                        </th>
+                                        <th class="text-left Arrow">
+                                            Access Aggregator
+                                        </th>
+                                        <th class="text-left Arrow">
+                                            hVPN Split Tunneling Availability
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in CPEDetailsList">
+                                        <td class="text-left Arrow">
+                                            {{item.COUNTRY}}
+                                        </td>
+                                        <td class="text-left Arrow">
+                                            {{ item.CPE_SUPPLIER}}
+                                        </td>
+                                        <td class="text-left Arrow">
+                                            {{ item.CPA}}
+                                        </td>
+                                        <td class="text-left Arrow">
+                                            {{ item.AGGREGATOR_BAU}}
+                                        </td>
+                                        <td class="text-left Arrow">
+                                            {{ item.SPLIT_TUNNELING}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div ng-show="{{noCPEData}}" class="alert alert-danger Arrow" role="alert" style="display: none">
+                                No Data Found</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="{{DSLInfo}}">
+                <div class="panel panel-primary">
+                    <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                        data-target="#panelSecondaryDSLData">
+                        <h3 class="panel-title text-left" style="font-size: 12px">
+                            Secondary DSL Data</h3>
+                        <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                    </div>
+                    <div id="panelSecondaryDSLData" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table class="table table-bordered" id="DSLPckData" ng-hide="DSLPckNoData==1">
+                                <tr>
+                                    <th class="Arrow">
+                                        DSL Information
+                                    </th>
+                                    <th class="Arrow">
+                                        Value
+                                    </th>
+                                </tr>
+                               <tr ng-show="PackageLevel==1">
+                                    <td colspan="2" align="left" class="Arrow">
+                                        <b>Package Level</b>
+                                    </td>
+                                </tr>
+                                <tr ng-show="PackageLevel==1" ng-repeat="item in DSLPackageData">
+                                    <td class="Arrow">
+                                        {{ item.charName }}
+                                    </td>
+                                    <td class="Arrow">
+                                        {{item.charValue }}
+                                    </td>
+                                </tr>
+                                <tr ng-show="PortTypeLevel==1">
+                                    <td colspan="2" align="left" class="Arrow">
+                                        <b>Port Type Level</b>
+                                    </td>
+                                </tr>
+                                <tr ng-show="PortTypeLevel==1" ng-repeat="item in DSLCountryPackageData">
+                                    <td class="Arrow">
+                                        {{ item.charName }}
+                                    </td>
+                                    <td class="Arrow">
+                                        {{ item.charValue }}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table id="DSLPckNoData" ng-show='DSLPckNoData==1'>
+                                <tr>
+                                    <td class="Arrow">
+                                        <b>No Valid Package Details Present</b>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+</body>
+</html>

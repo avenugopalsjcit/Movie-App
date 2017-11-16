@@ -1,0 +1,299 @@
+﻿<div>
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" data-target="#divDistributor">Supplier Restriction</a>
+        </li>
+        <li><a data-toggle="tab" class="Show_HVPN clickable1" data-target="#divBTGFR">BTGFR
+            Supplier Restriction</a> </li>
+        <li><a data-toggle="tab" class="Show_DSL clickable1" data-target="#divOrg">ORG Supplier
+            Restriction</a> </li>
+    </ul>
+    <div class="tab-content clearfix " ng-controller="DistributerCtrl">
+    
+        <div id="divDistributor" class="tab-pane active" >
+            <span style="font-size: large; margin-left: 500px">Create/Delete Restrictions </span>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <p style="color: Red;" class="Arrow">
+                        <span style="color: Black; font-weight: bold">Note:You are defining which supplier a
+                            distributor is not allowed to see. If you do not specify, then all supplier will
+                            be accessible to the distributor. </span>
+                    </p>
+                </div>
+            </div>
+            <div class="panel panel-primary bg1">
+                <div class="panel-body">
+                    <div>
+                        &nbsp;&nbsp;</div>
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label" style="max-width: 200px">
+                                Select Distributor :<span class="red"> * </span>
+                            </label>
+                            <div class="col-sm-2" style="max-width: 200px">
+                                <select id="Select1" multiple size="10" ng-model="Distributer" ng-options="ps.DistributerId as ps.DistributerName for ps in DistributerList"
+                                    class="form-control">
+                                    <!--<option value="">--- Select ---</option>-->
+                                </select>
+                                <span style="display: none; color: Red;" id="Span1">Please Select Distributor </span>
+                            </div>
+                            <label for="" class="col-sm-2 control-label" style="max-width: 200px">
+                                Select Country :<span class="red"> * </span>
+                            </label>
+                            <div class="col-sm-2" style="max-width: 200px">
+                                <select id="Select2" multiple size="10" ng-model="Country" ng-options="ps.CountryId as ps.CountryName for ps in CountryList"
+                                    class="form-control">
+                                    <!--<option value="">--- Select ---</option>-->
+                                </select>
+                                <span style="display: none; color: Red;" id="Span2">Please Select Country </span>
+                            </div>
+                            <label for="" class="col-sm-2 control-label" style="max-width: 200px">
+                                Select Supplier :<span class="red"> * </span>
+                            </label>
+                            <div class="col-sm-2" style="max-width: 200px">
+                                <select id="Select3" multiple size="10" ng-model="Supplier" ng-options="ps.SupplierId as ps.SupplierName for ps in SupplierList"
+                                    class="form-control">
+                                    <!--<option value="">--- Select ---</option>-->
+                                </select>
+                                <span style="display: none; color: Red;" id="Span3">Please Select Supplier </span>
+                            </div>
+                            <div class="col-sm-2" style="margin-left: 500px">
+                                <input type="button" ng-click="GetValue()" id="Savebtn" value="Save" class="btn btn-sc" />
+                                <input type="button" ng-click="resetDropDown()" value="Reset" class="btn btn-sc" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tblProductDetails">
+                <div class="panel panel-primary">
+                    <div>
+                        &nbsp;</div>
+                    <div id="Div6">
+                        <div id="activeid" style="margin-left: 500px; font-weight: bold">
+                            These are the active restrictions.</div>
+                        <div id="Inactiveid" style="margin-left: 500px; font-weight: bold">
+                            There are no active restrictions.</div>
+                        <table ng-table="usersTable" show-filter="true" class="table">
+                            <tr ng-repeat="category in $data">
+                                <td>
+                                    <input type="checkbox" name="check1" id="chekid" />
+                                </td>
+                                <td data-title="'Impacted Distributor'" filter="{ 'DistributerName': 'text' }" sortable="'DistributerName'">
+                                    {{category.DistributerName}}
+                                </td>
+                                <td data-title="'Impacted Country'" filter="{ 'CountryName': 'text' }" sortable="'CountryName'">
+                                    {{category.CountryName}}
+                                </td>
+                                <td data-title="'Impacted Supplier'" filter="{ 'SupplierName': 'text' }" sortable="'SupplierName'">
+                                    {{category.SupplierName}}
+                                </td>
+                                <td>
+                                </td>
+                                <input type="button" id="Deletebtn" value="Delete" class="btn btn-sc" ng-click="removeRow()" />
+                            </tr>
+                            <tr>
+                            </tr>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                </div>
+            </div>
+            <div id="tblPopCharacteristics" class="panel panel-primary">
+            </div>
+            <div id='trParentSpeedFilters' class="panel panel-primary bg1" style="display: none;">
+                <div class="panel-body">
+                </div>
+            </div>
+            <div class="form-group">
+            </div>
+        </div>
+    
+        <div  id="divBTGFR" class="tab-pane">
+            <span style="font-size: large; margin-left: 500px">Create/Delete Restrictions </span>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <p style="color: Red;" class="Arrow">
+                        <span style="color: Black; font-weight: bold">Note:SLA Information You are defining
+                            which supplier a BT GFR Code is not allowed to see. If you do not specify, then
+                            all supplier will be accessible to the BT GFR Code. </span>
+                    </p>
+                </div>
+            </div>
+            <div class="panel panel-primary bg1">
+                <div class="panel-body">
+                    <div>
+                        &nbsp;&nbsp;</div>
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label" style="max-width: 200px">
+                                Select BT GFR :<span class="red"> * </span>
+                            </label>
+                            <div class="col-sm-2" style="max-width: 200px">
+                                <!--ng-change="GetHVPNPortTypes()"-->
+                                <select id="Select4" multiple size="10" ng-model="BTGFR" ng-options="ps.BTGFRId as ps.Description for ps in BTGFRList"
+                                    class="form-control">
+                                    <!--<option value="">--- Select ---</option>-->
+                                </select>
+                                <span style="display: none; color: Red;" id="Span4">Please Select BT GFR </span>
+                            </div>
+                            <label for="" class="col-sm-2 control-label" style="max-width: 200px">
+                                Select Country :<span class="red"> * </span>
+                            </label>
+                            <div class="col-sm-2" style="max-width: 200px">
+                                <!--ng-change="GetHVPNPortTypes()"-->
+                                <select id="Select5" multiple size="10" ng-model="Country" ng-options="ps.CountryId as ps.CountryName for ps in CountryList"
+                                    class="form-control">
+                                    <!--<option value="">--- Select ---</option>-->
+                                </select>
+                                <span style="display: none; color: Red;" id="Span5">Please Select Country </span>
+                            </div>
+                            <label for="" class="col-sm-2 control-label" style="max-width: 200px">
+                                Select Supplier :<span class="red"> * </span>
+                            </label>
+                            <div class="col-sm-2" style="max-width: 200px">
+                                <!--ng-change="GetHVPNPortTypes()"-->
+                                <select id="Select6" multiple size="10" ng-model="Supplier" ng-options="ps.SupplierId as ps.SupplierName for ps in SupplierList"
+                                    class="form-control">
+                                    <!--<option value="">--- Select ---</option>-->
+                                </select>
+                                <span style="display: none; color: Red;" id="Span6">Please Select Supplier </span>
+                            </div>
+                            <div class="col-sm-2" style="margin-left: 500px">
+                                <input type="button" ng-click="GetValue()" id="Savebtn" value="Save" class="btn btn-sc" />
+                                <input type="button" ng-click="resetDropDown()" value="Reset" class="btn btn-sc" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                &nbsp;&nbsp</div>
+            <div id="BTGFRdiv">
+                <div class="panel panel-primary">
+                    <div>
+                        &nbsp;</div>
+                    <div id="activeidBTGFR" style="margin-left: 500px; font-weight: bold">
+                        These are the active restrictions.</div>
+                    <div id="InactiveidBTGFR" style="margin-left: 500px; font-weight: bold">
+                        There are no active restrictions.</div>
+                    <table ng-table="usersTable" show-filter="true" class="table table-striped">
+                        <tr ng-repeat="category in data">
+                            <td>
+                                <input type="checkbox" name="check1" id="Checkbox1" />
+                            </td>
+                            <td data-title="'Impacted BTGFR'" filter="{ 'Description': 'text' }" sortable="'Description'">
+                                {{category.Description}}
+                            </td>
+                            <td data-title="'Impacted Country'" filter="{ 'CountryName': 'text' }" sortable="'CountryName'">
+                                {{category.CountryName}}
+                            </td>
+                            <td data-title="'Impacted Supplier'" filter="{ 'SupplierName': 'text' }" sortable="'SupplierName'">
+                                {{category.SupplierName}}
+                            </td>
+                            <td>
+                            </td>
+                            <input type="button" id="Remove" value="Delete" class="btn btn-sc" ng-click="removeRow()" />
+                        </tr>
+                        <tr>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    
+        <div id="divOrg"  class="tab-pane">
+            <span style="font-size: large; margin-left: 500px">Create/Delete Restrictions </span>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <p style="color: Red;" class="Arrow">
+                        <span style="color: Black; font-weight: bold">Note:You are defining which supplier a
+                            Organization Code is not allowed to see. If you do not specify, then all suppliers
+                            will be accessible to the Organization Code. </span>
+                    </p>
+                </div>
+            </div>
+            <div class="panel panel-primary bg1">
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label" style="max-width: 200px">
+                                Select Organization :<span class="red"> * </span>
+                            </label>
+                            <div class="col-sm-2" style="max-width: 200px">
+                                <select id="Select7" multiple size="10" ng-model="Organization" ng-options="ps.DistId as ps.DistName for ps in OrgList"
+                                    class="form-control">
+                                    <!--<option value="">--- Select ---</option>-->
+                                </select>
+                                <span style="display: none; color: Red;" id="Span7">Please Select Organization </span>
+                            </div>
+                            <label for="" class="col-sm-2 control-label" style="max-width: 200px">
+                                Select Country :<span class="red"> * </span>
+                            </label>
+                            <div class="col-sm-2" style="max-width: 200px">
+                                <select id="Select8" multiple size="10" ng-model="Country" ng-options="ps.CountryId as ps.CountryName for ps in CountryList"
+                                    class="form-control">
+                                    <!--<option value="">--- Select ---</option>-->
+                                </select>
+                                <span style="display: none; color: Red;" id="Span8">Please Select Country </span>
+                            </div>
+                            <label for="" class="col-sm-2 control-label" style="max-width: 200px">
+                                Select Supplier :<span class="red"> * </span>
+                            </label>
+                            <div class="col-sm-2" style="max-width: 200px">
+                                <select id="Select9" multiple size="10" ng-model="Supplier" ng-options="ps.SupplierId as ps.SupplierName for ps in SupplierList"
+                                    class="form-control">
+                                    <!--<option value="">--- Select ---</option>-->
+                                </select>
+                                <span style="display: none; color: Red;" id="Span9">Please Select Supplier </span>
+                            </div>
+                            <div class="col-sm-2" style="margin-left: 500px">
+                                <input type="button" ng-click="GetValue()" id="Savebtn" value="Save" class="btn btn-sc" />
+                                <input type="button" ng-click="resetDropDown()" value="Reset" class="btn btn-sc" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    &nbsp;&nbsp;</div>
+            </div>
+            <div>
+                &nbsp;</div>
+            <div id="Orgdiv">
+                <div class="panel panel-primary">
+                    <div id="activeidOrg">
+                        <span style="margin-left: 500px; font-weight: bold">These are the active restrictions.</span>
+                    </div>
+                    <div id="InactiveidOrg">
+                        <span style="margin-left: 500px; font-weight: bold">There are no active restrictions.
+                        </span>
+                    </div>
+                    <table ng-table="usersTable" show-filter="true" class="table table-striped">
+                        <tr ng-repeat="category in data">
+                            <td>
+                                <input type="checkbox" name="check1" id="Checkbox2" />
+                            </td>
+                            <td data-title="'Impacted Organization'" filter="{ 'Description': 'text' }" sortable="'Description'">
+                                {{category.Description}}
+                            </td>
+                            <td data-title="'Impacted Country'" filter="{ 'CountryName': 'text' }" sortable="'CountryName'">
+                                {{category.CountryName}}
+                            </td>
+                            <td data-title="'Impacted Supplier'" filter="{ 'SupplierName': 'text' }" sortable="'SupplierName'">
+                                {{category.SupplierName}}
+                            </td>
+                            <td>
+                            </td>
+                            <input type="button" id="Remove" value="Delete" class="btn btn-sc" ng-click="removeRow()" />
+                        </tr>
+                        <tr>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pageLoaderOverlay">
+</div>
+

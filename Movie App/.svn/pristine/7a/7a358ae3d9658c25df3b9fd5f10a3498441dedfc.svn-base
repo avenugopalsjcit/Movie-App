@@ -1,0 +1,115 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using SCAdminBAL;
+using System.Web.Services;
+using System.Data;
+namespace SCAdmin
+{
+    public partial class CPESupplierAdmin : System.Web.UI.Page
+    {
+
+        public static  CpeSupplierAdminBAL objsupplierBAL = new CpeSupplierAdminBAL();
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        [WebMethod]
+        public static List<SLAAccSupp> GetCPESuppliers()
+        {
+            return objsupplierBAL.GetCPESuppliers();
+        }
+
+        [WebMethod]
+
+        public static List<SLAAccSupp> GetCPESupplierTypes()
+        {
+            return objsupplierBAL.GetCPESupplierType();
+        }
+
+        [WebMethod]
+        public static List<SLAAccSupp> GetCPEPricingTypes()
+        {
+            return objsupplierBAL.GetCPEPricingTypes();
+        }
+
+        [WebMethod]
+
+        public static List<ProductDetails> GetProductBasedonSupplier(int supplierId)
+        {
+
+            return objsupplierBAL.GetProductBasedonSupplier(supplierId);
+        }
+
+        [WebMethod]
+
+        public static List<SLAAccSupp> GetSuppandPricesBasedonProd(int supplierId, int ProductID)
+        {
+            return objsupplierBAL.GetSuppandPricesBasedonProd(supplierId, ProductID);
+        }
+
+        [WebMethod]
+
+        public static List<SLAAccSupp> GetPricingTypesBasedonProd(int supplierId, int ProductID)
+        {
+            return objsupplierBAL.GetPricingTypesBasedonProd(supplierId, ProductID);
+        }
+        [WebMethod]
+        public static List<string> GetInstallerandMaintainerFlags(int supplierId)
+        {
+
+            return objsupplierBAL.GetInstallerandMaintainerFlags(supplierId);
+
+        }
+        [WebMethod]
+        public static List<string> OnSelectionSupptypeandPriceType(string supptype, string pricingtype)
+        {
+            return objsupplierBAL.OnSelectionSupptypeandPriceType(supptype, pricingtype);
+        }
+        [WebMethod]
+        public static List<CountryRestrictionDropDown> UnassignedCPESupplierCountries(int supplierId, string supptype, string pricingtype)
+        {
+            return objsupplierBAL.UnassignedCPESupplierCountries(supplierId, supptype, pricingtype);
+        }
+        [WebMethod]
+        public static List<AccessType> AssignedAccessTypes(int supplierId, string supptype)
+        {
+            return objsupplierBAL.AssignedAccessTypes(supplierId, supptype);
+        }
+        [WebMethod]
+        public static List<CountryRestrictionDropDown> AssignedCPESupplierCountries(int supplierId, int ProductID, string supptype, string pricingtype)
+        {
+            return objsupplierBAL.AssignedCPESupplierCountries(supplierId, ProductID, supptype, pricingtype);
+        }
+        [WebMethod]
+        public static List<ProductDetails> ValidOwnerCPEProducts()
+        {
+            return objsupplierBAL.ValidOwnerCPEProducts();
+        }
+
+        [WebMethod]
+        public static List<EmailsforCPEproducts> RetrieveEmailId(int SupplierId, int CountryId, string ProductIDs)
+        {
+            return objsupplierBAL.RetrieveEmailId(SupplierId, CountryId, ProductIDs);
+        }
+        [WebMethod]
+        public static int GetNonStandardConfiguration(int supplierId, int ProductID, string supptype, string pricingtype)
+        {
+            return objsupplierBAL.GetNonStandardConfiguration(supplierId,ProductID, supptype, pricingtype);
+        }
+        [WebMethod]
+        public static List<CPESupplierfootertblData> GetAllFooterTableDetails(int supplierId)
+        {
+            return objsupplierBAL.GetAllFooterTableDetails(supplierId);
+        }
+        [WebMethod]
+        public static List<CPESupplierfootertblData> EmailAssignUnAssignGridData(int supplierId)
+        {
+            return objsupplierBAL.EmailAssignUnAssignGridData(supplierId);
+        }
+    }
+}

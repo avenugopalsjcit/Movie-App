@@ -1,0 +1,344 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SCAdminDAL;
+using System.Data;
+using PCDataAccess;
+using Newtonsoft.Json;
+using SCAdminBAL.MCU;
+using PCDataAccess_V;
+
+namespace SCAdminBAL
+{
+    public class MCUBAL
+    {
+        MCUDAL objMCUDAL = new MCUDAL();
+        public string LoadOwnerProducts(string UserID)
+        {
+            // DataTable dtPoPProd = objMCUDAL.LoadOwnerProducts(UserID);
+            //  DataTable dtCountryProd = objMCUDAL.LoadOwnerProducts_HVPN(UserID);
+
+            //MCUProdcuctList objMCUProdcuctList = new MCUProdcuctList();
+            //objMCUProdcuctList.CountryLevelCases = new List<CountryLevelProductCases>();
+            //objMCUProdcuctList.PoPLevelCase = new List<PoPLevelProductCases>();
+            //foreach (DataRow dr in dtPoPProd.Rows)
+            //{
+            //    PoPLevelProductCases objProd = new PoPLevelProductCases();
+            //    objProd.ProductCD = Convert.ToString(dr["Product_cd"]);
+            //    objProd.ProductName = Convert.ToString(dr["Product_name"]);
+            //    objMCUProdcuctList.PoPLevelCase.Add(objProd);
+            //}
+
+            //foreach (DataRow dr in dtCountryProd.Rows)
+            //{
+            //    CountryLevelProductCases objcountryProd = new CountryLevelProductCases();
+            //    objcountryProd.ProductCD = Convert.ToString(dr["Product_cd"]);
+            //    objcountryProd.ProductName = Convert.ToString(dr["Product_name"]);
+            //    objMCUProdcuctList.CountryLevelCases.Add(objcountryProd);
+            //}
+
+            DataTable dtPoPProd = objMCUDAL.getAllProduct(UserID);
+            return JsonConvert.SerializeObject(dtPoPProd);
+        }
+
+
+        public string getAvailability()
+        {
+            DataSet dsData = new DataSet();
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            dsData = oDataAccess.GetAvailabilities();
+            return JsonConvert.SerializeObject(dsData.Tables[0]);
+        }
+
+        public AccessFilter GetAccessFilterData(int[] SelectedCases, int[] SelectedPops, int[] SelectedPortSpeeds, int ProdCd, int SubProdCd)
+        {
+            //DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            //try
+            //{
+            //    dsData = oDataAccess.GetAccessFilterInfo(SelectedCases, SelectedPops, SelectedPortSpeeds, ProdCd, SubProdCd);
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw;
+            //}
+
+            dsData = objMCUDAL.GetAccessFilterInfo(SelectedCases, SelectedPops, SelectedPortSpeeds, ProdCd, SubProdCd);
+
+
+            AccessFilter objAccFilter = new AccessFilter();
+            objAccFilter.lstAccSupp = new List<MCUAccessSupp>();
+            objAccFilter.lstAccSuppProd = new List<MCUSupplierProd>();
+            objAccFilter.lstAccTech = new List<MCUAccessTech>();
+            DataView dvAS = new DataView();
+            DataRow[] x = null;
+            //Added by Vikas : R33 changes
+            List<string> Supplist = new List<string>();
+            //access-supplier combinations for the selected port speeds
+            dvAS = dsData.Tables[0].DefaultView;
+            x = dsData.Tables[0].Select("0=0", "supplier Asc");
+
+            string z = "";
+            for (int j = 0; j < dvAS.Count; j++)
+            {
+                if (x[j]["supplier"].ToString() != z)
+                {
+                    MCUAccessSupp objAccSupp = new MCUAccessSupp();
+                    objAccSupp.suppId = x[j]["supplier_id"].ToString();
+                    objAccSupp.suppName = x[j]["supplier"].ToString();
+                    objAccSupp.suppProdID = x[j]["supp_prdt_id"].ToString();
+                    objAccFilter.lstAccSupp.Add(objAccSupp);
+                    Supplist.Add(x[j]["supplier"].ToString());
+                }
+                z = x[j]["supplier"].ToString();
+            }
+
+
+            x = dsData.Tables[0].Select("0=0", "supplierproduct Asc");
+
+
+
+            objAccFilter.lstAccSuppProd = new List<MCUSupplierProd>();
+            z = "";
+            for (int i = 0; i < dvAS.Count; i++)
+            {
+
+                if (x[i]["supplierproduct"].ToString() != z)
+                {
+                    MCUSupplierProd objAccSuppProd = new MCUSupplierProd();
+                    objAccSuppProd.suppProdID = x[i]["Supp_PRDT_ID"].ToString();
+                    objAccSuppProd.suppProdName = x[i]["supplierproduct"].ToString();
+                    objAccSuppProd.suppId = x[i]["supplier_id"].ToString();
+                    objAccFilter.lstAccSuppProd.Add(objAccSuppProd);
+                }
+
+                z = x[i]["supplierproduct"].ToString();
+            }
+
+
+           // DataSet dsAccessType = null;
+            objAccFilter.lstAccTech = new List<MCUAccessTech>();
+
+            x = dsData.Tables[0].Select("0=0", "accesstype Asc");
+            z = "";
+            for (int i = 0; i < dvAS.Count; i++)
+            {
+                if (x[i]["accesstype"].ToString() != z)
+                {
+                    MCUAccessTech obj = new MCUAccessTech();
+                    obj.AccTechId = x[i]["Accesstype_Id"].ToString();
+                    obj.AccTechName = x[i]["accesstype"].ToString();
+                    objAccFilter.lstAccTech.Add(obj);
+                }
+                z = x[i]["accesstype"].ToString();
+            }
+
+
+
+
+
+            //End R33 changes for commenting above code
+            //Added by Vikas : R33 ddl changes start
+            //Access Technology ddl to be filtered with Phase-Attributes
+            //if (Supplist.Count > 0)
+            //{
+            //    string[] SupplistArr = Supplist.ToArray();
+
+            //    dsAccessType = objMCUDAL.getAccessTypeWithPhaseAttribute(ProdCd, SubProdCd, SelectedCases, SupplistArr);
+            //    DataSet dsAT = new DataSet();
+            //    dsAT = dsAccessType.Copy();
+            //    dsAccessType.Dispose();
+            //    DataView dvAT = new DataView();
+            //    DataRow[] v = null;
+            //    dvAT = dsAT.Tables[0].DefaultView;
+            //    v = dsAT.Tables[0].Select("0=0", "accesstype Asc");
+            //    z = "";
+
+            //    for (int i = 0; i < dvAT.Count; i++)
+            //    {
+            //        if (v[i]["accesstype"].ToString() != z)
+            //        {
+            //            MCUAccessTech obj = new MCUAccessTech();
+            //            obj.AccTechId = v[i]["SupplierAccessType_ID"].ToString() + "-" + v[i]["AccessType"].ToString();
+            //            obj.AccTechName = v[i]["accesstype"].ToString();
+            //            objAccFilter.lstAccTech.Add(obj);
+            //        }
+            //        z = v[i]["accesstype"].ToString();
+            //    }
+            //}
+            //else
+            //{
+            //    x = dsData.Tables[0].Select("0=0", "accesstype Asc");
+            //    z = "";
+            //    for (int i = 0; i < dvAS.Count; i++)
+            //    {
+            //        if (x[i]["accesstype"].ToString() != z)
+            //        {
+            //            MCUAccessTech obj = new MCUAccessTech();
+            //            obj.AccTechId = x[i]["Accesstype_Id"].ToString();
+            //            obj.AccTechName = x[i]["accesstype"].ToString();
+            //            objAccFilter.lstAccTech.Add(obj);
+            //        }
+            //        z = x[i]["accesstype"].ToString();
+            //    }
+            //}
+
+            return objAccFilter;
+
+        }
+
+        public string GetAccessFilterDataHVPN(int productId, int subProductId, int[] country, int selectedState, int[] popList, int[] caseList)
+        {
+            DataSet dtAccessFilter = objMCUDAL.GetAccessFilterHvpn(productId, subProductId, country, selectedState, popList, caseList);
+            return JsonConvert.SerializeObject(dtAccessFilter.Tables[0]);
+        }
+
+        public string GetPortSpeedData(Int32 ProductCd, Int32 SubproductCd)
+        {
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            try
+            {
+                dsData = oDataAccess.GetPortSpeedInfo(ProductCd, SubproductCd);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return JsonConvert.SerializeObject(dsData.Tables[0]);
+        }
+
+        public string GetHVPNPortSpeed(Int32 ProductCd, Int32 SubproductCd, int[] country, int selectedState, int[] popList, int[] caseList)
+        {
+            DataRetrieval_V oDataAccess = new DataRetrieval_V(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            DataTable dtAccessSupp = null;
+            DataTable dtSuppProd = null;
+            DataTable dtAcccessType = null;
+            DataSet dtAccessFilter = new DataSet();
+            try
+            {
+                dsData = oDataAccess.GetPortSpeedInfohvpn(ProductCd, SubproductCd);
+                dtAccessFilter = objMCUDAL.GetAccessFilterHvpn(ProductCd, SubproductCd, country, selectedState, popList, caseList);
+
+                DataView view = new DataView(dtAccessFilter.Tables[0]);
+                dtAccessSupp = view.ToTable(true, "SUPPLIER_NAME");
+                dtSuppProd = view.ToTable(true, "SUPPLIERPRODUCTNAME");
+                dtAcccessType = view.ToTable(true, "ACCESS_TYPE");
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return "[" + JsonConvert.SerializeObject(dsData.Tables[0]) + ","
+                + JsonConvert.SerializeObject(dtAccessSupp) + ","
+                + JsonConvert.SerializeObject(dtSuppProd) + ","
+                + JsonConvert.SerializeObject(dtAcccessType) + "]";
+        }
+
+        public string GetCharectristic(Int32 ProductCd, Int32 SubproductCd, int LocLevel, int ParentProductCd)
+        {
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            DataTable dtChar = new DataTable();
+            try
+            {
+                dsData = oDataAccess.GetCharInfo(ProductCd, SubproductCd);
+
+                if (LocLevel == 4 && ProductCd != 25)
+                {
+                    DataRow newRow = dsData.Tables[0].NewRow();
+                    newRow["Char_Type_Id"] = "-1";
+                    newRow["Char_Type_Name"] = "Access Suppliers";
+                    dsData.Tables[0].Rows.Add(newRow);
+                }
+                if (ParentProductCd > 0)
+                {
+                    DataRow newRow = dsData.Tables[0].NewRow();
+                    newRow["Char_Type_Id"] = "-2";
+                    newRow["Char_Type_Name"] = "Parent Port Speeds";
+                    dsData.Tables[0].Rows.Add(newRow);
+                }
+
+                DataView dvChartypelist = new DataView();
+                dvChartypelist = dsData.Tables[0].DefaultView;
+                dvChartypelist.Sort = "Char_Type_Name asc";
+                dtChar = dvChartypelist.ToTable();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            string abc = "[" + JsonConvert.SerializeObject(dtChar) + "," + JsonConvert.SerializeObject(dsData.Tables[1]) + "]";
+
+            // return JsonConvert.SerializeObject(dtChar);
+            return abc;
+        }
+
+        public string[] UpdateCase(string json)
+        {
+            MCUUpdateCaseParam oMCUUpdateCaseParam = JsonConvert.DeserializeObject<MCUUpdateCaseParam>(json);
+            Cases oCases = new Cases();
+
+            return oCases.UpdateCases(
+              oMCUUpdateCaseParam.LocLevel,
+              oMCUUpdateCaseParam.ProductCd,
+              oMCUUpdateCaseParam.SubProductCd,
+              oMCUUpdateCaseParam.UserId,
+              oMCUUpdateCaseParam.iPopId,
+              oMCUUpdateCaseParam.iCaseId,
+              oMCUUpdateCaseParam.pavailcd,
+              oMCUUpdateCaseParam.pcasevalidcd,
+              oMCUUpdateCaseParam.pcharid,
+              oMCUUpdateCaseParam.pcharavailcd,
+              oMCUUpdateCaseParam.pchartypeid,
+              oMCUUpdateCaseParam.pcharvalue,
+              oMCUUpdateCaseParam.pcharvalue2,
+              oMCUUpdateCaseParam.pportspeedcharid,
+              oMCUUpdateCaseParam.paccessspeedcharid,
+              oMCUUpdateCaseParam.psuppliercharid,
+              oMCUUpdateCaseParam.ptypecharid,
+              oMCUUpdateCaseParam.pnamecharid,
+              oMCUUpdateCaseParam.pportavailability,
+              oMCUUpdateCaseParam.pportvalidity,
+              oMCUUpdateCaseParam.pportspeedcharcount,
+              oMCUUpdateCaseParam.paccessspeedcharcount,
+              oMCUUpdateCaseParam.pchardetailvalidcd,
+              oMCUUpdateCaseParam.poffnetleadtime,
+              oMCUUpdateCaseParam.paccesssupplierid,
+              oMCUUpdateCaseParam.paccesssuppliervalid,
+              oMCUUpdateCaseParam.pparentportspeeds,
+              oMCUUpdateCaseParam.pparentportspeedvalid,
+              oMCUUpdateCaseParam.pparentaccessproducttypeid,
+              oMCUUpdateCaseParam.pparentaccesssuppliernameid,
+              oMCUUpdateCaseParam.pparentaccesssuppliercharid,
+              oMCUUpdateCaseParam.pparentaccessspeedcharid,
+              oMCUUpdateCaseParam.pCharCount,
+              oMCUUpdateCaseParam.pAccessSupplierCount,
+              oMCUUpdateCaseParam.pParentportSpeedCount,
+              oMCUUpdateCaseParam.pCarrier,
+              oMCUUpdateCaseParam.pCPESupplier,
+              oMCUUpdateCaseParam.strInsertCaseIds,
+              oMCUUpdateCaseParam.strRemoveCaseIds,
+              oMCUUpdateCaseParam.pPlatformcharid,
+              oMCUUpdateCaseParam.pCountryID
+              );
+        }
+
+        public string getValidAccessType(int productID)
+        {
+            MCUDAL objMCUDAL = new MCUDAL();
+            DataTable dtAccess = objMCUDAL.getValidAccessType(productID);
+            return JsonConvert.SerializeObject(dtAccess);
+        }
+
+        public string CaseIdExists(int[] caseIDs)
+        {
+            MCUDAL oMCUDAL = new MCUDAL();
+            DataTable dtCaseExist = oMCUDAL.CaseIdExists(string.Join(",", caseIDs));
+            return JsonConvert.SerializeObject(dtCaseExist);
+        }
+    }
+}

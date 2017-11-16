@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="../BootStrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../BootStrap/css/styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body ng-app="appModule">
+   
+    <div ng-controller="dispAccessDetContrl" class="clsallignpopupcontainer">
+        <div class="PaddingBottomforModalPops">
+            <button type="button" class="close" ng-click="$dismiss()">
+                &times;</button><br />
+        </div>
+        
+        
+        <div class="panel panel-primary bg1 searchFilter">
+        
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label">
+                            State/Province</label>
+                        <div class="col-sm-3">
+                            <select ng-change="GetCities(modproduct,modregion,modcountry,modstate)" ng-model="modstate"
+                                ng-options="state.StateID as state.StateName for state in StateData" class="form-control">
+                                <option value="">--- Select ---</option>
+                            </select>
+                            <span style="display: none; color: Red;" class="ValidateState Arrow">Please select state</span>
+                        </div>
+                        <label for="" class="col-sm-2 control-label">
+                            City <span class="red">* </span>
+                        </label>
+                        <div class="col-sm-3">
+                            <select ng-change="GetPops(modproduct,modregion,modcountry,modstate,modCity)" ng-model="modCity"
+                                ng-options="city.CityID as city.CityName for city in CityData" class="form-control">
+                                <option value="">--- Select ---</option>
+                            </select>
+                            <span style="display: none; color: Red;" class="ValidateCity Arrow">Please Select City</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label lblPoP" ng-hide="modproduct==15">
+                            PoP <span class="red">* </span>
+                        </label>
+                        <div class="col-sm-3" ng-hide="modproduct==15">
+                            <select ng-model="modPoP" id="ddlPoP" ng-change="GeInfoByPop()" ng-options="item.POPID as item.PopName for item in PopData"
+                                class="form-control">
+                                <option value="">--- Select ---</option>
+                            </select>
+                            <span style="display: none; color: Red;" class="ValidatePOP Arrow">Please Select PoP</span>
+                        </div>
+                        <label id="" for="" class="col-sm-2 control-label acclblPlatform">
+                            Network Platform <span class="red">* </span>
+                        </label>
+                        <div id="" class="col-sm-3 accddlPlatform">
+                            <select id="ddlNetworkPlatform" ng-model="modNetworkPlatform" ng-options="item.ID as item.NetworkPlatform for item in NetworkPlatformData"
+                                class="form-control">
+                                <option value="">--- Select ---</option>
+                            </select>
+                            <span style="display: none; color: Red;" id="validateNetworkPlatform" class="Arrow">
+                                Please select Network Platform</span>
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="button" ng-click="GetAccessDetails()" value="GO" class="btn btn-sc" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+
+        <div class="panel panel-primary panelAccDet" ng-hide="ShowAccessDetailsDocLinks==0">
+            <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                data-target="#AccessDocuments">
+                <h3 class="panel-title">
+                    Product Documents</h3>
+                <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i>
+                </span>
+            </div>
+            <div id="AccessDocuments" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div ng-controller="DocumentLinkscntrl" id="ProductDocLinks">
+                        <div class="row">
+                            <div class="col-md-6 col-lg-6 text-left">
+                                <table>
+                                    <tr ng-repeat="dc in DocumentslinksData">
+                                        <td>
+                                            <a href="{{dc.DocumentUrl}}" target="_blank">{{dc.DocumentTitle}}</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-primary bg1 panelAccDet">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="col-sm-1 control-label">
+                            Supplier</label>
+                        <div class="col-sm-3">
+                            <!--ng-options="item.Item1 as item.Item2 for item in AccSuppList"-->
+                            <select class="form-control" style="width: 100%; display: none" id="AccessSupp" ng-change="getAccDetForSupp()"
+                                ng-model="modAccSupp" ng-options="item.Item1 as item.Item2 for item in AccSuppList">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="slainfo" class="row panelAccDet PaddingBottom ">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+                <span class="Arrow"><b>SLA Information:</b><font color="Red"> These SLAs are BT's internal
+                    SLAs with our Access Suppliers. They are<u> NOT TO BE QUOTED TO END CUSTOMERS</u>.
+                    The terms of the SLA between the customer and BT is covered under the relevant BT
+                    product terms and conditions for the whole service (e.g. BT MPLS).</font> </span>
+            </div>
+        </div>
+        <div id="AccessDetailsTableDiv" class="scrollbar" style="padding-right:0px;padding-left:0px;">
+            <table id="AccdetList" class="table table-bordered tblnowrap panelAccDet" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th class="Arrow">
+                        Speed
+                    </th>
+                    <th class="Arrow">
+                        Access Type
+                    </th>
+                    <th class="Arrow">
+                        Supplier Product Name
+                        <br />
+                        / BT Internal SLA Information
+                    </th>
+                    <th class="Arrow">
+                        Access Display Interface
+                    </th>
+                </tr>
+                <tr ng-repeat="item in AccDetList">
+                    <td class="Arrow">
+                        {{item.Speed}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.AccType}}
+                    </td>
+                    <td>
+                        <a class="clickable1" ng-click="openSLAPopup(item.AccSupplier,item.suppProdName,item.AccSuppID,item.AccSuppProdID,item.AccTypeTypeId,item.AccSpeedID,item.Speed)">
+                            {{item.suppProdName}}</a>
+                    </td>
+                    <td class="Arrow">
+                        {{item.AccessInterface}}
+                    </td>
+                </tr>
+                <tr>
+                   
+                </tr>
+            </table>
+            <div class="alert alert-danger noDataBndle Arrow" role="alert"   ng-if="AccDetList.length === 0">
+                No Data Available for this Country and Product</div>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+</body>
+</html>

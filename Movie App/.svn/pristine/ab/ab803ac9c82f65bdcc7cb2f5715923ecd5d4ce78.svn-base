@@ -1,0 +1,117 @@
+﻿
+<div ng-controller="CpeLeadTime">
+<div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="panel panel-primary" >
+                    <div class="panel-heading Arrow" >
+                        CPE Lead Time & CPE Lead Time Status</div>
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                        <table>
+                        <tr>
+                        <td style="vertical-align:top;padding-left:20px;" >
+                            <div class="form-group">
+                                <label for="" >
+                                    CPE Supplier:
+                                </label><br />
+                                <div class="col-sm-12" style="margin-left:0px; width:240px;padding-left:0px !important;">
+                                    <select id="suppname" ng-change="GetSuppliers(form.modsupplier)"
+                                     ng-model="form.modsupplier" required
+                                      ng-options="item.supplierId as item.supplierName for item in CpeSupplierData"
+                                        class="form-control">
+                                      
+                                    </select>
+
+                                </div><br />
+                                <div class="bodyText" style="font-size:10;vertical-align:top;width:225px;">
+                                <b>NOTE:</b>
+	                    <br/>1.	Asterix (*) next to the country name and the Chocolate Brown colour represents that the selected Supplier is the Preferred SSP for these countries.
+                        <br/>2. The CPE Lead Time Status should be selected for all the countries whose CPE Availability is set to Available, ICB. If the CPE Lead Time Status is not given by the Preferred SSP then that country will not appear for Quote Creation in CPE+.
+                        <br/>3.	The CPE Lead Time is mandatory for all countries whose CPE Lead Time Status is set as ‘Standard’ or ‘Estimate’. The CPE Lead Time is not mandatory if the CPE Lead Time Status is set to 'ICB'.
+                        <br/>4. If for a country the CPE Lead Time is not known from the Preferred SSP then set the CPE Lead Time Status to ICB and then CPE Lead Time can be left Blank.
+                        <br/>5.	The CPE Lead Time should always be given in No. of Calendar days.            
+                        <br/><div style="color:Red">6.Some countries will not appear in the Quote creation in CPE+ as they don't have the Maintenance option or the CPE Lead Time and Status or both from the Preferred SSP
+                                    . Please go to Admin ->CPE -> CPE Supplier Report to find out those Countries.</div>
+                        7. Red color dates are indicating supplier has crossed EoM date for a given country.
+                        </div>
+                                </td>
+                                 <td style="vertical-align:top; padding-top:15px;padding-left:3px;" >
+                                <div>
+                                    <table cellpadding="0" cellspacing="0" class="table table-bordered" >
+                                        <thead>
+                                            <tr>
+                                                <th style="vertical-align:middle;">
+                                                    Country
+                                                </th>
+                                                <th style="vertical-align:middle;">
+                                                    Manufacturer Name
+                                                </th>
+                                                <th style="vertical-align:middle;">
+                                                    CPE Availability
+                                                </th>
+                                                <th style="vertical-align:middle;">
+                                                    CPE Lead Time
+                                                </th>
+                                                <th style="vertical-align:middle;">
+                                                    Lead time status
+                                                </th>
+                                                <th style="vertical-align:middle;">
+                                                    EOC
+                                                </th>
+                                                <th style="vertical-align:middle;">
+                                                    EOM
+                                                </th>
+                                                <th style="vertical-align:middle;">
+                                                    CPE Cease LeadTime
+                                                </th>
+                                                <th style="vertical-align:middle;">
+                                                    CPE Cease LeadTime Status
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="suppliers in bindSupplier">
+                                                <td>
+                                                    {{suppliers.countryname}}
+                                                </td>
+                                                <td>
+                                                    {{suppliers.manufacturerName}}
+                                                </td>
+                                                <td>
+                                                    {{suppliers.cpeAvailability}}
+                                                </td>
+                                                <td>
+                                                    {{suppliers.leadTime}}
+                                                </td>
+                                                <td>
+                                                    {{suppliers.leadTimeStatus}}
+                                                </td>
+                                                <td>
+                                                    {{suppliers.endOfContractDate}}
+                                                </td>
+                                                <td>
+                                                    {{suppliers.endOfMigrationDate}}
+                                                </td>
+                                                <td>
+                                                    {{suppliers.cpeCeaseLeadTime}}
+                                                </td>
+                                                <td>
+                                                    {{suppliers.cpeCeaseLeadTimeStatus}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </td> 
+                                </tr>
+                               
+                                </table>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="panel-footer"></div>-->
+               
+            </div>
+</div>

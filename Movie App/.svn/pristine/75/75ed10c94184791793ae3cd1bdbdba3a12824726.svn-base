@@ -1,0 +1,376 @@
+﻿app.controller("CapmanReportCtrl", function ($scope, $http, $sce, CapmanReport, NgTableParams, JSONToCSVConvertor) {
+    $(".pageLoaderOverlay").show();
+    $scope.ReportData = false;
+    $scope.POPData = false;
+    $scope.NoReportData = false;
+    $scope.SupplierData = false;
+    $scope.AccessSpeedData = false;
+    $scope.DisplayInterfaceData = false;
+    $scope.NoSubProductData = false;
+    $scope.NoCapmanReport = false;
+    $scope.NoInterfaceData = false;
+    $scope.ShowGoAccessButtons = false;
+    $scope.NoSpeedProductData = false;
+    $scope.NoSuplierProductData = false;
+    $scope.showCountry = false;
+    $scope.modCountryType = [];
+    $scope.modSupplierType = [];
+    $scope.modAccessSpeed = [];
+    $scope.modDisplayInterface = [];
+    $scope.ExportCapmanReportData = [];
+    $scope.userId = 608619284;
+    $scope.isuperuser = true;
+    $scope.showExport = false;
+    $scope.showExportDiv = false;
+    $scope.NoProductData = false;
+    $scope.HideSubProductData = false;
+    $scope.NoCountryDataInProdReport = false;
+    //  $(".pageLoaderOverlay").hide();
+    CapmanReport.FetchProducts($scope.userId, $scope.isuperuser).success(function (data) {
+
+        var result = [];
+        $scope.ProductsType = data.d;
+        $("#Select1").select2({});
+        $("#Select2").select2({});
+        $("#Select5").select2({});
+        $("#Select6").select2({});
+        $(".pageLoaderOverlay").hide();
+    });
+
+    $scope.GetProducts = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.ReportData = false;
+        $scope.NoReportData = false;
+        $scope.SupplierData = false;
+        $scope.POPData = false;
+        $scope.AccessSpeedData = false;
+        $scope.DisplayInterfaceData = false;
+        $scope.NoCapmanReport = false;
+        $scope.NoInterfaceData = false;
+        $scope.showExport = false;
+        $scope.ShowGoAccessButtons = false;
+        $scope.NoSpeedProductData = false;
+        $scope.NoSuplierProductData = false;
+        $scope.showExportDiv = false;
+        $scope.showCountry = false;
+        $scope.NoProductData = false;
+        $scope.NoCountryDataInProdReport = false;
+        $scope.HideSubProductData = false;
+        $scope.modCountryType = "";
+        $('#countryDiv .select2-chosen').html("-- Please Select --");
+        $('#subProductDiv .select2-chosen').html("-- Please Select --");
+        if ($scope.modProductType != null) {
+            CapmanReport.FetchSubProducts($scope.modProductType).success(function (data) {
+                $scope.showExport = false;
+                if (data.d.length > 0 && $scope.modProductType != 25) {
+                    $scope.NoSubProductData = true;
+                    $scope.NoCapmanReport = false;
+                    $scope.showCountry = false;
+                    $scope.SubProductsType = data.d;
+                }
+                else {
+                    CapmanReport.FetchCountriesByProduct($scope.modProductType).success(function (data) {
+                        $scope.NoSubProductData = false;
+                        $scope.NoReportData = false;
+                        $scope.NoCapmanReport = false;
+                        $scope.showExport = false;
+                        $scope.showCountry = true;
+                        $scope.CountriesType = data.d;
+                        $(".pageLoaderOverlay").hide();
+                    });
+                }
+                
+                if ($scope.modSubProductType != undefined) {
+                    if ($scope.modSubProductType.length > 0) {
+                        $scope.NoSubProductData = true;
+                    }
+                }
+
+                if ($scope.modProductType == 25) {
+                    $scope.NoReportData = false;
+                }
+                $(".pageLoaderOverlay").hide();
+            });
+
+        }
+        else {
+            $scope.NoProductData = true;
+            $scope.NoSubProductData = false;
+            $(".pageLoaderOverlay").hide();
+        }
+    }
+    $scope.GetSubProducts = function () {
+        $(".pageLoaderOverlay").hide();
+        $('#countryDiv .select2-chosen').html("-- Please Select --");
+        $scope.NoReportData = false;
+        $scope.showExport = false;
+        $scope.ShowGoAccessButtons = false;
+        $scope.NoSpeedProductData = false;
+        $scope.NoSuplierProductData = false;
+        $scope.showExportDiv = false;
+        $scope.showCountry = true;
+        $scope.HideSubProductData = false;
+        $scope.NoCountryDataInProdReport = false;
+        if ($scope.modSubProductType != null) {
+            if ($scope.modCountryType != undefined) {
+                if ($scope.modCountryType.length != 0) {
+                    $(".pageLoaderOverlay").show();
+                }
+                if ($scope.modSubProductType == undefined) {
+                    $scope.modSubProductType = 0;
+                }
+                CapmanReport.FetchCountriesByProduct($scope.modProductType).success(function (data) {
+                    $scope.NoReportData = false;
+                    $scope.NoCapmanReport = false;
+                    $scope.showExport = false;
+                    $scope.showCountry = true;
+                    $scope.CountriesType = data.d;
+                    $(".pageLoaderOverlay").hide();
+
+                });
+            }
+        }
+        else {
+            $scope.HideSubProductData = true;
+            $scope.showCountry = false;
+            $scope.ReportData = false;
+            $scope.POPData = false;
+            $scope.NoReportData = false;
+            $scope.NoCapmanReport = false;
+            $scope.NoInterfaceData = false;
+            $scope.ShowGoAccessButtons = false;
+            $scope.NoSpeedProductData = false;
+            $scope.NoSuplierProductData = false;
+            $scope.showExportDiv = false;
+        }
+    }
+    $scope.GetCountries = function () {
+        $scope.showExport = false;
+        $scope.ReportData = false;
+        $scope.POPData = false;
+        $scope.NoReportData = false;
+        $scope.NoCapmanReport = false;
+        $scope.NoInterfaceData = false;
+        $scope.ShowGoAccessButtons = false;
+        $scope.NoSpeedProductData = false;
+        $scope.NoSuplierProductData = false;
+        $scope.showExportDiv = false;
+        $scope.showCountry = true;
+        $scope.NoCountryDataInProdReport = false;
+        $scope.HideSubProductData = false;
+        if ($scope.modCountryType != null) {
+            if ($scope.modProductType == 25) {
+                $scope.modSupplierType = "";
+                $scope.modAccessSpeed = "";
+                $scope.modDisplayInterface = "";
+
+                CapmanReport.FetchAccessSuppliers($scope.modCountryType).success(function (data) {
+                    $scope.SupplierData = true;
+                    $scope.AccessSpeedData = false;
+                    $scope.DisplayInterfaceData = false;
+
+                    var aaa = data.d;
+                    var defaultval = { SupplierId: -1, SupplierName: 'All' };
+                    aaa.splice(0, 0, defaultval);
+                    $scope.SuppliersType = data.d;
+                    $(".pageLoaderOverlay").hide();
+                });
+            }
+            else {
+                $(".pageLoaderOverlay").show();
+                if ($scope.modSubProductType == undefined) {
+                    $scope.modSubProductType = 0;
+                }
+                CapmanReport.FetchCityPOPSData($scope.modCountryType, $scope.modProductType, $scope.modSubProductType).success(function (data) {
+                    if (data.d.length > 0) {
+                        $scope.NoReportData = false;
+                        $scope.POPData = true;
+                        $scope.ReportData = false;
+                        $scope.SupplierData = false;
+                        $scope.AccessSpeedData = false;
+                        $scope.DisplayInterfaceData = false;
+                        $scope.ExportCapmanReportData = [];
+                        data.d.forEach(function (item) {
+                            $scope.ExportCapmanReportData.push({ 'Country': item.Country, 'City - PoP': item.CityPop.replace(/<font color='green'>/g, "").replace(/font>/g, "").replace(/</g, "").replace(/,/g, ";").replace("/", ""), 'Access Speeds': item.Speed.replace(/<font color='green'>/g, "").replace(/font>/g, "").replace(/</g, "").replace(/,/g, ";").replace("/", "").replace(/\r\n/g, "") });
+                        });
+                        $scope.POPTable = new NgTableParams({}, { 'dataset': data.d });
+                        $scope.showExport = true;
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    else {
+                        $scope.NoReportData = true;
+                        $scope.ReportData = false;
+                        $scope.SupplierData = false;
+                        $scope.POPData = false;
+                        $scope.AccessSpeedData = false;
+                        $scope.DisplayInterfaceData = false;
+                        $scope.showExport = false;
+                        $(".pageLoaderOverlay").hide();
+                    }
+
+                });
+            }
+        }
+        else {
+            $scope.NoCountryDataInProdReport = true;
+            $scope.NoReportData = false;
+            $scope.ReportData = false;
+            $scope.SupplierData = false;
+            $scope.POPData = false;
+            $scope.AccessSpeedData = false;
+            $scope.DisplayInterfaceData = false;
+            $scope.showExport = false;
+            $(".pageLoaderOverlay").hide();
+        }
+
+    }
+
+    $scope.GetSuppliers = function () {
+        $scope.ReportData = false;
+        $scope.POPData = false;
+        $scope.NoCapmanReport = false;
+        $scope.NoInterfaceData = false;
+        $scope.NoSpeedProductData = false;
+        $scope.ShowGoAccessButtons = false;
+        $scope.showExportDiv = false;
+        $scope.showExport = false;
+        $scope.showCountry = true;
+        $(".pageLoaderOverlay").hide();
+        if ($scope.modProductType == 25) {
+            $scope.modAccessSpeed = "";
+            $scope.modDisplayInterface = "";
+        }
+        if ($scope.modSupplierType == undefined || $scope.modSupplierType == "") {
+            $scope.NoSuplierProductData = true;
+            $scope.NoSpeedProductData = false;
+            $scope.AccessSpeedData = false;
+        }
+        else {
+            $scope.AccessSpeedData = true;
+            $scope.NoSuplierProductData = false;
+        }
+        CapmanReport.FetchAccessSpeeds($scope.modCountryType, $scope.modSupplierType).success(function (data) {
+            $scope.SupplierData = true;
+            $scope.DisplayInterfaceData = false;
+            var aaa = data.d;
+            var defaultval = { AccessSpeedId: -1, AccessSpeedValue: 'All' };
+            aaa.splice(0, 0, defaultval);
+            $scope.AccessSpeedType = aaa;
+        });
+    }
+
+    $scope.GetAccessSpeed = function () {
+        $scope.ReportData = false;
+        $scope.POPData = false;
+        $scope.NoCapmanReport = false;
+        $scope.NoInterfaceData = false;
+        $scope.showExport = false;
+        $scope.showExportDiv = false;
+        $scope.ShowGoAccessButtons = false;
+        $scope.showCountry = true;
+        $(".pageLoaderOverlay").hide();
+        if ($scope.modProductType == 25) {
+            $scope.modDisplayInterface = "";
+        }
+        if ($scope.modAccessSpeed == undefined || $scope.modAccessSpeed == "") {
+            $scope.NoSpeedProductData = true;
+            $scope.DisplayInterfaceData = false;
+        }
+        else {
+            $scope.NoSpeedProductData = false;
+            $scope.DisplayInterfaceData = true;
+        }
+        CapmanReport.FetchInterfaceTypes($scope.modCountryType, $scope.modSupplierType, $scope.modAccessSpeed).success(function (data) {
+            $scope.SupplierData = true;
+            $scope.AccessSpeedData = true;
+            $scope.showExport = false;
+            var aaa = data.d;
+            var defaultval = { InterfaceId: -1, InterfaceType: 'All' };
+            aaa.splice(0, 0, defaultval);
+            $scope.DisplayInterfaceType = aaa;
+        });
+
+    }
+
+    $scope.GetDisplayInterface = function () {
+        $scope.ReportData = false;
+        $scope.POPData = false;
+        $scope.SupplierData = true;
+        $scope.AccessSpeedData = true;
+        $scope.DisplayInterfaceData = true;
+        $scope.NoInterfaceData = false;
+        $scope.showExport = false;
+        $scope.showExportDiv = false;
+        $scope.showCountry = true;
+        $(".pageLoaderOverlay").hide();
+        $scope.showAccessExportDiv = false;
+        if ($scope.modDisplayInterface == undefined || $scope.modDisplayInterface == "") {
+            $scope.NoInterfaceData = true;
+            $scope.ShowGoAccessButtons = false;
+        }
+        else {
+            $scope.NoInterfaceData = false;
+            $scope.ShowGoAccessButtons = true;
+        }
+
+    }
+
+    $scope.GetRecords = function () {
+        $scope.ReportData = false;
+        $scope.POPData = false;
+        $scope.SupplierData = true;
+        $scope.AccessSpeedData = true;
+        $scope.DisplayInterfaceData = true;
+        $scope.NoInterfaceData = false;
+        $scope.showExport = false;
+        $scope.showCountry = true;
+        $(".pageLoaderOverlay").show();
+        if ($scope.modDisplayInterface == undefined || $scope.modDisplayInterface == "") {
+            $scope.NoInterfaceData = true;
+            $scope.ReportData = false;
+            $scope.POPData = false;
+        }
+        if ($scope.modSupplierType.length > 0 && $scope.modAccessSpeed.length > 0 && $scope.modDisplayInterface.length > 0) {
+            CapmanReport.GetAccessReportData($scope.modCountryType, $scope.modSupplierType, $scope.modAccessSpeed, $scope.modDisplayInterface).success(function (data) {
+                if (data.d.length > 0) {
+                    $scope.ReportData = true;
+                    $scope.NoReportData = false;
+                    $scope.NoCapmanReport = false;
+                    $scope.NoInterfaceData = false;
+                    $scope.NoSpeedProductData = false;
+                    $scope.NoSuplierProductData = false;
+                    $scope.showExport = false;
+                    $scope.ExportCapmanReportData = [];
+                    data.d.forEach(function (item) {
+                        $scope.ExportCapmanReportData.push({ 'Country': item.Country, 'City - PoP': item.CityPop.replace(/,/g, ";"), 'Supplier': item.Supplier, 'Speeds': item.Speed.replace(/<font color='green'>/g, "").replace(/font>/g, "").replace(/</g, "").replace("/", ""), 'DisplayInterface': item.DisplayInterface, 'Support': item.Support, 'Resiliency': item.Resiliency });
+                    });
+                    $scope.ReportTable = new NgTableParams({}, { 'dataset': data.d });
+                    $scope.showExportDiv = true;
+                    $(".pageLoaderOverlay").hide();
+                }
+                else {
+                    $scope.NoCapmanReport = true;
+                    $scope.showExport = false;
+                    $scope.showExportDiv = true;
+                    $(".pageLoaderOverlay").hide();
+                }
+
+            });
+        }
+        else {
+            $(".pageLoaderOverlay").hide();
+        }
+
+    }
+
+    $scope.to_trusted = function (val) {
+
+        return $sce.trustAsHtml(val);
+    };
+
+    $scope.ExportCapmanProductReport = function () {
+        JSONToCSVConvertor.ConvertJSONToCSV($scope.ExportCapmanReportData, true, "CapmanProductReport", "csvDownloadFrame");
+    }
+
+
+});

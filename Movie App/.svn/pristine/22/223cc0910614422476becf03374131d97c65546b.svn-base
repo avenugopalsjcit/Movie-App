@@ -1,0 +1,287 @@
+﻿app.factory('AdminUOMGridFactory', function ($http) {
+
+    var AdminUOMGridFactory = {};
+
+    AdminUOMGridFactory.GetAdminAddressGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridUnitOfMeasureDetails', {});
+
+    }
+
+    return AdminUOMGridFactory;
+});
+app.factory('UMODetailsFactory', function ($http) {
+
+    var UMODetailsFactory = {};
+
+    UMODetailsFactory.GetUMODetails = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxUOMCD', {});
+
+    }
+
+    return UMODetailsFactory;
+});  
+
+app.factory('UOMInsertFactory', function ($http) {
+
+    var AvailabilityInsertFactory = {};
+
+    AvailabilityInsertFactory.GetAvailabilityInsert = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/InsertAdminUnitOfMeasure', { 'strAvailCd': strAvailCd, 'UOMDescription': UOMDescription, 'User_id': User_id });
+
+    }
+
+    return AvailabilityInsertFactory;
+});
+
+app.factory('UOMUpdateFactory', function ($http) {
+
+    var AvailabilityUpdateFactory = {};
+
+    AvailabilityUpdateFactory.GetAvailabilityUpdate = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/UpdateAdminUnitOfMeasure', { 'UOMDescription': UOMDescription, 'User_id': User_id, 'strAvailCd': strAvailCd });
+
+    }
+
+    return AvailabilityUpdateFactory;
+});
+
+
+app.factory('UOMDeleteFactory', function ($http) {
+
+    var AvailabilityDeleteFactory = {};
+
+    AvailabilityDeleteFactory.GetAvailabilityDelete = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/DeleteAdminUnitOfMeasure', { 'strAvailCd': strAvailCd });
+
+    }
+
+    return AvailabilityDeleteFactory;
+});
+
+app.factory('UOMPopupGrid', function ($http) {
+
+    var UOMPopupGrid = {};
+
+    UOMPopupGrid.GetAvailabilityPopup = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/PopupGridAdminUnitOfMeasure', { 'UOMId': UOMId });
+
+    }
+
+    return UOMPopupGrid;
+});
+
+app.controller('AdminUnitofMeasureCtrl', ['$scope', 'AdminUOMGridFactory', 'NgTableParams', 'UMODetailsFactory', 'UOMInsertFactory', 'UOMUpdateFactory', 'UOMDeleteFactory', 'UOMPopupGrid', function ($scope, AdminUOMGridFactory, NgTableParams, UMODetailsFactory, UOMInsertFactory, UOMUpdateFactory, UOMDeleteFactory, UOMPopupGrid) {
+
+
+
+
+
+
+
+
+
+  
+
+
+
+    AdminUOMGridFactory.GetAdminAddressGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+        $scope.AddressGrid = data;
+
+
+      
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+    //$(".pageLoaderOverlay").hide();
+
+    UOMDescription = "", UOMId = "";
+
+    $scope.EditRecord = function (category) {
+        UOMId = category.UOMId;
+        $scope.UnitofMeasure = category.UOMName;
+        UOMDescription = category.UOMName;
+       
+        $scope.Reset = 1;
+        UOMPopupGrid.GetAvailabilityPopup(UOMId).success(function (data) {
+            $scope.usersTable2 = data.d;
+            $(".pageLoaderOverlay").hide();
+        });
+
+       
+    }
+
+
+
+    $scope.addNewTask = function () {
+        $scope.UnitofMeasure = $scope.Description = $scope.Valid = "";
+        $scope.Reset = 0;
+    }
+
+
+
+    $scope.ResetRecord = function () {
+
+        $scope.UnitofMeasure = UOMDescription;
+       
+    }
+
+
+
+    $scope.SaveAdminAvail = function () {
+        // debugger;
+
+        UOMDescription = $scope.UnitofMeasure;
+        //        strAvailAbbr = $scope.AvailabilityAbbr;
+        User_id = $scope.User_Id;
+       
+        if (UOMDescription == "") {
+        }
+        else {
+            UMODetailsFactory.GetUMODetails().success(function (data) {
+
+
+                strAvailCd = data.d;
+                strAvailCd = strAvailCd;
+                UOMInsertFactory.GetAvailabilityInsert(strAvailCd, UOMDescription, User_id).success(function (data) {
+                    //alert("hi");
+                    // str = data.d;
+                    AdminUOMGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                        $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                        $(".pageLoaderOverlay").hide();
+                        bootbox.alert({
+                            "message": "Unit of Measure Added Successfully",
+                            "className": "my-custom-class",
+                            "callback": function () {
+                                console.log("Success callback");
+                            }
+                        });
+                    });
+
+
+                });
+            });
+
+
+        }
+
+    }
+
+
+
+    $scope.UpdateAdminAvail = function () {
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to update Unit of Measure?",
+            callback: function (result) {
+                if (result) {
+                    UOMDescription = $scope.UnitofMeasure;
+                    strAvailCd = UOMId;
+                    //        strAvailAbbr = $scope.AvailabilityAbbr;
+                    User_id = $scope.User_Id;
+                   
+
+                    UOMUpdateFactory.GetAvailabilityUpdate().success(function (data) {
+                        AdminUOMGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert({
+                                "message": "Unit of Measure Updated Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+                    });
+                }
+            }
+        });
+    }
+
+
+    $scope.DeleteAdminAvail = function (category) {
+        strAvailCd = category.UOMId;
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Unit of Measure? " + category.UOMName,
+            callback: function (result) {
+                if (result) {
+                    $(".pageLoaderOverlay").hide();
+                    UOMDeleteFactory.GetAvailabilityDelete(strAvailCd).success(function (data) {
+
+
+
+                        AdminUOMGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert({
+                                "message": "Unit of Measure Deleted Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+
+                    });
+                }
+            }
+
+        });
+
+
+    }
+
+
+
+
+
+
+
+
+
+} ]);
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

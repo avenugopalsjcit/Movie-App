@@ -1,0 +1,28 @@
+﻿
+app.controller("CpeLeadTimeCntrl", ["$scope", "NgTableParams", "Suppliersfactory", function ($scope, NgTableParams, Suppliersfactory) {
+ 
+    $(".pageLoaderOverlay").show();
+    Suppliersfactory.GetAllSuppliersData().success(function (data) {
+
+        $(".pageLoaderOverlay").hide();
+        $scope.AllSuppliersData = new NgTableParams({}, { 'dataset': data.d });
+    }).error(function (error) {
+        alert("Problem occured while loading Suppliers; " + error);
+        $(".pageLoaderOverlay").hide();
+    });
+
+
+
+} ]);
+
+
+app.factory('Suppliersfactory', ["$http",function ($http) {
+    var Suppliersfactory = {};
+
+    Suppliersfactory.GetAllSuppliersData = function () {
+        return $http.post("CpeLeadTime.aspx/BindSupplierData", {})
+
+    }
+
+    return Suppliersfactory;
+}]);

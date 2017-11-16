@@ -1,0 +1,251 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+
+
+
+
+
+namespace SCAdminDAL
+{
+    public class UpdateAnnouncementsDAL
+    {
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+
+
+        public DataTable GetGridAnnouncementsDetails()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            string str = string.Empty;
+
+            str = @"select ann_id, to_char(ann_date,'DD-MON-YY') as display_ann_date,to_char(ann_end_date,'DD-MON-YY') as display_ann_end_date, title, announcement from announcement order by CREATED_DT desc";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+
+        public int GetProdDetails(string annid)
+        {
+
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+            string[] annids = annid.Split(',').ToArray();
+            string str = string.Empty;
+            int count = 0;
+            int status = 0;
+            oConn.Open();
+            //if (operation == "Save")
+            //{
+
+            //   for (int i = 0; i < BGFRlst.Length; i++)
+            //      {
+            //          if (county.Length <= supp.Length)
+            //          {
+            //              for (int j = 0; j < county.Length; j++)
+            //              {
+            //                  for (int k = 0; k < supp.Length; k++)
+            //                  {
+            //                      str = @"Select Count(*) From CSU_BTGFR_RESTRICTIONS  Where BTGFR =" + BGFRlst[i] + " And COUNTRY_ID=" + county[j] + " And SUPPLIER_ID = " + supp[k];
+
+            //                      OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+
+            //                      object result = cmd1.ExecuteScalar();
+
+
+            //                      if (!Convert.ToBoolean(result))
+            //                      {
+            //                          str = @"INSERT INTO CSU_BTGFR_RESTRICTIONS ( BTGFR, COUNTRY_ID, SUPPLIER_ID ) VALUES (" + BGFRlst[i] + "," + county[j] + " ," + supp[k] + ")";
+            //                          OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            //                          status = cmd.ExecuteNonQuery();
+            //                          count = count + 1;
+            //                      }
+            //                  }
+            //              }
+
+            //          }
+            //         else
+            //          {
+            //              for (int k = 0; k < supp.Length; k++)
+            //              {
+
+            //                  for (int j = 0; j < supp.Length; j++)
+            //                  {
+            //                      str = @"Select Count(*) From CSU_BTGFR_RESTRICTIONS  Where BTGFR =" + BGFRlst[i] + " And COUNTRY_ID=" + county[j] + " And SUPPLIER_ID = " + supp[k];
+
+            //                      OracleCommand cmd1 = new OracleCommand(str.ToString(), oConn);
+
+            //                      object result = cmd1.ExecuteScalar();
+
+
+            //                      if (!Convert.ToBoolean(result))
+            //                      {
+            //                          str = @"INSERT INTO CSU_BTGFR_RESTRICTIONS ( BTGFR, COUNTRY_ID, SUPPLIER_ID ) VALUES (" + BGFRlst[i] + "," + county[j] + " ," + supp[k] + ")";
+            //                          OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            //                          status = cmd.ExecuteNonQuery();
+            //                          count = count + 1;
+            //                      }
+            //                  }
+            //              }
+
+
+            //          }
+
+            //      }
+
+
+            //  }
+
+
+
+
+
+            for (int i = 0; i < annids.Length; i++)
+            {
+                str = @"delete from Announcement where ann_ID =" + annids[i];//
+                // str = @"insert into Announcement(Ann_ID, Ann_Date, Ann_End_Date, Title, Announcement) values(ANNOUNCEMENT_ID.NextVal,'14-DEC-15','19-DEC-15','your ideas for SC','You want to get a better SC tool? You think there is a part that could be improved? You have many ideas? Perfect, then it is now the best time to come back with your feedback. FY16/17 discussions started and we collect new SC requirements. So get in contact to us') ";
+
+                OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+                status = cmd.ExecuteNonQuery();
+                count = count + 1;
+
+            }
+
+
+
+            oConn.Close();
+
+            return count;
+        }
+
+
+
+        public int AddNewAnnouncement(string anndate, string annenddate, string anncreateddate, string title, string announcement)
+        {
+            string query = string.Empty;
+            int status=0;
+            string deletequery = string.Empty;
+            //DateTime dt= Convert.ToDateTime (anndate);
+            //string formatteddate = dt.ToString("MM/dd/yyyy");
+
+            DateTime dtstartdate = DateTime.ParseExact(anndate, "MM/dd/yyyy", null);
+            var creation_date = String.Format("{0:dd-MMM-yyyy}", dtstartdate);
+
+            DateTime dtenddate = DateTime.ParseExact(annenddate, "MM/dd/yyyy", null);
+            var end_date = String.Format("{0:dd-MMM-yyyy}", dtenddate);
+
+            anncreateddate = DateTime.Now.ToString();
+
+            DateTime dtanncreateddate = DateTime.ParseExact(anncreateddate, "dd/MM/yyyy HH:mm:ss", null);
+            var anncreateddateformatted = String.Format("{0:dd-MMM-yyyy HH:mm:ss}", dtanncreateddate);
+
+            string existingtitle = title;
+            string commandQuery = @"select  upper(title) from announcement where upper(title)= '" + title.ToUpper() + "'";
+
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            
+            OracleDataReader dr=OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+
+            if (dr.HasRows)
+            {
+                status = 2;
+                return status;
+            }
+            else
+            {
+
+                //query = "insert into Announcement(Ann_ID, Ann_Date, Ann_End_Date,CREATED_DT, Title, Announcement) values( ANNOUNCEMENT_ID.NextVal,'" + creation_date + " ','" + end_date + "' ,'" + anncreateddateformatted + "', '" + title + "','" + announcement + "')";
+                query = "insert into Announcement(Ann_ID, Ann_Date, Ann_End_Date,CREATED_DT, Title, Announcement) values( ANNOUNCEMENT_ID.NextVal,'" + creation_date + " ','" + end_date + "' ," + "sysdate" + ", '" + title + "','" + announcement + "')";
+
+                // query = "insert into Announcement(Ann_ID, Ann_Date, Ann_End_Date, Title, Announcement) values( ANNOUNCEMENT_ID.NextVal,TO_DATE('"+anndate+"','dd/mm/yyyy hh24:mi:ss'),TO_DATE('"+anndate+"','dd/mm/yyyy hh24:mi:ss'),'"+title+"','"+announcement+"')";
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+            }
+
+            return status;
+        }
+
+
+
+        public int UpdateNewAnnouncement(string anndate, string annenddate, string anncreateddate, string title, string announcement,string annid)
+        {
+            string query = string.Empty;
+            int status = 0;
+            string deletequery = string.Empty;
+            var creation_date = "";
+            var end_date = "";
+            if (anndate.Length == 9)
+            {
+                creation_date = anndate;
+                
+
+            }
+            if (annenddate.Length == 9)
+            {
+                end_date = annenddate;
+
+
+            }
+            if (anndate.Length > 9 )
+            {
+                DateTime dtstartdate = DateTime.ParseExact(anndate, "MM/dd/yyyy", null);
+                creation_date = String.Format("{0:dd-MMM-yyyy}", dtstartdate);
+
+           
+
+                anncreateddate = DateTime.Now.ToString();
+
+                DateTime dtanncreateddate = DateTime.ParseExact(anncreateddate, "dd/MM/yyyy HH:mm:ss", null);
+                var anncreateddateformatted = String.Format("{0:dd-MMM-yyyy HH:mm:ss}", dtanncreateddate);
+            }
+            if (annenddate.Length > 9)
+            {
+               
+
+                DateTime dtenddate = DateTime.ParseExact(annenddate, "MM/dd/yyyy", null);
+                end_date = String.Format("{0:dd-MMM-yyyy}", dtenddate);
+
+                anncreateddate = DateTime.Now.ToString();
+
+                DateTime dtanncreateddate = DateTime.ParseExact(anncreateddate, "dd/MM/yyyy HH:mm:ss", null);
+                var anncreateddateformatted = String.Format("{0:dd-MMM-yyyy HH:mm:ss}", dtanncreateddate);
+            }
+
+           
+
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+            string existingtitle = title;
+            string commandQuery = @"select  upper(title) from announcement where upper(title)= '" + title.ToUpper() + "'  and ANN_ID  not in (" + annid + ")";
+
+          
+
+            OracleDataReader dr = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+
+            if (dr.HasRows)
+            {
+                status = 2;
+                return status;
+            }
+            else
+            {
+                query = "Update Announcement set Ann_Date ='" + creation_date + "',Ann_End_Date ='" + end_date + "',CREATED_DT = " + "sysdate" + ",Title = '"
+                            + title + "',Announcement='" + announcement + "' WHERE Ann_ID ='" + annid + "'";
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+            }
+
+            return status;
+        }
+    }
+}

@@ -1,0 +1,428 @@
+﻿<div ng-controller="mainctrl">
+    <div class="row" style="padding-left: 10px">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="row text-left Arrow ">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                                Restrictions
+                            </h3>
+                        </div>
+                    </div>
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" data-target="#divDistributor" ng-click="Disttab()">
+                    Supplier Restriction</a> </li>
+                <li><a data-toggle="tab" data-target="#divBTGFR" ng-click="BTGFRtab()">BT GFR Supplier
+                    Restriction</a> </li>
+                <li><a data-toggle="tab" data-target="#divOrg" ng-click="Orgtab()">ORG Supplier Restriction</a>
+                </li>
+            </ul>
+            <div class="tab-content clearfix ">
+                <div id="divDistributor" class="tab-pane active">
+                   
+                   
+                    
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <p style="color: Red;" class="Arrow">
+                                <span style="color: Black">Note:</span> <span style="color: Red">Restriction will define
+                                    the list of Suppliers to be removed from respective Distributor view. </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div >
+                        <div  style="height: auto;">
+                            <form class="form-horizontal" name="Restrictionform" novalidate>
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    Distributor(s) <span class="red">*</span>
+                                </label>
+                                <div class="col-sm-4" style="height: 330px" ng-class="{ 'has-error' : Restrictionform.DistList.$invalid && !Restrictionform.DistList.$pristine }">
+                                    <select id="Select1" multiple size="10" ng-model="Distributer" style="height: 300px"
+                                        ng-options="ps.DistributerId as ps.DistributerName for ps in DistributerList"
+                                        class="form-control" id="DistList" required>
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </select>
+                                    <span style="display: none; color: Red;" id="Span1">Please Select Distributor </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    Country(s) <span class="red">*</span>
+                                </label>
+                                <div class="col-sm-4" ng-class="{ 'has-error' : Restrictionform.CountryLst.$invalid && !Restrictionform.CountryLst.$pristine }">
+                                    <select id="Select2" multiple size="10" ng-model="Country" style="height: 300px"
+                                        ng-options="ps.CountryId as ps.CountryName for ps in CountryList" class="form-control"
+                                        id="CountryLst" required>
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </select>
+                                    <span style="display: none; color: Red;" id="Span2">Please Select Country </span>
+                                </div>
+                                <label for="" class="col-sm-2 control-label">
+                                    Supplier(s) <span class="red">*</span>
+                                </label>
+                                <div class="col-sm-4" ng-class="{ 'has-error' : Restrictionform.SupplierLst.$invalid && !Restrictionform.SupplierLst.$pristine }">
+                                    <select id="Select3" multiple size="10" ng-model="Supplier" style="height: 300px"
+                                        ng-options="ps.SupplierId as ps.SupplierName for ps in SupplierList" class="form-control"
+                                        id="SupplierLst" required>
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </select>
+                                    <span style="display: none; color: Red;" id="Span3">Please Select Supplier </span>
+                                </div>
+                            </div>
+                            
+                            <div class="row text-center">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                     <input type="button" ng-click="GetValue()" value="Add" id="Button3" class="btn btn-primary"
+                                        ng-disabled="Restrictionform.$invalid" />
+                                    <input type="button" ng-click="resetDropDown()" value="Reset" class="btn btn-primary" />
+                                </div>
+                            </div>
+
+                            </form>
+                        </div>
+                    </div>
+                    <div id="DistDiv">
+                        <div >
+                            <div>
+                                &nbsp;</div>
+                            <div class="form-horizontal" id="form2id">
+                               
+                              
+                                <div class="row text-left Arrow ">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="height:40px;">
+                            <b>
+                                <h4> Active Restrictions </h4>
+                            </b>
+                        </div>
+                    </div>
+                                <div class="pull-left alert alert-danger Arrow col-xs-12 col-sm-12 col-md-12 col-lg-12" role="alert" class="alert alert-danger Arrow" role="alert"" id="Inactiveid" style="margin-left: 0px" ng-show="!usersTable.data.length">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <p class="Arrow" style="color: Red">
+                                        
+                                            There are no Active Restrictions
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="DeletedivDist" style="position:relative;top:30px;">
+                                    <input type="button" id="Button1" value="Delete" class="btn btn-primary" disabled="disabled"
+                                        ng-click="removeRow()" style="margin-left: 10px;" />
+                                </div>
+                               
+                                   
+                                  <div ng-show="ActiveRestrictions" >
+                                    <table id="usersTableTbl" ng-table="usersTable" show-filter="true" class="table table-striped Arrow">
+                                           
+                                             <div class="row" id="divSelectall" style="position:relative;top:140px;margin-left:10px;">  <input type="checkbox" name="chk" ng-model="selectedAll" id="checkallid" ng-click="chkall()" /> 
+                                            </div>
+                                           
+                                          
+                                        <tr ng-repeat="category in $data">
+                                            <td class="Arrow" data-title="'Select All'" style="width:70px;">
+                                                <input type="checkbox" name="chk" id="chekid" ng-model="category.Selected" ng-click="chk(category)" />
+                                            </td>
+                                            <td data-title="' Distributor'" filter="{ 'DistributerName': 'text' }" sortable="'DistributerName'"
+                                                class="Arrow">
+                                                {{category.DistributerName}}
+                                            </td>
+                                            <td data-title="' Country'" filter="{ 'CountryName': 'text' }" sortable="'CountryName'"
+                                                class="Arrow">
+                                                {{category.CountryName}}
+                                            </td>
+                                            <td data-title="' Supplier'" filter="{ 'SupplierName': 'text' }" sortable="'SupplierName'"
+                                                class="Arrow">
+                                                {{category.SupplierName}}
+                                            </td>
+                                        </tr>
+                                    </table>
+                              </div>
+                            </div>
+                            <div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="divBTGFR" class="tab-pane">
+                    
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <p style="color: Red;" class="Arrow">
+                                <span style="color: Black">Note:</span> <span style="color: Red">Restriction will define
+                                    the list of Suppliers to be removed from respective BT GFR view. </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div >
+                        <div  style="height: auto">
+                            <form class="form-horizontal" name="BTGFRform" novalidate>
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    BT GFR(s) <span class="red">* </span>
+                                </label>
+                                <div class="col-sm-4" style="height: 330px" ng-class="{ 'has-error' : BTGFRform.BTGFRList.$invalid && !BTGFRform.BTGFRList.$pristine }">
+                                    <!--ng-change="GetHVPNPortTypes()"-->
+                                    <select id="Select4" multiple size="10" ng-model="BTGFR" style="height: 300px" ng-options="ps.BTGFRId as ps.Description for ps in BTGFRList"
+                                        class="form-control" id="BTGFRList" required>
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </select>
+                                    <span style="display: none; color: Red;" id="Span4">Please Select BT GFR </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    Country(s) <span class="red">* </span>
+                                </label>
+                                <div class="col-sm-4" ng-class="{ 'has-error' : BTGFRform.countlist.$invalid && !BTGFRform.countlist.$pristine }">
+                                    <!--ng-change="GetHVPNPortTypes()"-->
+                                    <select id="Select5" multiple size="10" ng-model="Country" style="height: 300px"
+                                        ng-options="ps.CountryId as ps.CountryName for ps in CountryList" class="form-control"
+                                        id="countlist" required>
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </select>
+                                    <span style="display: none; color: Red;" id="Span5">Please Select Country </span>
+                                </div>
+                                <label for="" class="col-sm-2 control-label">
+                                    Supplier(s) <span class="red">* </span>
+                                </label>
+                                <div class="col-sm-4" ng-class="{ 'has-error' : BTGFRform.Supplierlist.$invalid && !BTGFRform.Supplierlist.$pristine }">
+                                    <!--ng-change="GetHVPNPortTypes()"-->
+                                    <select id="Select6" multiple size="10" ng-model="Supplier" style="height: 300px"
+                                        ng-options="ps.SupplierId as ps.SupplierName for ps in SupplierList" class="form-control"
+                                        id="Supplierlist" required>
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </select>
+                                    <span style="display: none; color: Red;" id="Span6">Please Select Supplier </span>
+                                </div>
+                            </div>
+                         <div class="row text-center">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <input type="button" ng-click="GetValueBTGFR()" value="Add" id="Save" class="btn btn-primary"
+                                        ng-disabled="BTGFRform.$invalid" />
+                                    <input type="button" ng-click="resetDropDown()" value="Reset" class="btn btn-primary" />
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="BTGFRdiv">
+                        <div  id="formBtgid">
+                            <div>
+                                &nbsp;</div>
+                            <div class="row text-left Arrow ">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <h4><b>Active Restrictions </b></h4>
+                                </div>
+                            </div>
+                            <div class="pull-left alert alert-danger Arrow col-xs-12 col-sm-12 col-md-12 col-lg-12" id="InactiveidBTGFR" style="margin-left: 0px" ng-show="!usersTable1.data.length">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <p class="Arrow" style="color: Red">
+                                        There are no Active Restrictions
+                                    </p>
+                                </div>
+                            </div>
+                            <div id="DeleteBTGFRData" style="position:relative;top:30px;">
+                                <input type="button" id="Button2" value="Delete" class="btn btn-primary" ng-click="removeRowBTGFR()"
+                                    style="margin-left: 10px;" disabled="disabled" />
+                            </div>
+                             <div ng-show="BTGFRData" >
+                            <table ng-table="usersTable1" show-filter="true" class="table table-striped clickable">
+                            <div class="row" id="divCheck" style="position:relative;top:140px;margin-left:10px;">
+                              <input type="checkbox" name="chk" ng-model="selectedAll" id="Checkbox3" ng-click="chkallBTGFR()" /> 
+                             </div>
+                                           
+                                <tr ng-repeat="category in $data">
+                                    <td data-title="'Select All'" style="width:70px;">
+                                        <input type="checkbox" name="chk" id="Checkbox1"  ng-model="category.Selected" ng-click="chkBTGFR(category)" />
+                                    </td>
+                                    <td data-title="' BT GFR'" filter="{ 'Description': 'text' }" sortable="'Description'" class="Arrow">
+                                        {{category.Description}}
+                                    </td>
+                                    <td data-title="' Country'" filter="{ 'CountryName': 'text' }" sortable="'CountryName'" class="Arrow">
+                                        {{category.CountryName}}
+                                    </td>
+                                    <td data-title="' Supplier'" filter="{ 'SupplierName': 'text' }" sortable="'SupplierName'" class="Arrow">
+                                        {{category.SupplierName}}
+                                    </td>
+                                </tr>
+                            </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="divOrg" class="tab-pane">
+                   
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <p style="color: Red;" class="Arrow">
+                                <span style="color: Black">Note:</span> <span style="color: Red">Restriction will define
+                                    the list of Suppliers to be removed from respective Organization view. </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div >
+                        <div  style="height: auto">
+                            <form class="form-horizontal" name="Orgform" novalidate>
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="" class="col-sm-2 control-label">
+                                        Organization(s) <span class="red">*</span>
+                                    </label>
+                                    <div class="col-sm-4" style="height: 330px" ng-class="{ 'has-error' : Orgform.orglist.$invalid && !Orgform.orglist.$pristine }">
+                                        <select id="Select7" multiple size="10" ng-model="Organization" style="height: 300px"
+                                            ng-options="ps.DistId as ps.DistName for ps in OrgList" class="form-control"
+                                            id="orglist" required>
+                                            <!--<option value="">--- Select ---</option>-->
+                                        </select>
+                                        <span style="display: none; color: Red;" id="Span7">Please Select Organization </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="" class="col-sm-2 control-label">
+                                        Country(s) <span class="red">* </span>
+                                    </label>
+                                    <div class="col-sm-4" ng-class="{ 'has-error' : Orgform.countylist.$invalid && !Orgform.countylist.$pristine }">
+                                        <select id="Select8" multiple size="10" ng-model="Country" style="height: 300px"
+                                            ng-options="ps.CountryId as ps.CountryName for ps in CountryList" class="form-control"
+                                            id="countylist" required>
+                                            <!--<option value="">--- Select ---</option>-->
+                                        </select>
+                                        <span style="display: none; color: Red;" id="Span8">Please Select Country </span>
+                                    </div>
+                                    <label for="" class="col-sm-2 control-label">
+                                        Supplier(s) <span class="red">* </span>
+                                    </label>
+                                    <div class="col-sm-4" ng-class="{ 'has-error' : Orgform.suppList.$invalid && !Orgform.suppList.$pristine }">
+                                        <select id="Select9" multiple size="10" ng-model="Supplier" style="height: 300px"
+                                            ng-options="ps.SupplierId as ps.SupplierName for ps in SupplierList" class="form-control"
+                                            id="suppList" required>
+                                            <!--<option value="">--- Select ---</option>-->
+                                        </select>
+                                        <span style="display: none; color: Red;" id="Span9">Please Select Supplier </span>
+                                    </div>
+                                </div>
+                                 <div class="row text-center">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <input type="button" ng-click="GetValueOrg()" value="Add" id="Save" class="btn btn-primary"
+                                            ng-disabled="Orgform.$invalid" />
+                                        <input type="button" ng-click="resetDropDown()" value="Reset" class="btn btn-primary" />
+                                    </div>
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                        <div>
+                            &nbsp;&nbsp;</div>
+                    </div>
+                    <div>
+                        &nbsp;</div>
+                    <div id="Orgdiv">
+                        <div  id="formOrgid">
+                            <div class="row text-left Arrow ">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                   <h4> <b>Active Restrictions </b></h4>
+                                </div>
+                            </div>
+                                <div class="pull-left alert alert-danger Arrow col-xs-12 col-sm-12 col-md-12 col-lg-12" id="InactiveidOrg" ng-show="!usersTable2.data.length"
+                                    style="margin-left: 0px;margin-top:10px;">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <p class="Arrow" style="color: Red">
+                                            There are no Active Restrictions
+                                        </p>
+                                    </div>
+                                </div>
+                            <div id="deleteOrgdiv" style="position:relative;top:30px;">
+                                    <input type="button" id="Deletebtn" value="Delete" class="btn btn-primary" ng-click="removeRowOrg()"
+                                        style="margin-left: 10px;" disabled="disabled" />
+                                </div>
+                                <div ng-show="ORGData" >
+                            <table ng-table="usersTable2" show-filter="true" class="table table-striped clickable" id="ngtableOrg">
+                            
+                                  
+                                              <div class="row" id="div3" style="position:relative;top:140px;margin-left:10px;"><input type="checkbox" name="chk" ng-model="selectedAll" id="Checkbox4" ng-click="chkallOrg()" /> 
+                                           
+                                            </div>
+                               
+                                    <tr ng-repeat="category in $data">
+                                        <td data-title="'Select All'" style="width:70px;">
+                                            <input type="checkbox" name="chk" id="Checkbox2"  ng-model="category.Selected" ng-click="chkOrg(category)"/>
+                                        </td>
+                                        <td data-title="' Organization'" filter="{ 'Description': 'text' }" sortable="'Description'" class="Arrow">
+                                            {{category.Description}}
+                                        </td>
+                                        <td data-title="' Country'" filter="{ 'CountryName': 'text' }" sortable="'CountryName'" class="Arrow">
+                                            {{category.CountryName}}
+                                        </td>
+                                        <td data-title="' Supplier'" filter="{ 'SupplierName': 'text' }" sortable="'SupplierName'" class="Arrow">
+                                            {{category.SupplierName}}
+                                        </td>
+                                       
+                                    </tr>
+                                
+                            </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+    <script type="text/javascript">
+       
+
+        $(document).ready(function () {
+            $(document).click(function () {
+                $('.pagination').on('click', function () {
+                
+                    $("input:checkbox").prop('checked', false);
+                   
+
+                })
+                if ($("#form2id input:checkbox:checked").length > 0) {
+                    // any one is checked
+
+                    $('#Button1').removeAttr('disabled');
+                   
+
+                }
+                if ($("#form2id input:checkbox:checked").length == 0) {
+                    // any one is checked
+
+                    $('#Button1').attr('disabled', 'disabled');
+
+                }
+
+
+                if ($("#formBtgid input:checkbox:checked").length > 0) {
+                    // any one is checked
+
+                    $('#Button2').removeAttr('disabled');
+                }
+                if ($("#formBtgid input:checkbox:checked").length == 0) {
+                    // any one is checked
+
+                    $('#Button2').attr('disabled', 'disabled');
+                }
+
+                if ($("#formOrgid input:checkbox:checked").length > 0) {
+                    // any one is checked
+
+                    $('#Deletebtn').removeAttr('disabled');
+                }
+                if ($("#formOrgid input:checkbox:checked").length == 0) {
+                    // any one is checked
+
+                    $('#Deletebtn').attr('disabled', 'disabled');
+                }
+            });
+        });
+
+
+
+
+      
+     
+
+
+    </script>
+</div>

@@ -1,0 +1,245 @@
+﻿<div ng-controller="CaseDefinitionCtrl">
+<div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                Define Case
+            </h3>
+        </div>
+    </div>
+    <div class="row" style="padding-left: 10px">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">
+                                Product &nbsp; <span style="color: Red">*</span>
+                            </label>
+                            <div class="col-sm-3">
+                                <select id="ddlProduct" ng-change="GetRegions()" ng-model="Product" ng-options="prod.ProductID as prod.ProductName for prod in productdata" style="width:90%">
+                                    <option value="">--- Select Product ---</option>
+                                </select>
+                                <span style="display: none; color: Red;" id="ProductError" class="Arrow">Please select
+                                    product</span>
+                            </div>
+                            <div ng-show="Product>0" class="col-sm-3">
+                                <!--<a ng-click="SetDefaultValues()" href="#/AddNewCase">Add Case</a>-->
+                                <!--<a ng-show="iDSLFlag" style="color:Blue;font-weight:bold;">Country Access</a>-->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">
+                                Region &nbsp; <span style="color: Red">*</span>
+                            </label>
+                            <div class="col-sm-3">
+                                <select id="ddlRegion" ng-change="GetRegions()" ng-model="Region" ng-options="Reg.RegionID as Reg.RegionName for Reg in Regiondata"
+                                    style="width:90%">
+                                    <option value="">--- Select Region ---</option>
+                                </select>
+                                <span style="display: none; color: Red;" id="RegionError" class="Arrow">Please select
+                                    region</span>
+                            </div>
+                            <label for="" class="col-sm-2 control-label" ng-show="Countrydata">
+                                Country &nbsp; <span style="color: Red">*</span>
+                            </label>
+                            <div class="col-sm-3" ng-show="Countrydata" id="divCountry">
+                                <select id="ddlCountry" ng-model="Country" ng-options="cnt.CountryID as cnt.CountryName for cnt in Countrydata" 
+                                    style="width:90%">
+                                    <option value="">--- Select Country ---</option>
+                                </select>
+                                <span style="display: none; color: Red;" id="CountryError" class="Arrow">Please select
+                                    country</span>
+                            </div>
+                        </div>
+                        <div class="form-group" style="text-align: center;">
+                            <div class="col-sm-5" id="subViewDIv" style="width: 100%;">
+                                <!--ui-sref=".AdminDSLCase({CaseId:54})"-->
+                                <!--<input type="button"  value="Search" class="btn btn-primary" id="testbtn" ng-click="GetCases()" />     -->
+                                <!--<a href="#" class="btn btn-primary btn-lg" ng-click="GetCPECases()">CPE Only</a>-->
+                                <a href="#" class="btn btn-primary btn-lg" ng-click="SearchCases()">PoP Access</a>
+                                <a href="#" class="btn btn-primary btn-lg" ng-click="GetCasesCountryAccess()" ng-show="iDSLFlag">
+                                    Country Access</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer"></div>
+                    <div ui-view ng-show="CountryAccess">
+                    </div>
+                    <div id="CaseList" ng-show="CaseData!=null && CaseData!='' && editcase==0 && !CountryAccess">
+                        <a ng-click="AddCaseDetails()">Add Case</a>
+                        <table ng-table="CaseData" class="table table-bordered" show-filter="true">
+                           
+                            <tr ng-repeat="case in $data">
+                                <td data-title="'Case'"  filter="{ 'CaseName': 'text'}" >
+                                    <a ng-click="EditCaseDetails(case)">{{case.CaseName}}</a>
+                                   
+                                </td>
+
+                                 <td  data-title="'Details'" >
+                                    <a href="">Details</a>
+                                </td>
+                                <td  data-title="'ShowValid'"  filter="{ 'ShowValid': 'text'}">
+                                    {{case.ShowValid}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div ng-show="editcase==1 && !CountryAccess">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="">
+                                </label>
+                                <div class="col-sm-4">
+                                    &nbsp;
+                                </div>
+                                <label class="col-sm-2 control-label" for="Details">
+                                    <a ng-click="ShowCaseDetails()">Details</a></label>
+                                <div class="col-sm-4 cus-text-left">
+                                    <label class="col-sm-4 control-label cus-text-left" for="Case List">
+                                        <a ng-click="ShowCaseList()">Case List</a></label>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="isRegion==1">
+                                <label for="Region" class="col-sm-2 control-label">
+                                    Region</label>
+                                <div class="col-sm-4 cus-text-left">
+                                    <label for="RegionName" class="col-sm-4 control-label cus-text-left">
+                                        {{RegionName}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="isCountry==1">
+                                <label for="Country" class="col-sm-2 control-label">
+                                    Country</label>
+                                <div class="col-sm-4 cus-text-left">
+                                    <label for="CountryName" class="col-sm-4 control-label cus-text-left">
+                                        {{CountryName}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="isState==1">
+                                <label for=" State/Prov" class="col-sm-2 control-label">
+                                    State/Prov</label>
+                                <div class="col-sm-4 cus-text-left">
+                                    <label for="StateProvinceName" class="col-sm-4 control-label cus-text-left">
+                                        {{StateProvinceName}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="isCity==1">
+                                <label for=" City" class="col-sm-2 control-label">
+                                    City</label>
+                                <div class="col-sm-4 cus-text-left">
+                                    <label for="CityName" class="col-sm-4 control-label cus-text-left">
+                                        {{CityName}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="isPOP==1">
+                                <label for=" POP" class="col-sm-2 control-label">
+                                    Pop</label>
+                                <div class="col-sm-6 cus-text-left">
+                                    <label for="POPName" class="col-sm-6 control-label cus-text-left">
+                                        {{POPName}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for=" Availability" class="col-sm-2 control-label">
+                                    Availability</label>
+                                <div class="col-sm-3 cus-text-left">
+                                    <select id="lstBoxAvailability" ng-model="ddlAvailability" ng-options="avail.AvailID as avail.AvailDesc for avail in AvailDescData"
+                                        class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for=" Valid" class="col-sm-2 control-label">
+                                    Valid</label>
+                                <div class="col-sm-2 cus-text-left">
+                                    <input type="checkbox" ng-model="modValid" ng-checked="CaseValid==1" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for=" Exception Required" class="col-sm-2 control-label">
+                                    Exception Required</label>
+                                <div class="col-sm-2 cus-text-left">
+                                    <input type="checkbox" ng-model="ExceptionRequired" ng-checked="isExceptionRequired==1" />
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="isCity==1">
+                                <label for="  Support Resilient Only POP" class="col-sm-2 control-label">
+                                    Support Resilient Only POP</label>
+                                <div class="col-sm-2 cus-text-left">
+                                    <input type="checkbox" ng-model="SupportResilientPOP" ng-checked="isSupportResilientPOP==1"
+                                        ng-model="modValid" />
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="isPoPColor==1">
+                                <label for=" PoP Colour" class="col-sm-2 control-label">
+                                    PoP Colour</label>
+                                <div class="col-sm-4 cus-text-left">
+                                    <label for="POPColour" class="col-sm-4 control-label cus-text-left">
+                                        {{POPColour}}</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for=" NetworkName" class="col-sm-2 control-label">
+                                    Network Name</label>
+                                <div class="col-sm-4 cus-text-left">
+                                    <label for="POPColour" class="col-sm-4 control-label cus-text-left">
+                                        {{NetworkName}}</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tblPopCharacteristics" class="panel panel-primary">
+                            <div class="panel-heading Arrow">
+                                <h3 class="panel-title">
+                                    PoP Characteristics</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                                    <tr ng-repeat="popchr in POPCharacteristicsData">
+                                        <td width="40%" class="Arrow">
+                                            {{ popchr.CharName}}
+                                        </td>
+                                        <td width="60%" class="Arrow">
+                                            {{ popchr.CharValue}}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for=" Suppliers" class="col-sm-2 control-label">
+                                    Suppliers</label>
+                                <div class="col-sm-2">
+                                    <select id="ddlSuppliers" ng-model="Suppliers" multiple ng-multiple="true" size="5"
+                                        ng-options="Supp.SupplierID as Supp.SupplierName for Supp in Suppliersdata" class="form-control">
+                                    </select>
+                                </div>
+                                <label for=" Date" class="col-sm-2 control-label">
+                                    Date</label>
+                                <input type="text" name="inputDate" id="inputDate" ng-model="SiteAvailability" class="datepicker"
+                                    style="width: 150px; height: 26px;" disabled="disabled" />
+                                <button class="btn btn-sm btn-default" id="btndate">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                </div>
+                                <label for="" class="col-sm-2 control-label">
+                                    &nbsp;</label>
+                                <div class="col-sm-5">
+                                    <input type="button" ng-click="UpdateCaseInfo()" value="Update" class="btn btn-primary" />
+                                    <button ng-click="DeleteCaseInfo()" class="btn btn-primary">
+                                        Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+</div>

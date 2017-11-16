@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using SCAdminBAL;
+using System.Data;
+
+using System.Web.Security;
+using System.Web.Services;
+using System.Web.Script.Services;
+using System.Text;
+using System.Web.UI.WebControls.WebParts;
+using System.IO;
+using System.Web.Script.Serialization;
+//using System
+using Newtonsoft.Json;
+using System.Collections;
+using System.Reflection;
+using SCAdminDAL;
+using SCAdminBAL;
+using System.Data.OracleClient;
+using System.Web.UI;
+using System.Web.Security;
+
+
+namespace SCAdmin
+{
+    public partial class ProductDefination : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+       
+
+
+        [WebMethod]
+        public static string getServicetype()
+        {
+            DataTable dt = SCAdminBAL.ProductDefinationBAL.getSeviceTypes();
+            var data = new
+            {
+                getServiceTypes = dt,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+        [WebMethod]
+       // Servicetype service, int UpdateId = 0, int InsertId = 0, int ServiceTypeId = 0
+        public static int InsertSeviceTypes( string Userid,string service, int UpdateId = 0, int InsertId = 0)
+        {
+            SCAdminDAL.Servicetype serviceData =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<SCAdminDAL.Servicetype>(service);
+            return ProductDefinationBAL.InsertSeviceTypes(Userid,serviceData, UpdateId, InsertId);
+        }
+
+        [WebMethod]
+        // Servicetype service, int UpdateId = 0, int InsertId = 0, int ServiceTypeId = 0
+        public static string DeleteServiceType(int ServiceTypeId)
+        {
+            return ProductDefinationBAL.DeleteServiceType(ServiceTypeId);
+        }
+
+
+
+    }
+}

@@ -1,0 +1,70 @@
+﻿
+
+//var app = angular.module("app", ["ngTable"]);
+app.controller('AvailabilityCtrl1', ['$scope',  'NgTableParams', function ($scope,  NgTableParams) {
+
+    var data1 = [{ AvailabilityDesc: "Argentina*", AvailabilityAbbr: "CISCO ", Valid: true, btgfr: 123, Description: "solutions" },
+{ AvailabilityDesc: "Argentina*", AvailabilityAbbr: "HP", Valid: true, btgfr: 1234, Description: "solutions1" },
+{ AvailabilityDesc: "Argentina*", AvailabilityAbbr: "Ipanema", Valid: true,btgfr:1235,Description: "solutions2" },
+{ AvailabilityDesc: "Argentina*", AvailabilityAbbr: "Multitech ", Valid: true, btgfr: 1231, Description: "solutions3" },
+{ AvailabilityDesc: "Argentina*", AvailabilityAbbr: "RIVERBED ", Valid: true, btgfr: 12322, Description: "solutions4" },
+{ AvailabilityDesc: "Australia*", AvailabilityAbbr: "RIVERBED ", Valid: true, btgfr: 12355, Description: "solutions5" },
+{ AvailabilityDesc: "Australia*", AvailabilityAbbr: "RIVERBED ", Valid: true, btgfr: 12312, Description: "solutions6" },
+{ AvailabilityDesc: "Australia*", AvailabilityAbbr: "RIVERBED ", Valid: true, btgfr: 12344, Description: "solutions7" },
+{ AvailabilityDesc: "Australia*", AvailabilityAbbr: "RIVERBED ", Valid: true, btgfr: 12366, Description: "solutions8" },
+{ AvailabilityDesc: "Australia*", AvailabilityAbbr: "RIVERBED ", Valid: true, btgfr: 1237, Description: "solutions9" },
+{ AvailabilityDesc: "Australia*", AvailabilityAbbr: "RIVERBED ", Valid: true, btgfr: 1238, Description: "solutions0" },
+{ AvailabilityDesc: "Australia*", AvailabilityAbbr: "RIVERBED ", Valid: true, btgfr: 1239, Description: "solutions11"}];
+    
+    var abc = "";
+
+    $scope.usersTable = new NgTableParams({
+        // initial grouping
+        
+    }, {
+        'dataset': data1
+    });
+
+
+
+
+     $scope.EditRecord = function (category) {
+
+            $scope.AvailabilityAbbr = category.AvailabilityAbbr;
+            $scope.Description = category.AvailabilityDesc;
+            $scope.Valid = category.Valid;
+            availAbbr = category.AvailabilityAbbr;
+            availDesc = category.AvailabilityDesc;
+            availValid = category.Valid;
+            $scope.Reset = 1;
+        }
+
+        $scope.addNewTask = function () {
+            $scope.AvailabilityAbbr = $scope.Description = $scope.Valid = "";
+            $scope.Reset = 0;
+        }
+
+        $scope.ResetRecord = function () {
+
+            $scope.AvailabilityAbbr = availAbbr;
+            $scope.Description = availDesc;
+            $scope.Valid = availValid;
+        }
+
+
+
+
+
+
+
+
+
+
+
+    } ]);
+
+
+
+
+
+

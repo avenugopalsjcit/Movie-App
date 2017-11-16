@@ -1,0 +1,118 @@
+﻿app.factory('AdminDistributorCompaniesFactory', function ($http) {
+
+    var AdminDistributorCompaniesFactory = {};
+
+    AdminDistributorCompaniesFactory.GetDistCompanieslst = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminDistributorCompaniesView', { 'Level': Level});
+
+    }
+
+    return AdminDistributorCompaniesFactory;
+});
+app.factory('EditAdminDistributorCompaniesFactory', function ($http) {
+
+    var EditAdminDistributorCompaniesFactory = {};
+
+    EditAdminDistributorCompaniesFactory.GetDetails = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/EditAdminDistributorCompanies', { 'Level': Level, 'Id': Id });
+
+    }
+
+    return EditAdminDistributorCompaniesFactory;
+});
+
+app.controller('AdminDistributorCompaniesCtrl', ['$scope', 'AdminDistributorCompaniesFactory', 'EditAdminDistributorCompaniesFactory', function ($scope, AdminDistributorCompaniesFactory, EditAdminDistributorCompaniesFactory) {
+
+
+    Level = Id = "";
+    Level = "Dist";
+    $scope.level = 1;
+    $scope.Distchange = function () {
+        $scope.level = 1;
+        $scope.hidevalue = 1;
+        Level = "Dist";
+        AdminDistributorCompaniesFactory.GetDistCompanieslst().success(function (data) {
+
+            //$scope.CurrentDate = new Date();
+            $scope.Name = "";
+            $scope.Short = "";
+            $scope.valid = false;
+
+            $scope.Created = "";
+            $scope.Updated = "";
+
+            $scope.Distributor = data.d;
+
+
+            $(".pageLoaderOverlay").hide();
+
+
+        });
+    }
+    $scope.Compchange = function () {
+        $scope.comp = 2;
+        Level = "Comp";
+        $scope.hidevalue = 0;
+        $scope.Distributor = "";
+        AdminDistributorCompaniesFactory.GetDistCompanieslst().success(function (data) {
+
+            //$scope.CurrentDate = new Date();
+            $scope.Name = "";
+            $scope.Short = "";
+            $scope.valid = false;
+
+            $scope.Created = "";
+            $scope.Updated = "";
+            $scope.Distributor = data.d;
+
+
+            $(".pageLoaderOverlay").hide();
+
+
+        });
+
+    }
+
+    AdminDistributorCompaniesFactory.GetDistCompanieslst().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+
+        $scope.Distributor = data.d;
+
+
+        $(".pageLoaderOverlay").hide();
+
+
+    });
+
+
+    $scope.update = function () {
+        //        $scope.Name = "Name";
+        //        $scope.valid = true;
+        Id = $scope.DistComp;
+        Id = Id[0];
+        EditAdminDistributorCompaniesFactory.GetDetails().success(function (data) {
+
+            //$scope.CurrentDate = new Date();
+
+
+            $scope.Name = data.d[0].Name;
+            $scope.Short = data.d[0].Short;
+            if (data.d[0].Valid == 1) {
+                $scope.valid = true;
+            }
+            else {
+                $scope.valid = false;
+            }
+            $scope.Created = data.d[0].CreatedDate;
+            $scope.Updated = data.d[0].UpdatedDate;
+            $(".pageLoaderOverlay").hide();
+
+
+        });
+    };
+
+} ]);

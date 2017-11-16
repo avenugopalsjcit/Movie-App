@@ -1,0 +1,375 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using SCAdminDAL;
+using System.Xml.Serialization;
+using System.IO;
+using System.Xml;
+
+namespace SCAdminBAL
+{
+   public class SupplierRestrictionBAL
+    {
+      private SupplierRestrictionDAL objSRD = new SupplierRestrictionDAL();
+       public List<DistributorRestrictionDropDown> GetDistributorDetails(string category)
+       {
+         
+           DataTable dtSALASuppProd;
+
+           List<DistributorRestrictionDropDown> lstSuppProd = new List<DistributorRestrictionDropDown>();
+
+           using (dtSALASuppProd = objSRD.GetLstDistributorDetails(category))
+           {
+               if (category == "Distributor")
+               {
+
+
+                   foreach (DataRow dr in dtSALASuppProd.Rows)
+                   {
+                       DistributorRestrictionDropDown objSuppProd = new DistributorRestrictionDropDown();
+                       objSuppProd.DistributerId = Convert.ToInt32(dr["VBC_DIST_ID"]);
+                       objSuppProd.DistributerName = Convert.ToString(dr["DIST_NAME"]);
+                       lstSuppProd.Add(objSuppProd);
+                   }
+               }
+           }
+           
+
+
+         
+           return lstSuppProd;
+       }
+
+
+       public List<BTGFRRestrictionDropDown> GetBTGFRDetails(string category)
+       {
+          
+           DataTable dtSALASuppProd;
+
+           
+           List<BTGFRRestrictionDropDown> lstBTGFR = new List<BTGFRRestrictionDropDown>();
+
+           using (dtSALASuppProd = objSRD.GetLstDistributorDetails(category))
+           {
+               if (category == "BTGFR")
+               {
+                   foreach (DataRow dr in dtSALASuppProd.Rows)
+                   {
+                       BTGFRRestrictionDropDown itemBTGFR = new BTGFRRestrictionDropDown();
+                       itemBTGFR.BTGFRId = Convert.ToInt32(dr["BTGFR_ID"]);
+                       itemBTGFR.Description = Convert.ToString(dr["DESCRIPTION"]);
+                       lstBTGFR.Add(itemBTGFR);
+                   }
+               }
+
+           }
+
+
+           return lstBTGFR;
+       }
+
+
+       public List<OrganizationRestrictionDropDown> GetOrganizationDetails(string category)
+       {
+          
+           DataTable dtSALASuppProd;
+
+         
+           List<OrganizationRestrictionDropDown> lstOrg = new List<OrganizationRestrictionDropDown>();
+           using (dtSALASuppProd = objSRD.GetLstDistributorDetails(category))
+           {
+               if (category == "ORGANIZATION")
+               {
+                   foreach (DataRow dr in dtSALASuppProd.Rows)
+                   {
+                       OrganizationRestrictionDropDown itemOrg = new OrganizationRestrictionDropDown();
+                       itemOrg.DistId = Convert.ToInt32(dr["BTGFR_ID"]);
+                       itemOrg.DistName = Convert.ToString(dr["DESCRIPTION"]);
+                       lstOrg.Add(itemOrg);
+                   }
+               }
+           }
+
+
+            return lstOrg;
+       }
+
+       public List<CountryRestrictionDropDown> GetLstCountryDetails()
+       {
+          
+           DataTable dtSALASuppProd;
+
+           dtSALASuppProd = objSRD.GetLstCountryDetails();
+           
+
+               List<CountryRestrictionDropDown> lstSuppProd = new List<CountryRestrictionDropDown>();
+               foreach (DataRow dr in dtSALASuppProd.Rows)
+               {
+                   CountryRestrictionDropDown objSuppProd = new CountryRestrictionDropDown();
+                   objSuppProd.CountryId = Convert.ToInt32(dr["COUNTRY_ID"]);
+                   objSuppProd.CountryName = Convert.ToString(dr["COUNTRY_NAME"]);
+                   lstSuppProd.Add(objSuppProd);
+               }
+
+           
+           return lstSuppProd;
+       }
+
+
+       public List<SupplierRestrictionDropDown> GetSupplierDetails()
+       {
+           
+           DataTable dtSALASuppProd;
+
+
+           dtSALASuppProd = objSRD.GetLstSupplierDetails();
+
+           List<SupplierRestrictionDropDown> lstSuppProd = new List<SupplierRestrictionDropDown>();
+           foreach (DataRow dr in dtSALASuppProd.Rows)
+           {
+               SupplierRestrictionDropDown objSuppProd = new SupplierRestrictionDropDown();
+               objSuppProd.SupplierId = Convert.ToInt32(dr["c_supplier_id"]);
+               objSuppProd.SupplierName = Convert.ToString(dr["supplier_name"]);
+               lstSuppProd.Add(objSuppProd);
+           }
+
+
+           return lstSuppProd;
+       }
+
+
+
+
+       public List<OrganizationRestrictionGrid> GetOrganizationGridDetails(string category)
+       {
+          
+          
+           List<OrganizationRestrictionGrid> lstOrg = new List<OrganizationRestrictionGrid>();
+           DataTable dtGridDistributor = objSRD.GetGridDistributorDetails(category);
+
+          
+
+
+              
+                 
+            if (category == "ORGANIZATION") 
+           {
+
+               foreach (DataRow dr in dtGridDistributor.Rows)
+               {
+                   OrganizationRestrictionGrid objOrg = new OrganizationRestrictionGrid();
+                   objOrg.countryid = Convert.ToInt32(dr["country_id"]);
+                   objOrg.supplierid = Convert.ToInt32(dr["supplier_id"]);
+                   objOrg.BTGFR = Convert.ToInt32(dr["BTGFR"]);
+                   objOrg.Description = Convert.ToString(dr["description"]);
+                   objOrg.CountryName = Convert.ToString(dr["country_name"]);
+                   objOrg.SupplierName = Convert.ToString(dr["supplier_name"]);
+                   lstOrg.Add(objOrg);
+               }
+           }
+
+           return lstOrg;
+       }
+
+       public List<BTGFRRestrictionGrid> GetBTGFRGridDetails(string category)
+       {
+          
+
+           List<BTGFRRestrictionGrid> lstOrg = new List<BTGFRRestrictionGrid>();
+           DataTable dtGridDistributor = objSRD.GetGridDistributorDetails(category);
+
+
+
+
+
+
+           if (category == "BTGFR")
+           {
+
+               foreach (DataRow dr in dtGridDistributor.Rows)
+               {
+                   BTGFRRestrictionGrid objOrg = new BTGFRRestrictionGrid();
+                   objOrg.countryid = Convert.ToInt32(dr["country_id"]);
+                   objOrg.supplierid = Convert.ToInt32(dr["supplier_id"]);
+                   objOrg.BTGFR = Convert.ToInt32(dr["BTGFR"]);
+                   objOrg.Description = Convert.ToString(dr["description"]);
+                   objOrg.CountryName = Convert.ToString(dr["country_name"]);
+                   objOrg.SupplierName = Convert.ToString(dr["supplier_name"]);
+                   lstOrg.Add(objOrg);
+               }
+           }
+
+           return lstOrg;
+       }
+
+       public List<SupplierRestrictionGrid> GetDistributorGridDetails(string category)
+       {
+          
+
+           List<SupplierRestrictionGrid> lstOrg = new List<SupplierRestrictionGrid>();
+           DataTable dtGridDistributor = objSRD.GetGridDistributorDetails(category);
+
+
+
+
+
+
+           if (category == "Distributor")
+           {
+
+               foreach (DataRow dr in dtGridDistributor.Rows)
+               {
+                   SupplierRestrictionGrid objOrg = new SupplierRestrictionGrid();
+                   objOrg.countryid = Convert.ToInt32(dr["countryid"]);
+                   objOrg.supplierid = Convert.ToInt32(dr["supplierid"]);
+                   objOrg.DistributorId = Convert.ToInt32(dr["distributorid"]);
+                   objOrg.DistributerName = Convert.ToString(dr["dist_name"]);
+                   objOrg.CountryName = Convert.ToString(dr["country_name"]);
+                   objOrg.SupplierName = Convert.ToString(dr["supplier_name"]);
+                   lstOrg.Add(objOrg);
+               }
+           }
+
+           return lstOrg;
+       }
+
+       public int SaveDeleteItems(string operation, string organization, string country, string supplier)
+       {
+          
+           //List<SaveDelete> lstSD = new List<SaveDelete>();
+           List<Restrictionxml> xml = new List<Restrictionxml>();
+           string[] orgitems = organization.Split(',');
+           string[] ctryitems = country.Split(',');
+           string[] suppItems = supplier.Split(',');
+           for (int i = 0; i < orgitems.Length; i++)
+           {
+
+               for (int k = 0; k < ctryitems.Length; k++)
+               {
+
+                   for (int j = 0; j < suppItems.Length; j++)
+                   {
+                       Restrictionxml objXML = new Restrictionxml();
+                       objXML.BTGFR = Convert.ToInt32(orgitems[i]);
+                       objXML.countryid = Convert.ToInt32(ctryitems[k]);
+                       objXML.supplierid = Convert.ToInt32(suppItems[j]);
+
+                       xml.Add(objXML);
+
+
+
+
+
+
+                   }
+               }
+           }
+
+           //var xmlperson = ObjectToXMLGeneric<List<Restrictionxml>>(xml);
+           string xmlperson = SerializeXML(xml);
+          
+           int  SDDatatable = objSRD.GetProdDetails(operation, organization, country, supplier,xmlperson,"ORG");
+          
+           return SDDatatable;
+           
+       }
+
+       public int PostBGFROrg(string operation, string organization, string country, string supplier,string tab)
+       {
+           
+            //int count = objSRD.PostLstBGFROrgDetails(operation, organization, country, supplier,tab);
+            //return count;
+           List<Restrictionxml> xml = new List<Restrictionxml>();
+           string[] orgitems = organization.Split(',');
+           string[] ctryitems = country.Split(',');
+           string[] suppItems = supplier.Split(',');
+           for (int i = 0; i < orgitems.Length; i++)
+           {
+
+               for (int k = 0; k < ctryitems.Length; k++)
+               {
+
+                   for (int j = 0; j < suppItems.Length; j++)
+                   {
+                       Restrictionxml objXML = new Restrictionxml();
+                       objXML.BTGFR = Convert.ToInt32(orgitems[i]);
+                       objXML.countryid = Convert.ToInt32(ctryitems[k]);
+                       objXML.supplierid = Convert.ToInt32(suppItems[j]);
+
+                       xml.Add(objXML);
+
+
+                     
+
+
+
+                   }
+               }
+           }
+
+           //var xmlperson = ObjectToXMLGeneric<List<Restrictionxml>>(xml);
+           string xmlperson = SerializeXML(xml);
+          
+               int count = objSRD.PostLstBGFROrgDetails(xmlperson, tab);
+           
+           return count;
+       }
+
+       public int DeleteBGFROrg(string operation, string deleteitems, string deleteCtyItems, string deleteSupItems,string tab)
+       {
+
+           int count = objSRD.deleteLstBGFROrgDetails(operation,deleteitems,deleteCtyItems,deleteSupItems,tab);
+           
+
+
+           return count;
+       }
+
+       public static string SerializeXML(object _object)
+       {
+           XmlWriterSettings settings = new XmlWriterSettings();
+           settings.Indent = false;
+           settings.OmitXmlDeclaration = true;
+           settings.NewLineChars = "";
+           settings.NewLineHandling = NewLineHandling.None;
+
+           StringWriter stringWriter = new StringWriter();
+
+           XmlWriter xmlWriter = XmlWriter.Create(stringWriter, settings);
+
+           XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+           namespaces.Add(string.Empty, string.Empty);
+           XmlSerializer serializer = new XmlSerializer(_object.GetType());
+           serializer.Serialize(xmlWriter, _object, namespaces);
+
+           string xmlStr = stringWriter.ToString();
+
+           return xmlStr;
+       }
+
+
+       public static String ObjectToXMLGeneric<T>(T filter)  
+{  
+  
+    string xml = null;  
+    using (StringWriter sw = new StringWriter())  
+    {  
+   
+        XmlSerializer xs = new XmlSerializer(typeof(T));  
+        xs.Serialize(sw, filter);  
+        try  
+        {  
+            xml = sw.ToString();  
+  
+        }  
+        catch (Exception e)  
+        {  
+            throw e;  
+        }  
+    }  
+    return xml;  
+}  
+
+       
+    }
+}

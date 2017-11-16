@@ -1,0 +1,1057 @@
+﻿app.controller("Controller.EthernetCntrl", function ($scope, $compile, $location, $ngBootbox, $timeout, MCUParam, MCUHelper) {
+
+    $scope.productID = MCUParam.getProductId();
+    $scope.subProductID = MCUParam.getSubProductId();
+    $scope.MCUSession = MCUParam.getMCUSession();
+    $scope.AccessSpeedSupp = [];
+    $scope.displayparentportnote = false;
+    $scope.CaseArray = [];
+
+    $scope.modportspeedleadtime = '';
+    //on page load save and continue button should be disable
+    $scope.disableSaveButton = true;
+    $scope.lstValidCase = [{ id: -1, text: "--No Change--" }, { id: 0, text: "Invalid" }, { id: 1, text: "Valid"}]
+
+    // $("#portvalidity").select2();
+    $scope.modValidCase = $scope.lstValidCase[0];
+
+    $scope.modvalidport = $scope.lstValidCase[0];
+    $scope.formData = [];
+    $scope.formData.resetCase = '1';
+
+    $(".mcu_poplevel button").addClass('btn');
+    //on load all reset button will be disable
+    //$("#caseReset").prop('disabled', true);
+    $("#portadd").prop('disabled', true);
+    $("#saveContinue").prop('disabled', true);
+    $("#processChanges").prop('disabled', true);
+    $(".tblSavedDetails").hide();
+    //    $("#portReset").prop('disabled', true);
+    //    $("#saveContinue").prop('disabled', true);
+    //    $("#processChanges").prop('disabled', true);
+
+    $("#ddlaccsupp").prop('disabled', true);
+    $("#ddlsupprod").prop('disabled', true);
+    $("#ddlacctech").prop('disabled', true);
+
+    $scope.savedCaseDetails = [];
+    $scope.selectedPortspeed = [];
+    $scope.showPortSpeed = false;
+    $scope.showPortAccessSpeed = false;
+
+    MCUHelper.getPortCaseAvail().success(function (data) {
+        var availText = JSON.parse(data.d);
+        var ddlDefaultSelect = { 'AVAIL_ABBR': '', 'AVAIL_CD': 0, AVAIL_DESC: '--No Change--', 'AVAIL_VALID_CD': '' };
+        availText.splice(0, '0', ddlDefaultSelect);
+        $scope.lstCaseAvail = availText;
+        $scope.modCaseAvail = availText[0];
+        $scope.modportavail = availText[0];
+
+        $timeout(function () {
+            $("#ddlCaseAvail").select2();
+            $("#ddlPortAvail").select2({});
+        });
+
+    });
+
+    MCUHelper.GetCharectristic($scope.productID, $scope.subProductID).success(function (data) {
+        $scope.lstCharecteristics = JSON.parse(data.d)[0];
+        $scope.charTypeList = JSON.parse(data.d)[1];
+    });
+
+
+
+    $scope.loadPortSpeed = function () {
+        MCUHelper.getPortSpeedData($scope.productID, $scope.subProductID).success(function (data) {
+            var portSpeedTableData = JSON.parse(data.d);
+            $scope.lstPortspeed = portSpeedTableData;
+            if ($scope.MCUSession.AllPOPFlag <= 0) {
+                $scope.loadAccessFilter();
+            }
+
+        });
+    }
+    $scope.selectedPortSpeed = [];
+    $scope.loadAccessFilter = function () {
+
+        var PortSpeed = $scope.lstPortspeed.map(function (item) {
+            return item['PSPEED_ID'];
+        });
+        $scope.selectedPortSpeed = PortSpeed;
+        $scope.selectedCases = MCUParam.getSelectedCase();
+        $scope.selectedPoPs = MCUParam.getSelectedPoP();
+        $scope.selectedPlatform = MCUParam.getSelectedPlatform();
+        if ($scope.selectedCases.length == 0 || $scope.selectedPoPs.length == 0) {
+            $scope.lstPortspeed = [];
+            $('.pageLoaderOverlay').hide();
+            return;
+        }
+        MCUHelper.getAccessFilterData($scope.selectedCases, $scope.selectedPoPs,
+                                      PortSpeed, $scope.productID, $scope.subProductID).success(function (data) {
+                                          $("#ddlaccsupp").prop('disabled', false);
+                                          $("#ddlsupprod").prop('disabled', false);
+                                          $("#ddlacctech").prop('disabled', false);
+
+                                          var lstAccSupp = data.d.lstAccSupp;
+                                          var lstAccSuppProd = data.d.lstAccSuppProd;
+                                          var lstAccTech = data.d.lstAccTech;
+
+                                          $scope.AccSupp = data.d.lstAccSuppAll;
+                                          $scope.AccSuppProd = data.d.lstAccSuppProdAll;
+                                          $scope.AccTech = data.d.lstAccTechAll;
+
+                                          var defaultval = { suppId: '-1', suppName: 'All' };
+                                          $scope.AccSupp.splice(0, '0', defaultval);
+                                          lstAccSupp.splice(0, '0', defaultval);
+
+                                          $scope.lstAccSupp = lstAccSupp;
+                                          $scope.modAccSupp = lstAccSupp[0];
+
+
+                                          defaultval = { suppProdID: '-1', suppProdName: 'All' };
+                                          lstAccSuppProd.splice(0, '0', defaultval);
+                                          $scope.AccSuppProd.splice(0, '0', defaultval);
+                                          $scope.lstAccSuppProd = lstAccSuppProd;
+                                          $scope.modSuppProd = lstAccSuppProd[0];
+
+
+                                          defaultval = { AccTechId: '-1', AccTechName: 'All' };
+                                          lstAccTech.splice(0, '0', defaultval);
+                                          $scope.AccTech.splice(0, '0', defaultval);
+                                          $scope.lstAccTech = lstAccTech;
+                                          $scope.modAccTech = lstAccTech[0];
+                                          $('.pageLoaderOverlay').hide();
+                                          $timeout(function () {
+                                              $("#ddlaccsupp").select2({});
+                                              $("#ddlsupprod").select2({});
+                                              $("#ddlacctech").select2({});
+                                          });
+
+                                      });
+    }
+
+    //puting timout as select2 is not able to get any child element and throwing error
+    $timeout(function () {
+        // $("#ddlCaseAvail").select2();
+        $("#ddlcasevalid").select2({});
+        $("#portvalidity").select2({});
+
+    });
+
+
+    $scope.getSuppProd = function () {
+        if ($scope.modAccSupp != null) {
+            if ($scope.modAccSupp.suppId != '-1') {
+                $scope.filteredSuppProd = GetUniqueArray($.grep($scope.AccSuppProd, function (e) { return e.suppId == $scope.modAccSupp.suppId }), 'suppProdID');
+                $scope.filteredAccTech = GetUniqueArray($.grep($scope.AccTech, function (e) { return e.suppId == $scope.modAccSupp.suppId }), 'AccTechId');
+                defaultval = { suppProdID: '-1', suppProdName: 'All' };
+                $scope.filteredSuppProd.splice(0, '0', defaultval);
+                $scope.lstAccSuppProd = $scope.filteredSuppProd;
+                defaultval = { AccTechId: '-1', AccTechName: 'All' };
+                $scope.filteredAccTech.splice(0, '0', defaultval);
+                $scope.lstAccTech = $scope.filteredAccTech
+            } else {
+                $scope.lstAccSuppProd = GetUniqueArray($scope.AccSuppProd, 'suppProdID');
+                $scope.lstAccTech = GetUniqueArray($scope.AccTech, 'AccTechId');
+            }
+        } else {
+
+        }
+    }
+
+    $scope.getSupplier = function () {
+        if ($scope.modSuppProd != null) {
+            if ($scope.modSuppProd.suppProdID != '-1') {
+                $scope.filteredSupp = GetUniqueArray($.grep($scope.AccSupp, function (e) { return e.suppProdID == $scope.modSuppProd.suppProdID }), 'suppId');
+                $scope.filteredAccTech = GetUniqueArray($.grep($scope.AccTech, function (e) { return e.suppProdID == $scope.modSuppProd.suppProdID }), 'AccTechId');
+
+                var defaultval = { suppId: '-1', suppName: 'All' };
+                $scope.filteredSupp.splice(0, '0', defaultval);
+                $scope.lstAccSupp = $scope.filteredSupp;
+                defaultval = { AccTechId: '-1', AccTechName: 'All' };
+                $scope.filteredAccTech.splice(0, '0', defaultval);
+                $scope.lstAccTech = $scope.filteredAccTech;
+            } else {
+                $scope.lstAccSupp = GetUniqueArray($scope.AccSupp, 'suppId');
+                $scope.lstAccTech = GetUniqueArray($scope.AccTech, 'AccTechId');
+            }
+        }
+    }
+
+    $scope.onAccTypeChange = function () {
+        if ($scope.modAccTech != null) {
+            if ($scope.modAccTech.AccTechId != '-1') {
+                $scope.filteredSupp = GetUniqueArray($.grep($scope.AccSupp, function (e) { return e.AccTechId == $scope.modAccTech.AccTechId }),'suppId');
+                $scope.filteredSuppProd = GetUniqueArray($.grep($scope.AccSuppProd, function (e) { return e.AccTechId == $scope.modAccTech.AccTechId }), 'suppProdID');
+                var defaultval = { suppId: '-1', suppName: 'All' };
+                $scope.filteredSupp.splice(0, '0', defaultval);
+                $scope.lstAccSupp = $scope.filteredSupp;
+                defaultval = { suppProdID: '-1', suppProdName: 'All' };
+                $scope.filteredSuppProd.splice(0, '0', defaultval);
+                $scope.lstAccSuppProd = $scope.filteredSuppProd;
+            } else {
+                $scope.lstAccSupp = GetUniqueArray($scope.AccSupp,'suppId');
+                $scope.lstAccSuppProd = GetUniqueArray($scope.AccSuppProd, 'suppProdID');
+            }
+        }
+    }
+
+    $scope.prevRadioState = $scope.formData.resetCase;
+    $scope.ResetCountrySel = function (isResetRadio, state) {
+
+        $ngBootbox.confirm('All your current selections will be lost.Are you sure that you want to reset?')
+        .then(function () {
+            $scope.resetAllScopeValue();
+            if (isResetRadio == 1) {
+                $scope.prevRadioState = state;
+                $scope.formData.resetCase = state;
+                $scope.state = state;
+                //if user select any region then few part will remain hidden, to avoid this displaying all
+                $(".showallcountry").show();
+                $scope.$broadcast('loadTree', { resetCase: { caseValidity: state} });
+            }
+        },
+        function () {
+            $scope.formData.resetCase = $scope.prevRadioState;
+            $scope.state = $scope.prevRadioState;
+            //Confirm was cancelled, don't delete customer
+            console.log('Confirm was cancelled');
+        });
+
+    }
+
+    $scope.resetAllScopeValue = function () {
+
+        $scope.MCU_TreeViewScope = MCUParam.getScope("MCU_TreeView");
+        //reseting region
+        $scope.MCU_TreeViewScope.modRegion = [];
+        $('#divddlreg .select2-chosen').html("All Regions");
+        $(".showallcountry").show();
+        $('ul.wTreeStyle').find('input[type=checkbox]:checked').removeAttr('checked'); //unchecking all checked checkbox
+        $(".collapseall").empty(); //removing child div
+        $(".imgcloseall").attr('src', "image/closefolder.gif"); //assigning close folder to all image
+        //to disable add port button
+        $("#portadd").prop('disabled', true);
+        $("#saveContinue").prop('disabled', true);
+        $("#processChanges").prop('disabled', true);
+
+        //        $scope.modAccSupp = [];
+        //        $scope.modSuppProd = [];
+        //        $scope.modAccTech = [];
+        $scope.modCaseAvail.AVAIL_CD = 0;
+        $scope.modCaseAvail.AVAIL_DESC = '--No Change--';
+        $("#s2id_ddlCaseAvail .select2-chosen").html("--No Change--");
+        $scope.modValidCase.id = -1;
+        $scope.modValidCase.text = "--No Change--";
+        $("#s2id_ddlcasevalid .select2-chosen").html("--No Change--");
+
+        $scope.lstAccSupp = [];
+        $scope.lstAccSuppProd = [];
+        $scope.lstAccTech = [];
+
+        if ($scope.modAccSupp != undefined) {
+            $scope.modAccSupp.suppId = '-1';
+            $scope.modAccSupp.suppName = 'All';
+
+        }
+
+        if ($scope.modSuppProd != undefined) {
+            $scope.modSuppProd.suppProdID = '-1';
+            $scope.modSuppProd.suppProdName = 'All';
+
+        }
+
+        if ($scope.modAccTech != undefined) {
+            $scope.modAccTech.AccTechId = '-1';
+            $scope.modAccTech.AccTechName = 'All';
+
+        }
+        $("#s2id_ddlaccsupp .select2-chosen").html("All");
+        $("#s2id_ddlsupprod .select2-chosen").html("All");
+        $("#s2id_ddlacctech .select2-chosen").html("All");
+
+        $("#s2id_ddlaccsupp").prop('disabled', false);
+        $("#s2id_ddlsupprod").prop('disabled', false);
+        $("#s2id_ddlacctech").prop('disabled', false);
+
+        $scope.lstPortspeed = [];
+        $scope.savedCaseDetails = [];
+        $scope.formData.resetCase = 1;
+        //reset charecteristics
+        $scope.resetChar();
+        //reset saved details grid
+        //  $('#saveddetailspanel').empty();
+        $(".tblSavedDetails").hide();
+        resetPort();
+        $scope.CaseArray = [];
+    }
+
+
+    $scope.onportreset = function (e) {
+        if ($scope.modportspeed.length > 0) {
+            $ngBootbox.confirm('Your current selected port speeds/access speed will be lost.Are you sure that you want to reset?')
+        .then(function () {
+            resetPort();
+        });
+
+        }
+    }
+    function resetPort() {
+        $scope.modportspeed = [];
+        $scope.modvalidport.id = -1;
+        $scope.modvalidport.text = "--No Change--";
+        $("#s2id_portvalidity .select2-chosen").html("--No Change--");
+        $scope.modportavail.AVAIL_CD = 0;
+        $scope.modportavail.AVAIL_DESC = "--No Change--";
+        $("#s2id_ddlPortAvail .select2-chosen").html("--No Change--");
+        $scope.modportspeedleadtime = '';
+        $scope.modAccSpeed = [];
+        $scope.lstAccSpeed = [];
+        $scope.portspeedList = [];
+        $scope.AccessSuppCharList = [];
+        //$scope.portAccessJson = [];
+    }
+
+    $scope.addCasePop = function () {
+        //to check whether any selecttion made or not
+
+        if ($('.wTreeStyle input:checked').length == 0) {
+            bootbox.alert("Please make a selection in the Case Selection box");
+            return;
+        }
+
+        $('.pageLoaderOverlay').show();
+        $("#portadd").prop('disabled', false);
+
+        $scope.$broadcast('saveSelection', { data: {} });
+        $scope.loadPortSpeed();
+        // $("#caseReset").prop('disabled', false);
+        $scope.enableSaveButton = true;
+    }
+
+    $scope.onchangeofportspeed = function () {
+        if ($scope.modportspeed.length > 0) {
+            $("#portadd").prop('disabled', false);
+        } else { $("#portadd").prop('disabled', true); }
+    }
+
+    $scope.resetCase = function () {
+        var answer = confirm("All your current selections will be lost.Are you sure that you want to reset?")
+        if (answer) {
+            $('#termSheetPopup').find('input[type=checkbox]:checked').removeAttr('checked');
+            $("#portadd").prop('disabled', true);
+            $("#portReset").prop('disabled', true);
+            $("#saveContinue").prop('disabled', true);
+            $("#processChanges").prop('disabled', true);
+            $("#charAdd").prop('disabled', true);
+            $scope.lstAccSpeed = [];
+            $scope.modportspeed = [];
+            $scope.portAccessJson = [];
+            $scope.savedCaseDetails = [];
+        }
+    }
+
+
+    $scope.portspeedList = [];
+    $scope.onPortSpeedSelect = function () {
+        $scope.newSelectedPortID = getStringArray($scope.modportspeed, 'PSPEED_ID')
+
+    }
+
+    $scope.addPortSpeed = function () {
+
+
+        if ($scope.modportspeed == undefined || $scope.modportspeed.length == 0) {
+            bootbox.alert("Please select a port speed");
+            return;
+        }
+        $('.pageLoaderOverlay').show();
+        //if no filter is selected then pass -1
+        if ($scope.modAccSupp == undefined || $scope.modAccSupp == '') {
+            $scope.modAccSupp.suppId = '-1';
+            $scope.AccSuppText = 'All';
+        } else { $scope.AccSuppText = $scope.modAccSupp.suppName; }
+        if ($scope.modSuppProd == undefined || $scope.modSuppProd == '') {
+            $scope.modSuppProd.suppProdID = '-1';
+            $scope.SuppProdText = 'All';
+        } else { $scope.SuppProdText = $scope.modSuppProd.suppProdName; }
+        if ($scope.modAccTech == undefined || $scope.modAccTech == '') {
+            $scope.modAccTech.AccTechId = '-1';
+            $scope.AccTechText = 'All';
+        } else { $scope.AccTechText = $scope.modAccTech.AccTechName; }
+
+        //TO save access filter
+        if ($scope.modAccSupp == undefined)
+            $scope.AccessSupplierID = '0';
+        else
+            $scope.AccessSupplierID = $scope.modAccSupp.suppId;
+
+        if ($scope.modSuppProd == undefined)
+            $scope.AccessProductID = '0';
+        else
+            $scope.AccessProductID = $scope.modSuppProd.suppProdID;
+
+        if ($scope.modAccTech == undefined) {
+            $scope.AccessTypeID = '0';
+            $scope.PhaseAttr = '0';
+        } else {
+
+            if ($scope.modAccTech.AccTechId != '-1' && $scope.modAccTech.AccTechId.indexOf('-') != -1) {
+                $scope.updateParam.AccessTypeID = $scope.modAccTech.AccTechId.split('-')[0];
+                $scope.updateParam.PhaseAttr = $scope.modAccTech.AccTechId.split('-')[1]; ;
+            } else {
+                $scope.AccessTypeID = $scope.modAccTech.AccTechId;
+                $scope.PhaseAttr = '';
+            }
+        }
+
+        //get access speed
+        MCUHelper.getAccessSpeed($scope.selectedCases, $scope.selectedPoPs, $scope.newSelectedPortID, $scope.productID, $scope.subProductID,
+              $scope.AccSuppText, $scope.SuppProdText, $scope.AccTechText, 'PoPLevel').success(function (data) {
+                  $scope.AccessSpeedSupp = JSON.parse(data.d);
+                  $scope.lstAccSpeed = $scope.AccessSpeedSupp[0];
+                  $('.pageLoaderOverlay').hide();
+              });
+    }
+
+
+
+
+    $scope.AccessSuppCharList = [];
+    $scope.savedCaseDetails = [];
+    //to enble/disable 
+    $scope.writeSavedCases = function () {
+        $scope.CaseAvailtxt = '';
+        $scope.CaseValid = '';
+        $scope.PortAvailtxt = '';
+        $scope.PortValid = '';
+        $scope.LeadTime = '';
+
+        $scope.$broadcast('saveSelection', { data: {} });
+        $scope.selectedCases = MCUParam.getSelectedCase();
+        $scope.selectedPoPs = MCUParam.getSelectedPoP();
+        $scope.selectedPlatform = MCUParam.getSelectedPlatform();
+
+        $scope.portspeedAdded = false;
+        app.bindPortSpeed($scope);
+
+
+        //these flag are to restrict multiple load of same data
+        $scope.portAccessJson = [];
+        $scope.prevPoP = '';
+        $scope.prevIndex = '';
+
+
+        $scope.MCU_TreeViewScope = MCUParam.getScope("MCU_TreeView");
+        $scope.ValidPortAccessCombo = [];
+        //binding access speed
+        app.AccessSupp($scope);
+
+        //to bind charecteristics
+        saveSelectedChar();
+        //empty saved table data
+        $scope.savedCaseDetails = [];
+        //below code is to show/hide plus button to show or hide inner table
+        if ($scope.portspeedList.length > 0) {
+            if ($scope.AccessSuppCharList.length > 0) {
+                $scope.showPortAccessSpeed = true;
+                $scope.showPortSpeed = false;
+
+            } else {
+                $scope.innerTableHeading = "Port Speed";
+                $scope.showPortSpeed = true;
+            }
+        }
+
+       
+        $scope.iconSymbol = '+';
+
+        //bind caseArray
+        app.BindCaseArray($scope);
+
+        app.SavedCaseDetails($scope, MCUHelper);
+
+        $('#selectedChar').empty();
+        $("#processChanges").prop('disabled', false);
+        // resetPort();
+
+
+    }
+
+    $scope.portAccessJson = [];
+    $scope.openInnerTabe = function (popID, index) {
+
+        if ($scope.prevPoP != popID || $scope.prevIndex != index) {
+            app.portAccess($scope, popID);
+            $scope.prevIndex = index;
+            $scope.prevPoP = popID;
+        }
+        var iconSymbol = 'iconSymbol' + index + popID;
+        var innerTableId = 'innerTable' + index + popID;
+        if ($("#" + iconSymbol).html() == '+') {
+            $("#" + innerTableId).show();
+            $("#" + iconSymbol).html("-");
+        } else {
+            $("#" + iconSymbol).html("+");
+            $("#" + innerTableId).hide();
+        }
+        $('.pageLoaderOverlay').hide();
+    }
+
+    $scope.openInnerTabe1 = function (popID, index) {
+        if ($scope.prevPoP != popID || $scope.prevIndex != index) {
+            app.portAccess($scope, popID);
+            $scope.prevIndex = index;
+            $scope.prevPoP = popID;
+        }
+        var iconSymbol = 'iconSymbol1' + index + popID;
+        var innerTableId = 'innerTable1' + index + popID;
+        if ($("#" + iconSymbol).html() == '+') {
+            $("#" + innerTableId).show();
+            $("#" + iconSymbol).html("-");
+        } else {
+            $("#" + iconSymbol).html("+");
+            $("#" + innerTableId).hide();
+        }
+        $('.pageLoaderOverlay').hide();
+    }
+
+    $scope.addSelectedChar = function () {
+        //to check whether any selecttion made or not
+        if ($('.wTreeStyle input:checked').length == 0) {
+            bootbox.alert("Please make a selection in the Case Selection box");
+            return;
+        }
+
+        if ($scope.modSelectedchar == undefined || $scope.modSelectedchar.length == 0) {
+            bootbox.alert("Please Select a Characteristic Type");
+            return;
+        }
+        $('.pageLoaderOverlay').show();
+        // $scope.MCU_TreeViewScope = MCUParam.getScope("MCU_TreeView");
+
+        $scope.$broadcast('saveSelection', { data: {} });
+        $scope.selectedCases = MCUParam.getSelectedCase();
+        $scope.selectedPoPs = MCUParam.getSelectedPoP();
+        $scope.selectedPlatform = MCUParam.getSelectedPlatform();
+
+        $scope.selectedCharTypeID = getStringArray($scope.modSelectedchar, 'CHAR_TYPE_ID');
+        //  $scope.selectedPoPsID = getStringArray($scope.selectedPoPs, 'id');
+        // $scope.selectedPoPsID = $scope.MCU_TreeViewScope.selectedPoPs; //$scope.selectedPoPs;
+
+        $scope.selectedCharList = [];
+        $scope.selectedAccessSupplier = [];
+        $scope.parentPortSpeedList = [];
+        $scope.counter = 0;
+        $scope.modSelectedchar.forEach(function (selectedCharType) {
+            //If the array value selected is not access supplier or parentportspeed
+            if (selectedCharType.CHAR_TYPE_ID != -1 && selectedCharType.CHAR_TYPE_ID != -2) {
+                $scope.charTypeList.forEach(function (item) {
+                    if (item.CHAR_TYPE_ID == selectedCharType.CHAR_TYPE_ID) {
+                        $scope.selectedCharList.push(item);
+                    }
+                });
+                $scope.counter++;
+                callWriteCharTable();
+            }
+            else {
+                if (selectedCharType.CHAR_TYPE_ID == -1) {
+                    MCUHelper.getAccessSupplier($scope.selectedPoPs).success(function (data) {
+                        $scope.selectedAccessSupplier = JSON.parse(data.d);
+                        $scope.counter++;
+                        callWriteCharTable();
+                    }).error(function () { console.log("failed to load Access supplier data"); });
+                }
+                else {
+                    MCUHelper.getParentPortSpeed($scope.selectedPoPs, $scope.selectedPlatform, $scope.productID, $scope.subProductID)
+                    .success(function (data) {
+                        $scope.parentPortSpeedList = data.d;
+                        $scope.counter++;
+                        callWriteCharTable();
+                    });
+                }
+            }
+
+
+
+
+        });
+
+    }
+
+    function callWriteCharTable() {
+        if ($scope.counter == $scope.modSelectedchar.length) {
+            $scope.writeSelectedCharTable();
+        }
+    }
+    $scope.toggleCheckox = function (charid) {
+        if ($("#chkSelect" + charid).is(':checked')) {
+            $("#chkValid" + charid).attr("disabled", false);
+            $("#chkChangeVal" + charid).attr("disabled", false);
+        } else {
+            $("#chkValid" + charid).attr("disabled", true);
+            $("#chkChangeVal" + charid).attr("disabled", false);
+        }
+
+
+    }
+
+    $scope.toggletextbox = function (charid) {
+        if ($("#chkSelect" + charid).is(':checked')) {
+            $("#txt" + charid).attr("disabled", false);
+        } else {
+            $("#txt" + charid).attr("disabled", true);
+        }
+    }
+    $scope.savedCharList = [];
+    function saveSelectedChar() {
+
+        $(".chkSelectcol input:checked").each(function (e) {
+            var CharId = $(this).attr('id').replace('chkSelect', '');
+            var Type = $(this).attr('charType');
+            if ($scope.savedCharList.length == 0 || getStringArray($scope.savedCharList, 'CharId').indexOf(CharId) == -1) {
+                var productchar = {};
+                productchar.CharId = CharId;
+                productchar.CharName = $('#charname' + productchar.CharId).text();
+
+                productchar.CharAvailCd = $("#avail" + productchar.CharId).val();
+
+                productchar.CharAvailText = $("#avail" + productchar.CharId + " :selected").text();
+
+                if (Type == '')
+                    productchar.CharTypeId = $.grep($scope.selectedCharList, function (e) { return e.CHAR_ID == productchar.CharId })[0].CHAR_TYPE_ID;
+                if (Type == 'AccSupp')
+                    productchar.CharTypeId = -1;
+                if (Type == 'ParentPortSpeed')
+                    productchar.CharTypeId = -2;
+                productchar.CharValue = $("#txt" + productchar.CharId).val() == undefined ? '' : $("#txt" + productchar.CharId).val();
+                productchar.CharValue2 = '';
+                productchar.ValidCd = $("#chkValid" + productchar.CharId).is(':checked') == true ? 1 : 0;
+                productchar.ValidText = $("#chkValid" + productchar.CharId).is(':checked') == true ? 'Valid' : 'Invalid';
+                productchar.Type = Type;
+                $scope.savedCharList.push(productchar);
+            }
+        });
+    }
+
+    $scope.resetChar = function () {
+        $scope.modSelectedchar = [];
+        $('#selectedChar').empty();
+    }
+
+    $scope.resetCharBtn = function () {
+        if ($scope.modSelectedchar != undefined && $scope.modSelectedchar.length > 0) {
+            $ngBootbox.confirm('Your current selected characteristics will be lost.Are you sure that you want to reset?')
+            .then(function () {
+                $scope.resetChar();
+            });
+        }
+    }
+
+    $scope.availoptionvalue = '';
+    function getAvailDropdown(charid) {
+        $scope.avilhtml = "<select id='avail" + charid + "' style='width: 100%'>";
+        if ($scope.availoptionvalue == '') {
+            $scope.lstCaseAvail.forEach(function (item1) {
+                if (item1.AVAIL_CD != 0)
+                    $scope.availoptionvalue += "<option value='" + item1.AVAIL_CD + "'>" + item1.AVAIL_DESC + "</option>";
+            });
+        }
+        $scope.avilhtml += $scope.availoptionvalue;
+        $scope.avilhtml += "</select>";
+        return $scope.avilhtml;
+    }
+
+    $scope.writeSelectedCharTable = function () {
+
+        var html = "<table class=\"table table-bordered table-striped\" width=\"100%\" id=\"tblChar\"><thead><tr><th>Change</th><th>Characteristic</th>";
+        html += "<th class=\"lbltxt\">Valid</th><th class=\"lbltxt\">Availability</th><th class=\"lbltxt\">Change Value</th>";
+        html += "<th class=\"lbltxt\">Value</th></tr></thead>";
+        html += "<tbody>";
+        $scope.selectedCharList.forEach(function (item) {
+            html += "<tr>";
+            if (item.CHAR_TYPE_VALUE_COUNT != 6) {
+                html += "<td class='chkSelectcol'><input id='chkSelect" + item.CHAR_ID + "' charType='' ng-click ='toggleCheckox(" + item.CHAR_ID + ")' type='checkbox'/></td>";
+
+
+                //ng-click ='toggleCheckox(" + item.CHAR_ID + ")' type='checkbox'/></td>";
+            } else {
+
+            }
+            //2nd column
+            var charName = Boolean(item.CHAR_ACTUAL_VALUE) ? item.CHAR_NAME + "-" + item.CHAR_ACTUAL_VALUE : item.CHAR_NAME;
+            html += "<td><span id='charname" + item.CHAR_ID + "'>" + charName + "</span></td>";
+            //3rd column
+            html += "<td><input id='chkValid" + item.CHAR_ID + "' disabled ng-click =ValidateChar('" + item.CHAR_ID + "') type='checkbox' /></td>";
+            html += "<td>";
+            //3rd column
+            if (item.CHAR_TYPE_ID != 31 && item.CHAR_TYPE_ID != 40) {
+                html += getAvailDropdown(item.CHAR_ID);
+                html += "</td>";
+                $scope.modAvailCD = $scope.lstCaseAvail[0].AVAIL_CD;
+            }
+            html += "<td>";
+            if (item.CHAR_TYPE_VALUE_COUNT == 1 || item.CHAR_TYPE_VALUE_COUNT == 2 || item.CHAR_TYPE_VALUE_COUNT == 5) {
+                html += "<input id='chkChangeVal" + item.CHAR_ID + "' disabled type='checkbox' ng-click='toggletextbox(" + item.CHAR_ID + ")' />";
+            } else if (item.CHAR_TYPE_VALUE_COUNT == 6) {
+                html += "<input id='chkChangeVal" + item.CHAR_ID + "' disabled type='checkbox' ng-click='ValidateValueLength()'>";
+            }
+            html += "</td>";
+
+            switch (item.CHAR_TYPE_VALUE_COUNT) {
+                case '0':
+                    var actualval = item.CHAR_ACTUAL_VALUE == null ? '' : item.CHAR_ACTUAL_VALUE;
+                    html += "<td>" + actualval + "</td>";
+                    break;
+                case '1':
+                    if ($scope.MCUSession.Multipoint == 1 && item.CHAR_TYPE_ID == 643 && item.CHAR_ID != 3923) {
+                        html += "<td><input id='chkCharValue" + item.CHAR_ID + "' disabled type='checkbox' ng-click='' />";
+                    } else if (item.CHAR_TYPE_ID == 25) {
+                        html += "<td><input type='text' id='txt" + item.CHAR_ID + "' disabled ng-change=''/>";
+                    } else {
+                        html += "<td><input type='text' id='txt" + item.CHAR_ID + "' disabled/>";
+                    }
+                    html += "</td>";
+                    break;
+                case '2':
+                    if ($scope.MCUSession.Multipoint == 1 && item.CHAR_TYPE_ID == 644) {
+                        if (item.CHAR_NAME == 'Terrestrial Routes' || item.CHAR_NAME == 'Satellite Routes') {
+                            html += "<td><input id='chkCharValue" + item.CHAR_ID + "' disabled type='checkbox' />"
+                        } else {
+                            html += "<td><input type='text' id='txt" + item.CHAR_ID + "' disabled />";
+                            html += "<input id='chkCharValue" + item.CHAR_ID + "' disabled type=checkbox ng-change=''/>";
+                        }
+                    } else {
+                        html += " <td><input type='text' id='txt" + item.CHAR_ID + "' disabled ng-change=''/>";
+                        html += "To <input type='text' id='chkCharValue" + item.CHAR_ID + "' disabled ng-change=''/>";
+                    }
+                    html += " </td>";
+                    break;
+                case '5':
+                    html += "<td><input type='text' id='txt" + item.CHAR_ID + "' disabled ng-change=''/></td>";
+                    break;
+                case '6':
+                    var str = "window.open('ProductFileUpload.aspx?txtId=txt" + iten.CHAR_ID + "','_blank','height=180,width=700,top=200,left=200,status=no,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no,copyhistory=false,dependent=true')";
+                    html += "<td><input type=button' disabled value='File Upload' id='btnFileUpload'" + item.CHAR_ID + " ng-click=''/></td>";
+                    break;
+            }
+            html += "</tr>";
+
+
+
+        });
+
+        if ($scope.selectedAccessSupplier.length != 0) {
+            $scope.selectedAccessSupplier.forEach(function (item) {
+                $scope.MCUSession.AccessSupplierSelected = true;
+                html += "<tr>";
+                html += "<td class='chkSelectcol'><input id='chkSelect" + item.CHAR_ID + "'  type='checkbox' charType='AccSupp'  ng-click='toggleCheckox(" + item.CHAR_ID + ")'></td>";
+                html += "<td><span id='charname" + item.CHAR_ID + "'>" + item.CHAR_NAME + "</span></td>";
+                html += "<td><input id='chkValid" + item.CHAR_ID + "' disabled ng-click ='' type='checkbox'/></td>";
+                html += "<td></td><td></td><td></td></tr>";
+            });
+        }
+
+        if ($scope.parentPortSpeedList.length != 0) {
+            $scope.MCUSession.ParentPortSpeedSelected = true;
+            $scope.parentPortSpeedList.forEach(function (item) {
+                html += "<tr>";
+                if (item.IsValidMapping == 1) {
+                    html += "<td class='chkSelectcol'><input id='chkSelect" + item.CharDesc + "'  type='checkbox' charType='ParentPortSpeed'  ng-click='toggleCheckox(" + item.CharDesc + ")'></td>";
+                } else {
+                    html += "<td><input id='chkSelect" + item.CharDesc + "' disabled  type='checkbox'  ng-click=''></td>";
+                }
+
+                html += " <td><span id='charname" + item.CHAR_ID + "'>" + item.CHAR_NAME + "</span></td>";
+                html += "<td><input id='chkValid" + item.CharDesc + "' disabled type='checkbox'/></td>";
+                html += "<td></td><td></td><td></td></tr>";
+
+            });
+            $scope.displayparentportnote = true;
+        } else { $scope.displayparentportnote = false; }
+        html += "</tbody>";
+        html += "</table>";
+        var temp = $compile(html)($scope);
+        $("#selectedChar").html(temp);
+        $('.pageLoaderOverlay').hide();
+    }
+
+
+    $scope.onUpdateCases = function () {
+        app.UpdateCases($scope, MCUHelper, $ngBootbox);
+    }
+    //    $scope.onUpdateCases = function () {
+    //        $('.pageLoaderOverlay').show();
+    //        $scope.selPortID = [];
+    //        $scope.portAvailCd = [];
+    //        $scope.portValidCd = [];
+    //        $scope.portLeadTime = [];
+    //        $scope.AccSpeedCharId = [];
+    //        $scope.AccSuppId = [];
+    //        $scope.AccTypeId = [];
+    //        $scope.AccNameId = [];
+    //        $scope.pCPESupplier = [];
+    //        $scope.pCarrier = [];
+    //        $scope.pCharCount = [];
+    //        $scope.iaccessspeedcharcount = [];
+    //        $scope.pportspeedcharcount = [];
+    //        $scope.pAccessSupplierCount = [];
+    //        $scope.pParentportSpeedCount = [];
+
+    //        //charecteristics
+    //        $scope.pcharid = [];
+    //        $scope.pcharavailcd = [];
+    //        $scope.pchartypeid = [];
+    //        $scope.pcharvalue = [];
+    //        $scope.pcharvalue2 = [];
+    //        $scope.pchardetailvalidcd = [];
+    //        //char access supp
+    //        $scope.paccesssupplierid = [];
+    //        $scope.paccesssuppliervalid = [];
+    //        //char Parent port speed
+    //        $scope.pparentportspeeds = []
+    //        $scope.pparentportspeedvalid = [];
+
+    //        var icount = 0;
+    //        var iaccessspeedcharcount = 0;
+    //        var count = 0
+
+    //        //            $scope.selPortID = getStringArray($scope.portspeedList, 'CharId');
+    //        //            $scope.portAvailCd = getStringArray($scope.portspeedList, 'PortAvailability');
+    //        //            $scope.portValidCd = getStringArray($scope.portspeedList, 'ValidCd');
+    //        //            $scope.portLeadTime = getStringArray($scope.portspeedList, 'LeadTime');
+
+    //        if ($scope.selectedCases == undefined) {
+    //            $scope.$broadcast('saveSelection', { data: {} });
+    //            $scope.selectedCases = MCUParam.getSelectedCase();
+    //            $scope.selectedPoPs = MCUParam.getSelectedPoP();
+    //            $scope.selectedPlatform = MCUParam.getSelectedPlatform();
+    //        }
+
+    //        $scope.pavailcd = [];
+    //        $scope.pcasevalidcd = [];
+    //        $scope.selectedCases.forEach(function (caseItem) {
+    //            $scope.pavailcd.push($scope.modCaseAvail.AVAIL_CD);
+    //            $scope.pcasevalidcd.push($scope.modValidCase.id);
+    //            $scope.pCPESupplier.push(0);
+    //            $scope.pCarrier.push(-1);
+
+    //            if ($scope.portspeedList.length > 0) {
+
+    //                $scope.portspeedList.forEach(function (item) {
+    //                    if (item.CaseId.indexOf(caseItem) != -1) {
+    //                        $scope.selPortID.push(item.CharId);
+    //                        $scope.portAvailCd.push(item.PortAvailability);
+    //                        $scope.portValidCd.push(item.ValidCd);
+    //                        $scope.portLeadTime.push(item.LeadTime);
+    //                    }
+    //                    if ($scope.AccessSuppCharList.length > 0) {
+    //                        $scope.AccessSuppCharList.forEach(function (item) {
+    //                            //                            $scope.AccSpeedCharId.push(item.AccessId);
+    //                            //                            $scope.AccSuppId.push(item.SupplierId);
+    //                            //                            $scope.AccTypeId.push(item.AccessTypeId);
+    //                            //                            $scope.AccNameId.push(item.SupplierNameId);
+    //                            $scope.iaccessspeedcharcount.push(iaccessspeedcharcount);
+    //                        });
+    //                    }
+    //                    icount++;
+    //                });
+    //                iaccessspeedcharcount++;
+
+    //            }
+    //            $scope.pportspeedcharcount.push(icount);
+    //            //charecteristics
+    //            var pAccessSupplierCount = 0;
+    //            var pParentportSpeedCount = 0;
+
+    //            $scope.savedCharList.forEach(function (item) {
+    //                if (item.Type == '') {
+    //                    $scope.pcharid.push(item.CharId);
+    //                    $scope.pcharavailcd.push(item.CharAvailCd);
+    //                    $scope.pchardetailvalidcd.push(item.ValidCd);
+    //                    $scope.pchartypeid.push(item.CharTypeId);
+    //                    $scope.pcharvalue.push(item.CharValue);
+    //                    $scope.pcharvalue2.push(item.CharValue2);
+    //                    count++;
+
+    //                }
+
+    //                if (item.Type == 'AccSupp') {
+    //                    $scope.paccesssupplierid.push(item.CharId);
+    //                    $scope.paccesssuppliervalid.push(item.ValidCd);
+    //                    pAccessSupplierCount++;
+    //                }
+
+    //                if (item.Type == 'ParentPortSpeed') {
+    //                    $scope.pparentportspeeds.push(item.CharId);
+    //                    $scope.pparentportspeedvalid.push(item.ValidCd);
+    //                    pParentportSpeedCount++;
+    //                }
+    //            });
+
+    //            if (count == 0)
+    //                $scope.pCharCount.push(count);
+    //            else
+    //                $scope.pCharCount.push(1);
+
+    //            if (pAccessSupplierCount != 0)
+    //                $scope.pAccessSupplierCount.push(pAccessSupplierCount);
+    //            else
+    //                $scope.pAccessSupplierCount.push(1);
+
+    //            if (pParentportSpeedCount != 0)
+    //                $scope.pParentportSpeedCount.push(pParentportSpeedCount);
+    //            else
+    //                $scope.pParentportSpeedCount.push(1);
+
+    //        });
+
+    //        if ($scope.AccessSuppCharList.length > 0) {
+    //            $scope.AccSpeedCharId = getStringArray($scope.AccessSuppCharList, 'AccessId');
+    //            $scope.AccSuppId = getStringArray($scope.AccessSuppCharList, 'SupplierId');
+    //            $scope.AccTypeId = getStringArray($scope.AccessSuppCharList, 'AccessTypeId');
+    //            $scope.AccNameId = getStringArray($scope.AccessSuppCharList, 'SupplierNameId');
+    //        }
+
+    //        $scope.updateParam = {};
+    //        $scope.updateParam.LocLevel = $scope.MCUSession.LocLevel;
+    //        $scope.updateParam.ProductCd = $scope.productID;
+    //        $scope.updateParam.SubProductCd = $scope.subProductID;
+    //        $scope.updateParam.UserId = $scope.MCUSession.UserId == "" ? '607963746' : $scope.MCUSession.UserId;
+    //        $scope.updateParam.iPopId = $scope.selectedPoPs;
+    //        $scope.updateParam.iCaseId = $scope.selectedCases;
+    //        $scope.updateParam.pavailcd = $scope.pavailcd;
+    //        $scope.updateParam.pcasevalidcd = $scope.pcasevalidcd;
+    //        $scope.updateParam.pcharid = $scope.pcharid;
+    //        $scope.updateParam.pcharavailcd = $scope.pcharavailcd;
+    //        $scope.updateParam.pchartypeid = $scope.pchartypeid;
+    //        $scope.updateParam.pcharvalue = $scope.pcharvalue;
+    //        $scope.updateParam.pcharvalue2 = $scope.pcharvalue2;
+    //        $scope.updateParam.pportspeedcharid = $scope.selPortID;
+    //        $scope.updateParam.paccessspeedcharid = $scope.AccSpeedCharId;
+    //        $scope.updateParam.psuppliercharid = $scope.AccSuppId;
+    //        $scope.updateParam.ptypecharid = $scope.AccTypeId;
+    //        $scope.updateParam.pnamecharid = $scope.AccNameId;
+    //        $scope.updateParam.pportavailability = $scope.portAvailCd;
+    //        $scope.updateParam.pportvalidity = $scope.portValidCd;
+    //        $scope.updateParam.pportspeedcharcount = $scope.pportspeedcharcount;
+    //        $scope.updateParam.paccessspeedcharcount = $scope.iaccessspeedcharcount;
+    //        $scope.updateParam.pchardetailvalidcd = $scope.pchardetailvalidcd;
+    //        $scope.updateParam.poffnetleadtime = $scope.portLeadTime;
+    //        $scope.updateParam.paccesssupplierid = $scope.paccesssupplierid;
+    //        $scope.updateParam.paccesssuppliervalid = $scope.paccesssuppliervalid;
+    //        $scope.updateParam.pparentportspeeds = $scope.pparentportspeeds;
+    //        $scope.updateParam.pparentportspeedvalid = $scope.pparentportspeedvalid;
+    //        $scope.updateParam.pparentaccessproducttypeid = [];
+    //        $scope.updateParam.pparentaccesssuppliernameid = [];
+    //        $scope.updateParam.pparentaccesssuppliercharid = [];
+    //        $scope.updateParam.pparentaccessspeedcharid = [];
+    //        $scope.updateParam.pCharCount = $scope.pCharCount;
+    //        $scope.updateParam.pAccessSupplierCount = $scope.pAccessSupplierCount;
+    //        $scope.updateParam.pParentportSpeedCount = $scope.pParentportSpeedCount;
+    //        $scope.updateParam.pCarrier = $scope.pCarrier;
+    //        $scope.updateParam.pCPESupplier = $scope.pCPESupplier;
+    //        //Exception parameter
+    //        $scope.updateParam.strInsertCaseIds = $scope.strInsertCaseIds;
+    //        $scope.updateParam.strRemoveCaseIds = $scope.strRemoveCaseIds;
+    //        $scope.updateParam.pPlatformcharid = $scope.selectedPlatform;
+    //        $scope.updateParam.pCountryID = $scope.pCountryID;
+    //        //TO save access filter
+    //        $scope.updateParam.AccessSupplierID = $scope.AccessSupplierID;
+    //        $scope.updateParam.AccessProductID = $scope.AccessProductID;
+    //        $scope.updateParam.AccessTypeID = $scope.AccessTypeID;
+    //        $scope.updateParam.PhaseAttr = $scope.PhaseAttr;
+
+    //        $scope.param = JSON.stringify($scope.updateParam);
+    //        MCUHelper.updateCases($scope.param).success(function (data) {
+    //            $('.pageLoaderOverlay').hide();
+
+    //            $ngBootbox.alert("Case updated successfully").then(function () {
+    //                $("#leftpanel").show();
+    //                $("#rightpanel").show();
+    //                $("#savecontinuepanel").show();
+    //                $("#processChanges").show();
+    //                $("#cancelcase").hide();
+    //                $("#updatecase").hide();
+    //                $('#saveddetailspanel').show();
+    //                $('#FinalSelectedGrid').hide();
+    //                $scope.resetAllScopeValue();
+    //                //  $scope.$broadcast('loadTree', { resetCase: { caseValidity: $scope.state == undefined ? $scope.formData.resetCase : $scope.state} });
+    //                $scope.$broadcast('loadTree', { resetCase: { caseValidity: 1} });
+    //            });
+
+
+    //        }).error(function () {
+    //            alert("Case updated failed");
+    //            $('.pageLoaderOverlay').hide();
+    //        })
+
+    //    }
+
+    $scope.processChanges = function () {
+        $scope.CasestoUpdate = 'Cases to Update';
+        $("#leftpanel").hide();
+        $("#rightpanel").hide();
+        $("#savecontinuepanel").hide();
+        $("#processChanges").hide();     
+        $("#cancelcase").show();
+        $("#updatecase").show();
+        $scope.strInsertCaseIds = [];
+        $scope.strRemoveCaseIds = [];
+        $scope.pCountryID = [];
+        $('.tblSavedDetails input:checked').each(function () {
+            if ($(this).attr('id').indexOf("createException") != -1) {
+                if ($scope.strInsertCaseIds.indexOf($(this).attr('id').replace('createException', '')) == -1) {
+                    $scope.strInsertCaseIds.push($(this).attr('id').replace('createException', ''));
+                    $scope.pCountryID.push($(this).attr('country').replace('createExcountry', ''));
+                }
+            }
+
+
+            if ($(this).attr('id').indexOf("removeException") != -1) {
+                if ($scope.strRemoveCaseIds.indexOf($(this).attr('id').replace('removeException', '')) == -1) {
+                    $scope.strRemoveCaseIds.push($(this).attr('id').replace('removeException', ''));
+                    $scope.pCountryID.push($(this).attr('country').replace('removeExcountry', ''));
+                }
+            }
+        });
+        $('#FinalSelectedGrid').show();
+        $("#saveddetailspanel").hide()
+    }
+
+    $scope.onCancelCases = function () {
+        $("#leftpanel").show();
+        $("#rightpanel").show();
+        $("#savecontinuepanel").show();
+        $("#processChanges").show();
+        $("#cancelcase").hide();
+        $("#updatecase").hide();
+        $scope.resetAllScopeValue();
+        $('#saveddetailspanel').show();
+        $('#FinalSelectedGrid').hide();
+
+    }
+
+    $scope.set_color = function (validcd) {
+        if (validcd == 0) {
+            return { color: "black" }
+        }
+        if (validcd == 1) {
+            return { color: "green" }
+        }
+    }
+
+    $scope.concateField = function (a, b) {
+        return a + " " + b;
+    }
+
+    $scope.concatAccessSpeedField = function (a, b, c, d) {
+        return a + " / " + b + " / " + c + " / " + d;
+    }
+
+
+
+
+});
+
+

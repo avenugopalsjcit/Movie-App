@@ -1,0 +1,50 @@
+﻿
+
+app.controller('Controllers.ProductLocationLevelCtrl', function ($scope, NgTableParams) {
+    var self = this;
+    //$scope.sample ="madan mohan"
+    var data4 = [
+    { Name: "City" },
+    { Name: "Country" },
+    { Name: "Pop" },
+    { Name: "Region" },
+    {
+        Name: "sampleProduct#1"
+    }, {
+        Name: "sampleProduct#2"
+    }, {
+        Name: "sampleProduct#3"
+    }, {
+        Name: "sampleProduct#4"
+    }, {
+        Name: "sampleProduct#5"
+    }, {
+        Name: "sampleProduct#6"
+    }, {
+        Name: "sampleProduct#7"
+    }, {
+        Name: "sampleProduct#8"
+    }, {
+        Name: "sampleProduct#9"
+    }, {
+        Name: "sampleProduct#10"
+    }, {
+        Name: "sampleProduct#11"
+    }, {
+        Name: "sampleProduct#12"
+    }, {
+        Name: "sampleProduct#13"
+    }, {
+        Name: "sampleProduct#14"
+    }, {
+        Name: "sampleProduct#15"
+    }
+];
+
+    self.tableParams = new NgTableParams({},
+         { dataset: data4 });
+
+    $(".").bind("click", function () { })
+
+});
+

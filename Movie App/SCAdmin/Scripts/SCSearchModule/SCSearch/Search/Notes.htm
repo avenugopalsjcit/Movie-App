@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="appModule">
+<head>
+    <title>Notes</title>
+</head>
+<body>
+    <div class="container" ng-controller="ProdNotesController">
+        <div class="row">
+            <div class="col-md-6 col-lg-6">
+                &nbsp;</div>
+            <div class="col-md-6 col-lg-6 text-right PaddingBottomforModalPops">
+                <button type="button" class="close" ng-click="$dismiss()">
+                    &times;</button><br />
+            </div>
+            <div class="panel-heading Arrow">
+                <h3 class="bg-primary text-center" style="font-size: 18px">
+                    <label ng-show="isProduct==0" style="margin-top:5px" >
+                    Notes for {{ProductName}}/ {{RegionName}}/ {{CountryName}}
+                    </label>
+                    <label ng-show="isProduct==1" style="margin-top:5px">
+                    Notes for {{ProductName}}
+                    </label>
+                    <label ng-show="isProduct==2" style="margin-top:5px" >
+                    Notes for {{ProductName}}/{{RegionName}}
+                    </label>
+                    </h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-bordered" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th class="Arrow">
+                             Date
+                        </th>
+                        <th class="Arrow">
+                            Title
+                        </th>
+                        <th class="Arrow">
+                            Category
+                        </th>
+                        <th class="Arrow">
+                            Priority
+                        </th>
+                        <th class="Arrow">
+                            Notes ID
+                        </th>
+                    </tr>
+                    <tbody>
+                        <tr ng-repeat=" notes in ProdNotesData">
+                            <td class="Arrow">
+                                {{notes.UpdatedDate}}
+                            </td>
+                            <td>
+                                <a class="btn-link" ng-click="openNotesInformationpopup(notes.NoteID)">
+                                    {{notes.NoteTitle}}</a>
+                            </td>
+                            <td class="Arrow">
+                                {{notes.NoteCatageroy}}
+                            </td>
+                            <td class="Arrow">
+                                {{notes.NotePriority}}
+                            </td>
+                            <td class="Arrow">
+                                {{notes.NoteID}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+               
+            </div>
+        </div>
+    </div>
+</body>
+</html>

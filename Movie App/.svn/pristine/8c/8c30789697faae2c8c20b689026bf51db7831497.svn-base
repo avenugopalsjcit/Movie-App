@@ -1,0 +1,132 @@
+﻿app.portAccess = function ($scope, popID) {
+    $('.pageLoaderOverlay').show();
+
+    var cases = $.grep($scope.CaseArray, function (e) { return e.popID == popID; })[0];
+
+    if (cases.portspeedList.length > 0) {
+        $scope.portSpeedAdded = true;
+        $scope.portListByPoP = [];
+        if (cases.AccessSuppCharList.length > 0) {
+
+            $scope.innerTableHeading = "Port Speed - Access Speed";
+            $scope.showPortAccessSpeed = true;
+            var checkValidCombo = [];
+            var validCombo = false;
+            $scope.InvalidPortSpeed = [];
+            cases.portspeedList.forEach(function (itemPort) {
+                var count = 0;
+
+                cases.AccessSuppCharList.forEach(function (itemAccess) {
+                    //var checkValidCombo = $.grep($scope.AccessSuppCharList[count].ValidCombos, function (e) {
+
+                    //   if (itemAccess.PoPId.indexOf(popID) != -1) {
+                    var checkValidCombo = $.grep(itemAccess.ValidCombos, function (e) {
+                        if (e.PortSpeed == itemPort.CharId && e.Pop == popID) { return e; }
+                    });
+                    //if it is not a valid combo then text color should be red
+                    if (checkValidCombo.length == 0) {
+                        validCombo = false;
+                        if ($scope.InvalidPortSpeed.indexOf(itemPort.CharName) == -1)
+                            $scope.InvalidPortSpeed.push(itemPort.CharName);
+                    } else { validCombo = true; }
+
+                    if (itemAccess.UOM != null)
+                        AccActualVal = itemAccess.AccessActualValue + ' ' + itemAccess.UOM;
+                    else
+                        AccActualVal = itemAccess.AccessActualValue;
+
+                    $scope.portAccessJson.push({ portSpeedName: itemPort.CharName,
+                        AccessActualValue: AccActualVal,
+                        SupplierName: itemAccess.SupplierName,
+                        AccessTypeName: itemAccess.AccessTypeName,
+                        SupplierNameName: itemAccess.SupplierNameName,
+                        validCombo: validCombo
+                    });
+                    count++;
+                    //  }
+                });
+
+                if (count == 0) { $scope.showPortAccessSpeed = false; }
+            });
+        } else {
+            $scope.innerTableHeading = "Port Speed";
+
+            $scope.portListByPoP = cases.portspeedList;
+
+            //            $scope.portspeedList.forEach(function (itemPort) {
+            //                if (itemPort.PopId.indexOf(popID) != -1) {
+            //                    $scope.portListByPoP.push(itemPort);
+            //                }
+            //            });
+            $scope.showPortSpeed = true;
+        }
+    }
+    if (cases.savedCharList.length != 0) {
+        $scope.showSavedCharecteristics = true;
+        $scope.savedCharforCase = cases.savedCharList;
+    } else {
+        $scope.savedCharforCase = [];
+        $scope.showSavedCharecteristics = false;
+    }
+
+
+
+
+
+
+    //    if ($scope.portspeedList.length > 0) {
+    //        $scope.portSpeedAdded = true;
+    //        $scope.portListByPoP = [];
+    //        if ($scope.AccessSuppCharList.length > 0) {
+
+    //            $scope.innerTableHeading = "Port Speed - Access Speed";
+    //            $scope.showPortAccessSpeed = true;
+    //            var checkValidCombo = [];
+    //            var validCombo = false;
+    //            $scope.InvalidPortSpeed = [];
+    //            $scope.portspeedList.forEach(function (itemPort) {
+    //                var count = 0;
+
+    //                $scope.AccessSuppCharList.forEach(function (itemAccess) {
+    //                    //var checkValidCombo = $.grep($scope.AccessSuppCharList[count].ValidCombos, function (e) {
+
+    //                    if (itemAccess.PoPId.indexOf(popID) != -1) {
+    //                        var checkValidCombo = $.grep(itemAccess.ValidCombos, function (e) {
+    //                            if (e.PortSpeed == itemPort.CharId && e.Pop == popID) { return e; }
+    //                        });
+    //                        //if it is not a valid combo then text color should be red
+    //                        if (checkValidCombo.length == 0) {
+    //                            validCombo = false;
+    //                            if ($scope.InvalidPortSpeed.indexOf(itemPort.CharName) == -1)
+    //                                $scope.InvalidPortSpeed.push(itemPort.CharName);
+    //                        } else { validCombo = true; }
+    //                        $scope.portAccessJson.push({ portSpeedName: itemPort.CharName,
+    //                            AccessActualValue: itemAccess.AccessActualValue + ' ' + itemAccess.UOM,
+    //                            SupplierName: itemAccess.SupplierName,
+    //                            AccessTypeName: itemAccess.AccessTypeName,
+    //                            SupplierNameName: itemAccess.SupplierNameName,
+    //                            validCombo: validCombo
+    //                        });
+    //                        count++;
+    //                    }
+    //                });
+
+    //                if (count == 0) { $scope.showPortAccessSpeed = false; }
+    //            });
+    //        } else {
+    //            $scope.innerTableHeading = "Port Speed";
+    //            $scope.portspeedList.forEach(function (itemPort) {
+    //                if (itemPort.PopId.indexOf(popID) != -1) {
+    //                    $scope.portListByPoP.push(itemPort);
+    //                }
+    //            });
+    //            $scope.showPortSpeed = true;
+    //        }
+
+
+
+    //    }
+    //    if ($scope.savedCharList.length != 0) {
+    //        $scope.showCharecteristics = true;
+    //    }
+}

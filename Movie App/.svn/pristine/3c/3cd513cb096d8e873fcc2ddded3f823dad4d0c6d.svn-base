@@ -1,0 +1,294 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+   public class AdminAddressViewBAL
+    {
+       private AdminAddressViewDAL objSRD = new AdminAddressViewDAL();
+
+       public List<AdminAddressGrid> GetGridAdminAddress()
+        {
+
+
+            List<AdminAddressGrid> lstOrg = new List<AdminAddressGrid>();
+            DataTable dtGridDistributor = objSRD.GetGridAdminAddressDAL();
+
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AdminAddressGrid objOrg = new AdminAddressGrid();
+
+                objOrg.AddressDescription = Convert.ToString(dr["x_name"]);
+                objOrg.Agentid = Convert.ToInt32(dr["agent_id"]);
+                objOrg.Addressid = Convert.ToInt32(dr["address_id"]);
+                if (Convert.ToString(dr["Created_By"]) == "")
+                {
+                    objOrg.Created_Emp_Id = "Unknown";
+                }
+                else
+                {
+                    objOrg.Created_Emp_Id = Convert.ToString(dr["Created_By"]);
+                }
+                objOrg.Created_Dt = Convert.ToString(dr["Created_dt"]);
+                objOrg.Updated_Emp_Id = Convert.ToString(dr["Updated_By"]);
+                objOrg.Updated_Dt = Convert.ToString(dr["Updated_dt"]);
+                
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+       public List<ProductAddress> GetAdminAddressProduct()
+       {
+           DataTable Regiondt = objSRD.GetAdminAddressProductDAL();
+           AdminAddressList l = new AdminAddressList();
+           List<ProductAddress> lstproduct = new List<ProductAddress>();
+           foreach (DataRow dr in Regiondt.Rows)
+           {
+               ProductAddress objOrgproduct = new ProductAddress();
+               objOrgproduct.Char_id = Convert.ToInt32(dr["char_id"]);
+               objOrgproduct.Char_Name = Convert.ToString(dr["x_name"]);
+               
+               lstproduct.Add(objOrgproduct);
+           }
+           return lstproduct;
+       }
+
+       public List<country> GetAdminAddresscountry(string Areavalue)
+       {
+           DataTable Regiondt = objSRD.GetAdminAddressCountryDAL(Areavalue);
+           AdminAddressList l = new AdminAddressList();
+           List<country> lstcountry = new List<country>();
+               foreach (DataRow dr in Regiondt.Rows)
+               {
+                   country objOrgCountry = new country();
+                   objOrgCountry.Countryid = Convert.ToInt32(dr["COUNTRY_ID"]);
+                   objOrgCountry.countryname = Convert.ToString(dr["COUNTRY_NAME"]);
+                   //lstAddress.Add(objOrgCountry);
+                   lstcountry.Add(objOrgCountry);
+               }
+               return lstcountry;
+       }
+       public List<city> GetAdminAddresscity(string countryvalue, string Areavalue, string alpha)
+       {
+           DataTable Regiondt = objSRD.GetAdminAddressCityDAL(countryvalue,Areavalue,alpha);
+           AdminAddressList l = new AdminAddressList();
+           List<city> lstcity = new List<city>();
+           foreach (DataRow dr in Regiondt.Rows)
+           {
+               city objOrgCity = new city();
+               objOrgCity.Cityid = Convert.ToInt32(dr["CITY_ID"]);
+               objOrgCity.CityName = Convert.ToString(dr["CITY_NAME"]);
+               lstcity.Add(objOrgCity);
+               
+           }
+           return lstcity;
+       }
+      
+
+       public AdminAddressList GetAdminAddressDetail(string Addressid)
+          
+       {
+
+           AdminAddressList l = new AdminAddressList();
+             List<List<AdminAddressGrid>> lst;
+             DataSet ds = objSRD.GetAdminAddressDetails(Addressid);
+          
+           for (int i = 0; i < ds.Tables.Count; i++ )
+           {
+               foreach (DataRow dr in ds.Tables[i].Rows)
+               {
+                   city cty = new city();
+           AdminAddressGrid objOrg = new AdminAddressGrid();
+        
+             
+           ProductAddress objOrgname = new ProductAddress();
+           day objOrgdays = new day();
+           lst = new List<List<AdminAddressGrid>>();
+           if (i == 3)
+           {
+               
+               cty.CityName = Convert.ToString(dr["city_name"]);
+               l.ctlst.Add(cty);
+
+           }
+           if (i == 2)
+           {
+               objOrgname.Char_id = Convert.ToInt32(dr["CHAR_ID"]);
+               objOrgname.Char_Name = Convert.ToString(dr["X_NAME"]);
+               l.prodLst.Add(objOrgname);
+               
+           }
+           if (i == 1)
+           {
+               objOrgdays.SupportDays = Convert.ToString(dr["support_trans_week_days"]);
+               objOrgdays.SupportBusinessHours = Convert.ToString(dr["support_Business_hours"]);
+               objOrgdays.SupportTransHours = Convert.ToString(dr["support_trans_hours"]);
+               objOrgdays.Languages = Convert.ToString(dr["support_languages"]);
+               objOrgdays.Languages2 = Convert.ToString(dr["support_languages_7_24"]);
+               objOrgdays.Agentvalidcd = Convert.ToBoolean(dr["agent_valid_cd"]);
+               objOrgdays.AgentName = Convert.ToString(dr["agent_name"]);
+               l.daylst.Add(objOrgdays);
+              
+           }
+
+           if (i == 0)
+           {
+               objOrg.cityid = Convert.ToInt32(dr["city_id"]);
+               objOrg.Agentid = Convert.ToInt32(dr["AGENT_ID"]);
+              
+               objOrg.TollFreeAccNo = Convert.ToString(dr["TOLL_FREE_ACC_IN_C_NO_1"]);
+               objOrg.TollFreeAccNo1 = Convert.ToString(dr["TOLL_FREE_ACC_IN_C_NO_2"]);
+               objOrg.TollFreeAccNo2 = Convert.ToString(dr["TOLL_FREE_ACC_IN_C_NO_3"]);
+               objOrg.DirDialAccNo = Convert.ToString(dr["DIR_DIAL_ACC_NO_1"]);
+               objOrg.DirDialAccNo1 = Convert.ToString(dr["DIR_DIAL_ACC_NO_2"]);
+               objOrg.DirDialAccNo2 = Convert.ToString(dr["DIR_DIAL_ACC_NO_3"]);
+               objOrg.FaxNo = Convert.ToString(dr["FAX_NO_1"]);
+               objOrg.FaxNo1 = Convert.ToString(dr["FAX_NO_2"]);
+               objOrg.FaxNo2 = Convert.ToString(dr["FAX_NO_3"]);
+               if (dr["state_province_id"] == DBNull.Value)
+               {
+                   objOrg.stateprovinceid = 0;
+               }
+               else
+               {
+                   objOrg.stateprovinceid = Convert.ToInt32(dr["state_province_id"]);
+               }
+               objOrg.AddressValidCd = Convert.ToBoolean(dr["ADDRESS_VALID_CD"]);
+               objOrg.Countryid = Convert.ToInt32(dr["COUNTRY_ID"]);
+               objOrg.Regionid = Convert.ToInt32(dr["REGION_ID"]);
+               objOrg.AddressDescription = Convert.ToString(dr["address_desc"]);
+             
+               objOrg.Addressid = Convert.ToInt32(dr["address_id"]);
+               l.addlst.Add(objOrg);
+              
+           }
+               }
+               }
+         
+           return l;
+       }
+       public List<region> GetAdminAddressRegion()
+        {
+            List<AdminAddressGrid> lstAddress = new List<AdminAddressGrid>();
+            List<List<AdminAddressGrid>> lst = new List<List<AdminAddressGrid>>();
+           
+           
+            DataTable Regiondt = objSRD.GetAdminAddressRegionDAL();
+           AdminAddressList l = new AdminAddressList();
+           List<region> lstregion = new List<region>();
+               foreach (DataRow dr in Regiondt.Rows)
+               {
+                   region objOrgRegion = new region();
+
+                   objOrgRegion.regionid = Convert.ToInt32(dr["REGION_ID"]);
+                   objOrgRegion.regionname = Convert.ToString(dr["REGION_NAME"]);
+                   lstregion.Add(objOrgRegion);
+                   
+                 
+               }
+
+
+
+
+               return lstregion;
+        }
+       public int DeleteAdminAvail(string strAddressId, string strAgentId, string Role)
+        {
+
+            int count = objSRD.AdminAddressDelete(strAddressId, strAgentId, Role);
+
+
+
+            return count;
+        }
+     
+       public int InsertAdminAvail(string strAgentId, string strCharId,
+           string strCharTypeId, string strAgentName,
+           string strSupportTransWeekDays, string strSupportTransHours,
+           string strSupportBusinessHours, string strSupportLanguages,
+           string strSupportLanguages724, string strAgentValidCd, string User_id,
+           string strAddressId, string strAddressDesc, string strRegionId, string strCountryId,
+           string strCityId, string strStateProvinceId, string strTollFreeAccInCNo1, string strTollFreeAccInCNo2,
+           string strTollFreeAccInCNo3, string strDirDialAccNo1, string strDirDialAccNo2, string strDirDialAccNo3,
+           string strFaxNo1, string strFaxNo2, string strFaxNo3, string strAddressValidCd)
+        {
+
+            int count = objSRD.AdminAvailInsert( strAgentId,  strCharId, 
+             strCharTypeId,  strAgentName,
+             strSupportTransWeekDays, strSupportTransHours,
+             strSupportBusinessHours, strSupportLanguages,
+             strSupportLanguages724, strAgentValidCd, User_id, 
+             strAddressId, strAddressDesc,  strRegionId, strCountryId,
+             strCityId, strStateProvinceId, strTollFreeAccInCNo1, strTollFreeAccInCNo2,
+             strTollFreeAccInCNo3, strDirDialAccNo1, strDirDialAccNo2, strDirDialAccNo3,
+             strFaxNo1, strFaxNo2, strFaxNo3, strAddressValidCd );
+
+
+
+            return count;
+        }
+
+        public int UpdateAdminAvail(string strAgentName, string strSupportTransWeekDays,
+            string strSupportTransHours, string User_id, string strSupportBusinessHours,
+            string strSupportLanguages, string strSupportLanguages724, string strAgentValidCd,
+            string strAgentId,
+             string strAddressId, string strAddressDesc, string strRegionId, string strCountryId,
+            string strCityId, string strStateProvinceId, string strTollFreeAccInCNo1, string strTollFreeAccInCNo2,
+            string strTollFreeAccInCNo3, string strDirDialAccNo1, string strDirDialAccNo2, string strDirDialAccNo3,
+            string strFaxNo1, string strFaxNo2, string strFaxNo3, string strAddressValidCd)
+        {
+
+            int count = objSRD.AdminAvailUpdate( strAgentName,  strSupportTransWeekDays, 
+             strSupportTransHours,  User_id,  strSupportBusinessHours, 
+             strSupportLanguages,  strSupportLanguages724,  strAgentValidCd, 
+             strAgentId,
+              strAddressId, strAddressDesc,  strRegionId, strCountryId,
+             strCityId, strStateProvinceId, strTollFreeAccInCNo1, strTollFreeAccInCNo2,
+             strTollFreeAccInCNo3, strDirDialAccNo1, strDirDialAccNo2, strDirDialAccNo3,
+             strFaxNo1, strFaxNo2, strFaxNo3, strAddressValidCd );
+
+
+
+            return count;
+        }
+
+        public int AdminAddressDelete(string strAddressId, string strAgentId, string Role)
+        {
+            int count = objSRD.AdminAddressDelete(strAddressId, strAgentId, Role);
+            return count;
+        }
+        public int GetMaxAddressCD()
+        {
+          
+            return objSRD.MaxCsuAddress();
+
+        }
+
+        public int GetMaxAgentCD()
+        {
+           
+            return objSRD.MaxCsuAgent();
+
+        }
+        public int GetMaxChartypeCD(string CharId)
+        {
+
+            return objSRD.GetMaxChartypeCD(CharId);
+
+        }
+      
+    }
+}

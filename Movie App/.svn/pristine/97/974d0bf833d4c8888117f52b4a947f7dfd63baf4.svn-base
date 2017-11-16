@@ -1,0 +1,209 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+   public class AdminAddressViewBAL
+    {
+       private AdminAddressViewDAL objSRD = new AdminAddressViewDAL();
+
+       public List<AdminAddressGrid> GetGridAdminAddress()
+        {
+
+
+            List<AdminAddressGrid> lstOrg = new List<AdminAddressGrid>();
+            DataTable dtGridDistributor = objSRD.GetGridAdminAddressDAL();
+
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AdminAddressGrid objOrg = new AdminAddressGrid();
+
+                objOrg.AddressDescription = Convert.ToString(dr["x_name"]);
+                objOrg.AgentName = Convert.ToString(dr["agent_name"]);
+                objOrg.Addressid = Convert.ToInt32(dr["address_id"]);
+                //objOrg.AvailValidCd = Convert.ToInt32(dr["AVAIL_CD"]);
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+       public AdminAddressList GetAdminAddressDetail()
+        {
+            List<AdminAddressGrid> lstAddress = new List<AdminAddressGrid>();
+            List<List<AdminAddressGrid>> lst = new List<List<AdminAddressGrid>>();
+           
+            //AvailabilityGrid objOrg = new AvailabilityGrid();
+           DataSet ds = objSRD.GetAdminAddressDetails();
+           AdminAddressList l = new AdminAddressList();
+           for (int i = 0; i < ds.Tables.Count; i++ )
+           {
+               foreach (DataRow dr in ds.Tables[i].Rows)
+               {
+                   AdminAddressGrid objOrg = new AdminAddressGrid();
+                   region objOrgRegion = new region();
+                   country objOrgCountry = new country();
+                   city objOrgCity = new city();
+                   AdminAddressGrid objOrgname = new AdminAddressGrid();
+                   AdminAddressGrid objOrgdays = new AdminAddressGrid();
+                   if (i == 5)
+                   {
+                       objOrgCity.Cityid = Convert.ToInt32(dr["CITY_ID"]);
+                       objOrgCity.CityName = Convert.ToString(dr["CITY_NAME"]);
+                       l.cityLst.Add(objOrgCity);
+                       //lst.Add(objOrgCity);
+                   }
+                   if (i == 4)
+                   {
+                       objOrgCountry.Countryid = Convert.ToInt32(dr["COUNTRY_ID"]);
+                       objOrgCountry.countryname = Convert.ToString(dr["COUNTRY_NAME"]);
+                       //lstAddress.Add(objOrgCountry);
+                       l.countryLst.Add(objOrgCountry);
+                   }
+                   if (i == 3)
+                   {
+                       objOrgRegion.regionid = Convert.ToInt32(dr["REGION_ID"]);
+                       objOrgRegion.regionname = Convert.ToString(dr["REGION_NAME"]);
+                       l.regionLst.Add(objOrgRegion);
+                   }
+                   //if (i == 2)
+                   //{
+                   //    objOrgname.CharId = Convert.ToInt32(dr["CHAR_ID"]);
+                   //    objOrgname.XName = Convert.ToString(dr["X_NAME"]);
+                   //    lstAddress.Add(objOrgname);
+                   //    lst.Add(lstAddress);
+                   //}
+                   //if (i == 1)
+                   //{
+                   //    objOrgdays.SupportDays = Convert.ToString(dr["support_trans_week_days"]);
+                   //    lstAddress.Add(objOrgdays);
+                   //    lst.Add(lstAddress);
+                   //}
+
+                   //if (i == 0)
+                   //{
+                   //    objOrg.Agentid = Convert.ToInt32(dr["AGENT_ID"]);
+                   //    //objOrg.Cityid = Convert.ToInt32(dr["CITY_ID"]);
+                   //    objOrg.TollFreeAccNo = Convert.ToString(dr["TOLL_FREE_ACC_IN_C_NO_1"]);
+                   //    objOrg.TollFreeAccNo1 = Convert.ToString(dr["TOLL_FREE_ACC_IN_C_NO_2"]);
+                   //    objOrg.TollFreeAccNo2 = Convert.ToString(dr["TOLL_FREE_ACC_IN_C_NO_3"]);
+                   //    objOrg.DirDialAccNo = Convert.ToString(dr["DIR_DIAL_ACC_NO_1"]);
+                   //    objOrg.DirDialAccNo1 = Convert.ToString(dr["DIR_DIAL_ACC_NO_2"]);
+                   //    objOrg.DirDialAccNo2 = Convert.ToString(dr["DIR_DIAL_ACC_NO_3"]);
+                   //    objOrg.FaxNo = Convert.ToString(dr["FAX_NO_1"]);
+                   //    objOrg.FaxNo1 = Convert.ToString(dr["FAX_NO_2"]);
+                   //    objOrg.FaxNo2 = Convert.ToString(dr["FAX_NO_3"]);
+                   //    objOrg.AddressValidCd = Convert.ToInt32(dr["ADDRESS_VALID_CD"]);
+                   //    objOrg.Countryid = Convert.ToInt32(dr["COUNTRY_ID"]);
+                   //    objOrg.Regionid = Convert.ToInt32(dr["REGION_ID"]);
+                   //    //objOrg.AddressDescription = Convert.ToString(dr["x_name"]);
+                   //    //objOrg.AgentName = Convert.ToString(dr["agent_name"]);
+                   //    objOrg.Addressid = Convert.ToInt32(dr["address_id"]);
+                   //    lstAddress.Add(objOrg);
+                   //    lst.Add(lstAddress);
+                   //}
+                   ////objOrg.AvailValidCd = Convert.ToInt32(dr["AVAIL_CD"]);
+                 
+               }
+               
+           }
+
+
+           return l;
+        }
+        public int DeleteAdminAvail(string strAvailCd)
+        {
+
+            int count = objSRD.AdminAvailDelete(strAvailCd);
+
+
+
+            return count;
+        }
+        public List<AvailabilityGrid> PopupGridAdminAvail(string strAvailCd)
+        {
+
+            List<AvailabilityGrid> lstOrg = new List<AvailabilityGrid>();
+            DataTable dtGridDistributor = objSRD.AdminAvailPopupGrid(strAvailCd);
+
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AvailabilityGrid objOrg = new AvailabilityGrid();
+                //var options = { timeZone: 'UTC', timeZoneName: 'short' };
+                //  console.log(date.toLocaleTimeString('en-US', options));
+                objOrg.Created_Emp_Id = Convert.ToString(dr["CREATED_EMP_ID"]);
+                objOrg.Created_Dt = Convert.ToString(dr["CREATED_DT"]);
+                objOrg.Updated_Emp_Id = Convert.ToString(dr["UPDATED_EMP_ID"]);
+                objOrg.Updated_Dt = Convert.ToString(dr["UPDATED_DT"]);
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+        public int InsertAdminAvail(string strAvailCd, string strAvailDesc, string strAvailAbbr, string strAvailValidCd, string User_id)
+        {
+
+            int count = objSRD.AdminAvailInsert(strAvailCd, strAvailDesc, strAvailAbbr, strAvailValidCd, User_id);
+
+
+
+            return count;
+        }
+
+        public int UpdateAdminAvail(string strAvailDesc, string strAvailAbbr, string strAvailvalidCd, string User_id, string strAvailCd)
+        {
+
+            int count = objSRD.AdminAvailUpdate(strAvailDesc, strAvailAbbr, strAvailvalidCd, User_id, strAvailCd);
+
+
+
+            return count;
+        }
+
+
+        public List<AdminBtgfrGrid> GetGridAdminBtgfrView()
+        {
+
+
+            List<AdminBtgfrGrid> lstOrg = new List<AdminBtgfrGrid>();
+            DataTable dtGridDistributor = objSRD.GetGridAdminBtgfr();
+
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AdminBtgfrGrid objOrg = new AdminBtgfrGrid();
+
+                objOrg.btgfr = Convert.ToString(dr["btgfr"]);
+                objOrg.description = Convert.ToString(dr["description"]);
+
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+    }
+}

@@ -1,0 +1,165 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+  public  class AdminGlossaryViewBAL
+    {
+      private AdminGlossaryViewDAL objSRD = new AdminGlossaryViewDAL();
+      public List<Glossary> GetGridAdminDocumentationView(string AccessLevel, string User_id)
+      {
+
+
+          List<Glossary> lstOrg = new List<Glossary>();
+          DataTable dtGridDistributor = objSRD.GetGridAdminDocumentation(AccessLevel, User_id);
+
+          //DataTable dtGridTermDesc = objSRD.GetAdminGlossaryTermDesc(AccessLevel, User_id);
+
+
+
+         // int i = 0;
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              Glossary objOrg = new Glossary();
+             // objOrg.TermDesc = Convert.ToString(dtGridTermDesc.Rows[i]);
+              objOrg.TermName = Convert.ToString(dr["Term_name"]);
+              objOrg.ProductName = Convert.ToString(dr["Product_Name"]);
+              objOrg.ProductCD = Convert.ToInt32(dr["Product_Cd"]);
+             
+
+              lstOrg.Add(objOrg);
+             // i++;
+          }
+
+
+          return lstOrg;
+      }
+
+
+      public List<Glossary> GetGridAdminGlossaryProductView(string AccessLevel, string User_id)
+      {
+
+
+          List<Glossary> lstOrg = new List<Glossary>();
+          DataTable dtGridDistributor = objSRD.GetGridAdminGlossaryProduct(AccessLevel, User_id);
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              Glossary objOrg = new Glossary();
+
+             // objOrg.TermName = Convert.ToString(dr["Term_name"]);
+              objOrg.ProductName = Convert.ToString(dr["Product_Name"]);
+              objOrg.ProductCD = Convert.ToInt32(dr["Product_Cd"]);
+
+
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+      public List<Glossary> GetAdminGlossaryView(string ProductCD, string TermName)
+      {
+
+
+          List<Glossary> lstOrg = new List<Glossary>();
+          DataTable dtGridDistributor = objSRD.GetAdminGlossary(ProductCD, TermName);
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              Glossary objOrg = new Glossary();
+
+             // objOrg.TermName = Convert.ToString(dr["Term_name"]);
+              objOrg.TermDesc = Convert.ToString(dr["TERM_DESC"]);
+              objOrg.TermId = Convert.ToInt32(dr["Term_Id"]);
+
+
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+
+      public void InsertUpdateAdminGlossary(string ProductCD, string TermName, string TermDesc, string User_id)
+      {
+
+          objSRD.GetAdminInsertIndicatorGlossary(ProductCD, TermName, TermDesc, User_id);
+
+
+
+      
+      }
+
+
+
+      public void AdminGlossaryDelete(string TermName, string ProductCD)
+      {
+
+         objSRD.AdminGlossaryDelete(TermName,ProductCD);
+
+
+
+         
+      }
+
+
+      public List<Glossary> PopupGridAdminGlossary(string strAvailCd)
+      {
+
+          List<Glossary> lstOrg = new List<Glossary>();
+          DataTable dtGridDistributor = objSRD.AdminGlossaryPopupGrid(strAvailCd);
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              Glossary objOrg = new Glossary();
+              //var options = { timeZone: 'UTC', timeZoneName: 'short' };
+              //  console.log(date.toLocaleTimeString('en-US', options));
+              if (dr["CREATED_DT"] != DBNull.Value)
+              {
+                  DateTime currentDate = Convert.ToDateTime(dr["CREATED_DT"]);
+                  objOrg.CREATED_DT = currentDate.ToString("dd-MMM-yyyy HH:mm");
+              }
+              if (dr["UPDATED_DT"] != DBNull.Value)
+              {
+                  DateTime updatedDate = Convert.ToDateTime(dr["UPDATED_DT"]);
+                  objOrg.UPDATED_DT = updatedDate.ToString("dd-MMM-yyyy HH:mm");
+              }
+
+              objOrg.CREATED_EMP_ID = Convert.ToString(dr["CREATED_EMP_ID"]);
+             
+              objOrg.UPDATED_EMP_ID = Convert.ToString(dr["UPDATED_EMP_ID"]);
+              
+              lstOrg.Add(objOrg);
+
+          }
+          return lstOrg;
+      }
+
+
+    }
+}

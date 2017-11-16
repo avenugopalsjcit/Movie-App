@@ -1,0 +1,1977 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Services;
+using System.Web.Script.Serialization;
+using System.Web.Script.Services;
+using SCAdminBAL;
+using System.Data;
+using System.Configuration;
+
+namespace SCAdmin
+{
+    public partial class SingleCase : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        [WebMethod]
+        public static List<Product> GetProducts()
+        {
+            //DataSet ds=
+            CaseDefBAL bal = new CaseDefBAL();
+            DataSet dsProducts = bal.GetProducts();
+            List<Product> lstProducts = new List<Product>();
+            if (dsProducts != null && dsProducts.Tables.Count > 0 && dsProducts.Tables[0].Rows.Count > 0)
+            {
+                var prodLst = dsProducts.Tables[0].AsEnumerable().Select(t => new { ProductID = t.Field<int>("ProductID"), ProductName = t.Field<string>("ProductName") }).ToList();
+                foreach (var item in prodLst)
+                {
+                    lstProducts.Add(new Product() { ProductID = item.ProductID, ProductName = item.ProductName });
+                }
+
+            }
+            return lstProducts;
+        }
+
+        [WebMethod]
+        public static List<Region> GetRegions()
+        {
+            //DataSet ds=
+            CaseDefBAL bal = new CaseDefBAL();
+            DataSet dsRegions = bal.GetRegions();
+            List<Region> lstRegions = new List<Region>();
+            if (dsRegions != null && dsRegions.Tables.Count > 0 && dsRegions.Tables[0].Rows.Count > 0)
+            {
+                var RgnLst = dsRegions.Tables[0].AsEnumerable().Select(t => new { RegionID = t.Field<decimal>("RegionID"), RegionName = t.Field<string>("RegionName") }).ToList();
+                foreach (var item in RgnLst)
+                {
+                    lstRegions.Add(new Region() { RegionID = item.RegionID, RegionName = item.RegionName });
+                }
+
+            }
+            return lstRegions;
+        }
+
+        [WebMethod]
+        public static Region GetRegionByCountry(int CountryId)
+        {            
+            CaseDefBAL bal = new CaseDefBAL();
+            return bal.GetRegionByCountry(CountryId);
+        }
+
+        [WebMethod]
+        public static List<Country> GetCountries(int RegionID, int ProductID)
+        {
+            //DataSet ds=
+            CaseDefBAL bal = new CaseDefBAL();
+            DataSet dsCountry = bal.GetCountries(RegionID, ProductID);
+            List<Country> lstRegions = new List<Country>();
+            if (dsCountry != null && dsCountry.Tables.Count > 0 && dsCountry.Tables[0].Rows.Count > 0)
+            {
+                var RgnLst = dsCountry.Tables[0].AsEnumerable().Select(t => new { CountryID = t.Field<decimal>("CountryID"), CountryName = t.Field<string>("CountryName") }).ToList();
+                foreach (var item in RgnLst)
+                {
+                    lstRegions.Add(new Country() { CountryID = item.CountryID, CountryName = item.CountryName });
+                }
+
+            }
+            return lstRegions;
+        }
+
+        [WebMethod]
+        public static List<Country> GetCountriesForCountryLevel(int ProductID)
+        {
+            //DataSet ds=
+            CaseDefBAL bal = new CaseDefBAL();
+            DataSet dsCountry = bal.GetCountriesForCountryLevel(ProductID);
+            List<Country> lstRegions = new List<Country>();
+            if (dsCountry != null && dsCountry.Tables.Count > 0 && dsCountry.Tables[0].Rows.Count > 0)
+            {
+                var RgnLst = dsCountry.Tables[0].AsEnumerable().Select(t => new { CountryID = t.Field<decimal>("CountryID"), CountryName = t.Field<string>("CountryName") }).ToList();
+                foreach (var item in RgnLst)
+                {
+                    lstRegions.Add(new Country() { CountryID = item.CountryID, CountryName = item.CountryName });
+                }
+
+            }
+            return lstRegions;
+        }
+
+        [WebMethod]
+        public static List<CaseDetails> GetCases(int ProductID, int SubProductID, int RegionID, int CountryID, int UserID, int AccessLevel)
+        {
+            List<CaseDetails> lstCases = new List<CaseDetails>();
+            CaseDefBAL bal = new CaseDefBAL();
+            DataSet dsCases = bal.GetCases(ProductID, SubProductID, RegionID, CountryID, AccessLevel, UserID);
+            if (dsCases != null && dsCases.Tables.Count > 0 && dsCases.Tables[0].Rows.Count > 0)
+            {
+                CaseDetails cd = new CaseDetails();
+                string CaseName = "";
+                for (int i = 0; i < dsCases.Tables[0].Rows.Count; i++)
+                {
+                    CaseName = dsCases.Tables[0].Rows[i]["X_NAME"].ToString();
+
+                    int x = 0;
+
+                    while (x == 0)
+                    {
+                        if (CaseName.Length - 1 == CaseName.LastIndexOf("-"))
+                        {
+                            CaseName = CaseName.Remove(CaseName.LastIndexOf("-"));
+                        }
+                        else {
+                            x = 1;
+                        }
+                    }
+                    //if (CaseName.Length - 1 == CaseName.LastIndexOf("-"))
+                    //{
+                    //    CaseName = CaseName.Remove(CaseName.LastIndexOf("-"));
+                    //}
+                    //if (CaseName.Length - 1 == CaseName.LastIndexOf("-"))
+                    //{
+                    //    CaseName = CaseName.Remove(CaseName.LastIndexOf("-"));
+                    //}
+                    //if (CaseName.Length - 1 == CaseName.LastIndexOf("-"))
+                    //{
+                    //    CaseName = CaseName.Remove(CaseName.LastIndexOf("-"));
+                    //}
+
+                    string SiteAvailability = string.Empty;
+                    if (dsCases.Tables[0].Columns.Contains("SiteAvailability"))
+                    {
+
+                        string strAvailDate = dsCases.Tables[0].Rows[i]["SiteAvailability"].ToString();                        
+                        if (strAvailDate != "")
+                        {
+                            SiteAvailability = Convert.ToDateTime(strAvailDate).ToString("MM/dd/yyyy");
+                        }
+                    }
+
+                    lstCases.Add(new CaseDetails() { 
+                        
+                        ProductID = ProductID, 
+                        RegionID = RegionID, 
+                        CaseID = Convert.ToDecimal(dsCases.Tables[0].Rows[i]["CASE_ID"].ToString()), 
+                        HubSiteID = Convert.ToDecimal(dsCases.Tables[0].Rows[i]["HUB_SITE_ID"].ToString() == "" ? "0" : dsCases.Tables[0].Rows[i]["HUB_SITE_ID"].ToString()),
+                        CountryID = dsCases.Tables[0].Rows[i]["COUNTRY_ID"].ToString() != "" ? Convert.ToDecimal(dsCases.Tables[0].Rows[i]["COUNTRY_ID"].ToString()) : 0,
+                        CityID = dsCases.Tables[0].Rows[i]["CITY_ID"].ToString() != "" ? Convert.ToDecimal(dsCases.Tables[0].Rows[i]["CITY_ID"].ToString()) : 0,  
+                        ShowValid = dsCases.Tables[0].Rows[i]["SHOWVALID"].ToString(), 
+                        CaseName = CaseName, 
+                        RegionName = dsCases.Tables[0].Rows[i]["REGION_NAME"].ToString(), 
+                        CountryName = dsCases.Tables[0].Rows[i]["COUNTRY_NAME"].ToString(), 
+                        CityName = dsCases.Tables[0].Rows[i]["CITY_NAME"].ToString(), 
+                        HubSiteName = dsCases.Tables[0].Rows[i]["HUB_SITE_NAME"].ToString(), 
+                        StateName = dsCases.Tables[0].Rows[i]["STATE_PROVINCE_NAME"].ToString(), 
+                        SiteAvailability = SiteAvailability, 
+                        StateProvinceID = dsCases.Tables[0].Rows[i]["StateProvinceID"].ToString() != "" ? Convert.ToDecimal(dsCases.Tables[0].Rows[i]["StateProvinceID"].ToString()) : 0, 
+                        SupportResilientPop = dsCases.Tables[0].Rows[i]["support_resilient_pop"].ToString() != "" ? Convert.ToInt32(dsCases.Tables[0].Rows[i]["support_resilient_pop"].ToString()) : 0, 
+                        Exception = dsCases.Tables[0].Rows[i]["exception"].ToString() != "" ? Convert.ToInt32(dsCases.Tables[0].Rows[i]["exception"].ToString()) : 0 });
+
+                }
+            }
+            return lstCases;
+        }
+
+        [WebMethod]
+        public static List<CaseDetails> GetCPECases(int ProductID, int RegionID, int CountryID, int UserID, int AccessLevel)
+        {
+            List<CaseDetails> lstCases = new List<CaseDetails>();
+            CaseDefBAL bal = new CaseDefBAL();
+            DataSet dsCases = bal.GetCPECases(ProductID, RegionID, CountryID, AccessLevel, UserID);
+            if (dsCases != null && dsCases.Tables.Count > 0 && dsCases.Tables[0].Rows.Count > 0)
+            {
+                CaseDetails cd = new CaseDetails();
+                string CaseName = "";
+                for (int i = 0; i < dsCases.Tables[0].Rows.Count; i++)
+                {
+                    CaseName = dsCases.Tables[0].Rows[i]["X_NAME"].ToString();
+                    if (CaseName.Length - 1 == CaseName.LastIndexOf("-"))
+                    {
+                        CaseName = CaseName.Remove(CaseName.LastIndexOf("-"));
+                    }
+                    if (CaseName.Length - 1 == CaseName.LastIndexOf("-"))
+                    {
+                        CaseName = CaseName.Remove(CaseName.LastIndexOf("-"));
+                    }
+                    if (CaseName.Length - 1 == CaseName.LastIndexOf("-"))
+                    {
+                        CaseName = CaseName.Remove(CaseName.LastIndexOf("-"));
+                    }
+
+                    string strAvailDate = dsCases.Tables[0].Rows[i]["SiteAvailability"].ToString();
+                    string SiteAvailability = "";
+                    if (strAvailDate != "")
+                    {
+                        SiteAvailability = Convert.ToDateTime(strAvailDate).ToString("MM/dd/yyyy");
+                    }
+                 
+                      lstCases.Add(new CaseDetails() { ProductID = ProductID, RegionID = RegionID, CaseID = Convert.ToDecimal(dsCases.Tables[0].Rows[i]["CASE_ID"].ToString()), HubSiteID = Convert.ToDecimal(dsCases.Tables[0].Rows[i]["HUB_SITE_ID"].ToString() == "" ? "0" : dsCases.Tables[0].Rows[i]["HUB_SITE_ID"].ToString()), CountryID = Convert.ToDecimal(dsCases.Tables[0].Rows[i]["COUNTRY_ID"].ToString()), CityID = Convert.ToDecimal(dsCases.Tables[0].Rows[i]["CITY_ID"].ToString()), ShowValid = dsCases.Tables[0].Rows[i]["SHOWVALID"].ToString(), CaseName = CaseName, CityName = dsCases.Tables[0].Rows[i]["CITY_NAME"].ToString(), SiteAvailability = SiteAvailability});
+
+                }
+            }
+            return lstCases;
+        }
+
+        [WebMethod]
+        public static List<CPECases> GetCPECaseData(int CaseId)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            return bal.GetCPECaseData(CaseId);
+        }
+
+        [WebMethod]
+        public static List<CPESuppliers> GetCPESuppliers()
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            return bal.GetCPESuppliers();
+        }
+
+        [WebMethod]
+        public static List<AvailDescription> GetAvailDesc()
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            List<AvailDescription> lstAvailDesc = new List<AvailDescription>();
+            DataSet ds = bal.GetAvailDesc();
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                CaseDetails cd = new CaseDetails();
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    lstAvailDesc.Add(new AvailDescription() { AvailID = Convert.ToInt32(ds.Tables[0].Rows[i]["avail_cd"].ToString()), AvailDesc = ds.Tables[0].Rows[i]["avail_desc"].ToString() });
+
+                }
+            }
+            return lstAvailDesc;
+        }
+
+        [WebMethod]
+        public static List<PoPCharcteristics> GetPopChars(int HubSiteID, int ProductID, int CaseID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            List<PoPCharcteristics> lstPopchars = new List<PoPCharcteristics>();
+            DataSet ds = bal.GetPoPChars(HubSiteID, ProductID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                CaseDetails cd = new CaseDetails();
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    // lstPopchars.Add(new PoPCharcteristics() { CharValue = ds.Tables[0].Rows[i]["char_value"].ToString(), CharName = ds.Tables[0].Rows[i]["char_name"].ToString() });
+
+                    if (ds.Tables[0].Rows[i]["char_name"].ToString() == "POP_PLATFORM_CODE")
+                    {
+                        DataSet dsHubSite = bal.GetHubSiteType(CaseID);
+                        if (dsHubSite != null && dsHubSite.Tables.Count > 0 && dsHubSite.Tables[0].Rows.Count > 0)
+                        {
+                            if (dsHubSite.Tables[0].Rows[0]["Char_Name"].ToString().Contains("GPOP"))
+                            {
+                                lstPopchars.Add(new PoPCharcteristics() { CharValue = ds.Tables[0].Rows[i]["char_value"].ToString(), CharName = ds.Tables[0].Rows[i]["char_name"].ToString() });
+                            }
+                            else
+                            {
+                                lstPopchars.Add(new PoPCharcteristics() { CharValue = "NA", CharName = ds.Tables[0].Rows[i]["char_name"].ToString() });
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        lstPopchars.Add(new PoPCharcteristics() { CharValue = ds.Tables[0].Rows[i]["char_value"].ToString(), CharName = ds.Tables[0].Rows[i]["char_name"].ToString() });
+                    }
+
+
+                }
+            }
+            return lstPopchars;
+        }
+
+        [WebMethod]
+        public static List<PoPCharcteristics> GetPoPCharValues(int HubSiteID, int ProductID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            List<PoPCharcteristics> lstPopchars = new List<PoPCharcteristics>();
+            DataSet ds = bal.GetPoPCharValues(HubSiteID, ProductID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                CaseDetails cd = new CaseDetails();
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    lstPopchars.Add(new PoPCharcteristics() { CharValue = ds.Tables[0].Rows[i]["char_value"].ToString(), CharName = ds.Tables[0].Rows[i]["char_name"].ToString() });
+
+                }
+            }
+            return lstPopchars;
+        }
+
+        [WebMethod]
+        public static string GetNetworkDetails(int CaseID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            List<NetworkDetails> lstNetwork = new List<NetworkDetails>();
+            DataSet ds = bal.GetNetworkDetails(CaseID);
+            string Network = "";
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                Network = ds.Tables[0].Rows[0]["Network_Name"].ToString();
+            }
+            return Network;
+        }
+
+        [WebMethod]
+        public static List<string> GetProductLevel(int ProductID, int CountryID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            DataSet ds = bal.GetProductLevel(ProductID);
+            List<string> lstProductLevel = new List<string>();
+            //"REGION","COUNTRY","CITY","HUB SITE","POP"
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                if (ds.Tables[0].Rows[0]["product_loc_level_desc"].ToString().ToLower() == "REGION".ToLower())
+                {
+                    lstProductLevel.Add("REGION");
+                }
+                if (ds.Tables[0].Rows[0]["product_loc_level_desc"].ToString().ToLower() == "COUNTRY".ToLower())
+                {
+                    if (!lstProductLevel.Contains("REGION"))
+                        lstProductLevel.Add("REGION");
+
+                    lstProductLevel.Add("COUNTRY");
+                }
+                if (ds.Tables[0].Rows[0]["product_loc_level_desc"].ToString().ToLower() == "CITY".ToLower())
+                {
+                    if (!lstProductLevel.Contains("REGION"))
+                        lstProductLevel.Add("REGION");
+
+                    if (!lstProductLevel.Contains("COUNTRY"))
+                        lstProductLevel.Add("COUNTRY");
+
+                    lstProductLevel.Add("CITY");
+                }
+                if (ds.Tables[0].Rows[0]["product_loc_level_desc"].ToString().ToLower() == "HUB SITE".ToLower())
+                {
+                    if (!lstProductLevel.Contains("REGION"))
+                        lstProductLevel.Add("REGION");
+
+                    if (!lstProductLevel.Contains("COUNTRY"))
+                        lstProductLevel.Add("COUNTRY");
+
+                    if (!lstProductLevel.Contains("CITY"))
+                        lstProductLevel.Add("CITY");
+
+                    lstProductLevel.Add("HUB SITE");
+                }
+                if (ds.Tables[0].Rows[0]["product_loc_level_desc"].ToString().ToLower() == "POP".ToLower())
+                {
+                    if (!lstProductLevel.Contains("REGION"))
+                        lstProductLevel.Add("REGION");
+
+                    if (!lstProductLevel.Contains("COUNTRY"))
+                        lstProductLevel.Add("COUNTRY");
+
+                    if (!lstProductLevel.Contains("CITY"))
+                        lstProductLevel.Add("CITY");
+
+                    if (!lstProductLevel.Contains("HUB SITE"))
+                        lstProductLevel.Add("HUB SITE");
+
+                    lstProductLevel.Add("POP");
+                }
+
+                int Flag = 0;
+                DataSet dsState = bal.GetStateProvinceFlag(CountryID);
+                if (dsState != null && dsState.Tables.Count > 0 && dsState.Tables[0].Rows.Count > 0)
+                {
+                    Flag = Convert.ToInt32(dsState.Tables[0].Rows[0]["state_province_flag"].ToString());
+                }
+
+                if (Flag == 1)
+                {
+                    lstProductLevel.Add("STATE");
+                }
+            }
+
+            return lstProductLevel;
+        }
+
+        [WebMethod]
+        public static int GetCaseAvail(int CaseID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            int CaseAvailID = 0;
+
+            DataSet ds = bal.GetCaseDetails(CaseID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                CaseAvailID = Convert.ToInt32(ds.Tables[0].Rows[0]["case_avail_cd"].ToString());
+            }
+            return CaseAvailID;
+        }
+
+        [WebMethod]
+        public static int GetStateProvinceFlag(int CountryID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            int Flag = 0;
+            DataSet ds = bal.GetStateProvinceFlag(CountryID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                Flag = Convert.ToInt32(ds.Tables[0].Rows[0]["state_province_flag"].ToString());
+            }
+            return Flag;
+        }
+
+        [WebMethod]
+        public static List<Suppliers> GetSuppliers(int ProductID, int HubSiteID, int CaseID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            List<Suppliers> lstSupp = new List<Suppliers>();
+            DataSet ds = bal.GetSupplierDetails(HubSiteID, CaseID, ProductID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    lstSupp.Add(new Suppliers() { SupplierID = Convert.ToInt32(ds.Tables[0].Rows[i]["CHAR_ID"].ToString()), SupplierName = ds.Tables[0].Rows[i]["CHAR_NAME"].ToString(), Selected = Convert.ToInt32(ds.Tables[0].Rows[i]["CHAR_ID"].ToString()) });
+
+                }
+            }
+
+            ds = bal.GetSupplierDetails(HubSiteID, CaseID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    lstSupp.Add(new Suppliers() { SupplierID = Convert.ToInt32(ds.Tables[0].Rows[i]["CHAR_ID"].ToString()), SupplierName = ds.Tables[0].Rows[i]["CHAR_NAME"].ToString(), Selected = 0 });
+
+                }
+            }
+
+            return lstSupp;
+        }
+
+
+        [WebMethod]
+        public static int SaveCaseDetails(int CaseID, int CityID, int StatePovinceID, int HubSiteID, string EmpID, string SiteAvailabilityDate, int SupportResilientPOP, int ExceptionRequired, string SelectedSuppliers, int Availability, int CaseValid, int CPESupplierId)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            return bal.SaveCaseDetails(CaseID, CityID, StatePovinceID, HubSiteID, EmpID, SiteAvailabilityDate, SupportResilientPOP, ExceptionRequired, SelectedSuppliers, Availability, CaseValid, CPESupplierId);
+
+        }
+
+        [WebMethod]
+        public static int DeleteCaseDetails(int AccessLevel, int CaseID, int UserID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            int result = 0;
+            try
+            {
+                bal.DeleteCaseDetails(AccessLevel, CaseID, UserID);
+                result = 1;
+            }
+            catch (Exception)
+            {
+                result = 0;
+
+            }
+            return result;
+        }
+
+        [WebMethod]
+        public static EditCaseDetails GetCaseCharValues(int CaseID, int ShowAll, string SupplierIds, string AccessTypeIds, 
+            string SupplierProductNameIds, int ProductID, int HubSiteID,string PortSpeedIds,string AccessSpeedIds)
+        {
+            EditCaseDetails edc = new EditCaseDetails();
+            //edc.lstCaseDetails = new List<CaseTypeDetails>();
+            List<CaseTypeDetails> lst = new List<CaseTypeDetails>();
+            List<AccessType> lstAccessType = new List<SCAdminBAL.AccessType>();
+            List<Supplier> lstSupplier = new List<SCAdminBAL.Supplier>();
+            List<SupplieerProductName> lstSupplierProductName = new List<SupplieerProductName>();
+            List<ClsPortSpeed> lstPortSpeed = new List<ClsPortSpeed>();
+            List<AccessSpeed> lstAccessSpeed = new List<AccessSpeed>();
+
+            CaseDefBAL bal = new CaseDefBAL();
+            DataSet ds = bal.GetCaseCharDetails(CaseID);
+            int index = 0;
+
+            DataSet dsAvail = bal.GetAvailDesc();
+
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                CaseTypeDetails cd = new CaseTypeDetails();
+                cd.charDet = new List<CaseCharDetails>();
+                DataSet dsPortSpeeds = new DataSet();
+                string strCharIds = "";
+
+
+
+                DataRow[] drPortSpeed = ds.Tables[0].Select("char_type_name='Port Speed'");
+                if (drPortSpeed.Length > 0)
+                {
+                    if (string.IsNullOrEmpty(PortSpeedIds))
+                    {
+                        foreach (DataRow drPS in drPortSpeed)
+                        {
+
+                            strCharIds = strCharIds == "" ? drPS["Char_ID"].ToString() : strCharIds + "," + drPS["Char_ID"].ToString();
+                        }
+                    }
+                    else
+                    {
+                        strCharIds = PortSpeedIds;
+                    }
+                }
+
+                if (HubSiteID > 0)
+                {
+                    dsPortSpeeds = bal.GetPortSpeedCaseDetails(SupplierIds, AccessTypeIds, SupplierProductNameIds, strCharIds, ProductID, CaseID, HubSiteID, AccessSpeedIds);
+                }
+
+                lst.Add(cd);
+                string strNewIds = "";
+                if (AccessSpeedIds != "" && PortSpeedIds=="")
+                {
+                    if (dsPortSpeeds != null && dsPortSpeeds.Tables.Count > 0 && dsPortSpeeds.Tables[0].Rows.Count > 0)
+                    {
+                        DataView dvPortSpeeds = dsPortSpeeds.Tables[0].DefaultView;
+                        //dvPortSpeeds.RowFilter = "PORT_SPEED_CHAR_ID=";
+                        DataTable dtPortSpeeds = dvPortSpeeds.ToTable(true, "PORT_SPEED_CHAR_ID");
+                        foreach (DataRow dr in dtPortSpeeds.Rows)
+                        {
+                            strNewIds = strNewIds == "" ? dr["PORT_SPEED_CHAR_ID"].ToString() : strNewIds + "," + dr["PORT_SPEED_CHAR_ID"].ToString();
+                        }
+                    }
+                }
+
+                foreach (DataRow item in ds.Tables[0].Rows)
+                {
+
+                    string strMultiChar = "";
+                    if (Convert.ToInt32(item["char_type_value_count"].ToString()) == 3 || Convert.ToInt32(item["char_type_value_count"].ToString()) == 4)
+                    {
+                        strMultiChar = item["char_type_name"].ToString().ToUpper();
+
+                    }
+
+                    string[] strKeys = new string[] { strMultiChar, "CUSTOMER SERVICE PROVIDER", "DISTRIBUTOR", "LOCATION", "ACCESS PROVIDER", "INTERFACE", "SWITCH", "SUPPLIER", "SUPPORT REGION" };
+
+                    CaseCharDetails ccd = new CaseCharDetails();
+                    ccd.OptionMatrixId = Convert.ToInt32(item["option_matrix_id"].ToString());
+                    ccd.SelectedValue = Convert.ToInt32(item["option_matrix_id"].ToString());
+                    ccd.CharName = item["char_name"].ToString();
+                    ccd.isMultiple = Convert.ToInt32(item["char_type_value_count"].ToString()) != 3 ? 1 : 0;
+                    ccd.CharTypeName = item["char_type_name"].ToString();
+                    if ((item["case_detail_valid_cd"].ToString() != "" && Convert.ToInt32(item["case_detail_valid_cd"].ToString()) == 1) && (Convert.ToInt32(item["char_type_value_count"].ToString()) == 3 || Convert.ToInt32(item["char_type_value_count"].ToString()) == 4))
+                    {
+                        
+                        if (cd.charDet.Count > 0)
+                        {
+                            cd.charDet[0].SelectedValue = Convert.ToInt32(item["option_matrix_id"].ToString());
+                            cd.charDet[0].SelectedText = item["char_name"].ToString();
+                        }
+                        
+                    }
+                    
+                    if ((Convert.ToInt32(item["char_type_value_count"].ToString()) != 3 && Convert.ToInt32(item["char_type_id"].ToString()) != 28))
+                    {
+                        cd = PopulateValues(lst, item, index, dsAvail);
+                    }
+                    else if (Convert.ToInt32(item["char_type_id"].ToString()) == 28)
+                    {
+                        //if (lst.Where(t => t.ShowData == -1).Count() == 0)
+                        //{
+                        //    CaseTypeDetails cdNoData = new CaseTypeDetails();
+                        //    cdNoData.Type = "    ";
+                        //    cdNoData.ShowData = -1;
+                        //    lst.Add(cdNoData);
+                        //}
+                        if (ShowAll == 1 || SupplierIds != "" || AccessTypeIds != "" || SupplierProductNameIds != "" || PortSpeedIds != "" || AccessSpeedIds != "")
+                        {
+
+                            string[] strNewCharIds = null;
+                            if (strNewIds != "")
+                            {
+                                strNewCharIds = strNewIds.Split(',');
+                            }
+                            if (strNewCharIds!=null && strNewCharIds.Length > 0)
+                            {
+                                if (!strNewCharIds.Contains(item["Char_id"].ToString()))
+                                {
+                                    index++;
+                                    continue;
+                                }
+                            }
+
+                            index = PopulatePortSpeedValues(item, index, lst, CaseID, SupplierIds, AccessTypeIds, SupplierProductNameIds, ProductID, HubSiteID, ref lstAccessType, ref lstSupplier, ref lstSupplierProductName, dsPortSpeeds, dsAvail, PortSpeedIds, AccessSpeedIds);
+                        }
+                    }
+                    else
+                    {
+                        if (strKeys.Contains(strMultiChar) && strMultiChar != "")
+                        {
+                            //cd.charDet.Add(ccd);
+                            cd = lst[0];
+                            cd.charDet.Add(ccd);
+                        }
+                    }
+
+
+
+                    if (item["Char_Type_Id"].ToString() != "929")
+                    {
+                        //if (index == 0 && Convert.ToInt32(item["char_type_value_count"].ToString()) == 3 && Convert.ToInt32(item["char_type_id"].ToString()) != 28)
+                        //{
+                        //    lst.Add(cd);
+                        //}
+                        //else 
+                        if (Convert.ToInt32(item["char_type_value_count"].ToString()) != 3 && Convert.ToInt32(item["char_type_id"].ToString()) != 28)
+                        {
+                            lst.Add(cd);
+                        }
+                    }
+                    index++;
+
+
+                }
+
+                if (dsPortSpeeds != null && dsPortSpeeds.Tables.Count > 0 && dsPortSpeeds.Tables[0].Rows.Count > 0)
+                {
+                    DataView dvSupplier = dsPortSpeeds.Tables[0].DefaultView;
+                    DataTable dtSupplier = dvSupplier.ToTable(true, "SUPPLIERID", "SUPPLIER");
+
+                    DataView dvType = dsPortSpeeds.Tables[0].DefaultView;
+                    DataTable dtType = dvType.ToTable(true, "TypeID", "Type");
+
+                    DataView dvName = dsPortSpeeds.Tables[0].DefaultView;
+                    DataTable dtName = dvSupplier.ToTable(true, "NameID", "Name");
+
+                    DataView dvAccessSpeed = dsPortSpeeds.Tables[0].DefaultView;
+                    dvAccessSpeed.Sort = "CHAR_NUM_VALUE ASC";
+                    DataTable dtAccessSpeed = dvAccessSpeed.ToTable(true, "Access_Speed_Char_ID", "Char_Actual_Value", "Char_Unit_Of_Measure");
+
+                    DataView dvPortSpeed = ds.Tables[0].DefaultView;
+                    dvPortSpeed.RowFilter = "CHAR_TYPE_NAME='Port Speed'";
+                    DataTable dtPortSpeed = dvPortSpeed.ToTable(true, "Char_ID", "Char_Actual_Value", "Char_Unit_Of_Measure");
+
+                    if (dtSupplier != null && dtSupplier.Rows.Count > 0)
+                    {
+                        foreach (DataRow drSupplier in dtSupplier.Rows)
+                        {
+                            lstSupplier.Add(new Supplier() { ID = Convert.ToInt32(drSupplier["SUPPLIERID"].ToString()), Name = drSupplier["SUPPLIER"].ToString() });
+                        }
+                    }
+
+                    if (dtType != null && dtType.Rows.Count > 0)
+                    {
+                        foreach (DataRow drType in dtType.Rows)
+                        {
+                            lstAccessType.Add(new AccessType() { ID = Convert.ToInt32(drType["TypeID"].ToString()), Type = drType["Type"].ToString() });
+                        }
+                    }
+
+                    if (dtName != null && dtName.Rows.Count > 0)
+                    {
+                        foreach (DataRow drName in dtName.Rows)
+                        {
+                            lstSupplierProductName.Add(new SupplieerProductName() { ID = Convert.ToInt32(drName["NameID"].ToString()), SupplierProdName = drName["Name"].ToString() });
+                        }
+                    }
+
+                    if (dtPortSpeed != null && dtPortSpeed.Rows.Count > 0)
+                    {
+                        foreach (DataRow drName in dtPortSpeed.Rows)
+                        {
+                            lstPortSpeed.Add(new ClsPortSpeed() { ID = Convert.ToInt32(drName["Char_ID"].ToString()), Name = drName["Char_Actual_Value"].ToString() + " " + drName["Char_Unit_Of_Measure"].ToString() });
+                        }
+                    }
+
+                    if (dtAccessSpeed != null && dtAccessSpeed.Rows.Count > 0)
+                    {
+                        foreach (DataRow drName in dtAccessSpeed.Rows)
+                        {
+                            lstAccessSpeed.Add(new AccessSpeed() { AccessSpeedId = Convert.ToInt32(drName["Access_Speed_Char_ID"].ToString()), AccessSpeedValue = drName["Char_Actual_Value"].ToString() + " " + drName["Char_Unit_Of_Measure"].ToString() });
+                        }
+                    }
+
+                }
+            }
+
+            edc.lstCaseDetails = lst;
+            edc.lstAccessType = lstAccessType;
+            edc.lstSupplier = lstSupplier;
+            edc.lstSupplierProductName = lstSupplierProductName;
+            edc.lstPortSpeed = lstPortSpeed;
+            edc.lstAccessSpeed = lstAccessSpeed;
+            return edc;
+
+        }
+
+        private static int PopulatePortSpeedValues(DataRow item, int Index, List<CaseTypeDetails> lst, int CaseID, string Supplier, string AccessType, 
+            string SupplierProduct, int ProductID, int HubSiteID, ref List<AccessType> lstAccessType, ref List<Supplier> lstSupplier,
+            ref List<SupplieerProductName> lstSupplierProductName, DataSet dsPortSpeeds, DataSet dsAvail, string PortSpeedIds, string AccessSpeedIds)
+        {
+            CaseTypeDetails cd = new CaseTypeDetails();
+            cd.charDet = new List<CaseCharDetails>();
+            cd.CharID = Convert.ToInt32(item["Char_id"].ToString());
+
+            CaseDefBAL bal = new CaseDefBAL();
+            //DataSet dsDetails = bal.GetCaseDetailsByFilter(Supplier, AccessType, SupplierProduct, cd.CharID, ProductID, CaseID, HubSiteID);
+            if (dsPortSpeeds != null && dsPortSpeeds.Tables.Count > 0 && dsPortSpeeds.Tables[0].Rows.Count > 0)
+            {
+                bool flag = true;
+                cd.Type = item["char_type_name"].ToString();
+                
+
+                DataRow[] drPortSpeeds = dsPortSpeeds.Tables[0].Select("PORT_SPEED_CHAR_ID=" + item["Char_id"].ToString());
+                if (drPortSpeeds.Length > 0)
+                {
+                    foreach (DataRow dr in drPortSpeeds)
+                    {
+                        if (flag)
+                        {
+                            cd.Characteristic = item["char_actual_value"].ToString() + " " + item["char_unit_of_measure"].ToString();
+                            cd.CharTypeId = Convert.ToInt32(item["Char_Type_Id"].ToString());
+                            cd.AccessSpeed = Convert.ToInt32(dr["ACCESS_SPEED_CHAR_ID"].ToString());
+                            cd.OptionMatrixID = Convert.ToInt32(item["option_matrix_id"].ToString());
+                            cd.PortSpeedLeadTime = item["char_value_2"].ToString();
+                            cd.CharTypeValueCount = Convert.ToInt32(item["char_type_value_count"].ToString());
+                            cd.PortSpeedLeadTimeText = 1;
+                            cd.ShowData = Index;
+                            //DataSet dsPortInfo = bal.GetPortInfo(CaseID, cd.CharID, Convert.ToInt32(dr["access_speed_char_id"].ToString()), Convert.ToInt32(dr["TypeID"].ToString()), Convert.ToInt32(dr["NameID"].ToString()), Convert.ToInt32(dr["SUPPLIERID"].ToString()));
+                            //if (dsPortInfo != null && dsPortInfo.Tables.Count > 0 && dsPortInfo.Tables[0].Rows.Count > 0)
+                            //{
+                            cd.CharAvailId = dr["PORT_SPEED_AVAIL_CD"].ToString() != "" ? Convert.ToInt32(dr["PORT_SPEED_AVAIL_CD"].ToString()) : 0;
+                            //}
+                            cd.ProductTypeID = Convert.ToInt32(dr["TYPEID"].ToString());
+                            cd.AccessSupplierNameID = Convert.ToInt32(dr["NAMEID"].ToString());
+                            cd.AccessSupplierID = Convert.ToInt32(dr["SupplierID"].ToString());
+                            //
+                            cd.CaseValid = dr["valid_cd"].ToString() == "1" ? true : false;
+                            cd.CaseStaticValue = dr["char_actual_value"].ToString() + " " + dr["char_unit_of_measure"].ToString() + " - " + dr["type"].ToString() + " - " + (dr["name"].ToString() != "" ? dr["name"].ToString() : " ") + " (" + dr["supplier"].ToString() + ")";
+
+                            lst.Add(cd);
+                            flag = false;
+                        }
+                        else
+                        {
+                            CaseTypeDetails cdNew = new CaseTypeDetails();
+
+                            cdNew.charDet = new List<CaseCharDetails>();
+                            cdNew.CharID = Convert.ToInt32(item["Char_id"].ToString());
+
+                            cdNew.Type = "  ";
+                            cdNew.Characteristic = "";
+
+                            //cdNew.CharTypeId = Convert.ToInt32(item["Char_Type_Id"].ToString());
+                            cdNew.AccessSpeed = Convert.ToInt32(dr["ACCESS_SPEED_CHAR_ID"].ToString());
+
+                            cdNew.CharTypeId = Convert.ToInt32(item["Char_Type_Id"].ToString());
+                            cdNew.OptionMatrixID = Convert.ToInt32(item["option_matrix_id"].ToString());
+                            cdNew.PortSpeedLeadTime = "";
+                            cdNew.PortSpeedLeadTimeText = 0;
+                            cdNew.ShowData = Index;
+
+                            cdNew.ProductTypeID = Convert.ToInt32(dr["TYPEID"].ToString());
+                            cdNew.AccessSupplierNameID = Convert.ToInt32(dr["NAMEID"].ToString());
+                            cdNew.AccessSupplierID = Convert.ToInt32(dr["SupplierID"].ToString());
+                            cdNew.CharAvailId = dr["PORT_SPEED_AVAIL_CD"].ToString() != "" ? Convert.ToInt32(dr["PORT_SPEED_AVAIL_CD"].ToString()) : 0;
+                            cdNew.CaseValid = dr["valid_cd"].ToString() == "1" ? true : false;
+
+                            cdNew.CaseStaticValue = dr["char_actual_value"].ToString() + " " + dr["char_unit_of_measure"].ToString() + " - " + dr["type"].ToString() + " - " + (dr["name"].ToString() != "" ? dr["name"].ToString() : " ") + " (" + dr["supplier"].ToString() + ")";
+
+                            lst.Add(cdNew);
+                        }
+                        Index++;
+                    }
+                }
+                else
+                {
+                    if (Supplier == "" && AccessType == "" && SupplierProduct == "" && PortSpeedIds == "" && AccessSpeedIds == "")
+                    {
+                        cd.Type = item["char_type_name"].ToString();
+                        cd.Characteristic = item["char_actual_value"].ToString() + " " + item["char_unit_of_measure"].ToString();
+                        cd.CharTypeId = Convert.ToInt32(item["Char_Type_Id"].ToString());
+                        cd.OptionMatrixID = Convert.ToInt32(item["option_matrix_id"].ToString());
+                        cd.PortSpeedLeadTime = item["char_value_2"].ToString();
+                        cd.PortSpeedLeadTimeText = 1;
+                        cd.ShowData = -2;
+                        cd.CaseValid = false;
+                        lst.Add(cd);
+                    }
+                }
+            }
+            else
+            {
+                if (Supplier == "" && AccessType == "" && SupplierProduct == "" && PortSpeedIds == "" && AccessSpeedIds == "")
+                {
+                    cd.Type = item["char_type_name"].ToString();
+                    cd.Characteristic = item["char_actual_value"].ToString() + " " + item["char_unit_of_measure"].ToString();
+                    cd.CharTypeId = Convert.ToInt32(item["Char_Type_Id"].ToString());
+                    cd.OptionMatrixID = Convert.ToInt32(item["option_matrix_id"].ToString());
+                    cd.PortSpeedLeadTime = item["char_value_2"].ToString();
+                    cd.PortSpeedLeadTimeText = 1;
+                    cd.ShowData = -2;
+                    cd.CaseValid = false;
+                    lst.Add(cd);
+                }
+            }
+
+
+            return Index;
+        }
+
+
+        private static CaseTypeDetails PopulateValues(List<CaseTypeDetails> lstData, DataRow item, int Index, DataSet dsAvail)
+        {
+            CaseTypeDetails cd = new CaseTypeDetails();
+            cd.charDet = new List<CaseCharDetails>();
+            cd.CharID = Convert.ToInt32(item["Char_id"].ToString());
+            //cd.Type = item["char_type_name"].ToString();
+            if (lstData.Where(t => t.Type == item["char_type_name"].ToString()).Count() == 0)
+            {
+                cd.Type = item["char_type_name"].ToString();
+            }
+            else
+            {
+                cd.Type = "       ";
+            }
+            cd.TypeData = item["char_type_name"].ToString();
+            cd.Characteristic = item["char_name"].ToString();
+            cd.CharTypeId = Convert.ToInt32(item["Char_Type_Id"].ToString());
+            cd.OptionMatrixID = Convert.ToInt32(item["option_matrix_id"].ToString());
+            cd.PortSpeedLeadTime = item["char_value_2"].ToString();//Convert.ToInt32(item["Char_Type_Id"].ToString()) == 28 ? item["char_value_2"].ToString() : "";
+            cd.CharTypeValueCount = Convert.ToInt32(item["char_type_value_count"].ToString());
+            cd.ShowData = Index;
+            if (Convert.ToInt32(item["char_type_value_count"].ToString()) == 1)
+            {
+                if (item["char_value"].ToString() != "")
+                {
+                    if (item["char_value"].ToString() != "null")
+                    {
+                        cd.CaseValue = item["char_value"].ToString();
+                    }
+                    else
+                    {
+                        cd.CaseValue = "";
+                    }
+                }
+                else
+                {
+                    cd.CaseValue2 = item["char_value_2"].ToString();
+                }
+            }
+            else if (Convert.ToInt32(item["char_type_value_count"].ToString()) == 2)
+            {
+
+            }
+            else if (Convert.ToInt32(item["char_type_value_count"].ToString()) == 5)
+            {
+                if (item["char_value"].ToString() != "null")
+                {
+                    cd.CaseValue = item["char_value"].ToString();
+                }
+                else
+                {
+                    cd.CaseValue = "";
+                }
+            }
+            else if (Convert.ToInt32(item["char_type_value_count"].ToString()) == 6)
+            {
+
+            }
+            else
+            {
+                cd.CaseValue = "";
+            }
+
+            if (item["case_detail_valid_cd"].ToString() == "1")
+            {
+                cd.CaseValid = true;
+            }
+            else
+            {
+                cd.CaseValid = false;
+            }
+
+            if (item["char_avail_cd"].ToString() != "")
+            {
+                cd.CharAvailId = Convert.ToInt32(item["char_avail_cd"].ToString());
+                DataRow[] dr = dsAvail.Tables[0].Select("avail_cd=" + cd.CharAvailId);
+                if (dr.Length > 0)
+                    cd.CharAvailName = dr[0]["avail_desc"].ToString();
+            }
+
+            //cd.ProductTypeID = Convert.ToInt32(dr["TYPEID"].ToString());
+            //cd.AccessSupplierNameID = Convert.ToInt32(dr["NAMEID"].ToString());
+            //cd.AccessSupplierID = Convert.ToInt32(dr["SupplierID"].ToString());
+
+            return cd;
+        }
+
+        [WebMethod]
+        public static EditParentCaseDetails GetParentPortSpeeds(int HubSiteID, int NetworkID, int CaseID, int ParentID, int ProductID, 
+            string Supplier, string AccessType, string SupplierProduct, string PortSpeedIds, string AccessSpeedIds)
+        {
+
+            EditParentCaseDetails edc = new EditParentCaseDetails();
+            List<ParentPortSpeed> lstPortSpeed = new List<ParentPortSpeed>();
+            CaseDefBAL bal = new CaseDefBAL();
+            List<AccessType> lstAccessType = new List<SCAdminBAL.AccessType>();
+            List<Supplier> lstSupplier = new List<SCAdminBAL.Supplier>();
+            List<SupplieerProductName> lstSupplierProductName = new List<SupplieerProductName>();
+            List<ClsPortSpeed> lstPortSpeedData = new List<ClsPortSpeed>();
+            List<AccessSpeed> lstAccessSpeed = new List<AccessSpeed>();
+            string strNewIds = "";
+            DataSet dsNetwork = bal.GetNetworkID(CaseID);
+            if (dsNetwork != null && dsNetwork.Tables.Count > 0 && dsNetwork.Tables[0].Rows.Count > 0)
+            {
+                NetworkID = Convert.ToInt32(dsNetwork.Tables[0].Rows[0]["ServiceId"].ToString());
+            }
+
+            DataSet ds = bal.GetParentPortSpeeds(HubSiteID, ParentID, NetworkID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                string PortSpeedCharID = "";
+                if (string.IsNullOrEmpty(PortSpeedIds))
+                {
+                    foreach (DataRow item in ds.Tables[0].Rows)
+                    {
+                        PortSpeedCharID = string.IsNullOrEmpty(PortSpeedCharID) ? item["CHAR_ID"].ToString() : PortSpeedCharID + "," + item["CHAR_ID"].ToString();
+                    }
+                    strNewIds = PortSpeedCharID;
+                }
+                else
+                {
+                    PortSpeedCharID = PortSpeedIds;
+                    strNewIds = PortSpeedIds;
+                }
+
+                DataSet dsChild = bal.GetParentPortSpeedMapping(PortSpeedCharID, Convert.ToInt32(ds.Tables[0].Rows[0]["CASE_ID"].ToString()), HubSiteID, ParentID, ProductID, CaseID, Supplier, AccessType, SupplierProduct, AccessSpeedIds);
+                if (dsChild != null && dsChild.Tables.Count > 0 && dsChild.Tables[0].Rows.Count > 0)
+                {
+
+                    strNewIds = "";
+                    DataView dvPortSpeeds = dsChild.Tables[0].DefaultView;
+                    //dvPortSpeeds.RowFilter = "PORT_SPEED_CHAR_ID=";
+                    DataTable dtPortSpeeds = dvPortSpeeds.ToTable(true, "PORT_SPEED_CHAR_ID");
+                    foreach (DataRow dr in dtPortSpeeds.Rows)
+                    {
+                        strNewIds = strNewIds == "" ? dr["PORT_SPEED_CHAR_ID"].ToString() : strNewIds + "," + dr["PORT_SPEED_CHAR_ID"].ToString();
+                    }
+                    
+
+                    DataSet dsPortInfo = null;
+                    bool blnMapping = false;
+                    bool hasParentSpeeds = false;
+                    DataSet dsCount = bal.GetParentSpeedsCount(CaseID);
+                    if (dsCount != null && dsCount.Tables.Count > 0 && dsCount.Tables[0].Rows.Count > 0)
+                    {
+                        hasParentSpeeds = true;
+                    }
+                    bool validate_parent = false;
+                    DataSet dsValidate = bal.ValidateParentPortSpeed(ProductID);
+                    if (dsValidate != null && dsValidate.Tables.Count > 0 && dsValidate.Tables[0].Rows.Count > 0)
+                    {
+                        validate_parent = true;
+                    }
+                    foreach (DataRow item in ds.Tables[0].Rows)
+                    {
+
+                        string[] strNewCharIds = null;
+                        if (strNewIds != "")
+                        {
+                            strNewCharIds = strNewIds.Split(',');
+                        }
+                        if (strNewCharIds != null && strNewCharIds.Length > 0)
+                        {
+                            if (!strNewCharIds.Contains(item["Char_id"].ToString()))
+                            {
+                                continue;
+                            }
+                        }
+
+                        ParentPortSpeed ps = new ParentPortSpeed();
+                        ps.PortSpeed = "Port Speed";
+                        ps.UnitOfMesure = item["char_actual_value"].ToString() + " " + item["char_unit_of_measure"].ToString();
+                        ps.lsMapping = new List<PortSpeedMapping>();
+
+                        DataRow[] drChild = dsChild.Tables[0].Select("PORT_SPEED_CHAR_ID=" + item["CHAR_ID"].ToString());
+
+
+                        foreach (DataRow dr in drChild)
+                        {
+
+                            //dsPortInfo = bal.GetPortInfo(CaseID, Convert.ToInt32(item["CHAR_ID"].ToString()), Convert.ToInt32(dr["access_speed_char_id"].ToString()), Convert.ToInt32(dr["access_product_type_id"].ToString()), Convert.ToInt32(dr["access_supplier_name_id"].ToString()), Convert.ToInt32(dr["access_supplier_char_id"].ToString()));
+                            PortSpeedMapping pm = new PortSpeedMapping();
+                            //DataSet dsEnableMapping = bal.GetEnableMapping(ProductID, Convert.ToInt32(item["CHAR_ID"].ToString()), Convert.ToInt32(dr["access_speed_char_id"].ToString()), Convert.ToInt32(dr["access_product_type_id"].ToString()));
+                            pm.Availablity = dr["AVAIL_DESC"].ToString() != "" ? dr["AVAIL_DESC"].ToString() : "Unknown";
+                            pm.Mapping = dr["CHAR_ACTUAL_VALUE"].ToString() + " " + dr["CHAR_UNIT_OF_MEASURE"].ToString() + " - " + dr["Type"].ToString() + " - " + dr["Name"].ToString() + " (" + dr["SUPPLIER"].ToString() + ")";
+                            pm.CharID = Convert.ToInt32(item["CHAR_ID"].ToString());
+                            pm.OptionMatrixID = Convert.ToInt32(item["OPTION_MATRIX_ID"].ToString());
+                            pm.ProductTypeID = Convert.ToInt32(dr["ACCESS_PRODUCT_TYPE_ID"].ToString());
+                            pm.AccessSpeed = Convert.ToInt32(dr["access_speed_char_id"].ToString());
+                            pm.AccessSupplierID = Convert.ToInt32(dr["access_supplier_char_id"].ToString());
+                            pm.AccessSupplierNameID = Convert.ToInt32(dr["access_supplier_name_id"].ToString());
+                            pm.CharTypeID = Convert.ToInt32(item["CHAR_TYPE_ID"].ToString());
+                            pm.AvailValue = Convert.ToInt32(dr["PORT_SPEED_AVAIL_CD"].ToString());
+                            if (dr["PORT_SPEED_CHAR_ID_NEW"].ToString() != "" && dr["ACCESS_SPEED_CHAR_ID_NEW"].ToString() != "" && dr["ACCESS_PRODUCT_TYPE_ID_NEW"].ToString() != "")
+                            {
+                                blnMapping = true;
+                            }
+                            else
+                            {
+                                blnMapping = false;
+                            }
+
+                            //if (dsPortInfo != null && dsPortInfo.Tables.Count > 0 && dsPortInfo.Tables[0].Rows.Count > 0)
+                            //{
+                                if (hasParentSpeeds)
+                                {
+                                    if (dr["VALIDID"].ToString() == "1")
+                                    {
+
+                                        if (blnMapping)
+                                        {
+                                            pm.isChecked = true;
+                                            pm.Valid = "ON";
+                                            pm.isDisabled = 0;
+                                        }
+                                        else
+                                        {
+                                            pm.isChecked = true;
+                                            pm.Valid = "DISON";
+                                            pm.isDisabled = 1;
+                                        }
+                                    }
+                                    else if (dr["VALIDID"].ToString() == "0")
+                                    {
+                                        if (blnMapping)
+                                        {
+                                            pm.isChecked = false;
+                                            pm.Valid = "OFF";
+                                            pm.isDisabled = 0;
+                                        }
+                                        else
+                                        {
+                                            pm.isChecked = false;
+                                            pm.Valid = "DISOFF";
+                                            pm.isDisabled = 1;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        pm.isChecked = true;
+                                        pm.Valid = "ON";
+                                        pm.isDisabled = 0;
+                                    }
+                                }
+                                else
+                                {
+                                    if (validate_parent)
+                                    {
+                                        if (blnMapping)
+                                        {
+                                            pm.isChecked = true;
+                                            pm.Valid = "ON";
+                                            pm.isDisabled = 0;
+                                        }
+                                        else
+                                        {
+                                            pm.isChecked = true;
+                                            pm.Valid = "DISON";
+                                            pm.isDisabled = 1;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (blnMapping)
+                                        {
+                                            pm.isChecked = true;
+                                            pm.Valid = "OFF";
+                                            pm.isDisabled = 0;
+                                        }
+                                        else
+                                        {
+                                            pm.isChecked = true;
+                                            pm.Valid = "DISOFF";
+                                            pm.isDisabled = 1;
+                                        }
+                                    }
+                                }
+
+
+                            //}
+                            //else
+                            //{
+                            //    if (validate_parent)
+                            //    {
+                            //        if (blnMapping)
+                            //        {
+                            //            pm.isChecked = true;
+                            //            pm.Valid = "ON";
+                            //            pm.isDisabled = 0;
+                            //        }
+                            //        else
+                            //        {
+                            //            pm.isChecked = true;
+                            //            pm.Valid = "DISON";
+                            //            pm.isDisabled = 1;
+                            //        }
+                            //    }
+                            //    else
+                            //    {
+                            //        if (blnMapping)
+                            //        {
+                            //            pm.isChecked = true;
+                            //            pm.Valid = "OFF";
+                            //            pm.isDisabled = 0;
+                            //        }
+                            //        else
+                            //        {
+                            //            pm.isChecked = true;
+                            //            pm.Valid = "DISOFF";
+                            //            pm.isDisabled = 1;
+                            //        }
+                            //    }
+                            //}
+                            ps.lsMapping.Add(pm);
+
+                        }
+                        lstPortSpeed.Add(ps);
+                    }
+
+
+                    DataView dvSupplier = dsChild.Tables[0].DefaultView;
+                    DataTable dtSupplier = dvSupplier.ToTable(true, "access_supplier_char_id", "SUPPLIER");
+
+                    DataView dvType = dsChild.Tables[0].DefaultView;
+                    DataTable dtType = dvType.ToTable(true, "ACCESS_PRODUCT_TYPE_ID", "Type");
+
+                    DataView dvName = dsChild.Tables[0].DefaultView;
+                    DataTable dtName = dvSupplier.ToTable(true, "ACCESS_SUPPLIER_NAME_ID", "Name");
+
+                    DataView dvAccessSpeed = dsChild.Tables[0].DefaultView;
+                    dvAccessSpeed.Sort = "CHAR_NUM_VALUE ASC";
+                    DataTable dtAccessSpeed = dvAccessSpeed.ToTable(true, "Access_Speed_Char_ID", "Char_Actual_Value", "Char_Unit_Of_Measure");
+
+                    DataView dvPortSpeed = ds.Tables[0].DefaultView;
+                    //dvPortSpeed.RowFilter = "CHAR_TYPE_NAME='Port Speed'";
+                    DataTable dtPortSpeed = dvPortSpeed.ToTable(true, "Char_ID", "Char_Actual_Value", "Char_Unit_Of_Measure");
+
+                    if (dtSupplier != null && dtSupplier.Rows.Count > 0)
+                    {
+                        foreach (DataRow drSupplier in dtSupplier.Rows)
+                        {
+                            lstSupplier.Add(new Supplier() { ID = Convert.ToInt32(drSupplier["access_supplier_char_id"].ToString()), Name = drSupplier["SUPPLIER"].ToString() });
+                        }
+                    }
+
+                    if (dtType != null && dtType.Rows.Count > 0)
+                    {
+                        foreach (DataRow drType in dtType.Rows)
+                        {
+                            lstAccessType.Add(new AccessType() { ID = Convert.ToInt32(drType["ACCESS_PRODUCT_TYPE_ID"].ToString()), Type = drType["Type"].ToString() });
+                        }
+                    }
+
+                    if (dtName != null && dtName.Rows.Count > 0)
+                    {
+                        foreach (DataRow drName in dtName.Rows)
+                        {
+                            lstSupplierProductName.Add(new SupplieerProductName() { ID = Convert.ToInt32(drName["ACCESS_SUPPLIER_NAME_ID"].ToString()), SupplierProdName = drName["Name"].ToString() });
+                        }
+                    }
+
+                    if (dtPortSpeed != null && dtPortSpeed.Rows.Count > 0)
+                    {
+                        foreach (DataRow drName in dtPortSpeed.Rows)
+                        {
+                            lstPortSpeedData.Add(new ClsPortSpeed() { ID = Convert.ToInt32(drName["Char_ID"].ToString()), Name = drName["Char_Actual_Value"].ToString() + " " + drName["Char_Unit_Of_Measure"].ToString() });
+                        }
+                    }
+
+                    if (dtAccessSpeed != null && dtAccessSpeed.Rows.Count > 0)
+                    {
+                        foreach (DataRow drName in dtAccessSpeed.Rows)
+                        {
+                            lstAccessSpeed.Add(new AccessSpeed() { AccessSpeedId = Convert.ToInt32(drName["Access_Speed_Char_ID"].ToString()), AccessSpeedValue = drName["Char_Actual_Value"].ToString() + " " + drName["Char_Unit_Of_Measure"].ToString() });
+                        }
+                    }
+
+                }
+            }
+            edc.lstCaseDetails = lstPortSpeed;
+            edc.lstAccessSpeed = lstAccessSpeed;
+            edc.lstAccessType = lstAccessType;
+            edc.lstPortSpeed = lstPortSpeedData;
+            edc.lstSupplier = lstSupplier;
+            edc.lstSupplierProductName = lstSupplierProductName;
+            return edc;
+
+        }
+
+        [WebMethod]
+        public static bool GetiDSLFlag(string ProductCd, string SubProductCd, string Level)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            bool iDSLFlag = bal.GetiDSLFlag(ProductCd, SubProductCd, Level);
+            return iDSLFlag;
+        }
+
+        [WebMethod]
+        public static List<CountryAccessCases> GetCountryAccessCases(string ProductCd, string Region, string CountryId)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            return bal.GetCountryAccessCasesByRegion(ProductCd, Region, CountryId);
+        }
+
+        [WebMethod]
+        public static int GetParentProduct(int ProductID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            return bal.GetParentProduct(ProductID);
+        }
+
+        [WebMethod]
+        public static int UpdateCaseDetails(string ChildCaseDetails, string ParentCaeDetails, int ChildCount, int ParentCount)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            var childDetails = js.Deserialize<ChildCaseDetails[]>(ChildCaseDetails);
+            var ParentDetails = js.Deserialize<ParentCaseDetails[]>(ParentCaeDetails);
+            //childDetails.Length
+            //List<object> lstItems = new JavaScriptSerializer().ConvertToType<List<object>>(ChildCaseDetails);
+            int Result = 0;
+            try
+            {
+                DataSet dsCharTypeIDs = bal.GetCharTypeIDs("'CUSTOMER SERVICE PROVIDER','LOCATION','DISTRIBUTOR','SUPPORT REGION','ACCESS PROVIDER','INTERFACE','SWITCH','SUPPLIER'");
+                string strQry = "";
+                //strQry = "DECLARE DUMMY INTEGER; ";
+                strQry = strQry + "BEGIN ";
+                string tempValue = "0";
+                string strSql = "";
+                strSql = strQry;
+                string validVal = "";
+                if (childDetails != null)
+                {
+                    foreach (var item in childDetails)
+                    {
+
+                        if (item.CharTypeID == "'28'")
+                        {
+                            //string strSql = "";
+                            string changedFlag = "N";
+                            DataSet dsCount = bal.GetRecordsCount("csu_case_port_access_speeds", item.CaseID, item.CharID, item.AccessSpeedID, item.AccessTypeID, item.AccessSupplierNameID, item.AccessSupplierID);
+                            if (dsCount != null && dsCount.Tables.Count > 0 && dsCount.Tables[0].Rows.Count > 0)
+                            {
+                                if (dsCount.Tables[0].Rows[0]["valid_cd"].ToString() != item.AvailValue.Replace("'", ""))
+                                {
+                                    changedFlag = "Y";
+                                }
+
+                                strSql += " Update csu_case_port_access_speeds ";
+                                strSql += " Set port_speed_avail_cd = " + item.AvailValue + ",";
+                                //strSql += " valid_cd = " + item.CaseValidVal == "ON" ? "1" : "0" + ", ";
+
+                                if (item.CaseValidVal.Replace("'", "").Contains("1") || item.CaseValidVal.Replace("'", "").Contains("0"))
+                                {
+                                    validVal = item.CaseValidVal.Replace("'", "");
+                                }
+                                else
+                                {
+                                    validVal = item.CaseValidVal.Replace("'", "") == "true" ? "1" : "0";
+                                }
+                                strSql += " valid_cd = " + validVal + ", ";
+
+                                //If tmpTable = "csu_parent_port_access_speeds" Then
+                                //If CStr(arrValid(I)) = CStr(VALIDCODE) Then
+                                //        strSql += " child_set = 0,";
+                                //    Else
+                                //        strSql += " child_set = 1,"
+                                //    End If
+                                //End If
+                                strSql += " updated_emp_id = '" + item.UserID.Replace("'", "") + "', ";
+                                strSql += " updated_dt = sysdate ";
+                                strSql += " Where case_id = " + item.CaseID.Replace("'", "");
+                                strSql += " And port_speed_char_id = " + item.CharID.Replace("'", "");
+                                strSql += " And access_speed_char_id = " + item.AccessSpeedID.Replace("'", "");
+                                strSql += " And access_product_type_id = " + item.AccessTypeID.Replace("'", "");
+                                strSql += " And access_supplier_name_id = " + item.AccessSupplierNameID.Replace("'", "");
+                                strSql += " And access_supplier_char_id = " + item.AccessSupplierID.Replace("'", "");
+                                strSql += " ;";
+                            }
+                            else
+                            {
+                                changedFlag = "Y";
+                                strSql += "Insert into csu_case_port_access_speeds ";
+                                strSql += " (case_id, port_speed_char_id, access_speed_char_id, access_product_type_id, ";
+                                strSql += "access_supplier_name_id, access_supplier_char_id, port_speed_avail_cd, valid_cd,";
+                                //If tmpTable = "csu_parent_port_access_speeds" Then
+                                //    ssql = ssql & "child_set,"
+                                //End If
+                                strSql += "created_emp_id,created_dt,updated_emp_id,updated_dt)";
+                                strSql += "Values(" + item.CaseID.Replace("'", "") + ", ";
+                                strSql += item.CharID.Replace("'", "") + ", ";
+                                strSql += item.AccessSpeedID.Replace("'", "") + ", ";
+                                strSql += item.AccessTypeID.Replace("'", "") + ", ";
+                                strSql += item.AccessSupplierNameID.Replace("'", "") + ", ";
+                                strSql += item.AccessSupplierID.Replace("'", "") + ", ";
+                                strSql += item.AvailValue.Replace("'", "") + ", ";
+
+                                if (item.CaseValidVal.Replace("'", "").Contains("1") || item.CaseValidVal.Replace("'", "").Contains("0"))
+                                {
+                                    validVal = item.CaseValidVal.Replace("'", "");
+                                }
+                                else
+                                {
+                                    validVal = item.CaseValidVal.Replace("'", "") == "true" ? "1" : "0";
+                                }
+
+                                strSql += validVal + ", ";
+                                //If tmpTable = "csu_parent_port_access_speeds" Then
+                                //    If CStr(arrValid(I)) = CStr(VALIDCODE) Then
+                                //        ssql = ssql & "0,"
+                                //    Else
+                                //        ssql = ssql & "1,"
+                                //    End If
+                                //End If
+                                strSql += " '" + item.UserID.Replace("'", "") + "', ";
+                                strSql += " sysdate, ";
+                                strSql += " '" + item.UserID.Replace("'", "") + "', ";
+                                strSql += " sysdate) ;";
+                            }
+
+
+                        }
+                    }
+                }
+                if (ParentDetails != null)
+                {
+                    foreach (var item in ParentDetails)
+                    {
+
+                        if (item.CharTypeID == "'28'")
+                        {
+                            //string strSql = "";
+                            string changedFlag = "N";
+
+                            DataSet dsCount = bal.GetRecordsCount("csu_parent_port_access_speeds", item.CaseID.Replace("'", ""), item.CharID.Replace("'", ""), item.AccessSpeedID.Replace("'", ""), item.ProductTypeID.Replace("'", ""), item.AccessSupplierNameID.Replace("'", ""), item.AccessSupplierID.Replace("'", ""));
+                            if (dsCount != null && dsCount.Tables.Count > 0 && dsCount.Tables[0].Rows.Count > 0)
+                            {
+                                if (dsCount.Tables[0].Rows[0]["valid_cd"].ToString() != item.AvailValue.Replace("'", ""))
+                                {
+                                    changedFlag = "Y";
+                                }
+
+                                strSql += " Update csu_parent_port_access_speeds ";
+                                strSql += " Set port_speed_avail_cd = " + item.AvailValue.Replace("'", "") + ",";
+                                //validVal = item.CaseValidValue.Replace("'", "") == "ON" ? "1" : "0";
+                                if (item.CaseValidValue.Replace("'", "").Contains("1") || item.CaseValidValue.Replace("'", "").Contains("0"))
+                                {
+                                    validVal = item.CaseValidValue.Replace("'", "");
+                                }
+                                else
+                                {
+                                    validVal = item.CaseValidValue.Replace("'", "") == "true" ? "1" : "0";
+                                }
+
+                                strSql += " valid_cd = " + validVal + ", ";
+
+                                if (item.AvailValue.Replace("'", "") == "1")
+                                {
+                                    strSql += " child_set = 0,";
+                                }
+                                else
+                                {
+                                    strSql += " child_set = 1,";
+
+                                }
+                                strSql += " updated_emp_id = '" + item.UserID.Replace("'", "") + "', ";
+                                strSql += " updated_dt = sysdate ";
+                                strSql += " Where case_id = " + item.CaseID.Replace("'", "");
+                                strSql += " And port_speed_char_id = " + item.CharID.Replace("'", "");
+                                strSql += " And access_speed_char_id = " + item.AccessSpeedID.Replace("'", "");
+                                strSql += " And access_product_type_id = " + item.ProductTypeID.Replace("'", "");
+                                strSql += " And access_supplier_name_id = " + item.AccessSupplierNameID.Replace("'", "");
+                                strSql += " And access_supplier_char_id = " + item.AccessSupplierID.Replace("'", "");
+                                strSql += " ;";
+                            }
+                            else
+                            {
+                                changedFlag = "Y";
+                                strSql += "Insert into csu_parent_port_access_speeds ";
+                                strSql += " (case_id, port_speed_char_id, access_speed_char_id, access_product_type_id, ";
+                                strSql += "access_supplier_name_id, access_supplier_char_id, port_speed_avail_cd, valid_cd,child_set,";
+                                //If tmpTable = "csu_parent_port_access_speeds" Then
+                                //    ssql = ssql & "child_set,"
+                                //End If
+                                strSql += "created_emp_id,created_dt,updated_emp_id,updated_dt)";
+                                strSql += "Values(" + item.CaseID.Replace("'", "") + ", ";
+                                strSql += item.CharID.Replace("'", "") + ", ";
+                                strSql += item.AccessSpeedID.Replace("'", "") + ", ";
+                                strSql += item.ProductTypeID.Replace("'", "") + ", ";
+                                strSql += item.AccessSupplierNameID.Replace("'", "") + ", ";
+                                strSql += item.AccessSupplierID.Replace("'", "") + ", ";
+                                strSql += item.AvailValue.Replace("'", "") + ", ";
+                                //validVal = item.CaseValidValue.Replace("'", "") == "ON" ? "1" : "0";
+
+                                if (item.CaseValidValue.Replace("'", "").Contains("1") || item.CaseValidValue.Replace("'", "").Contains("0"))
+                                {
+                                    validVal = item.CaseValidValue.Replace("'", "");
+                                }
+                                else
+                                {
+                                    validVal = item.CaseValidValue.Replace("'", "") == "true" ? "1" : "0";
+                                }
+
+                                strSql += validVal + ", ";
+
+                                //strSql += validVal + ", ";
+
+                                if (validVal == "1")
+                                    strSql += "0,";
+                                else
+                                    strSql += "1,";
+
+                                strSql += " '" + item.UserID.Replace("'", "") + "', ";
+                                strSql += " sysdate, ";
+                                strSql += " '" + item.UserID.Replace("'", "") + "', ";
+                                strSql += " sysdate) ;";
+                            }
+
+
+                        }
+                    }
+                }
+
+                strSql += "COMMIT; END; ";
+
+                bal.SaveCaseDetails(strSql);
+
+                validVal = "";
+                if (childDetails != null)
+                {
+                    foreach (ChildCaseDetails item in childDetails)
+                    {
+
+                        DataSet dsValueCount = bal.GetCharTypeValueCount(item.CharTypeID.Replace("'", ""));
+                        if (dsValueCount != null && dsValueCount.Tables.Count > 0 && dsValueCount.Tables[0].Rows.Count > 0)
+                        {
+
+                            if (dsValueCount.Tables[0].Rows[0]["char_type_value_count"].ToString() != "6" && dsValueCount.Tables[0].Rows[0]["char_type_value_count"].ToString() != "5")
+                            {
+                                if (item.AvailValue != "" && item.AvailValue != null)
+                                {
+                                    strQry += " UPDATE csu_case_details set ";
+                                    strQry += " char_avail_cd = " + item.AvailValue.Replace("'", "") + ", ";
+                                    validVal = item.CaseValue.Replace("'", "") == "" ? "" : item.CaseValue.Replace("'", "");
+                                    strQry += " char_value = '" + validVal + "', ";
+                                    if (item.CharTypeID.Replace("'", "") == "28")
+                                    {
+                                        if (item.CharID.Replace("'", "") != tempValue)
+                                        {
+                                            strQry += " char_value_2 = '" + item.PortSpeedLeadTime.Replace("'", "") + "' , ";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        validVal = "";
+                                        validVal = item.CharValue2 == null ? "" : item.CharValue2.Replace("'", "");
+                                        strQry += " char_value_2 = '" + validVal + "' , ";
+                                    }
+                                    strQry += " char_avail_dt = to_date(Null,'DD-MON-YYYY'), ";
+                                    if (item.CaseValidVal.Replace("'", "").Contains("1") || item.CaseValidVal.Replace("'", "").Contains("0"))
+                                    {
+                                        validVal = item.CaseValidVal.Replace("'", "");
+                                    }
+                                    else
+                                    {
+                                        validVal = item.CaseValidVal.Replace("'", "") == "true" ? "1" : "0";
+                                    }
+                                    strQry += " case_detail_valid_cd = " + validVal + ", ";
+                                    strQry += " updated_emp_id = '" + item.UserID.Replace("'", "") + "',";
+                                    strQry += " updated_dt = sysdate";
+                                    strQry += " where case_id = " + item.CaseID.Replace("'", "");
+                                    strQry += " and option_matrix_id = " + item.OptionMatrixID.Replace("'", "");
+
+                                    strQry += "; ";
+                                }
+                            }
+
+                            else
+                            {
+                                if (dsValueCount.Tables[0].Rows[0]["char_type_value_count"].ToString() == "6")
+                                {
+                                    strQry += "update csu_case_details set ";
+                                    strQry += " char_avail_dt = to_date(Null,'DD-MON-YYYY'), ";
+                                    validVal = "";
+                                    if (item.CaseValidVal.Replace("'", "").Contains("1") || item.CaseValidVal.Replace("'", "").Contains("0"))
+                                    {
+                                        validVal = item.CaseValidVal.Replace("'", "");
+                                    }
+                                    else
+                                    {
+                                        validVal = item.CaseValidVal.Replace("'", "") == "true" ? "1" : "0";
+                                    }
+                                    strQry += " case_detail_valid_cd = " + validVal + ", ";
+                                    strQry += " char_avail_cd = " + item.AvailValue.Replace("'", "") + ", ";
+                                    strQry += " updated_emp_id = '" + item.UserID.Replace("'", "") + "',";
+                                    strQry += " updated_dt = sysdate";
+                                    strQry += " where case_id = " + item.CaseID.Replace("'", "");
+                                    strQry += " and option_matrix_id = " + item.OptionMatrixID.Replace("'", "");
+
+                                    strQry += "; ";
+                                }
+                                else
+                                {
+                                    //strCharActValue = arrCharValue(I)
+                                    //end if
+                                    strQry += "update csu_case_details set ";
+                                    validVal = "";
+                                    validVal = item.CaseValue.Replace("'", "") == "" ? "" : item.CaseValue.Replace("'", "");
+                                    strQry += " char_value = '" + validVal + "', ";
+                                    strQry += " char_avail_cd = " + item.AvailValue.Replace("'", "") + ", ";
+                                    if (item.CharTypeID.Replace("'", "") == "28")
+                                    {
+                                        if (item.CharID.Replace("'", "") != tempValue)
+                                        {
+                                            strQry += " char_value_2 = '" + item.PortSpeedLeadTime.Replace("'", "") + "' , ";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        strQry += " char_value_2 = '" + item.CharValue2.Replace("'", "") + "' , ";
+                                    }
+                                    strQry += " char_avail_dt = to_date(Null,'DD-MON-YYYY'), ";
+                                    validVal = "";
+                                    if (item.CaseValidVal.Replace("'", "").Contains("1") || item.CaseValidVal.Replace("'", "").Contains("0"))
+                                    {
+                                        validVal = item.CaseValidVal.Replace("'", "");
+                                    }
+                                    else
+                                    {
+                                        validVal = item.CaseValidVal.Replace("'", "") == "true" ? "1" : "0";
+                                    }
+                                    strQry += " case_detail_valid_cd = " + validVal + ", ";
+                                    strQry += " updated_emp_id = '" + item.UserID.Replace("'", "") + "',";
+                                    strQry += " updated_dt = sysdate";
+                                    strQry += " where case_id = " + item.CaseID.Replace("'", "");
+                                    strQry += " and option_matrix_id = " + item.OptionMatrixID.Replace("'", "");
+
+                                    strQry += "; ";
+                                }
+                            }
+                        }
+                        tempValue = item.CharID.Replace("'", "");
+                    }
+
+
+                    if (childDetails.Length > 0)
+                    {
+
+                        foreach (DataRow item in dsCharTypeIDs.Tables[0].Rows)
+                        {
+                            strQry += " " + BuildUpdateStatement(Convert.ToInt32(item["char_type_id"].ToString()), childDetails[0].CaseID.Replace("'", ""), childDetails[0].UserID.Replace("'", ""));
+                        }
+
+
+
+                        strQry += "COMMIT; END; ";
+
+
+                        bal.SaveCaseDetails(strQry);
+                    }
+                }
+
+                if (childDetails != null)
+                {
+                    if (childDetails.Length > 0)
+                    {
+                        foreach (var item in childDetails)
+                        {
+                            if (item.CharTypeID == "'28'")
+                            {
+                                try
+                                {
+                                    bal.SetPortSpeedAvailablility(Convert.ToInt32(item.CaseID.Replace("'", "")), Convert.ToInt32(item.CharID.Replace("'", "")));
+                                }
+                                catch 
+                                {
+                                    
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+                if (ParentDetails != null)
+                {
+                    if (ParentDetails.Length > 0)
+                    {
+                        foreach (var item in ParentDetails)
+                        {
+                            if (item.CharTypeID == "'28'")
+                            {
+                                try
+                                {
+                                    bal.SetPortSpeedAvailablility(Convert.ToInt32(item.CaseID.Replace("'", "")), Convert.ToInt32(item.CharID.Replace("'", "")));
+                                }
+                                catch
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                //For I = 0 To nRows-1
+                //    If arrCharTypeId(I) = 28 Then
+                //        Response.write "webcsuown.set_prtspeed_availability(" & strCaseId & "," & arrCharId(I) & ") <br>"
+                //        DbConn.Execute "webcsuown.set_prtspeed_availability(" & strCaseId & "," & arrCharId(I) & ")"   'Subrahmanyam
+                //    End If
+                //Next
+
+                Result = 1;
+            }
+            catch
+            {
+                Result = 0;
+            }
+            return Result;
+        }
+
+        private static string BuildUpdateStatement(int CharTypeID, string CaseID, string UserID)
+        {
+            string UpdateStmt = "";
+            UpdateStmt = "update csu_case_details set  case_detail_valid_cd = 0, updated_emp_id = '" + UserID + "',updated_dt = sysdate  where case_id = " + CaseID + " and char_type_id = " + CharTypeID + "; ";
+
+            return UpdateStmt;
+        }
+
+        [WebMethod]
+        public static List<CaseAvailability> GetCaseAvailability()
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            return bal.GetCaseAvailability();
+        }
+
+        [WebMethod]
+        public static List<city> GetCities(int RegionID, int CountryID, string Filter, int PageNo)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            int PageSize = Convert.ToInt32(ConfigurationManager.AppSettings["PageSize"].ToString());
+            int Count = 0;
+            DataSet dsCities = bal.GetCities(RegionID, CountryID, Filter, PageNo, PageSize, ref Count);
+            List<city> lstCities = new List<city>();
+
+            if (dsCities != null && dsCities.Tables.Count > 0 && dsCities.Tables[0].Rows.Count > 0)
+            {
+                int PageCount = (int)Math.Ceiling((double)Count / PageSize);
+                var cityLst = dsCities.Tables[0].AsEnumerable().Select(t => new { CityID = t.Field<decimal>("CITY_ID"), CityName = t.Field<string>("CITY_NAME") }).ToList();
+                foreach (var item in cityLst)
+                {
+                    lstCities.Add(new city() { Cityid = item.CityID, CityName = item.CityName, Count = Count, PageCount = PageCount });
+                }
+
+            }
+            return lstCities;
+        }
+
+        [WebMethod]
+        public static List<StateProvince> GetStates(int RegionID, int CountryID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+
+            DataSet dsStateProvince = bal.GetStates(RegionID, CountryID);
+            List<StateProvince> lstStates = new List<StateProvince>();
+
+            if (dsStateProvince != null && dsStateProvince.Tables.Count > 0 && dsStateProvince.Tables[0].Rows.Count > 0)
+            {
+
+                var StateLst = dsStateProvince.Tables[0].AsEnumerable().Select(t => new { StateID = t.Field<decimal>("state_province_id"), StateName = t.Field<string>("state_province_name") }).ToList();
+                foreach (var item in StateLst)
+                {
+                    lstStates.Add(new StateProvince() { StateID = item.StateID, StateName = item.StateName });
+                }
+
+            }
+            return lstStates;
+        }
+
+        [WebMethod]
+        public static city GetFirstCity(int RegionID, int CountryID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            DataSet dsCities = bal.GetFirstCity(RegionID, CountryID);
+            city ct = new city();
+            if (dsCities != null && dsCities.Tables.Count > 0 && dsCities.Tables[0].Rows.Count > 0)
+            {
+                ct.Cityid = Convert.ToInt32(dsCities.Tables[0].Rows[0]["CITY_ID"].ToString());
+                ct.CityName = dsCities.Tables[0].Rows[0]["CITY_NAME"].ToString();
+            }
+            return ct;
+        }
+
+        [WebMethod]
+        public static int AddCaseDetails(int RegionID, int ProductID, int CountryID, int CityID, int HubSiteID, string CapmanPlatformId, int CaseAvailID, int SubProduct, int StatePovinceID, int BundleFlag, string SiteAvailDate, int CaseValidVal, int UserID, int CPESupplierId)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            int CaseID = bal.GetCaseID();
+            int Result = 0;
+            string SqlBlock = "";
+            //SqlBlock = "DECLARE DUMMY NUMBER; ";
+            try
+            {
+                SqlBlock += "BEGIN ";
+
+                SqlBlock += "Insert into csu_cases ";
+                SqlBlock += "( case_id,region_id, case_avail_cd,product_cd, subproduct_cd, country_id, city_id, state_province_id, hub_site_id, bundled_unbundled_flag, site_availability_dt, ";
+                SqlBlock += "case_valid_cd,created_emp_id, created_dt, updated_emp_id, updated_dt, access_supplier_char_id,access_speed_char_id,";
+                if (CapmanPlatformId != "")
+                {
+                    SqlBlock += ",capman_platform_id,";
+                }
+                SqlBlock += "exception)";
+                SqlBlock += " VALUES ";
+                SqlBlock += "(" + CaseID + "," + RegionID + " ," + CaseAvailID + "," + ProductID + ",";
+                if (SubProduct == 0)
+                {
+                    SqlBlock += "Null,";
+                }
+                else
+                {
+                    SqlBlock += SubProduct + ",";
+                }
+                SqlBlock += CountryID + "," + CityID + ",";
+                if (StatePovinceID == 0)
+                {
+                    SqlBlock += " Null ,";
+                }
+                else
+                {
+                    SqlBlock += StatePovinceID + ",";
+                }
+                if (HubSiteID == 0)
+                {
+                    SqlBlock += " Null ,";
+                }
+                else
+                {
+                    SqlBlock += HubSiteID + ",";
+                }
+                SqlBlock += BundleFlag + ",";
+                if (SiteAvailDate == "")
+                {
+                    SqlBlock += "'',";
+                }
+                else
+                {
+                    DateTime CaseAvailDate = DateTime.ParseExact(SiteAvailDate, "MM/dd/yyyy", null);
+                    var AvailDate = String.Format("{0:dd-MMM-yyyy}", CaseAvailDate);
+
+
+                    SqlBlock += " '" + AvailDate + "',";
+                }
+
+                SqlBlock += CaseValidVal + ",'" + UserID + "'," + " sysdate," + " '" + UserID + "', sysdate, ";
+                //If CPEProduct Then
+                //    SqlBlock = SqlBlock & strCpeSupplierId & ", "
+                //Else
+                //    SqlBlock = SqlBlock & strCarrier & ", "
+                //End If
+                if (ProductID == 63)
+                {
+                    SqlBlock += CPESupplierId + ",";
+                }
+                SqlBlock += "Null";
+                //SqlBlock = SqlBlock & strPortSpeed
+
+                if (CapmanPlatformId != "")
+                    SqlBlock += CapmanPlatformId + ", ";
+
+                SqlBlock += ",'') ; ";
+
+                //SqlBlock = SqlBlock & ")"
+                //SqlBlock = SqlBlock & "; " & vbcrlf
+
+
+
+                DataSet dsCharacteristics = bal.GetProductCharacteristics(ProductID);
+
+                if (dsCharacteristics != null && dsCharacteristics.Tables.Count > 0 && dsCharacteristics.Tables[0].Rows.Count > 0)
+                {
+
+                    foreach (DataRow item in dsCharacteristics.Tables[0].Rows)
+                    {
+
+
+
+                        //process = 1
+                        //'Infosys - modified for multi point product
+                        //'If CInt(strProductCd) = PRODUCT_IPL Then
+                        //If (Cint(strServiceType) = BANDWIDTH_SERVICE_TYPE  or CInt(strServiceType) = ETHERNET_SERVICE_TYPE) AND (ucase(strSubProductCd) <> "NULL" and (not isNull(strSubProductCd))) Then
+                        //'End of modification
+                        //    If UCase(dynTemp("char_type_name")) = "PORT SPEED" Then
+                        //        If CInt(strPortSpeed) <> CInt(dynTemp("char_id")) Then process = 0
+                        //    ElseIf UCase(dynTemp("char_type_name")) = "CARRIER" Then
+                        //        If CInt(strCarrier) <> CInt(dynTemp("char_id")) Then process = 0
+                        //    End If
+
+                        //End If
+
+
+
+
+                        SqlBlock += " insert into csu_case_details ";
+                        SqlBlock += "(case_id,option_matrix_id, char_id, char_value, char_type_id, case_detail_valid_cd, char_avail_cd, created_emp_id, created_dt, updated_emp_id, updated_dt )";
+                        SqlBlock += " VALUES (";
+                        SqlBlock += CaseID + ", " + item["option_matrix_id"].ToString() + ", " + item["char_id"] + ", ";
+                        if (item["char_actual_value"].ToString() == "")
+                            SqlBlock += "'',";
+                        else
+                            SqlBlock += "'" + item["char_actual_value"].ToString() + "', ";
+
+                        SqlBlock += item["char_type_id"].ToString() + ", ";
+
+                        //'Infosys - modified for multi point product
+                        //'If CInt(strProductCd) = PRODUCT_IPL Then
+                        //If Cint(strServiceType)= BANDWIDTH_SERVICE_TYPE  or CInt(strServiceType) = ETHERNET_SERVICE_TYPE Then
+                        //'End of modification
+                        //    if(item["char_type_name"].ToString() = "PORT SPEED")
+                        //        If CInt(strPortSpeed) = CInt(dynTemp("char_id")) Then
+                        //            SqlBlock = SqlBlock & "1, "
+                        //            SqlBlock = SqlBlock & C_AVAILABLE & ", "
+                        //        Else
+                        //            SqlBlock = SqlBlock & "0, "
+                        //            SqlBlock = SqlBlock & C_NOT_AVAILABLE & ", "
+                        //        End If
+                        //    ElseIf UCase(dynTemp("char_type_name")) = "CARRIER" Then
+                        //        If CInt(strCarrier) = CInt(dynTemp("char_id")) Then
+                        //            SqlBlock = SqlBlock & "1, "
+                        //            SqlBlock = SqlBlock & C_AVAILABLE & ", "
+                        //        Else
+                        //            SqlBlock = SqlBlock & "0, "
+                        //            SqlBlock = SqlBlock & C_NOT_AVAILABLE & ", "
+                        //        End If
+                        //    Else
+                        //        SqlBlock = SqlBlock & "0, "
+                        //        SqlBlock = SqlBlock & C_AVAILABLE & ", "
+                        //    End If
+                        //Else
+                        //    SqlBlock = SqlBlock & "0, "
+                        //    SqlBlock = SqlBlock & C_AVAILABLE & ", "
+                        //End If
+
+                        SqlBlock += "0,1, ";
+
+                        SqlBlock += "'" + UserID + "',";
+                        SqlBlock += " sysdate,";
+                        SqlBlock += " '" + UserID + "',";
+                        SqlBlock += " sysdate";
+                        SqlBlock += "); ";
+
+                    }
+
+                    SqlBlock += " END; ";
+
+                    bal.SaveCaseDetails(SqlBlock);
+                    Result = 1;
+                }
+            }
+            catch
+            {
+                Result = 0;
+            }
+            return Result;
+
+        }
+
+        [WebMethod]
+        public static CaseUpdateTimeLines GetCaseUpdatedDetails(int CaseID, int flag)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            DataSet ds = null;
+            if (flag == 1)
+            {
+                ds = bal.GetUpdatedDetails(CaseID);
+            }
+            else
+            {
+                ds = bal.GetUpdatedCaseDetails(CaseID);
+            }
+            CaseUpdateTimeLines user = new CaseUpdateTimeLines();
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                user.CreatedById = ds.Tables[0].Rows[0]["CREATED_EMP_ID"].ToString();
+                user.CreatedBy = ds.Tables[0].Rows[0]["CreatedBy"].ToString();
+                user.CreatedDate = ds.Tables[0].Rows[0]["CreateDate"].ToString();
+                user.UpdatedById = ds.Tables[0].Rows[0]["UPDATED_EMP_ID"].ToString();
+                user.UpdatedBy = ds.Tables[0].Rows[0]["UpdatedBy"].ToString();
+                user.UpdatedDate = ds.Tables[0].Rows[0]["UpdatedDate"].ToString();
+            }
+
+            return user;
+        }
+
+
+
+        [WebMethod]
+        public static List<PoPDetails> GetPopDetails(int RegionID, int CountryID, int CityID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            List<PoPDetails> lstPoPDetails = new List<PoPDetails>();
+            DataSet ds = bal.GetPopDetails(RegionID, CountryID, CityID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    lstPoPDetails.Add(new PoPDetails() { PoPID = Convert.ToInt32(ds.Tables[0].Rows[i]["HUB_SITE_ID"].ToString()), PoPName = ds.Tables[0].Rows[i]["HUB_SITE_NAME"].ToString() });
+
+                }
+            }
+            return lstPoPDetails;
+        }
+
+        [WebMethod]
+        public static List<SubProduct> GetSubProducts(int ProductID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            List<SubProduct> lstSubProduct = new List<SubProduct>();
+            DataSet ds = bal.GetSubProducts(ProductID);
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    lstSubProduct.Add(new SubProduct() { SubProductID = Convert.ToInt32(ds.Tables[0].Rows[i]["subproduct_cd"].ToString()), SubProductName = ds.Tables[0].Rows[i]["subproduct_name"].ToString() });
+
+                }
+            }
+            return lstSubProduct;
+        }
+
+        [WebMethod]
+        public static CaseDetails GetSubProductsCaseDetaiils(int ProductID, int RegionID, int CountryID)
+        {
+            CaseDefBAL bal = new CaseDefBAL();
+            List<SubProduct> lstSubProduct = new List<SubProduct>();
+            DataSet ds = bal.GetSubProductsCaseDetails(ProductID, RegionID, CountryID);
+            CaseDetails cd = new CaseDetails();
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                cd.CaseID = Convert.ToInt32(ds.Tables[0].Rows[0]["case_id"].ToString());
+                cd.ShowValid = ds.Tables[0].Rows[0]["SHOWVALID"].ToString();
+                cd.Exception = ds.Tables[0].Rows[0]["exception"].ToString() != "" ? Convert.ToInt32(ds.Tables[0].Rows[0]["exception"].ToString()) : 0;
+            }
+            return cd;
+        }
+    }
+
+}

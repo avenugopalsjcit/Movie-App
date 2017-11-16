@@ -1,0 +1,401 @@
+﻿namespace SCAdminDAL
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using Oracle.DataAccess.Client;
+    using System.Data;
+    using System.Configuration;
+
+
+    public class UsersDAL
+    {
+        DataSet ds;
+        OracleDataAdapter dad;
+        OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+      
+        public DataTable GetTabledata(int Id, string TabName)
+        {
+            string query = string.Empty;
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            if (Id == -1)
+            {
+                switch (TabName)
+                {
+                    case "UserStatus": query = "select us1.user_status_cd, us1.user_status_cd_desc, (select User_name from CSU_USER where EMP_Id = us1.Created_emp_id) Created_By, to_char(us1.Created_dt,'DD-MON-YYYY HH:MI:SS AM') as Created_dt, (select User_name from CSU_USER where EMP_Id = us1.Updated_emp_id) Updated_By,to_char(us1.Updated_dt,'DD-MON-YYYY HH:MI:SS AM') as Updated_dt from csu_ref_user_status us1 order by upper(us1.user_status_cd_desc)";
+                        break;
+                    case "UserCategory": query = "select uc1.User_category_cd, uc1.User_category_desc, (select User_name from CSU_USER where EMP_Id = uc1.Created_emp_id) Created_By, to_char(uc1.Created_dt,'DD-MON-YYYY HH:MI:SS AM') as Created_dt, (select User_name from CSU_USER where EMP_Id = uc1.Updated_emp_id) Updated_By," +
+                                        "to_char(uc1.Updated_dt,'DD-MON-YYYY HH:MI:SS AM') as Updated_dt" +
+                                        " from csu_ref_user_category uc1 order by upper(uc1.User_category_desc)";
+                        break;
+                    case "ProductOwnerStatus": query = "select pos.product_owner_status_cd, pos.product_owner_status_desc, (select User_name from CSU_USER where EMP_Id = pos.Created_emp_id) Created_By, to_char(pos.Created_dt,'DD-MON-YYYY HH:MI:SS AM') as Created_dt, (select User_name from CSU_USER where EMP_Id = pos.Updated_emp_id) Updated_By," +
+                                        "to_char(pos.Updated_dt,'DD-MON-YYYY HH:MI:SS AM') as Updated_dt" +
+                                        " from csu_ref_owner_status pos order by upper(pos.product_owner_status_desc)";
+                        break;
+                }
+            }
+            else
+            {
+                switch (TabName)
+                {
+                    case "UserStatus": query = "select us1.user_status_cd, us1.user_status_cd_desc, (select User_name from CSU_USER where EMP_Id = us1.Created_emp_id) Created_By, to_char(us1.Created_dt,'DD-MON-YYYY HH:MI:SS AM') as Created_dt, (select User_name from CSU_USER where EMP_Id = us1.Updated_emp_id) Updated_By,to_char(us1.Updated_dt,'DD-MON-YYYY HH:MI:SS AM') as Updated_dt from csu_ref_user_status us1 where us1.User_status_cd = " + Id + " order by upper(us1.user_status_cd_desc)";
+                        break;
+                    case "UserCategory": query = "select uc1.User_category_cd, uc1.User_category_desc, (select User_name from CSU_USER where EMP_Id = uc1.Created_emp_id) Created_By, to_char(uc1.Created_dt,'DD-MON-YYYY HH:MI:SS AM') as Created_dt, (select User_name from CSU_USER where EMP_Id = uc1.Updated_emp_id) Updated_By," +
+                                        "to_char(uc1.Updated_dt,'DD-MON-YYYY HH:MI:SS AM') as Updated_dt" +
+                                        " from csu_ref_user_category uc1 where uc1.User_category_cd = " + Id + " order by upper(uc1.User_category_desc)";
+                        break;
+                    case "ProductOwnerStatus": query = "select pos.product_owner_status_cd, pos.product_owner_status_desc, (select User_name from CSU_USER where EMP_Id = pos.Created_emp_id) Created_By, to_char(pos.Created_dt,'DD-MON-YYYY HH:MI:SS AM') as Created_dt, (select User_name from CSU_USER where EMP_Id = pos.Updated_emp_id) Updated_By," +
+                                        "to_char(pos.Updated_dt,'DD-MON-YYYY HH:MI:SS AM') as Updated_dt" +
+                                        " from csu_ref_owner_status pos where pos.product_owner_status_cd = " + Id + " order by upper(pos.product_owner_status_desc)";
+                        break;
+                }
+
+                query = string.Format(query, Id);
+            }
+
+            return objGetDataFromDB.GetDataTable(query.ToString());
+        }
+
+        public int CreateTableRecord(int Id, string Desc, string User_id, string TabName)
+        {
+            string query = string.Empty;
+
+            switch (TabName)
+            {
+                case "UserStatus": query = "Insert into csu_ref_user_status (User_Status_Cd, User_Status_Cd_Desc, created_emp_id, created_dt) VALUES(" + Id + ", '" + Desc + "', '" + User_id + "', TO_DATE('" + System.DateTime.Now + "', 'dd/mm/yyyy hh24:mi:ss'))";
+                    break;
+                case "UserCategory": query = "Insert into csu_ref_user_category (User_category_cd, User_category_desc, created_emp_id, created_dt) VALUES(" + Id + ", '" + Desc + "', '" + User_id + "', TO_DATE('" + System.DateTime.Now + "', 'dd/mm/yyyy hh24:mi:ss'))";
+                    break;
+                case "ProductOwnerStatus": query = "Insert into csu_ref_owner_status ( Product_Owner_Status_Cd, Product_Owner_Status_Desc, created_emp_id, created_dt) VALUES(" + Id + ", '" + Desc + "', '" + User_id + "', TO_DATE('" + System.DateTime.Now + "', 'dd/mm/yyyy hh24:mi:ss'))";
+                    break;
+            }
+
+            //con.Open();
+            OracleCommand cmd = new OracleCommand(query, con);
+
+            OracleCommand cmdOra = new OracleCommand(query.ToString(), con);
+            cmdOra.CommandType = CommandType.Text;
+
+            con.Open();
+            int status = cmd.ExecuteNonQuery();
+            con.Close();
+            return status;
+        }
+
+        public int UpdateTableRecord(int Id, string Desc, string User_id, string TabName)
+        {
+            string query = string.Empty;
+
+            switch (TabName)
+            {
+                case "UserStatus": query = "update csu_ref_user_status set User_Status_Cd_Desc = '" + Desc + "', updated_emp_id = '" + User_id + "', updated_dt = TO_DATE('" + System.DateTime.Now + "', 'dd/mm/yyyy hh24:mi:ss') where User_Status_Cd = " + Id;
+                    break;
+                case "UserCategory": query = "update csu_ref_user_category set User_category_desc = '" + Desc + "', updated_emp_id = '" + User_id + "', updated_dt = TO_DATE('" + System.DateTime.Now + "', 'dd/mm/yyyy hh24:mi:ss') where User_category_cd = " + Id;
+                    break;
+                case "ProductOwnerStatus": query = "update csu_ref_owner_status set Product_Owner_Status_Desc = '" + Desc + "', updated_emp_id = '" + User_id + "', updated_dt = TO_DATE('" + System.DateTime.Now + "', 'dd/mm/yyyy hh24:mi:ss') where Product_Owner_Status_Cd = " + Id;
+                    break;
+            }
+
+            con.Open();
+            OracleCommand cmd = new OracleCommand(query, con);
+
+            OracleCommand cmdOra = new OracleCommand(query.ToString(), con);
+            cmdOra.CommandType = CommandType.Text;
+
+            int status = cmd.ExecuteNonQuery();
+            con.Close();
+            return status;
+        }
+
+        public int DeleteTableRecord(int Id, string TabName)
+        {
+            string query = string.Empty;
+            string sqlQuery = string.Empty;
+            int statusCount = 0;
+            int noPrevData = 0;
+            //con.Open();
+            switch (TabName)
+            {
+                case "UserStatus":
+
+                    string commandQuery = "select * from csu_user where rownum = 1 and User_Status_Cd =" + Id;                    
+
+                     OracleDataReader drUserStatus =OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+
+                     if (drUserStatus.HasRows)
+                     {
+                         statusCount = 2;
+                         return statusCount;
+                     }
+                     else
+                     {
+                         query = "Delete from csu_ref_user_status where User_Status_Cd = " + Id;
+                         OracleCommand cmdOra = new OracleCommand(query.ToString(), con);
+                         cmdOra.CommandType = CommandType.Text;
+
+                         statusCount = cmdOra.ExecuteNonQuery();
+                         noPrevData = 1;
+                       
+                     }                   
+                    
+                    break;
+
+                case "UserCategory":
+                    
+                     string categoryQuery = "select * from csu_user where rownum = 1 and User_Status_Cd =" + Id;
+
+                     OracleDataReader drCategory = OracleDataAccess.ExecuteReader(con, CommandType.Text, categoryQuery);
+
+                     if (drCategory.HasRows)
+                     {
+                         statusCount = 2;
+                         return statusCount;
+                     }
+                     else
+                     {
+                         query = "DELETE FROM csu_ref_user_category WHERE User_category_cd = " + Id;
+                         OracleCommand cmdOra = new OracleCommand(query.ToString(), con);
+                         cmdOra.CommandType = CommandType.Text;
+
+                         statusCount = cmdOra.ExecuteNonQuery();
+                         noPrevData = 1;
+                       
+                     }
+
+                     break;               
+                    
+                    //query = "DELETE FROM csu_ref_user_category WHERE User_category_cd = " + Id;
+                    //break;
+                case "ProductOwnerStatus":
+                     string ProductOwnerStatusQuery = "select * from csu_user_product_owner where rownum = 1 and product_owner_status_cd ="+Id;
+                     OracleDataReader drproductowner = OracleDataAccess.ExecuteReader(con, CommandType.Text, ProductOwnerStatusQuery);
+                     if (drproductowner.HasRows)
+                     {
+                         statusCount = 2;
+                         return statusCount;
+                     }
+                     else
+                     {
+                         query = "DELETE FROM csu_ref_owner_status WHERE Product_Owner_Status_Cd = " + Id;
+                         OracleCommand cmdOra = new OracleCommand(query.ToString(), con);
+                         cmdOra.CommandType = CommandType.Text;
+
+                         statusCount = cmdOra.ExecuteNonQuery();
+                         noPrevData = 1;
+
+                     }
+                   
+                    break;
+            }
+
+            //con.Open();
+            //OracleCommand cmd = new OracleCommand(query, con);
+
+            //OracleCommand cmdOra = new OracleCommand(query.ToString(), con);
+            //cmdOra.CommandType = CommandType.Text;
+
+            //int status = cmd.ExecuteNonQuery();
+            con.Close();
+            return noPrevData;
+        }
+
+
+
+        public int DeleteUserAccess(string empId)
+        {
+            string query = string.Empty;
+            string str = string.Empty;
+            int statusCount = 0;
+            int noPrevData = 0;
+            con.Open();
+            string ProductOwnerStatusQuery = "select * from csu_user_product_owner where rownum = 1 and primary_cd!=0 and  emp_id =" + empId;
+            OracleDataReader drproductowner = OracleDataAccess.ExecuteReader(con, CommandType.Text, ProductOwnerStatusQuery);
+            if (drproductowner.HasRows)
+            {
+                statusCount = 2;
+                return statusCount;
+            }
+            else
+            {
+                query = "Delete from csu_user_product_owner where emp_id = '" + empId + "'";
+                str = "Delete from csu_user where emp_id = '" + empId + "'";
+                OracleCommand cmdOra = new OracleCommand(query, con);
+
+                OracleCommand cmdOrastr = new OracleCommand(str, con);
+
+                int status = cmdOrastr.ExecuteNonQuery();
+                cmdOra.ExecuteNonQuery();
+                noPrevData = 1;
+            }
+            //Delete from csu_user_product_owner where emp_id = '608963806'
+            //Delete from csu_user where emp_id = '608963806'          
+            con.Close();
+            return noPrevData;
+        }
+
+        public int UpdateUserAccess(int catId, string UsrStatcd,string UsrEmail,string UsrId,string EmpId)
+        {
+            string query = string.Empty;
+            string str = string.Empty;
+            int status = 0;
+            string ProductOwnerStatusQuery = "select * from csu_user_product_owner where rownum = 1 and primary_cd!=0 and  emp_id =" + EmpId;
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+            OracleDataReader drproductowner = OracleDataAccess.ExecuteReader(con, CommandType.Text, ProductOwnerStatusQuery);
+            if (drproductowner.HasRows)
+            {
+                con.Close();
+                status = 2;
+                return status;
+            }
+            else
+            {
+                query = "Update csu_user set USER_CATEGORY_CD =" + catId + ",USER_STATUS_CD =" + UsrStatcd + ",USER_EMAIL = " + UsrEmail + ",UPDATED_EMP_ID = '"
+                    + UsrId + "',UPDATED_DT=sysdate WHERE EMP_ID ='" + EmpId + "'";
+                str = "Delete from csu_user_product_owner where emp_id = '" + EmpId + "'";
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+
+                OracleCommand cmd = new OracleCommand(query, con);
+
+                OracleCommand cmdOra = new OracleCommand(str, con);
+
+                status = cmd.ExecuteNonQuery();
+                if (catId != 2 && status > 0)
+                {
+                    cmdOra.ExecuteNonQuery();
+                }
+                con.Close();
+            }
+            
+            return status;
+        }
+
+
+
+        public DataSet GetUserCategories()
+        {
+            string Query = "SELECT USER_CATEGORY_CD,USER_CATEGORY_DESC FROM CSU_REF_USER_CATEGORY";
+            OracleCommand cmd = new OracleCommand(Query, con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+
+        }
+
+        public DataSet GetUserStatusDetails()
+        {
+            string Query = "SELECT USER_STATUS_CD, USER_STATUS_CD_DESC FROM CSU_REF_USER_STATUS";
+            OracleCommand cmd = new OracleCommand(Query, con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+
+        }
+
+
+
+        public DataSet GetUserAccessData()
+        {
+                   
+            StringBuilder sb = new StringBuilder();
+            sb.Append(" SELECT a.EMP_ID, a.USER_NAME, b.USER_CATEGORY_DESC, b.USER_CATEGORY_CD,a.USER_EMAIL,c.USER_STATUS_CD,c.user_status_cd_desc,a.User_Email_id ");
+            sb.Append(" FROM CSU_USER a, CSU_REF_USER_CATEGORY b, CSU_REF_USER_STATUS C ");
+            sb.Append(" WHERE a.USER_CATEGORY_CD = b.USER_CATEGORY_CD ");
+            sb.Append(" AND a.USER_STATUS_CD = c.USER_STATUS_CD ");
+            //sb.Append(" AND a.USER_STATUS_CD = 1 ");
+            //sb.Append(" AND b.USER_CATEGORY_CD=" + CategoryID);
+            sb.Append(" ORDER BY c.user_status_cd_desc, UPPER(a.USER_NAME) ");
+
+             OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+             dad = new OracleDataAdapter(cmd);
+             ds = new DataSet();
+             dad.Fill(ds);
+             return ds;
+        }
+
+
+        public DataSet GetProductOwnerProducts(string EmpID)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(" Select Product_Name, Primary_CD,b.Emp_id ");
+            sb.Append(" from CSU_Product a, CSU_User_Product_Owner b ");
+            sb.Append(" where a.Product_cd = b.Product_cd and b.Emp_id IN ("+EmpID+" )");
+            sb.Append(" and b.Product_Owner_status_cd = 1");
+            OracleCommand cmd = new OracleCommand(sb.ToString(), con);
+            dad = new OracleDataAdapter(cmd);
+            ds = new DataSet();
+            dad.Fill(ds);
+            return ds;
+        }
+
+        public DataSet GetProducts(string EmpID)
+        {
+            StringBuilder sb = new StringBuilder();
+            //sb.Append(" SELECT PRODUCT_CD as ProductID, PRODUCT_NAME AS ProductName FROM CSU_PRODUCT ORDER BY PRODUCT_NAME");
+            sb.Append(" SELECT DISTINCT P.PRODUCT_CD AS PRODUCTID, P.PRODUCT_NAME AS PRODUCTNAME , CASE WHEN PO.PRODUCT_CD IS NULL THEN 0 ELSE PO.PRODUCT_CD END as ProductAssigned ");
+            sb.Append(" FROM CSU_PRODUCT P LEFT JOIN CSU_USER_PRODUCT_OWNER PO ON P.PRODUCT_CD=PO.PRODUCT_CD AND EMP_ID = '" + EmpID + "' AND PRODUCT_OWNER_STATUS_CD=1");
+            sb.Append(" ORDER BY PRODUCT_NAME ");
+            return OracleDataAccess.ExecuteDataset(con, CommandType.Text, sb.ToString());
+        }
+
+
+
+
+        public int SaveProductOwner(int ProductID, int EmpID, int CreatedBy, int UpdatedBy, int ProductOwnerStatusID)
+        {
+            string sql = "Select count(*) as count from CSU_USER_Product_Owner  WHERE emp_id = '" + EmpID + "' AND Product_cd = " + ProductID;
+
+            int result = 0, primary = 0;
+            DataSet ds = OracleDataAccess.ExecuteDataset(con, CommandType.Text, sql);
+
+            if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            {
+                if (ds.Tables[0].Rows[0]["count"].ToString() == "0")
+                {
+                    sql = "Select count(*) as cnt from CSU_USER_Product_Owner WHERE Product_cd = " + ProductID;
+
+                    DataSet dsCount = OracleDataAccess.ExecuteDataset(con, CommandType.Text, sql);
+                    if (dsCount != null && dsCount.Tables.Count > 0 && dsCount.Tables[0].Rows.Count > 0)
+                    {
+                        if (dsCount.Tables[0].Rows[0]["cnt"].ToString() == "0")
+                        {
+                            primary = 1;
+                        }
+                        else
+                        {
+                            primary = 0;
+                        }
+                    }
+
+                    sql = "Insert INTO CSU_USER_PRODUCT_OWNER (EMP_ID, PRODUCT_CD, PRODUCT_OWNER_STATUS_CD, CREATED_EMP_ID, CREATED_DT, Updated_emp_id, Updated_Dt, Primary_cd) VALUES ('" + EmpID + "'," + ProductID + ",1,'" + CreatedBy + "', sysdate, '" + UpdatedBy + "', sysdate, " + primary + ")";
+                }
+                else
+                {
+                    sql = "Update CSU_USER_PRODUCT_OWNER SET Product_Owner_Status_cd = 1,UPDATED_EMP_ID ='" + UpdatedBy + "', UPDATED_DT = sysdate WHERE emp_id = '" + EmpID + "' AND Product_cd = " + ProductID;
+                }
+            }
+
+            result = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, sql);
+
+
+            return result;
+        }
+
+        public int ResetProductOwner(int EmpID)
+        {
+            //string sql = "DELETE FROM CSU_USER_Product_Owner  WHERE emp_id = '" + EmpID + "' AND Product_cd = " + ProductID;
+            string sql = " UPDATE CSU_USER_PRODUCT_OWNER SET PRODUCT_OWNER_STATUS_CD = 0, UPDATED_EMP_ID ='" + EmpID + "', UPDATED_DT = sysdate  WHERE emp_id = '" + EmpID + "' And Primary_Cd = 0 ";
+            return OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, sql);
+            
+        }
+
+    }
+}

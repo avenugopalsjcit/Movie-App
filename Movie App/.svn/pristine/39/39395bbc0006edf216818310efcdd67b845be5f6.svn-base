@@ -1,0 +1,130 @@
+﻿<!--Controllers.UserDetailsCtrl-->
+
+
+<div class="container" ng-controller="Controllers.UserDetailsCtrl">
+
+       
+  
+            
+       <form  ng-submit="GetUserDtls(EINInfo)">       
+       <div class="row text-left Arrow ">
+           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+               <h3>
+                   User Details
+               </h3>
+           </div>
+       </div>
+                   
+                              
+                <div class="row text-left Arrow">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p>
+
+                            Note:<span style="color:red;"> This page is meant only for Application Support Team.</span>
+                        </p>
+                    </div>
+                </div>
+                    <div class="row text-left">                       
+                      
+                            <div class="form-horizontal">
+                                <div class="form-group" style="margin-left:-140px">
+                                    <label class="col-sm-2 control-label" for="">
+                                        EIN / UIN
+                                    </label>
+                                    <input class="ng-pristine ng-untouched ng-valid" id="EINInfo" style="height: 30px;"
+                                        type="text" ng-model="EINInfo"/>
+                                    <input class="btn btn-primary" style="height: 30px;" type="button" value="Get Details"
+                                        ng-click="GetUserDtls(EINInfo)" id="btn_user"/>
+                                </div>
+                            </div>
+                       
+                        </div> 
+                                
+                <div ng-show="NoUserData" class="alert alert-danger Arrow" role="alert">
+                    {{ErrorMsg}}
+                </div>
+                 <div ng-show="EmptyUser" class="alert alert-danger Arrow" role="alert">
+                   Please enter EIN / UIN
+                </div>
+
+
+                <div ng-show="UserData" class="col-xs-8">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th colspan="2" class="Arrow">
+                                User Information
+                            </th>
+                        </tr>
+                        <tr>
+                            <td class="text-left Arrow">
+                                EIN
+                            </td>
+                            <td class="text-left Arrow">
+                                {{EIN}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-left Arrow">
+                                First Name
+                            </td>
+                            <td class="text-left Arrow">
+                                {{FirstName}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-left Arrow">
+                                Last Name
+                            </td>
+                            <td class="text-left Arrow">
+                                {{LastName}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-left Arrow">
+                                Email
+                            </td>
+                            <td class="text-left Arrow">
+                                {{Email}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-left Arrow">
+                                Mobile
+                            </td>
+                            <td class="text-left Arrow">
+                                {{Mobile}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-left Arrow">
+                                Telephone Number
+                            </td>
+                            <td class="text-left Arrow">
+                                {{TelePhoneNo}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-left Arrow">
+                                BT GFR Code
+                            </td>
+                            <td class="text-left Arrow">
+                                {{GFRCode}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-left Arrow">
+                                Country
+                            </td>
+                            <td class="text-left Arrow">
+                                {{Country}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+           </form> 
+       
+    </div>
+
+
+
+

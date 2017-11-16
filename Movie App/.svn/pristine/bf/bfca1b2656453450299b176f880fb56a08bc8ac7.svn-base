@@ -1,0 +1,115 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+  public  class AdminNotesCategoryBAL
+    {
+      private AdminNotesCategoryDAL objSRD = new AdminNotesCategoryDAL();
+
+        public List<NotesCategory> GetGridNotesCategoryDetails()
+        {
+
+
+            List<NotesCategory> lstOrg = new List<NotesCategory>();
+            DataTable dtGridDistributor = objSRD.GetGridNotesCategoryDetails();
+
+
+              
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                NotesCategory objOrg = new NotesCategory();
+
+                objOrg.NotesCategoryDesc = Convert.ToString(dr["note_category_desc"]);
+                
+                 objOrg.CREATED_EMP_ID = Convert.ToString(dr["Created_By"]);
+             
+              objOrg.UPDATED_EMP_ID = Convert.ToString(dr["Updated_By"]);
+              objOrg.UPDATED_DT = Convert.ToString(dr["Updated_dt"]);
+              objOrg.CREATED_DT = Convert.ToString(dr["Created_dt"]);
+                objOrg.NotesCategoryCD = Convert.ToInt32(dr["note_category_cd"]);
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+        public int GetMaxAvailCD()
+        {
+            //AvailabilityGrid objOrg = new AvailabilityGrid();
+            return objSRD.MaxAvailCD();
+
+        }
+        public int DeleteAdminAvail(string strAvailCd)
+        {
+
+            int count = objSRD.AdminAvailDelete(strAvailCd);
+
+
+
+            return count;
+        }
+        public List<NotesCategory> PopupGridAdminAvail(string strAvailCd)
+        {
+
+            List<NotesCategory> lstOrg = new List<NotesCategory>();
+            DataTable dtGridDistributor = objSRD.AdminAvailPopupGrid(strAvailCd);
+
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                NotesCategory objOrg = new NotesCategory();
+                //var options = { timeZone: 'UTC', timeZoneName: 'short' };
+                //  console.log(date.toLocaleTimeString('en-US', options));
+                DateTime currentDate = Convert.ToDateTime(dr["CREATED_DT"]);
+
+                DateTime updatedDate = Convert.ToDateTime(dr["UPDATED_DT"]);
+
+                objOrg.CREATED_EMP_ID = Convert.ToString(dr["CREATED_EMP_ID"]);
+                objOrg.CREATED_DT = currentDate.ToString("dd-MMM-yyyy HH:mm");
+                objOrg.UPDATED_EMP_ID = Convert.ToString(dr["UPDATED_EMP_ID"]);
+                objOrg.UPDATED_DT = updatedDate.ToString("dd-MMM-yyyy HH:mm");
+                lstOrg.Add(objOrg);
+
+            }
+            return lstOrg;
+        }
+        public int InsertAdminAvail(string strAvailCd, string strCategoryDesc, string User_id)
+        {
+
+            int count = objSRD.AdminAvailInsert(strAvailCd, strCategoryDesc, User_id);
+
+
+
+            return count;
+        }
+
+        public int UpdateAdminAvail(string strCategoryDesc, string User_id, string strAvailCd)
+        {
+
+            int count = objSRD.AdminAvailUpdate(strCategoryDesc, User_id, strAvailCd);
+
+
+
+            return count;
+        }
+
+
+       
+
+    }
+}

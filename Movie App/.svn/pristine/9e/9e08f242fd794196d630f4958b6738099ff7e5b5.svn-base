@@ -1,0 +1,60 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using SCAdminBAL;
+using System.Data;
+using System.IO;
+using System.Web.Services;
+using System.Runtime;
+
+
+namespace SCAdmin
+{
+    public partial class FileUploads : System.Web.UI.Page
+    {
+
+        public static UploadFileHistoryBAL objUploadFileHistory = new UploadFileHistoryBAL();
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+        [WebMethod]
+        public static List<FileHistory> GetFileUploadRecords()
+        {
+            return objUploadFileHistory.GetFileHistoryRecords();
+        }
+
+        [WebMethod]
+        public static int fileUpload()
+        {
+            HttpFileCollection ftp = HttpContext.Current.Request.Files;
+            //string file, string description, string filePath,string userID
+            //string SaveLocation = HttpContext.Current.Server.MapPath("/PCUploads");
+            string SaveLocation = string.Empty;
+            //SaveLocation = HttpContext.Current.Server.MapPath("../prodcat22/PCUploads");            
+            string root = HttpContext.Current.Server.MapPath(".");
+            //SaveLocation = Path.GetFullPath(Path.Combine(root, "/PCUploads"));
+            root = root.Replace("\\SCAdmin", "\\ProdCat22");
+            SaveLocation = root + "\\PCUploads\\";
+            string fileSavePath = string.Empty;
+            // fileSavePath = HttpContext.Current.Server.MapPath("/PCUploads");
+
+            //string fileExtension = Path.GetExtension(file);
+           
+            ////fileSavePath = fileSavePath + "\\" + file;
+            ////after checking or creating folder it’s time to save the file
+
+            //fileSavePath = SaveLocation + file;
+            return 1;
+            //return objUploadFileHistory.fileUpload(file, description, filePath, fileSavePath, fileExtension, userID, SaveLocation);
+        }
+        [WebMethod]
+        public static int DeleteFileRecord(int ApprovalID)
+        {
+            return objUploadFileHistory.DeleteFileRecord(ApprovalID);
+        }
+    }
+}

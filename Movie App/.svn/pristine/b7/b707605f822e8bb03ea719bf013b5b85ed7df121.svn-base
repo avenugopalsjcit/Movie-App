@@ -1,0 +1,227 @@
+﻿
+    <div >
+        
+            <div id="divAnnouncements"  ng-controller="NotesCtrl" >
+         
+               <div class="panel panel-primary col-md-12">
+                       
+                        <div id="Div6">
+                        
+                        <div class="row text-left Arrow ">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                                 Notes
+                            </h3>
+                        </div>  
+                    </div>
+                        
+                      <!--  <div class="col-md-12"  >
+                        <button class="btn btn-default btn-sm pull-right" id="Addbtn" data-toggle="modal" data-target="#basicModal" ng-click="addNewTask()" >Add Availability</button>
+                         </div>-->
+                        
+                            
+
+                              <table ng-table="usersTable" id="tblAvailability"  class="table table-striped Arrow">
+                                <tr ng-repeat="category in $data ">
+                                       <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                                        <td data-title="' Availability'"  sortable="'AvailabilityDesc'" class="Arrow">
+                                            {{category.ServiceTypeDesc}}
+                                        </td>
+                                        <td>
+                                          {{category.ProductName}}
+                                        </td>
+                                        <td data-title="' Edit'">
+                                        <button class="btn btn-default btn-sm" id="Editbtn" data-toggle="modal" ng-click="EditRecord(category)" data-target="#basicModal" ><span class="glyphicon glyphicon-pencil"></span></button>
+                                        </td>
+                                        <td data-title="' Delete'">
+                                        <button value="Delete" class="btn btn-sm btn-danger" id="AnnouncementId" class="chkAnnounmence" > <span class="glyphicon glyphicon-trash"></span></button></span>
+                                    </td>
+                                        
+                                    </tr>
+                                   
+                                </table>
+                            
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+
+               
+
+               <!--<div class="modal fade" id="EditModalPopUpModal"   tabindex="-1" role="dialog" aria-labelledby="EditModalPopUpModal" aria-hidden="true" style="background: transparent none repeat scroll 0% 0%; box-shadow: none; border-width: medium medium medium 0px; border-style: none; border-color: -moz-use-text-color; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; border-image: none; display: block; width: 900px; margin-left: -430px; margin-right: 0px; padding-left: 0px; padding-right: 0px;">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="H1">
+                            Edit New Announcement</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal">
+                        <div class="control-group" style="margin-left: -88px;">
+                            <label class="control-label" for="inputDate">
+                                Start Date</label>
+                            <div class="controls" style="margin-left: 199px;">
+                                <input type="text" id="Text1" ng-model="Editannstartdate" placeholder="Start Date" style="width: 150px;
+                                    height: 26px;"><br />
+                            </div>
+                        </div>
+                        <div class="control-group" style="margin-left: -88px;">
+                            <label class="control-label" for="inputDate" class="dp" style="padding-top: 0px;
+                                margin-left: -5px;">
+                                End Date</label>
+                            <div class="controls" style="margin-left: 200px; height: 20px;">
+                                <input type="text" id="Text2" class="dp" ng-model="Editannenddate" placeholder="End Date"
+                                    style="width: 150px; height: 27px;"><br />
+                            </div>
+                        </div>
+                        <div class="control-group" style="margin-left: -90px;">
+                            <label class="control-label" for="inputtitle" style="padding-top: 0px; margin-left: -36px;">
+                                Title</label>
+                            <div class="controls" style="margin-right: 0px; margin-left: 203px;">
+                                <input type="text" id="Text3" ng-model="Edittitle" placeholder="Title" style="width: 300px;
+                                    height: 28px;">
+                            </div>
+                        </div>
+                        <div class="control-group" style="margin-left: -75px;">
+                            <label class="control-label" for="inputDescription" style="border-right-width: 0px;
+                                margin-right: 10px; padding-top: 0px; margin-left: 18px; padding-right: 0px;
+                                padding-left: 0px;">
+                                Announcement</label>
+                            <div class="controls" style="margin-left: 0px;">
+                                <textarea id="Textarea1" ng-model="Editannouncement" placeholder="Description" style="width: 470px;
+                                    height: 80px;"></textarea>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            Close</button>
+                        <button type="button" class="btn btn-primary" ng-click="addNewTask()">
+                            Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>-->    
+               
+            <!--   <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true" style="background: transparent; box-shadow: none;   border-style: none;  display: block; width: 900px;  margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;" >-->
+              <div class="modal fade" id="basicModal" role="dialog" >
+    <div class="modal-dialog" style="height:300px">
+
+        <div >
+            <div class="modal-dialog vertical-align-center" >
+                <div class="modal-content">
+                    <div class="modal-header" ng-show="Reset==0">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add  Notes</h4>
+                    </div>
+                                        <div class="modal-header" ng-show="Reset==1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Edit  Notes</h4>
+                    </div>
+                    <div class="modal-body">
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                        <label for="" class="col-sm-2 control-label" style="width:150px">
+                                                 Notes &nbsp; <span style="color: Red">*</span>
+                                            </label>
+                                            <div class="col-sm-2">
+                                                <select id="Select3" ng-change="GetRegions()" ng-model="Product" 
+                                                    class="form-control">
+                                                    <option value="">--- Select ---</option>
+                                                    <option value="1">Note for {{Product}}</option>
+                                                     <option value="2">Note for a Region</option>
+                                                      <option value="3">Note for a Country</option>
+                                                       <option value="4">Note for a City</option>
+                                                </select>
+                                            </div>
+                                           
+                                        </div>
+                                        <div class="form-horizontal">
+                                         
+                                       
+                                        </div>
+                                        
+                                    </div>
+                                
+                               
+                                
+                            </div>
+                    <div>
+                    
+                    
+                             <!-- <table ng-table="usersTable" id="Table1"  class="table table-striped Arrow">
+                                <tr ng-repeat="category in $data">-->
+                                       <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                                     <!--   <td data-title="' Availability'"  sortable="'AvailabilityDesc'" class="Arrow">
+                                            {{category.AvailabilityDesc}}
+                                        </td>
+                                        <td data-title="' Edit'">
+                                        <button class="btn btn-default btn-sm" data-toggle="modal" ng-click="EditRecord(category)"   data-target="#basicModal"  ><span class="glyphicon glyphicon-pencil"></span></button>
+                                        </td>
+                                        <td data-title="' Delete'">
+                                        <button value="Delete" class="btn btn-sm btn-danger" id="Button1" class="chkAnnounmence" > <span class="glyphicon glyphicon-trash"></span></button></span>
+                                    </td>
+                                        
+                                    </tr>
+                                   
+                                </table>-->
+                    </div>
+                    <div class="modal-footer" style="background-color:none">
+                   
+                        <button type="button" id="Resetbtn" ng-show="Reset==1" class="btn btn-default"  ng-click="ResetRecord()">
+                            Reset</button>
+                        
+                             <button type="button" class="btn btn-primary"  data-dismiss="modal" ng-click="closemodal()" >
+                            Close</button>
+                        <button type="button" class="btn btn-primary"  data-dismiss="modal" >
+                            Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+               
+
+               </div>
+               
+            </div>
+            
+       
+        
+        
+        
+    </div>
+    
+  
+    
+    <div class="pageLoaderOverlay">
+    </div>
+    
+    <div>
+        
+    
+   
+       
+
+        
+  
+
+    </div>
+
+ 
+    
+    
+ 

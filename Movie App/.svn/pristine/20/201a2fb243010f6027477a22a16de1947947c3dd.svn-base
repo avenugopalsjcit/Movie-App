@@ -1,0 +1,2293 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+ 
+  <!--  <link href="../BootStrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+     <link rel="stylesheet" href"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+    <link href="../BootStrap/css/styles.css" rel="stylesheet" type="text/css" />-->
+
+
+</head>
+<body ng-app="appModule">
+    <div ng-controller='ProductCaseCntrl'>
+        <ul class="nav nav-tabs">
+            <li ng-hide="ShowEthernet==0" class="active" ><a data-toggle="tab" ng-click="GetEthernetData()"  data-target="#divEthernet">
+                Ethernet/Leased Line</a> </li>
+
+
+            <li ng-hide="HideHVPN==1" ng-disabled="ShowHVPN==0"><a data-toggle="tab" ng-click="GetHVPNData()" ng-disabled="ShowHVPN==0" class="Show_HVPN clickable1" data-target="#divHVPN">hVPN</a>
+
+           
+                <input type="hidden" id="hdnHVPNLoaded" value="0" ng-model="HVPNLoaded" />
+            </li>
+
+            <li ng-hide="HideDSL==1" ng-disabled="ShowDSL==0"  ><a data-toggle="tab" ng-click="GetDSLData()" ng-disabled="ShowDSL==0" class="Show_DSL clickable1" data-target="#divDSL">DSL</a>
+
+                     
+                <input type="hidden" id="hdnDSLLoaded" value="0" ng-model="DSLLoaded" />
+            </li>
+
+
+            <li ng-hide="HideVSAT==1" ng-disabled="ShowVSAT==0"  ><a data-toggle="tab" ng-click="GetVSATData()" ng-disabled="ShowVSAT==0" class="a Show_VSAT clickable1"  data-target="#VSATCntrl">VSAT</a>
+
+
+            
+                <input type="hidden" id="hdnVSATLoaded" value="0" ng-model="VSATLoaded" />
+            </li>
+            <li ng-hide="ShowDocLinks==0" ><a data-toggle="tab" ng-click="GetDocLinks()" class="clickable1"  data-target="#ProductDocLinks">Product Documents</a>
+               
+            </li>
+            
+        </ul>
+        <div class="tab-content clearfix ">
+            <div id="divEthernet" class="tab-pane active">
+                <div class="panel panel-primary bg1">
+                    <div class="panel-body">
+                     
+                        <div>&nbsp;&nbsp;</div>
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    State/Province</label>
+                                <div class="col-sm-3">
+                                    <select ng-change="GetCities(modproduct,modregion,modcountry,modstate)" ng-model="modstate"
+                                        ng-options="state.StateID as state.StateName for state in StateData" class="form-control">
+                                        <option value="">--- Select ---</option>
+                                    </select>
+                                    <span style="display: none;color:Red;" id="ValidateState">Please Select State</span>
+                                </div>
+                                <label for="" class="col-sm-2 control-label">
+                                    City <span class="red"> * </span></label>
+                                <div class="col-sm-3">
+                                    <select ng-change="GetPops(modproduct,modregion,modcountry,modstate,modCity)" ng-model="modCity" 
+                                        ng-options="city.CityID as city.CityName for city in CityData" class="form-control">
+                                        <option value="">--- Select ---</option>
+                                    </select>
+                                    <span style="display: none;color:Red;" id="ValidateCity">Please Select City</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    PoP <span class="red"> * </span></label>
+                                <div class="col-sm-3">
+                                    <select ng-model="modPoP" ng-change="GeInfoByPop()" ng-options="item.POPID as item.PopName for item in PopData"
+                                        class="form-control">
+                                        <option value="">--- Select ---</option>
+                                    </select>
+                                    <span style="display: none;color:Red;" id="ValidatePOP">Please Select PoP</span>
+                                </div>
+                                <label id="lblPlatform" for="" class="col-sm-2 control-label">
+                                    Network Platform <span class="red"> * </span></label>
+                                <div id="ddlPlatform" class="col-sm-3">
+                                    <select id="ddlNetworkPlatform" ng-model="modNetworkPlatform" ng-change="RemoveNPAlert()"
+                                        ng-options="item.ID as item.NetworkPlatform for item in NetworkPlatformData"
+                                        class="form-control">
+                                        <option value="">--- Select ---</option>
+                                    </select>
+                                    <span style="display: none;color:Red;" id="spnNP">Please Select Network Platform</span>
+                                </div>
+                                
+                                    <div class="col-sm-2">
+                                        <input type="button" ng-click="GetEtherNetDetails()" value="GO" class="btn btn-sc" />
+                                    </div>
+                              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tblProductDetails">
+                    <div class="col-md-12 col-lg-12" style="text-align: center; color: Red">
+                        <p class="Arrow">
+                            Features not entered into Sales Catalogue should be considered Not Available.</p>
+                    </div>
+                    <div class="row">
+                        <!--<div class="col-md-6 col-lg-6">
+                            &nbsp;</div>-->
+                        <div class="col-md-6 col-lg-6 text-left PaddingBottom" ng-hide="CPEExists==0">
+                            <a class="btn-link"  ng-click="openCpeInformationpopup()">
+                                View CPE Information </a>
+                        </div>
+                    </div>
+                   
+                    <div id="cpeinformation" ng-hide="modproduct=='21'">
+                        <div class="modal fade" id="cpeinformationmodal" tabindex="-1" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">
+                                            &times;</button>
+                                        <h4 class="modal-title" id="myModalLabel">
+                                            CPE Bundle Details
+                                        </h4>
+                                    </div>
+                                    <div class="modal-body" id="content">
+                                        <div class="CPEInfoContent">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 
+                    <div  class="panel panel-primary">
+                        <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#prodCaseDet1">
+                            <h3 class="panel-title">
+                             Product Details </h3>
+                           
+                           <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+
+                        </div>
+
+                             
+                        <div id="prodCaseDet1" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                                <tr>
+                                    <td width="40%" class="Arrow">
+                                        Service Available 
+                                    </td>
+                                    <td width="60%" class="Arrow">
+                                        {{ServiceAvailable}}
+                                    </td>
+                                </tr>
+                                 <tr ng-show="PopColor!=''">
+                                    <td class="Arrow">
+                                        PoP Colour 
+                                    </td>
+                                    <td class="Arrow">
+                                        {{PopColor}}
+                                    </td>
+                                </tr>
+                                <tr ng-show="PopCode!=''">
+                                    <td width="40%" class="Arrow">
+                                        PoP Code 
+                                    </td>
+                                    <td width="60%" class="Arrow">
+                                        {{PopCode}}
+                                    </td>
+                                </tr>
+                               
+
+                                <tr ng-show="TargetAvailabilityDate!=''">
+                                    <td class="Arrow">
+                                        Target Availability Date 
+                                    </td>
+                                    <td class="Arrow">
+                                        {{TargetAvailabilityDate}}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="40%" class="Arrow">
+                                        Network Name 
+                                    </td>
+                                    <td width="60%" class="Arrow">
+                                        {{NetworkName}}
+                                    </td>
+                                </tr>
+                                <tr ng-show="ResilientPop!=''">
+                                    <td width="40%" class="Arrow">
+                                        Support Resilient Only PoP 
+                                    </td>
+                                    <td width="60%" class="Arrow">
+                                        {{ResilientPop}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tblPopCharacteristics" class="panel panel-primary">
+                    <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#prodCaseDet2">
+                        <h3 class="panel-title">
+                            PoP Characteristics</h3>
+                        <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i>
+                        </span>
+                    </div>
+                    <div id="prodCaseDet2" class="panel-collapse collapse">
+                   <div class="panel-body">
+                        <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                            <tr ng-repeat="pc in PopCharData">
+                                <td width="40%" class="Arrow">
+                                    {{pc.CharName}} 
+                                </td>
+                                <td width="60%" class="Arrow">
+                                    {{pc.CharValue}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+                <div id="tblChars1">
+                    <div  class="panel panel-primary" ng-repeat='item in tblchars'>
+                        <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#collapseThree{{$index}}">
+                            <h3 class="panel-title">
+                                {{item.CharTypeAlias}}</h3>
+                            <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i>
+                            </span>
+                        </div>
+                        <div id="collapseThree{{$index}}" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                                <tr ng-repeat="subitem in item.chars | orderBy:'CharName'">
+                                    <td width="40%" class="Arrow">
+                                        {{subitem.CharName}} 
+                                    </td>
+                                    <td width="60%" class="Arrow">
+                                        <div ng-bind-html="to_trusted(subitem.CharValue)"></div>
+
+                                       
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="slainfo" class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p style="color: Red;" class="Arrow">
+                            <span style="color: Black;">SLA Information:</span> These SLAs are BT's internal
+                            SLAs with our Access Suppliers. They are <u> NOT TO BE QUOTED TO END CUSTOMERS </u>. The
+                            terms of the SLA between the customer and BT is covered under the relevant BT product
+                            terms and conditions for the whole service (e.g. BT MPLS).<br />
+                            <span style="color: Black;" class="Arrow">Note:</span> Flexiport feature is Available for ordering
+                            and is applicable for all port speeds as long as burst port speed is available.For
+                            the following Access Types Flexiport is Available : Ethernet, Leased Line.<br />
+                            The existing Service Lead Times defined for the MPLS ports are applicable for Flexiport
+                            Availability as well.
+                        </p>
+                    </div>
+                </div>
+                <div id='trParentSpeedFilters' class="panel panel-primary bg1" style="display: none;">
+                    <div class="panel-body">
+                        <div class="row Arrow text-center" id="divParentProdName">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <span><b>{{ProductName}} Port Access</b></span>
+                            </div>
+                        </div>
+                        <div>&nbsp;&nbsp;</div>
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    Access Supplier(s)</label>
+                                <div class="col-sm-2">
+                                    <select class="form-control" ng-model="ParentAccessSupplier" ng-change="filterParentSuppProd(ParentAccessSupplier)" ng-options="suppData.AccessSupplierID as suppData.AccessSupplierName for suppData in ParentAccessSupplierData">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                                <label for="" class="col-sm-2 control-label">
+                                  Port Speed(s) <span class="red"> * </span></label>
+                                <div class="col-sm-2">
+                                    <select class="form-control" multiple size="7" ng-change="RemoveAlert1()" 
+                                    ng-options="pSpeed.PortSpeedID as pSpeed.PortSpeedName for pSpeed in PortSpeedData"
+                                    ng-model="ParentPortSpeedData" id="PortSpeed">
+                                        <!--<option ng-repeat='pSpeed in PortSpeedData' value="{{pSpeed.PortSpeedID}}">{{pSpeed.PortSpeedName}}</option>-->
+                                        
+                                    </select>
+                                    <span style="display: none;color:Red;" id="spnChildPortSpeed">Please Select Port Speed</span>
+                                </div>
+                                
+                                
+                            </div>
+
+                             <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    Access Speed(s) </label>
+                                <div class="col-sm-2">
+                                    <select ng-model="ParentAccessSpeed" multiple size="7"  ng-options="CAccesssupp.AccessSpeedID as CAccesssupp.AccessSpeedName for CAccesssupp in ParentAccessSpeedData"
+                                        class="form-control">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                                <label for="" class="col-sm-2 control-label">
+                                    Access Supplier Product(s)</label>
+                                <div class="col-sm-3">
+                                    <select ng-model="ParentAccessSupplierProduct" style="width:auto" multiple size="7"  ng-options="CAccesssupp.SupplierID as CAccesssupp.SupplierProductName for CAccesssupp in ParentSupplierProductData"
+                                        class="form-control">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    Access Technology(s) </label>
+                                <div class="col-sm-2">
+                                    <select ng-model="ParentAccessType" multiple size="7"  ng-options="CAccesssupp.AccessTypeID as CAccesssupp.AccessTypeName for CAccesssupp in ParentAccessTypeData"
+                                        class="form-control">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                                <label id="lblParentCPESuppliers" ng-hide="CPEExists==0" for="" class="col-sm-2 control-label">
+                                    CPE Supplier(s)</label>
+                                <div id="ddlParentCPESuppliers" ng-hide="CPEExists==0" class="col-sm-2">
+                                    <select id="ddlParentCPESupplier" ng-model="ParentCPESuppliers" ng-options="objsupp.supplierID as objsupp.SupplierName for objsupp in CpeSupplierData"
+                                        class="form-control">
+                                        <option value="">--- Select ---</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-sm-2">
+                                    <input class="btn btn-sc" type="button" value="GO" ng-click="GetParentPortSpeeds(true)" />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="Parent1Paging" class="row text-right">
+                    <!--mpls-->
+                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-left">
+                        <label id="lblPageStatus"  ng-model="PageStatus">Page {{PageNo}} of {{PageCount}} </label>
+                    </div>
+                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                      <b><a href="" ng-click="PrevParent()">Prev</a> &nbsp; <a href="" ng-click="NextParent()">
+                            Next</a></b>  
+                    </div>
+                </div>
+
+                <div id="tblParentSpeeds" class="table-responsive" style="display: none;">
+                    
+                    <table cellpadding="0"  cellspacing="0" class="table table-bordered tblnowrap clsremovewhitespace">
+                        <tr>
+                            <th colspan="11" class="Arrow text-left">
+                            Port Access Availability
+                            </th>
+                            <th nowrap valign="bottom" align="center" colspan="4" class="Arrow">
+                                Service Lead Time
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="11" class="Arrow">
+                            </th>
+                            <th ng-show="CPEExists==0" class="Arrow">
+                                OffNet 
+                            </th>
+                            <th ng-show="CPEExists==1" colspan="2"  class="Arrow">
+                                OffNet  
+                            </th>
+                            <th ng-show="CPEExists==0" class="Arrow">
+                                OnNet  
+                            </th>
+                            <th ng-show="CPEExists==1" colspan="2" class="Arrow">
+                                OnNet
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="Arrow">
+                                Port Speed 
+                            </th>
+                            <th class="Arrow">
+                                Port Speed Availability
+                            </th>
+                            <th class="Arrow">
+                                Access Speed
+                            </th>
+                            <th class="Arrow">
+                                Access Technology
+                            </th>
+                            <th class="Arrow">
+                                Access Supplier Name
+                                <br />
+                                Supplier Product Name<br />
+                                / BT Internal SLA Information
+                            </th>
+                            <th class="Arrow">
+                                Service Type
+                            </th>
+                            <th class="Arrow">
+                                Access Speed Availability
+                            </th>
+                            <th class="Arrow">
+                                Ordering Status
+                            </th>
+                            <th class="Arrow">
+                                Interface
+                            </th>
+                            <th class="Arrow">
+                                Framing
+                            </th>
+                            <th class="Arrow">
+                                Connector
+                            </th>
+                            <!--<th ng-hide="CPEExists==0" class="Arrow">
+                                with CPE
+                                <br />
+                                calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th class="Arrow">
+                                without CPE
+                                <br />
+                                calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th ng-hide="CPEExists==0" class="Arrow">
+                                with CPE
+                                <br />
+                                calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th class="Arrow">
+                                without CPE
+                                <br />
+                                calendar days
+                                <br />
+                                + Status
+                            </th>-->
+                            <th ng-hide="CPEExists==0" class="Arrow">
+                                with CPE
+                                <br />
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th ng-show="CPEExists==0" class="Arrow">
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th ng-show="CPEExists==1" class="Arrow">
+                                without CPE
+                                <br />
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th ng-hide="CPEExists==0" class="Arrow">
+                                with CPE
+                                <br />
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th ng-show="CPEExists==0" class="Arrow">
+                                
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th  ng-show="CPEExists==1" class="Arrow">
+                                without CPE
+                                <br />
+                               Calendar days
+                                <br />
+                                + Status
+                            </th>
+                        </tr>
+                        <tr ng-repeat='psData in ParentPortSpeedGridData'>
+                            <td class="Arrow">
+                                 {{psData.PortSpeeds}}
+                            </td>
+                            <td class="Arrow">
+                                {{psData.PortSpeedAvailability}}
+                            </td>
+                            <td class="Arrow">
+                                {{psData.AccessSpeed}}
+                            </td>
+                            <!--<td>
+                                {{psData.AccessTechnology}}
+                            </td>-->
+                            <td class="popoverRootTd">
+                                 <a data-toggle="popover" ng-if="psData.ServiceVariant !='' || psData.DeliveryMode !='' " ng-mouseover="ParentMouseOver($index+1)" ng-mouseleave="ParentMouseLeave($index+1)" class="trigger clickable1">
+                                    {{psData.AccessTechnology}}
+                                 </a>
+                                 <span ng-if="psData.ServiceVariant =='' && psData.DeliveryMode ==''">
+                                 {{psData.AccessTechnology}}
+                                 </span>
+                                 <table id="tblParentAccTech{{$index+1}}" style="right: 10px; display: none; max-width: 190px;" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Service Variant</th>
+                                            <th>Delivery Mode</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>{{psData.ServiceVariant}}</td>
+                                        <td>{{psData.DeliveryMode}}</td>
+                                            
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                            </td>
+                            <td class="popoverRootTd">
+                                {{psData.SupplierProductName}}
+                                <br />
+                                <!--<a href='SLAInformation.asp?slaproduct={{psData.AccessSupplierNameID}}&speed={{psData.AccessSpeedCharID}}&speeduom={{psData.ASpeedUOM}}&sSupplier={{psData.AccessSupplierCharID}}&AccTypename={{psData.AccessProductTypeID}}'>
+                                    {{psData.SupplierProductName1}}</a>-->
+                                     <a class="clickable1" ng-click="openSLAPopup(psData.AccessSupplierNameID,psData.SupplierProductName,psData.SupplierProductName1,psData.AccessSupplierCharID,psData.AccessProductTypeID,psData.AccessSpeedCharID,psData.AccessSpeed,psData.ASpeedUOM)"
+                                     ng-mouseover="ParentMouseOverSuppProdName($index+1)" ng-mouseleave="ParentMouseLeaveSuppProdName($index+1)" >
+                                    {{psData.SupplierProductName1}}</a>
+
+                                    <table ng-hide="psData.SupplierInterconnection==null || psData.SupplierInterconnection=='' || !(Product == 100 || Product == 121 || Product == 106)" id="tblSuppProdName{{$index+1}}" style="left: 120px; top:24px; display: none; max-width: 190px;" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Supplier Interconnection Type</th>
+                                            <th>MTU Size</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>{{psData.SupplierInterconnection}}</td>
+                                        <td>{{psData.MTUSize}}</td>
+                                            
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td class="Arrow">
+                                {{psData.ServiceType}}
+                            </td>
+                            <td class="Arrow">
+                                {{psData.AccessSpeedAvailability}}
+                            </td>
+                            <td>
+                               <!-- <a href='product/dispACCESSdetails.asp?Product=25&Region={{psData.RegionID}}&Country={{psData.CountryID}}&Site=0&ChosenSupplier={{psData.AccessSupplierCharID}}'>
+                                    {{psData.OrderingStatus}}</a>-->
+
+                                      <a ng-click="OpenAccDetPopup(psData.AccessSupplierCharID)" class="clickable1"">{{psData.OrderingStatus}}</a>
+                            </td>
+                            <td class="Arrow">
+                                {{psData.Interface}}
+                            </td>
+                            <td class="Arrow">
+                                {{psData.Framing}}
+                            </td>
+                            <td class="Arrow">
+                                {{psData.Connecter}}
+                            </td>
+                           <!-- <td>
+                                {{psData.offnetwithCPEStatus[0]}} &nbsp;&nbsp;&nbsp;{{psData.offnetwithCPEStatus[1]}}
+                            </td>-->
+
+                             <td ng-hide="CPEExists==0" class="popoverRootTd">
+                                <a  data-toggle="popover" ng-mouseover="ParentMouseOverOffnetWithCPE($index+1)" ng-mouseleave="ParentMouseLeaveOffnetWithCPE($index+1)" class="trigger clickable1">
+                                    {{psData.offnetwithCPEStatus[0]}}
+                                   
+                                 </a>
+                               
+                                <span ng-show="psData.offnetwithCPEStatus[0]!=null && psData.offnetwithCPEStatus[0]!=''" >&nbsp;&nbsp;&nbsp;</span> 
+                                
+                               <a ng-show="psData.offnetwithCPEStatus[1]!=''"  data-toggle="popover" ng-mouseover="ParentMouseOverOffnetWithCPE($index+1)" ng-mouseleave="ParentMouseLeaveOffnetWithCPE($index+1)" class="trigger clickable1">
+                                   
+                                    {{psData.offnetwithCPEStatus[1]}}
+                                 </a>
+
+                                <table id="tblParentOffnetWithCPE{{$index+1}}" style="display:none;left:-400%" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>CPE Lead Time/Status</th>
+                                            <th>Access Lead Time/Status</th>
+                                            <th>Port Speed Lead Time</th>
+                                            <th>Service Lead Time With CPE/Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td >{{psData.CPLeadTimeStatus}}</td>
+                                        <td >{{psData.offnetAccessLeadTimeStatus}}</td>
+                                        <td >{{psData.PortSpeedLeadTime}}</td>
+                                        <td >{{psData.offnetServiceLeadTimeWithCPE}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </td>
+
+                           <!-- <td>
+                                {{psData.offnetWithOutCPEStatus[0]}} &nbsp;&nbsp;&nbsp;{{psData.offnetWithOutCPEStatus[1]}}
+                            </td>
+-->
+                            <td class="popoverRootTd">
+                                <a data-toggle="popover" ng-mouseover="ParentMouseOverOffnetWithOutCPE($index+1)" ng-mouseleave="ParentMouseLeaveOffnetWithOutCPE($index+1)" class="trigger clickable1">
+                                    {{psData.offnetWithOutCPEStatus[0]}}
+                                 </a>
+                                
+                               <span ng-show="psData.offnetWithOutCPEStatus[0]!=null && psData.offnetWithOutCPEStatus[0]!=''" >&nbsp;&nbsp;&nbsp;</span> 
+
+                                <a ng-show="psData.offnetWithOutCPEStatus[1]!=''" data-toggle="popover" ng-mouseover="ParentMouseOverOffnetWithOutCPE($index+1)" ng-mouseleave="ParentMouseLeaveOffnetWithOutCPE($index+1)" class="trigger clickable1">
+                                    {{psData.offnetWithOutCPEStatus[1]}}
+                                 </a>
+
+                                 <table id="tblParentOffnetWithOutCPE{{$index+1}}" style="display:none;left:-400%" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Access Lead Time/Status</th>
+                                            <th>Port Speed Lead Time</th>
+                                            <th>Service Lead Time Without CPE/Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td >{{psData.offnetAccessLeadTimeStatus}}</td>
+                                        <td >{{psData.PortSpeedLeadTime}}</td>
+                                        <td >{{psData.offnetServiceLeadTimeWithOutCPE}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </td>
+
+                           <!-- <td>
+                                {{psData.onnetWithCPEStatus[0]}} &nbsp;&nbsp;&nbsp;{{psData.onnetWithCPEStatus[1]}}
+                            </td>-->
+
+                             <td ng-hide="CPEExists==0" class="popoverRootTd">
+                               <span style="width:10px"> <a data-toggle="popover" ng-mouseover="ParentMouseOverOnnetWithCPE($index+1)" ng-mouseleave="ParentMouseLeaveOnnetWithCPE($index+1)" class="trigger clickable1">
+                                    {{psData.onnetWithCPEStatus[0]}} 
+                                 </a></span>
+                             <!--  <span ng-show="psData.onnetWithCPEStatus[0]!=null && psData.onnetWithCPEStatus[0]!=''" >&nbsp;&nbsp;&nbsp;</span>--> 
+                               
+
+                               <a ng-show="psData.onnetWithCPEStatus[1]!=''" data-toggle="popover" ng-mouseover="ParentMouseOverOnnetWithCPE($index+1)" ng-mouseleave="ParentMouseLeaveOnnetWithCPE($index+1)" class="trigger clickable1">
+                                   {{psData.onnetWithCPEStatus[1]}}
+                                 </a>
+                                
+                                 <table id="tblParentOverOnnetWithCPE{{$index+1}}" style="display:none;left:-550%" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>CPE Lead Time/Status</th>
+                                            <th>Access Lead Time/Status</th>
+                                            <th>Port Speed Lead Time</th>
+                                            <th>Service Lead Time with CPE/Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td >{{psData.CPLeadTimeStatus}}</td>
+                                        <td >{{psData.onnetAccessLeadTimeStatus}}</td>
+                                        <td >{{psData.PortSpeedLeadTime}}</td>
+                                        <td >{{psData.onnetServiceLeadTimeWithCPE}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+
+                           <!-- <td>
+                                {{psData.onnetWithoutCPEStatus[0]}} &nbsp;&nbsp;&nbsp;{{psData.onnetWithoutCPEStatus[1]}}
+                            </td>-->
+
+                            <td class="popoverRootTd">
+
+                                <a data-toggle="popover" ng-mouseover="ParentMouseOverOnnetWithOutCPE($index+1)" ng-mouseleave="ParentMouseLeaveOnnetWithOutCPE($index+1)" class="trigger clickable1">
+                                    {{psData.onnetWithoutCPEStatus[0]}}
+                                 </a>
+
+                                <span ng-show="psData.onnetWithoutCPEStatus[0]!=null && psData.onnetWithoutCPEStatus[0]!=''" >&nbsp;&nbsp;&nbsp;</span> 
+
+                                 <a ng-show="psData.onnetWithoutCPEStatus[1]!=''" data-toggle="popover" ng-mouseover="ParentMouseOverOnnetWithOutCPE($index+1)" ng-mouseleave="ParentMouseLeaveOnnetWithOutCPE($index+1)" class="trigger clickable1">
+                                    {{psData.onnetWithoutCPEStatus[1]}}
+                                 </a>
+                                
+                                 <table id="tblParentMouseOverOnnetWithOutCPE{{$index+1}}" style="display:none;left:-430%" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Access Lead time/Status</th>
+                                            <th>Port Speed Lead Time</th>
+                                            <th>Service lead time without CPE/Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>{{psData.onnetAccessLeadTimeStatus}}</td>
+                                        <td>{{psData.PortSpeedLeadTime}}</td>
+                                        <td>{{psData.onnetServiceLeadTimeWithOutCPE}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                        
+               <div id="Parent2Paging" class="row text-right">
+                    <!--mpls-->
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                      <b><a href="" ng-click="PrevParent()">Prev</a> &nbsp; <a href="" ng-click="NextParent()">
+                            Next</a></b>  
+                    </div>
+                </div>
+
+                <div id="tblPortSpeedFilters" class="panel panel-primary bg1" style="display: none;">
+                    <div id='trChild' class="panel-body">
+                        <div class="row Arrow text-center" id="divParentPortSpeeds">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <span ><b>{{ParentProductName}} Parent Port Access</b></span>
+                            </div>
+                        </div>
+                <div>&nbsp;&nbsp;</div>
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    Access Supplier(s)</label>
+                                <div class="col-sm-2">
+                                    <select ng-model="ChildAccessSupplier" ng-change="filterSuppProd(ChildAccessSupplier)" ng-options="CAccesssupp.AccessSupplierID as CAccesssupp.AccessSupplierName for CAccesssupp in ChildAccSuppdata"
+                                        class="form-control">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                               
+                                <label for="" class="col-sm-2 control-label">
+                                    Port Speed(s)  <span class="red"> * </span> </label>
+                                <div class="col-sm-3">
+                                    <select id="ParentPortSpeed" ng-change="RemoveAlert()" multiple size="7" ng-model="ChildPortSpeed" 
+                                    ng-options="cSpeed.PortSpeedID as cSpeed.PortSpeedName for cSpeed in ChildPortSpeedData"
+                                    class="form-control">
+                                        <!--<option ng-repeat='cSpeed in ChildPortSpeedData' value="{{cSpeed.PortSpeedID}}">{{cSpeed.PortSpeedName}}</option>-->
+                                    </select>
+                                    <span style="display: none;color:Red;" id="spnParentportSpeed">Please Select Parent Port Speed</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    Access Speed(s) </label>
+                                <div class="col-sm-2">
+                                    <select ng-model="ChildAccessSpeed" multiple size="7"  ng-options="CAccesssupp.AccessSpeedID as CAccesssupp.AccessSpeedName for CAccesssupp in AccessSpeedData"
+                                        class="form-control">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                                <label for="" class="col-sm-2 control-label">
+                                    Access Supplier Product(s)</label>
+                                <div class="col-sm-3">
+                                    <select ng-model="ChildAccessSupplierProduct" style="width:auto" multiple size="7"  ng-options="CAccesssupp.SupplierID as CAccesssupp.SupplierProductName for CAccesssupp in SupplierProductData"
+                                        class="form-control">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    Access Technology(s) </label>
+                                <div class="col-sm-2">
+                                    <select ng-model="ChildAccessType" multiple size="7"  ng-options="CAccesssupp.AccessTypeID as CAccesssupp.AccessTypeName for CAccesssupp in AccessTypeData"
+                                        class="form-control">
+                                        <option value="">All</option>
+                                    </select>
+                                </div>
+                                <label id="lblChildCPESuppliers" ng-hide="CPEExists==0" for="" class="col-sm-2 control-label">
+                                    CPE Supplier(s) </label>
+                                <div id="ddlChildCPESuppliers" ng-hide="CPEExists==0" class="col-sm-2">
+                                    <select id="ddlCPESuppliers" ng-model="ChildCPESuppliers" ng-options="objsupp.supplierID as objsupp.SupplierName for objsupp in CpeSupplierData"
+                                        class="form-control">
+                                        <option value="">--- Select ---</option>
+                                    </select>
+                                </div>
+                                <!--<label for="" class="col-sm-2 control-label">&nbsp;</label>-->
+                                <div class="col-sm-2">
+                                    <input class="btn btn-sc" type="button" value="GO" ng-click="GeChildPortSpeeds(true)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="Child1Paging" class="row text-right">
+                    <!--bt mpls-->
+
+                     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-left">
+                        <label id="Label1"  ng-model="PageStatus">Page {{PageNum}} of {{ChildPageCount}} </label>
+                    </div>
+                   
+                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                        <b><a href="" id="PrevChild1" ng-click="PrevChild()">Prev</a> &nbsp; <a href="" id="NextChild1" ng-click="NextChild()">
+                            Next</a></b>
+                    </div>
+                </div>
+                <div class="form-group">
+                </div>
+                <div id="tblChildSpeeds" class="table-responsive" style="display: none;">
+                    <table cellpadding="0"  cellspacing="0" class="table table-bordered tblnowrap clsremovewhitespace">
+                    <thead>
+                     <tr>
+                            <th colspan="11" class="Arrow text-left" >
+                            Port Access Availability 
+
+                            </th>
+                            <th nowrap valign="bottom" align="center" colspan="4" class="Arrow">
+                                Service Lead Time
+                            </th>
+                        </tr>
+                       <!-- <tr>
+                            <th colspan="11">
+                            </th>
+                            <th colspan="2" class="Arrow">
+                                off-net
+                            </th>
+                            <th colspan="2" class="Arrow">
+                                on-net
+                            </th>
+                        </tr>-->
+                        <tr>
+                            <th colspan="11" class="Arrow">
+                            </th>
+                            <th ng-show="CPEExists==0" class="Arrow">
+                                OffNet 
+                            </th>
+                            <th ng-show="CPEExists==1" colspan="2"  class="Arrow">
+                                OffNet  
+                            </th>
+                            <th ng-show="CPEExists==0" class="Arrow">
+                                OnNet  
+                            </th>
+                            <th ng-show="CPEExists==1" colspan="2" class="Arrow">
+                                OnNet
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="Arrow">
+                                Port Speed 
+                            </th>
+                            <th class="Arrow">
+                                Port Speed Availability
+                            </th>
+                            <th class="Arrow">
+                                Access Speed
+                            </th>
+                            <th class="Arrow">
+                                Access Technology
+                            </th>
+                            <th class="Arrow">
+                                Access Supplier Name
+                                <br />
+                                Supplier Product Name<br />
+                                / BT Internal SLA Information
+                            </th>
+                            <th class="Arrow">
+                                Service Type
+                            </th>
+                            <th class="Arrow">
+                                Access Speed Availability
+                            </th>
+                            <th class="Arrow">
+                                Ordering Status
+                            </th>
+                            <th class="Arrow">
+                                Interface
+                            </th>
+                            <th class="Arrow">
+                                Framing
+                            </th>
+                            <th class="Arrow">
+                                Connector
+                            </th>
+                            <th ng-hide="CPEExists==0" class="Arrow">
+                                with CPE
+                                <br />
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th ng-show="CPEExists==0" class="Arrow">
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th ng-show="CPEExists==1" class="Arrow">
+                                without CPE
+                                <br />
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th ng-hide="CPEExists==0" class="Arrow">
+                                with CPE
+                                <br />
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th ng-show="CPEExists==0" class="Arrow">
+                                
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                            <th  ng-show="CPEExists==1" class="Arrow">
+                                without CPE
+                                <br />
+                                Calendar days
+                                <br />
+                                + Status
+                            </th>
+                        </tr>
+                    </thead>
+                       <tbody>
+                        <tr ng-repeat='psData in ChildPortSpeedGridData'>
+                            <td class="Arrow">
+                                {{psData.PortSpeeds}}
+                            </td>
+                            <td class="Arrow">
+                                {{psData.PortSpeedAvailability}}
+                            </td>
+                            <td class="Arrow">
+                                {{psData.AccessSpeed}}
+                            </td>
+                            <td class="popoverRootTd">
+                                 <a ng-if="psData.ServiceVariant !='' || psData.DeliveryMode !='' " data-toggle="popover" ng-mouseover="MouseOver($index+1)" ng-mouseleave="MouseLeave($index+1)" class="trigger clickable1">
+                                    {{psData.AccessTechnology}}
+                                 </a>
+                                 <span ng-if="psData.ServiceVariant=='' && psData.DeliveryMode=='' ">
+                                 {{psData.AccessTechnology}}
+                                 </span>
+                                 <table id="tblAT{{$index+1}}" style="right: 10px; display: none; max-width: 190px;" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Service Variant</th>
+                                            <th>Delivery Mode</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>{{psData.ServiceVariant}}</td>
+                                        <td>{{psData.DeliveryMode}}</td>
+                                            
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                            </td>
+                            <td class="Arrow popoverRootTd">
+                                {{psData.SupplierProductName}}
+                                <br />
+                               <!-- <a href='SLAInformation.asp?slaproduct={{psData.AccessSupplierNameID}}&speed={{psData.AccessSpeedCharID}}&speeduom={{psData.ASpeedUOM}}&sSupplier={{psData.AccessSupplierCharID}}&AccTypename={{psData.AccessProductTypeID}}'>
+                                    {{psData.SupplierProductName1}}</a>-->
+                                    <a  class="clickable1" ng-mouseover="ChildMouseOverSuppProdName($index+1)" ng-mouseleave="ChildMouseLeaveSuppProdName($index+1)"
+                                    ng-click="openSLAPopup(psData.AccessSupplierNameID,psData.SupplierProductName,psData.SupplierProductName1,psData.AccessSupplierCharID,psData.AccessProductTypeID,psData.AccessSpeedCharID,psData.AccessSpeed,psData.ASpeedUOM)">
+                                    {{psData.SupplierProductName1}}</a>
+
+                                    <table ng-hide="psData.SupplierInterconnection==null || psData.SupplierInterconnection=='' || !(Product == 100 || Product == 121 || Product == 106)"  id="tblChildSuppProdName{{$index+1}}" style="left: 140px; top:20px; display: none; max-width: 190px;" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Supplier Interconnection Type</th>
+                                            <th>MTU Size</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>{{psData.SupplierInterconnection}}</td>
+                                        <td>{{psData.MTUSize}}</td>
+                                            
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </td>
+                            <td class="Arrow">
+                                {{psData.ServiceType}}
+                            </td>
+                            <td class="Arrow">
+                                {{psData.AccessSpeedAvailability}}
+                            </td>
+                            <td>
+                                <!--<a href='product/dispACCESSdetails.asp?Product=25&Region={{psData.RegionID}}&Country={{psData.CountryID}}&Site=0&ChosenSupplier={{psData.AccessSupplierCharID}}'>
+                                    {{psData.OrderingStatus}}</a>-->
+                                   <a class="clickable1" ng-click="OpenAccDetPopup(psData.AccessSupplierCharID)">
+                                    {{psData.OrderingStatus}}</a>
+                            </td>
+                            <td class="Arrow">
+                                {{psData.Interface}}
+                            </td>
+                            <td class="Arrow">
+                                {{psData.Framing}}
+                            </td>
+                            <td class="Arrow">
+                                {{psData.Connecter}}
+                            </td>
+                            <td ng-hide="CPEExists==0" class="popoverRootTd">
+                             <div class="ToolTipdiv" ng-show="psData.offnetwithCPEStatus[0]!=null && psData.offnetwithCPEStatus[0]!=''">  <a data-toggle="popover" ng-mouseover="MouseOverOffnetWithCPE($index+1)" ng-mouseleave="MouseLeaveOffnetWithCPE($index+1)" class="trigger clickable1">
+                                    {{psData.offnetwithCPEStatus[0]}}
+                                 </a></div> 
+                               <!-- <span ng-show="psData.offnetwithCPEStatus[0]!=null && psData.offnetwithCPEStatus[0]!=''" >&nbsp;&nbsp;&nbsp;</span>--> 
+                                
+                                <a ng-show="psData.offnetwithCPEStatus[1]!=''" data-toggle="popover" ng-mouseover="MouseOverOffnetWithCPE($index+1)" ng-mouseleave="MouseLeaveOffnetWithCPE($index+1)" class="trigger clickable1">
+                                    {{psData.offnetwithCPEStatus[1]}}
+                                 </a>
+                                
+
+                                <table id="tblOffnetWithCPE{{$index+1}}" style="display:none;left:-300%" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>CPE Lead Time/Status</th>
+                                            <th>Access Lead Time/Status</th>
+                                            <th>Port Speed Lead Time</th>
+                                            <th>Service Lead Time with CPE/Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>{{psData.CPLeadTimeStatus}}</td>
+                                        <td>{{psData.offnetAccessLeadTimeStatus}}</td>
+                                        <td>{{psData.PortSpeedLeadTime}}</td>
+                                        <td>{{psData.offnetServiceLeadTimeWithCPE}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </td>
+                            <td class="popoverRootTd">
+                              <div class="ToolTipdiv" ng-show="psData.offnetWithOutCPEStatus[0]!=null && psData.offnetWithOutCPEStatus[0]!=''">
+                               <a data-toggle="popover" ng-mouseover="MouseOverOffnetWithOutCPE($index+1)" ng-mouseleave="MouseLeaveOffnetWithOutCPE($index+1)" class="trigger clickable1">
+                                    {{psData.offnetWithOutCPEStatus[0]}}
+                                 </a></div> 
+                               <!-- <span ng-show="psData.offnetWithOutCPEStatus[0]!=null && psData.offnetWithOutCPEStatus[0]!=''" >&nbsp;&nbsp;&nbsp;</span> -->
+                                <a ng-show="psData.offnetWithOutCPEStatus[1]!=''" data-toggle="popover" ng-mouseover="MouseOverOffnetWithOutCPE($index+1)" ng-mouseleave="MouseLeaveOffnetWithOutCPE($index+1)" class="trigger clickable1">
+                                   {{psData.offnetWithOutCPEStatus[1]}}
+                                 </a>
+                                
+
+                                 <table id="tblOffnetWithOutCPE{{$index+1}}" style="display:none;left:-400% ;top:25px;" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Access Lead Time/Status</th>
+                                            <th>Port Speed Lead Time</th>
+                                            <th>Service Lead Time without CPE/Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>{{psData.offnetAccessLeadTimeStatus}}</td>
+                                        <td>{{psData.PortSpeedLeadTime}}</td>
+                                        <td>{{psData.offnetServiceLeadTimeWithOutCPE}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </td>
+                            <td ng-hide="CPEExists==0" class="popoverRootTd">
+                              <div class="ToolTipdiv" ng-show="psData.onnetWithCPEStatus[0]!=null && psData.onnetWithCPEStatus[0]!=''">  <a  data-toggle="popover" ng-mouseover="MouseOverOnnetWithCPE($index+1)" ng-mouseleave="MouseLeaveOnnetWithCPE($index+1)" class="trigger clickable1">
+                                    {{psData.onnetWithCPEStatus[0]}}
+                                 </a></div>
+                               <!-- <span ng-show="psData.onnetWithCPEStatus[0]!=null && psData.onnetWithCPEStatus[0]!=''" >&nbsp;&nbsp;&nbsp;</span> -->
+                                <a ng-show="psData.onnetWithCPEStatus[1]!=''" data-toggle="popover" ng-mouseover="MouseOverOnnetWithCPE($index+1)" ng-mouseleave="MouseLeaveOnnetWithCPE($index+1)" class="trigger clickable1">
+                                   {{psData.onnetWithCPEStatus[1]}}
+                                 </a>
+                                
+                                 <table id="tblOnnetWithCPE{{$index+1}}" style="display:none;left:-550%" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>CPE Lead Time/Status</th>
+                                            <th>Access Lead Time/Status</th>
+                                            <th>Port Speed Lead Time</th>
+                                            <th>Service Lead Time with CPE/Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>{{psData.CPLeadTimeStatus}}</td>
+                                        <td>{{psData.onnetAccessLeadTimeStatus}}</td>
+                                        <td>{{psData.PortSpeedLeadTime}}</td>
+                                        <td>{{psData.onnetServiceLeadTimeWithCPE}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td class="popoverRootTd">
+
+                              <div class="ToolTipdiv" ng-show="psData.onnetWithoutCPEStatus[0]!=null && psData.onnetWithoutCPEStatus[0]!=''"> <a data-toggle="popover" ng-mouseover="MouseOverOnnetWithOutCPE($index+1)" ng-mouseleave="MouseLeaveOnnetWithOutCPE($index+1)" class="trigger clickable1">
+                                    {{psData.onnetWithoutCPEStatus[0]}}
+                                 </a></div>
+                             <!-- <span ng-show="psData.onnetWithoutCPEStatus[0]!=null && psData.onnetWithoutCPEStatus[0]!=''" >&nbsp;&nbsp;&nbsp;</span> -->
+                                 <a ng-show="psData.onnetWithoutCPEStatus[1]!=''" data-toggle="popover" ng-mouseover="MouseOverOnnetWithOutCPE($index+1)" ng-mouseleave="MouseLeaveOnnetWithOutCPE($index+1)" class="trigger clickable1">
+                                    {{psData.onnetWithoutCPEStatus[1]}}
+                                 </a>
+                                
+                                 <table id="tblOnnetWithOutCPE{{$index+1}}" style="display:none;left:-460%;top:25px" class="table table-bordered popoverCtnTbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Access Lead Time/Status</th>
+                                            <th>Port Speed Lead Time</th>
+                                            <th>Service Lead Time without CPE/Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>{{psData.onnetAccessLeadTimeStatus}}</td>
+                                        <td>{{psData.PortSpeedLeadTime}}</td>
+                                        <td>{{psData.onnetServiceLeadTimeWithOutCPE}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="Child2Paging" class="row text-right">
+                <!--bt mpls-->
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <b><a href="" id="PrevChild2" ng-click="PrevChild()">Prev</a> &nbsp; <a href="" id="NextChild2" ng-click="NextChild()">
+                        Next</a></b>
+                </div>
+            </div>
+                <div id="divLeasedLineNoData" class="alert alert-danger Arrow" role="alert" style="display: none">
+                    No data Available for the options selected.</div>
+
+            </div>
+            <div ng-controller="HVPNCntrl" id="divHVPN" class="tab-pane">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p style="color: Red;" class="Arrow">
+                            <span style="color: Black;">SLA Information:</span> These SLAs are BT's internal
+                            SLAs with our Access Suppliers. They are <u> NOT TO BE QUOTED TO END CUSTOMERS </u>. The
+                            terms of the SLA between the customer and BT is covered under the relevant BT product
+                            terms and conditions for the whole service (e.g. BT MPLS)
+                        </p>
+                    </div>
+                </div>
+
+                <div class="panel panel-primary bg1">
+                    <div class="panel-body">
+                    <div class="row Arrow text-center" id="div2">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <span><b>{{ProductName}} Port Access</b></span>
+                            </div>
+                        </div>
+                        <div>&nbsp;&nbsp;</div>
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label style="display: none" for="">
+                                    BT Package/VSAT
+                                </label>
+                                <div style="display: none">
+                                    <select id="ddlBTPackage" ng-model="BTPackage" ng-options="packageData.PackageID as packageData.PackageName for packageData in BTPackageData"
+                                        class="form-control">
+                                        <!-- <option value="">--- Select ---</option>-->
+                                    </select>
+                                    <!--<select ng-model="BTPackage" id="ddlBTPackage">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='packageData in BTPackageData' value="{{packageData.PackageID}}">{{packageData.PackageName}}</option>
+                        </select>-->
+                                </div>
+                                <label for="" class="col-sm-3 control-label">
+                                    Access Supplier(s)<span class="red"> * </span> 
+                                </label>
+                                <div class="col-sm-2">  <!--ng-change="GetPortSpeedData()"-->
+                                    <select id="ddlHVPNAccessSupplier" ng-model="HVPNAccessSupplier"  ng-change="RemoveHVPNAlert(HVPNAccessSupplier)"
+                                        ng-options="accSupplier.supplierID as accSupplier.SupplierName for accSupplier in HVPNAccessSuppliersData"
+                                        class="form-control">
+                                        <option value="">--- Select ---</option>
+                                    </select>
+                                    <span style="display: none;color:Red;" id="spnHVPNAccessSupplier" class="Arrow">Please Select Access Supplier</span>
+                                </div>
+                                <label for="" class="col-sm-2 control-label">
+                                    Port Speed(s) <span class="red"> * </span> 
+                                </label>
+                                <div class="col-sm-2">  <!--ng-change="GetHVPNPortTypes()"-->
+                                    <select id="ddlHVPNPortSpeed" multiple size="7" ng-model="HVPNPortSpeed" ng-change="RemoveHVPNAlert1()"
+                                        ng-options="ps.PortSpeedID as ps.PortSpeed for ps in HVPNPortSpeedData" class="form-control">
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </select>
+                                    <span style="display: none;color:Red;" id="spnHVPNPortSpeed" class="Arrow">Please Select Port Speed</span>
+                                </div>
+                                <div class="col-sm-2">
+                                    <input class="btn btn-sc" type="button" value="GO" ng-click="GetHVPNPortTypes(true)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="row">
+                    <div class="col-md-4 col-lg-4 Arrow">
+                        <h5>
+                            {{TunnelingNote}}
+                        </h5>
+                    </div>
+                   
+                </div>-->
+                <div class="panel panel-primary">
+                    <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                        data-target="#TunnelNote">
+                        <h3 class="panel-title">
+                            Split Tunneling Availability
+                        </h3>
+                        <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                    </div>
+                    <div id="TunnelNote" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table class="table table-bordered" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td width="40%" class="Arrow">
+                                        Split Tunneling Availability
+                                    </td>
+                                    <td width="60%" class="Arrow">
+                                        {{TunnelingNote}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-lg-6 text-left PaddingBottom" ng-hide="CPEExists==0" style="padding-top:20px">
+                        <a class="btn-link" ng-click="GetBundleData()">View CPE Information</a>
+                    </div>
+                </div>
+                <div id="HvpnNoData" class="alert alert-danger Arrow" role="alert" style="display: none">
+                    For selected criteria no match found</div>
+                    <div>&nbsp;</div>
+                <div class="row Arrow ">
+                 <div id="divParentPortTypesHeading" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> <b> hVPN Port Types</b> </div>
+                 </div>
+                 <div id="divHVPNParentPaging1" class="row text-right">
+                    <!--bt mpls-->
+
+                     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-left">
+                        <label id="Label2"  ng-model="PageStatus">Page {{PageNo}} of {{PageCount}} </label>
+                    </div>
+                   
+                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                        <b><a href="" ng-click="PrevParent()">Prev</a> &nbsp; <a href="" ng-click="NextParent()">
+                            Next</a></b>
+                    </div>
+                </div>
+                <div class="form-group">
+                </div>
+                <div id="divHVPNParentPortTypes" class="table-responsive"  style="display: none">
+
+                    <table id="tblHVPNParentPortTypes" cellpadding="0" cellspacing="0" class="table table-bordered tblnowrap">
+                        <!--<tr id="trHeading"  height="15px">
+                            <td colspan="14" align="left">HVPN Port Types</td>
+                        </tr>-->
+                        <tr>
+                            <th class="Arrow">
+                                BT Package
+                            </th>
+                            <th class="Arrow">
+                                Access Type
+                            </th>
+                            <th class="Arrow">
+                                Port Speed (Down / Up)
+                            </th>
+                            <th class="Arrow">
+                                Availability
+                            </th>
+                            <th class="Arrow">
+                                Access Speed (Down / Up)
+                            </th>
+                            <th class="Arrow">
+                                Interface
+                            </th>
+                            <th class="Arrow">
+                                Framing Structure
+                            </th>
+                            <th class="Arrow">
+                                Connector
+                            </th>
+                            <th class="Arrow">
+                                Access Availability Status
+                            </th>
+                            <th class="Arrow">
+                                Contention Ratio
+                            </th>
+                            <th class="Arrow">
+                                Supplier
+                            </th>
+                            <th class="Arrow">
+                                Supplier Product/BT Internal SLA
+                            </th>
+                            <th class="Arrow">
+                                Service Lead Time
+                            </th>
+                            <th class="Arrow">
+                                PoP
+                            </th>
+                            <th class="Arrow">
+                                CPE
+                            </th>
+                        </tr>
+                        <tr ng-repeat='ps in HVPNParentPortTypeData'>
+                            <td>
+                                <u> <a class="clickable1" ng-click="openHVPNPKGDet(ps.SuppProdID,ps.PackageName,ps.AccessType,ps.Supplier,
+                                 ps.SupplierProductBTInternalSLA,ps.AccessSpeed,ps.Interface,ps.FramingStructure,ps.Connector,ps.PortPackageID)">{{ps.PackageName}}</a></u>
+                            </td>
+                            <td class="Arrow">
+                                {{ps.AccessType}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.PortSpeed}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.Availability}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.AccessSpeed}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.Interface}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.FramingStructure}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.Connector}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.AccessAvailabilityStatus}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.ContentionRatio}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.Supplier}}
+                            </td>
+                            <td>
+                            <u> <a  class="clickable1" ng-click="openSALInfoPOPUp(ps.PackageID,ps.AccSupplierCharID,ps.SuppProdID,ps.AccessTypeID,ps.portTypeID,ps.Supplier,ps.SupplierProductBTInternalSLA,ps.AccessSpeed)">
+                             {{ps.SupplierProductBTInternalSLA}}</a></u>
+                            </td>
+                            <td class="Arrow">
+                                {{ps.ServiceLeadTime}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.POP}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.CPE}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div>&nbsp;</div>
+
+                <div id="divHVPNParentPaging2" class="row text-right">
+                    <!--bt mpls-->
+
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <b><a href="" ng-click="PrevParent()">Prev</a> &nbsp; <a href="" ng-click="NextParent()">
+                            Next</a></b>
+                    </div>
+                </div>
+
+                <div class="row Arrow ">
+                <div id="divPortTypesHeading" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> <b> hVPN Parent Port Types</b> </div>
+                </div>
+                 <div id="divHVPNChildPaging1" class="row text-right">
+                    <!--bt mpls-->
+
+                     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-left">
+                        <label id="Label4"  ng-model="PageStatus">Page {{PageNum}} of {{ChildPageCount}} </label>
+                    </div>
+                   
+                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                        <b><a href="" ng-click="PrevChild()">Prev</a> &nbsp; <a href="" ng-click="NextChild()">
+                            Next</a></b>
+                    </div>
+                </div>
+
+                <div id="HvpnTableData" class="table-responsive">
+
+                    
+
+                    <table id="tblHVPNData" cellpadding="0" cellspacing="0" class="table table-bordered tblnowrap">
+                        <!--<tr id="trHeading1" height="15px">
+                            <td colspan="14" align="left">HVPN Parent Port Types</td>
+                        </tr>-->
+                        <thead>
+                        <tr>
+                            <th class="Arrow">
+                                BT Package
+                            </th>
+                            <th class="Arrow">
+                                Access Type
+                            </th>
+                            <th class="Arrow">
+                                Port Speed (Down / Up)
+                            </th>
+                            <th class="Arrow">
+                                Availability
+                            </th>
+                            <th class="Arrow">
+                                Access Speed (Down / Up)
+                            </th>
+                            <th class="Arrow">
+                                Interface
+                            </th>
+                            <th class="Arrow">
+                                Framing Structure
+                            </th>
+                            <th class="Arrow">
+                                Connector
+                            </th>
+                            <th class="Arrow">
+                                Access Availability Status
+                            </th>
+                            <th class="Arrow">
+                                Contention Ratio
+                            </th>
+                            <th class="Arrow">
+                                Supplier
+                            </th>
+                            <th class="Arrow">
+                                Supplier Product / BT Internal SLA
+                            </th>
+                            <th class="Arrow">
+                                Service Lead Time
+                            </th>
+                            <th class="Arrow">
+                                PoP
+                            </th>
+                            <th class="Arrow">
+                                CPE
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat='ps in HVPNPortTypeData'>
+                            <td>
+                                <u> <a class="clickable1" ng-click="openHVPNPKGDet(ps.SuppProdID,ps.PackageName,ps.AccessType,ps.Supplier,
+                                 ps.SupplierProductBTInternalSLA,ps.AccessSpeed,ps.Interface,ps.FramingStructure,ps.Connector,ps.PortPackageID)">{{ps.PackageName}}</a></u>
+                            </td>
+                            <td class="Arrow">
+                                {{ps.AccessType}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.PortSpeed}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.Availability}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.AccessSpeed}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.Interface}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.FramingStructure}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.Connector}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.AccessAvailabilityStatus}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.ContentionRatio}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.Supplier}}
+                            </td>
+                            <td>
+                            <u> <a  class="clickable1" ng-click="openSALInfoPOPUp(ps.PackageID,ps.AccSupplierCharID,ps.SuppProdID,ps.AccessTypeID,ps.portTypeID,ps.Supplier,ps.SupplierProductBTInternalSLA,ps.AccessSpeed)">
+                             {{ps.SupplierProductBTInternalSLA}}</a></u>
+                            </td>
+                            <td class="Arrow">
+                                {{ps.ServiceLeadTime}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.POP}}
+                            </td>
+                            <td class="Arrow">
+                                {{ps.CPE}}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    
+                     
+                </div>
+
+                <div id="divHVPNChildPaging2" class="row text-right">
+                    <!--bt mpls-->
+
+                     
+                   
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <b><a href="" ng-click="PrevChild()">Prev</a> &nbsp; <a href="" ng-click="NextChild()">
+                            Next</a></b>
+                    </div>
+                </div>
+                
+            </div>
+            <div id="divDSL" ng-controller="DSLCntrl" class="tab-pane">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p style="color: Red;" class="Arrow">
+                            <span style="color: Black;">SLA Information:</span> These SLAs are BT's internal
+                            SLAs with our Access Suppliers. They are <u> NOT TO BE QUOTED TO END CUSTOMERS </u>. The
+                            terms of the SLA between the customer and BT is covered under the relevant BT product
+                            terms and conditions for the whole service (e.g. BT MPLS)
+                        </p>
+                    </div>
+                </div>
+
+                <div class="panel panel-primary bg1">
+                    <div class="panel-body">
+                    <div class="row Arrow text-center" id="div3">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <span><b>{{ProductName}} Port Access</b></span>
+                            </div>
+                        </div>
+                        <div>&nbsp;&nbsp;</div>
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    BT Package<span class="red"> * </span> 
+                                </label>
+                                <div class="col-sm-2"> 
+                                    <select class="form-control" id="ddlDSLBTPackage" ng-model="DSLBTPackage" ng-change="GetDSLAccessSuppliers()"
+                                        ng-options="packageData.PackageID as packageData.PackageName for packageData in DSLBTPackageData">
+                                        <option value="">--- Select ---</option>
+                                    </select>
+                                   <span style="display: none;color:Red;" id="spnDSLBTPackage">Please Select BT Package</span>
+                                </div>
+                                <label for="" class="col-sm-3 control-label">
+                                    Access Supplier(s)<span class="red"> * </span> 
+                                </label>
+                                <div class="col-sm-2">  <!--ng-change="GetDSLByAccessSuppliers()"-->
+                                    <select class="form-control" id="ddlDSLAccessSupplier" ng-model="DSLAccessSupplier" ng-change="GetDSLRemoveAlert()"
+                                        ng-options="accSupplier.AccessSupplierID as accSupplier.AccessSupplier for accSupplier in DSLAccessSuppliersData">
+                                        <option value="">--- Select ---</option>
+                                    </select>
+                                    <span style="display: none;color:Red;" id="spnDSLAccessSupplier">Please Select Access Supplier</span>
+                                </div>
+                                <div class="col-sm-2">
+                                    <input class="btn btn-sc" type="button" value="GO" ng-click="GetDSLByAccessSuppliers()" /> &nbsp;&nbsp;&nbsp;
+                                    <input class="btn btn-sc" type="button" value="Reset" ng-click="ClearDSLPackages()" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                        data-target="#TunnelNote1">
+                        <h3 class="panel-title">
+                            Split Tunneling Availability
+                        </h3>
+                        <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                    </div>
+                    <div id="TunnelNote1" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table class="table table-bordered" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td width="40%" class="Arrow">
+                                        Split Tunneling Availability
+                                    </td>
+                                    <td width="60%" class="Arrow">
+                                        {{TunnelingNote}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <!--<div class="col-md-6 col-lg-6">&nbsp;</div>-->
+                    <div class="col-md-6 col-lg-6 text-left" ng-hide="CPEExists==0">
+                        <a class="btn-link" ng-click="GetBundleData()">
+                            View CPE Information </a>
+                    </div>
+                </div>
+                <div>&nbsp;</div>
+                <div id="DSLNoData" class="alert alert-danger Arrow" role="alert" style="display: none">
+                    For selected criteria no match found
+                </div>
+
+                <div class="row Arrow ">
+                 <div id="divDSLParentPortTypesHeading" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> <b> Port Types</b> </div>
+                 </div>
+
+                 <div id="Div1" class="alert alert-danger Arrow" role="alert" style="display: none">
+                    For selected criteria no match found</div>
+                    <div>&nbsp;</div>
+               
+                 <div id="divDSLParentPaging1" class="row text-right">
+                    <!--bt mpls-->
+
+                     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-left">
+                        <label id="Label6"  ng-model="PageStatus">Page {{PageNo}} of {{PageCount}} </label>
+                    </div>
+                   
+                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                        <b><a href="" ng-click="PrevParent()">Prev</a> &nbsp; <a href="" ng-click="NextParent()">
+                            Next</a></b>
+                    </div>
+                </div>
+                <div class="form-group">
+                </div>
+
+                <div id="divDSLParentPortTypesDaga" class="table-responsive scrollbar">
+                    <table cellpadding="0" cellspacing="0" class="table table-bordered tblnowrap">
+                       <!--<tr>
+                        <td colspan="17">Port Types</td>
+                       </tr>-->
+                        <tr>
+                            <th class="Arrow">
+                                DSL Package
+                            </th>
+                            <th class="Arrow">
+                                DSL Type
+                            </th>
+                            <th class="Arrow">
+                                Speed(Down / Up)
+                            </th>
+                            <th class="Arrow">
+                                Interface
+                            </th>
+                            <th class="Arrow">
+                                Framing Structure
+                            </th>
+                            <th class="Arrow">
+                                Connector
+                            </th>
+                            <th class="Arrow">
+                                Contention Ratio
+                            </th>
+                            <th class="Arrow">
+                                Supplier
+                            </th>
+                            <th class="Arrow">
+                                Supplier Product / SLA
+                            </th>
+                            <th class="Arrow">
+                                Availability
+                            </th>
+                            <th class="Arrow">
+                                Contracted Lead Time
+                            </th>
+                            <th class="Arrow">
+                                Interconnect Design
+                            </th>
+                            <th class="Arrow">
+                                End to End Lead Time(Contracted + Local Loop)
+                            </th>
+                            <th class="Arrow">
+                                GPoP Interconnect
+                            </th>
+                            <th class="Arrow">
+                                TIR Value
+                            </th>
+                            <th class="Arrow">
+                                EF Supported Speeds
+                            </th>
+                            <th class="Arrow">
+                                CPE
+                            </th>
+                        </tr>
+                        <tr ng-repeat="item1 in DSLParentData">
+                            <td>
+                                 <a class="clickable1" ng-click="openHVPNPKGDet(item1.PackageName,item1.DSLType,item1.Supplier,
+                                 item1.SupplierProductSLA,item1.DSLSpeed,item1.Interface,item1.FramingStructure,item1.Connector,item1.ParentPackageID,
+                                 item1.PackageID,item1.PortPackageID)">{{item1.PackageName}}</a>
+                            </td>
+                            <td class="Arrow">
+                                {{item1.DSLType}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.DSLSpeed}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.Interface}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.FramingStructure}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.Connector}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.ContentionRatio}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.Supplier}}
+                            </td>
+                            <td>
+                            <a class="clickable1" ng-click="openSALInfoPOPUp(item1.PackageID,item1.AccSupplierCharID,item1.SuppProdID,item1.AccessTypeID,item1.portTypeID,item1.Supplier,item1.SupplierProductSLA,item1.DSLSpeed)">
+                                {{item1.SupplierProductSLA}}</a>
+                            </td>
+                            <td class="Arrow">
+                                {{item1.AvailableDesc}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.ContractedLeadTime}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.InterconnectDesign}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.EndToEndLeadTime}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.GPOP}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.TIRValue}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.EFSupportedSpeeds}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.CPE}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div id="divDSLParentPaging2" class="row text-right">
+                    <!--bt mpls-->
+
+                     
+                   
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <b><a href="" ng-click="PrevParent()">Prev</a> &nbsp; <a href="" ng-click="NextParent()">
+                            Next</a></b>
+                    </div>
+                </div>
+
+                <div>&nbsp;</div>
+
+                <div id="divDSLChildPaging1" class="row text-right">
+                    <!--bt mpls-->
+
+                     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-left">
+                        <label id="Label8"  ng-model="PageStatus">Page {{PageNum}} of {{ChildPageCount}} </label>
+                    </div>
+                   
+                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+                        <b><a href="" ng-click="PrevChild()">Prev</a> &nbsp; <a href="" ng-click="NextChild()">
+                            Next</a></b>
+                    </div>
+                </div>
+
+                <div class="row Arrow ">
+                 <div id="divDSLPortTypesHeading" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> <b> Parent Port Types</b> </div>
+                 </div>
+
+                <div id="divDSLData" class="table-responsive scrollbar">
+                    <table cellpadding="0" cellspacing="0" class="table table-bordered tblnowrap">
+                       <!-- <tr>
+                        <td colspan="17">Parent Port Types</td>
+                       </tr>-->
+                        <tr>
+                            <th class="Arrow">
+                                DSL Package
+                            </th>
+                            <th class="Arrow">
+                                DSL Type
+                            </th>
+                            <th class="Arrow">
+                                Speed(Down / Up)
+                            </th>
+                            <th class="Arrow">
+                                Interface
+                            </th>
+                            <th class="Arrow">
+                                Framing Structure
+                            </th>
+                            <th class="Arrow">
+                                Connector
+                            </th>
+                            <th class="Arrow">
+                                Contention Ratio
+                            </th>
+                            <th class="Arrow">
+                                Supplier
+                            </th>
+                            <th class="Arrow">
+                                Supplier Product / SLA
+                            </th>
+                            <th class="Arrow">
+                                Availability
+                            </th>
+                            <th class="Arrow">
+                                Contracted Lead Time
+                            </th>
+                            <th class="Arrow">
+                                Interconnect Design
+                            </th>
+                            <th class="Arrow">
+                                End to End Lead Time(Contracted + Local Loop)
+                            </th>
+                            <th class="Arrow">
+                                GPoP Interconnect
+                            </th>
+                            <th class="Arrow">
+                                TIR Value
+                            </th>
+                            <th class="Arrow">
+                                EF Supported Speeds
+                            </th>
+                            <th class="Arrow">
+                                CPE
+                            </th>
+                        </tr>
+                        <tr ng-repeat="item1 in DSLData">
+                            <td>
+                                 <a class="clickable1" ng-click="openHVPNPKGDet(item1.PackageName,item1.DSLType,item1.Supplier,
+                                 item1.SupplierProductSLA,item1.DSLSpeed,item1.Interface,item1.FramingStructure,item1.Connector,item1.ParentPackageID,item1.PackageID,item1.PortPackageID)">{{item1.PackageName}}</a>
+                            </td>
+                            <td class="Arrow">
+                                {{item1.DSLType}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.DSLSpeed}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.Interface}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.FramingStructure}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.Connector}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.ContentionRatio}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.Supplier}}
+                            </td>
+                            <td>
+                            <a class="clickable1" ng-click="openSALInfoPOPUp(item1.PackageID,item1.AccSupplierCharID,item1.SuppProdID,item1.AccessTypeID,item1.portTypeID,item1.Supplier,item1.SupplierProductSLA,item1.DSLSpeed)">
+                                {{item1.SupplierProductSLA}}</a>
+                            </td>
+                            <td class="Arrow">
+                                {{item1.AvailableDesc}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.ContractedLeadTime}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.InterconnectDesign}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.EndToEndLeadTime}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.GPOP}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.TIRValue}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.EFSupportedSpeeds}}
+                            </td>
+                            <td class="Arrow">
+                                {{item1.CPE}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div id="divDSLChildPaging2" class="row text-right">
+                    <!--bt mpls-->
+
+                    
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <b><a href="" ng-click="PrevChild()">Prev</a> &nbsp; <a href="" ng-click="NextChild()">
+                            Next</a></b>
+                    </div>
+                </div>
+            </div>
+            <div ng-controller="VSATCntrl" id="divvsat" class="tab-pane">
+                <div class="row Arrow">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p style="color: Red;">
+                            <span style="color: Black;" >SLA Information:</span> These SLAs are BT's internal
+                            SLAs with our Access Suppliers. They are <u> NOT TO BE QUOTED TO END CUSTOMERS </u>. The
+                            terms of the SLA between the customer and BT is covered under the relevant BT product
+                            terms and conditions for the whole service (e.g. BT MPLS)
+                        </p>
+                    </div>
+                </div>
+
+                <div class="panel panel-primary bg1">
+                    <div class="panel-body">
+                    <div class="row Arrow text-center" id="div4">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <span><b>{{ProductName}} Port Access</b></span>
+                            </div>
+                        </div>
+                        <div>&nbsp;&nbsp;</div>
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">
+                                    Access Supplier(s)<span class="red"> * </span> 
+                                </label>
+                                <div class="col-sm-3">
+                                    <select class="form-control" id="ddlVSATAccSupplier" ng-model="VSATAccSupplier" ng-change="RemoveAlert()"
+                                    ng-options="accSupplier.VSATAccessSupplierID as accSupplier.VSATAccessSupplier for accSupplier in VSATAccessSuppliersData">
+                                    <option value="">--- Select ---</option>
+                                    </select>
+                                    <span style="display: none;color:Red;" id="spnVSATAccessSupplier">Please Select Access Supplier</span>
+                                </div>
+                                <label for="" class="col-sm-2 control-label">
+                                    Port Speed(s)<span class="red"> * </span> 
+                                </label>
+                                <div class="col-sm-3">  <!--ng-change="GetVSATAttributes()"-->
+                                    <select class="form-control" multiple size="7" id="ddlVSATPortSpeed" ng-model="VSATPortSpeed"  ng-change="RemoveAlert1()"
+                                        ng-options="ps.PortSpeedID as ps.PortSpeed for ps in VSATPortSpeedData">
+                                        <!--<option value="">--- Select ---</option>-->
+                                    </select>
+
+                                    
+
+                                    <span style="display: none;color:Red;" id="spnVSATPortSpeed">Please Select Port Speed</span>
+                                </div>
+                                <div class="col-sm-2">
+                                    <input class="btn btn-sc" type="button" value="GO" ng-click="GetVSATAttributes()" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="col-md-6 col-lg-6">&nbsp;</div>-->
+                    <div class="col-md-6 col-lg-6 text-left" ng-hide="CPEExists==0">
+                        <a class="btn-link " ng-click="GetBundleData()">
+                            View CPE Information </a>
+                    </div>
+                </div>
+               
+                <div id="VSATNoData" class="alert alert-danger Arrow" role="alert" style="display: none">
+                    For selected criteria no match found</div>
+
+                 <div class="row Arrow ">
+                 <div id="divVSATPortTypesHeading" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> <b> Port Types</b> </div>
+                 </div>
+
+                <div id="divVSATParentData" class="table-responsive">
+                    <table cellpadding="0" cellspacing="0" class="table table-bordered tblnowrap">
+                        <tr>
+                            <th class="Arrow">
+                                Access Type
+                            </th>
+                            <th class="Arrow">
+                                Port Speed (Down / Up)
+                            </th>
+                            <th class="Arrow">
+                                Availability
+                            </th>
+                            <th class="Arrow">
+                                Access Speed (Down / Up)
+                            </th>
+                            <th class="Arrow">
+                                Interface
+                            </th>
+                            <th class="Arrow">
+                                Framing Structure
+                            </th>
+                            <th class="Arrow">
+                                Connector
+                            </th>
+                            <th class="Arrow">
+                                Access Availability Status
+                            </th>
+                            <th class="Arrow">
+                                Contention Ratio
+                            </th>
+                            <th class="Arrow">
+                                Supplier
+                            </th>
+                            <th class="Arrow">
+                                Supplier Product / BT Internal SLA
+                            </th>
+                            <th class="Arrow">
+                                Service Lead Time
+                            </th>
+                            <th class="Arrow">
+                                PoP
+                            </th>
+                            <th class="Arrow">
+                                CPE
+                            </th>
+                            <th class="Arrow">
+                                VSAT Supply Type
+                            </th>
+                        </tr>
+                        <tr ng-repeat='vs in VSATParentPortSpeedTypeData'>
+                            <td class="Arrow">
+                                {{vs.AccessType}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.PortSpeed}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.Availability}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.AccessSpeed}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.Interface}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.FramingStructure}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.Connector}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.AvailableDesc}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.ContentionRatio}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.Supplier}}
+                            </td>
+                            <td>
+                             <a class="clickable1" ng-click="openSALInfoPOPUp(vs.PackageID,vs.AccSupplierCharID,vs.SuppProdID,vs.AccessTypeID,vs.portTypeID,vs.Supplier,vs.SupplierProductBTInternalSLA,vs.AccessSpeed)">
+                                {{vs.SupplierProductBTInternalSLA}}
+                                </a>
+                            </td>
+                            <td class="Arrow">
+                                {{vs.ServiceLeadTime}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.POP}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.CPE}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.VSATSupplyType}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+
+                 <div>&nbsp;</div>
+                <div class="row Arrow ">
+                 <div id="divVSATParentPortTypesHeading" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 Arrow"> <b> Parent Port Types</b> </div>
+                 </div>
+
+                <div id="VSATableData" class="table-responsive scrollbar">
+                    <table cellpadding="0" cellspacing="0" class="table table-bordered tblnowrap">
+                        <tr>
+                            <th class="Arrow">
+                                Access Type
+                            </th>
+                            <th class="Arrow">
+                                Port Speed (Down / Up)
+                            </th>
+                            <th class="Arrow">
+                                Availability
+                            </th>
+                            <th class="Arrow">
+                                Access Speed (Down / Up)
+                            </th>
+                            <th class="Arrow">
+                                Interface
+                            </th>
+                            <th class="Arrow">
+                                Framing Structure
+                            </th>
+                            <th class="Arrow">
+                                Connector
+                            </th>
+                            <th class="Arrow">
+                                Access Availability Status
+                            </th>
+                            <th class="Arrow">
+                                Contention Ratio
+                            </th>
+                            <th class="Arrow">
+                                Supplier
+                            </th>
+                            <th class="Arrow">
+                                Supplier Product / BT Internal SLA
+                            </th>
+                            <th class="Arrow">
+                                Service Lead Time
+                            </th>
+                            <th class="Arrow">
+                                PoP
+                            </th>
+                            <th class="Arrow">
+                                CPE
+                            </th>
+                            <th class="Arrow">
+                                VSAT Supply Type
+                            </th>
+                        </tr>
+                        <tr ng-repeat='vs in VSATPortSpeedTypeData'>
+                            <td class="Arrow">
+                                {{vs.AccessType}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.PortSpeed}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.Availability}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.AccessSpeed}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.Interface}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.FramingStructure}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.Connector}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.AvailableDesc}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.ContentionRatio}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.Supplier}}
+                            </td>
+                            <td>
+                             <a class="clickable1" ng-click="openSALInfoPOPUp(vs.PackageID,vs.AccSupplierCharID,vs.SuppProdID,vs.AccessTypeID,vs.portTypeID,vs.Supplier,vs.SupplierProductBTInternalSLA,vs.AccessSpeed)">
+                                {{vs.SupplierProductBTInternalSLA}}
+                                </a>
+                            </td>
+                            <td class="Arrow">
+                                {{vs.ServiceLeadTime}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.POP}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.CPE}}
+                            </td>
+                            <td class="Arrow">
+                                {{vs.VSATSupplyType}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+           
+            <div ng-controller="DocumentLinkscntrl" class="tab-pane" id="ProductDocLinks">
+                <div class="row">
+                    <div class="col-md-6 col-lg-6 text-left">
+                        <table>
+                            <tr ng-repeat="dc in DocumentslinksData">
+                                <td>
+                                    <a href="{{dc.DocumentUrl}}" target="_blank">{{dc.DocumentTitle}}</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                
+                <div ng-show="modproduct=='76' || modproduct=='75'|| modproduct=='21'">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-6 text-left">
+
+                            <table>
+                                <tr>
+                                    <td>
+                                        <a  class="clickable1"  ng-click="openHVPN()">hVPN Features per Country</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a class="clickable1"  ng-click="openCPEAvailMatrixRule(ProductID)">Common Access and CPE Availability</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <div id="divUserInfo" style="padding-left:14px;padding-right:14px">
+            <table style="height:10px">
+            <tr>
+            <td>&nbsp;</td>
+            </tr>
+            </table>
+                <table cellpadding="0" cellspacing="0" class="table table-bordered table-striped" >
+                    <tr>
+                        <td class="Arrow">
+                            Created By
+                        </td>
+                        <td class="Arrow">
+                            Created Date
+                        </td>
+                        <td class="Arrow">
+                            Updated By
+                        </td>
+                        <td class="Arrow">
+                            Date Last Updated
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="Arrow">
+                            {{CreatedBy}}
+                        </td>
+                        <td class="Arrow">
+                            {{CreatedDate}}
+                        </td>
+                        <td class="Arrow">
+                            {{UpdatedBy}}
+                        </td>
+                        <td class="Arrow">
+                            {{UpdatedDate}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        
+    </div>
+     <!-- Bootstrap -->
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>
+
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" type="text/javascript"></script>
+
+   <!-- <script type="text/javascript">
+        $('.popover-markup > .trigger').popover({
+            html: true,
+            title: function () {
+                return $(this).parent().find('.head').html();
+            },
+            content: function () {
+                return $(this).parent().find('.content').html();
+            },
+
+            //placement: get_popover_placement,
+            placement: placementfunc,
+            trigger: 'hover'
+        });
+
+        function placementfunc(tip, element) {
+            var offset = $(element).offset();
+            height = $(document).outerHeight();
+            width = $(document).outerWidth();
+            vert = 0.5 * height - offset.top;
+            vertPlacement = vert > 0 ? 'bottom' : 'top';
+            horiz = 0.5 * width - offset.left;
+            horizPlacement = horiz > 0 ? 'right' : 'left';
+            placement = Math.abs(horiz) > Math.abs(vert) ? horizPlacement : vertPlacement;
+            return placement;
+        }
+        //function get_popover_placement(pop, dom_el) { var width = window.innerWidth; var height = window.innerHeight; var top_pos = $(dom_el).offset().top; if (height - top_pos < 400) { return 'top'; } if (width < 500) { return 'bottom'; } var left_pos = $(dom_el).offset().left; if (width - left_pos > 400) { return 'left'; } return 'left'; }
+    </script>-->
+
+    <script type="text/javascript"> 
+      
+      $('.clsremovewhitespace').html(function(i, el) { 
+      return el.replace(/>\s*</g, '><'); 
+      }); 
+
+     
+      </script> 
+
+
+    
+</body>
+</html>

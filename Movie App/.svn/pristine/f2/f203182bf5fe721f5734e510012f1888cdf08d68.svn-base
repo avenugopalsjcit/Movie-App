@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="BTCPEProduct">
+<head>
+    <title>BT CPE Product</title>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css?parameter=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="../Scripts/angular.min.js"></script>
+    <script src="../Scripts/angular-resource.min.js"></script>
+    <script src="../Scripts/app/DispCPEProduct.js"></script>
+</head>
+<body>
+    <div class="container">
+        CPE Maintenance Options
+    </div>
+    <div ng-controller="suppliercontroller">
+        {{status}} Select A Supplier:
+        <select ng-change="" ng-model="ddlsuppliers">
+            <option value="0" label="ALL"></option>
+            <option ng-repeat='objsupp in CpeSupplierList' value="{{objsupp.Item1}}">{{objsupp.Item2}}</option>
+        </select>
+        <div ng-repeat='prodname in prodlist' class="product">
+            <div>
+                <button ng-click="getMaintOptForProduct(prodname.Item2)" data-toggle="collapse" data-target="#maintoption">
+                    expand</button>{{prodname.Item1}}
+            </div>
+            <div class="collapse" id="maintoption">
+                <table>
+                    <tr bgcolor="#3a6ea5">
+                        <td class="bodyTextBold">
+                            <font color="white">Supplier</font>
+                        </td>
+                        <td class="bodyTextBold">
+                            <font color="white">Service Name</font>
+                        </td>
+                        <td class="bodyTextBold">
+                            <font color="white">Service Availability</font>
+                        </td>
+                        <td class="bodyTextBold">
+                            <font color="white">Service Restrictions</font>
+                        </td>
+                        <td class="bodyTextBold">
+                            <font color="white">Smart Service Availibility</font>
+                        </td>
+                        <td class="bodyTextBold">
+                            <font color="white">Manufaturer Name</font>
+                        </td>
+                        <td class="bodyTextBold">
+                            <font color="white">Maintainer Name</font>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="x in maintoptionlist">
+                        <td>
+                            {{ x.SupplierName }}
+                        </td>
+                        <td>
+                            {{ x.ServiceName }}
+                        </td>
+                        <td>
+                            {{ x.ServiceAvailabilityDesc }}
+                        </td>
+                        <td>
+                            {{ x.ServiceRestriction }}
+                        </td>
+                        <td>
+                            {{x.smartServiceAvailability}}
+                        </td>
+                        <td>
+                            {{ x.ManufacturerName }}
+                        </td>
+                        <td>
+                            {{ x.MaintainerName }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div>
+            <div>
+                CPE Lead Time</div>
+            <div>
+                <table id="TableLead" class="bodyText" cellspacing="2" cellpadding="6" width="100%">
+                    <tr bgcolor="#3a6ea5" height="25">
+                        <td class="bodyTextBold">
+                            <font color="black">&nbsp; Supplier</font>
+                        </td>
+                        <td class="bodyTextBold">
+                            <font color="black">&nbsp; Transaction Type</font>
+                        </td>
+                        <td class="bodyTextBold">
+                            <font color="black">&nbsp; CPE Lead Time</font>
+                        </td>
+                        <td class="bodyTextBold">
+                            <font color="black">&nbsp; CPE Lead Time Status</font>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="x in CPELeadtimelist">
+                        <td>
+                            {{ x.suppliername }}
+                        </td>
+                        <td>
+                            {{ x.transactionType }}
+                        </td>
+                        <td>
+                            {{ x.CPELeadTime }}
+                        </td>
+                        <td>
+                            {{ x.CPELeadTimeStatus }}
+                        </td>
+                    </tr>
+                </table>
+                <div class="row">
+                    <div class="col-sm-3">
+                        Supplier</div>
+                    <div class="col-sm-3">
+                        Transaction Type</div>
+                    <div class="col-sm-3">
+                        CPE Lead Time</div>
+                    <div class="col-sm-3">
+                        CPE Lead Time Status</div>
+                </div>
+                <div class="row" ng-repeat="x in CPELeadtimelist">
+                    <div class="col-sm-3">
+                        {{ x.suppliername }}</div>
+                        <div ng-if="x.CPELeadTime != '' && x.CPELeadTime != ''">
+                    <div class="col-sm-3">
+                        provide</div>
+                    <div class="col-sm-3">
+                        {{ x.CPELeadTime }}</div>
+                    <div class="col-sm-3">
+                        {{ x.CPELeadTimeStatus }}</div>
+                        </div>
+
+                         <div ng-if="x.CPECeaseLeadTime != '' && x.CPECeaseLeadTimeStatus != ''">
+                    <div class="col-sm-3">
+                        cease</div>
+                    <div class="col-sm-3">
+                        {{ x.CPECeaseLeadTime }}</div>
+                    <div class="col-sm-3">
+                        {{ x.CPECeaseLeadTimeStatus }}</div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

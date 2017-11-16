@@ -1,0 +1,1396 @@
+﻿app.controller("productCtrl", function ($scope, $http, $rootScope, SLA, $timeout, $compile, NgTableParams, $location, $cacheFactory, $log) {
+
+
+
+    $scope.IseditProduct = false;
+    $scope.OrgData = {};
+    $scope.pageLoad = false;
+
+    $(".pageLoaderOverlay").show();
+
+    $http.post('ProductDefination.aspx/getProducts', {}).success(function (data) {
+
+        $scope.ServiceTypes = angular.fromJson(data.d).getProducts;
+
+        $scope.MasterAccessInterfaces = angular.fromJson(data.d).getProducts.CSU_REF_VALID_CHAR;
+        $scope.ServiceTypes.Access_Speed = [];
+        $scope.ServiceTypes.Interfaces = [];
+        angular.forEach($scope.MasterAccessInterfaces, function (value, key) {
+            //For AccessSpeeds
+            $scope.CHAR_ID = value.CHAR_ID;
+            if (value.CHAR_TYPE_ID == 27) {
+                $scope.Access_CHAR_NAME = (value.CHAR_NAME + value.CHAR_UNIT_OF_MEASURE).replace("Access Speed ", "");
+                $scope.ServiceTypes.Access_Speed.push({ "Access_CHAR_NAME": $scope.Access_CHAR_NAME, "Access_CHAR_ID": $scope.CHAR_ID });
+            }
+            //For Interfaces
+            if (value.CHAR_TYPE_ID == 868) {
+                $scope.Interface_NAME = value.CHAR_NAME
+                $scope.ServiceTypes.Interfaces.push({ "Interface_NAME": $scope.Interface_NAME, "Interface_CHAR_ID": $scope.CHAR_ID });
+            }
+            $scope.ServiceTypes["OptionalInterfaces"] = [];
+            $scope.ServiceTypes.PreferredInterfaces = [];
+            $scope.updateMappedInterfacesarray = [];
+        });
+
+
+
+        angular.copy($scope.ServiceTypes, $scope.OrgData);
+        $(".clsddlProducttype").select2();
+        $("#DDL_PL_Product").select2();
+        $('.pageLoaderOverlay').hide();
+    }).error(function () { })
+
+    $scope.pageLoad = false;
+
+    $scope.ResetProducts = function (ServiceTypes) {
+        $('.select2-container .select2-chosen').text('--Select--')
+        $scope.ServiceTypes = {};
+        $scope.Product = {};
+        $scope.ServiceTypes = $scope.OrgData;
+
+    }
+
+
+
+
+
+
+
+
+
+    //==============================================================Add Product=============================================
+    $scope.AddProduct = function (Product) {
+        // debugger;
+        $('.select2-container .select2-chosen').text('--Select--');
+        $scope.ServiceTypes = {};
+        var Product_PARENT_PRODUCT_CD, Product_ALIAS_ID, PRODUCT_VALID_CD, DISPLAY_LEAD_TIME, ACCESS_METHOD_REQUIRED, EFM_REQUIRED;
+
+        Product_PARENT_PRODUCT_CD = Product.PARENT_PRODUCT_CD == undefined ? 0 : Product.PARENT_PRODUCT_CD;
+        Product.PARENT_PRODUCT_CD = Product_PARENT_PRODUCT_CD;
+
+        Product_ALIAS_ID = Product.ALIAS_ID == undefined ? 0 : Product.ALIAS_ID;
+        Product.ALIAS_ID = Product_ALIAS_ID;
+
+        PRODUCT_VALID_CD = Product.PRODUCT_VALID_CD == undefined ? 0 : (Product.PRODUCT_VALID_CD == true ? 1 : 0);
+        Product.PRODUCT_VALID_CD = PRODUCT_VALID_CD;
+
+        DISPLAY_LEAD_TIME = Product.DISPLAY_LEAD_TIME == undefined ? 0 : (Product.DISPLAY_LEAD_TIME == true ? 1 : 0);
+        Product.DISPLAY_LEAD_TIME = DISPLAY_LEAD_TIME;
+
+        ACCESS_METHOD_REQUIRED = Product.ACCESS_METHOD_REQUIRED == undefined ? 0 : (Product.ACCESS_METHOD_REQUIRED == true ? 1 : 0);
+        Product.ACCESS_METHOD_REQUIRED = ACCESS_METHOD_REQUIRED;
+
+        EFM_REQUIRED = Product.EFM_REQUIRED == undefined ? 0 : (Product.EFM_REQUIRED == true ? 1 : 0);
+        Product.EFM_REQUIRED = EFM_REQUIRED;
+
+        Product.CREATED_EMP_ID = $rootScope.User_Id;
+        Product.UPDATED_EMP_ID = $rootScope.User_Id;
+
+        console.log(Product);
+
+        $http.post('ProductDefination.aspx/AddProduct', { 'Product': angular.toJson(Product) }).success(function (data) {
+            //debugger;
+            $scope.ProductsList = {};
+            SLA.getProducts().success(function (data) {
+                $scope.ProductsList = data.d;
+            });
+            console.log("Success" + data);
+        }).error(function (data) {
+            console.log("Fail " + data);
+        });
+
+    }
+    //======================================================================================================================
+
+    //=============================================================Update Product===========================================
+    $scope.UpdateProduct = function (ProductID, Product) {
+        var CapmanRecords = "";
+        var SupportRecords = "";
+        var SupportRecordNames = "";
+
+        var MultiDrop = [];
+        var Products = [];
+        Products.push(Product);
+        //drag and drop li model is not available
+        $("#CapmanUniqueRecordsID li").each(function (index) {
+            CapmanRecords += $(this).children('p').text().trim() + ",";
+        });
+
+        var Phase_Attributes = [];
+
+        $("#SupportDuplicateRecordsID li").each(function (index) {
+            SupportRecords = $(this).children('p').eq(0).text().trim();
+            SupportRecordNames = $(this).children('p').eq(1).text().trim();
+            Phase_Attributes.push({
+                'PHASE_ID': SupportRecords,
+                'PHASE_NAME': SupportRecordNames
+            })
+        });
+
+
+
+
+        MultiDrop.push({ "CapmanRecords": (CapmanRecords.replace(/,(?=[^,]*$)/, '').split(",")) });
+        MultiDrop.push({ "SupportRecords": (SupportRecords.replace(/,(?=[^,]*$)/, '').split(",")) });
+        MultiDrop.push({ "SupportRecordNames": (SupportRecordNames.replace(/,(?=[^,]*$)/, '').split(",")) });
+
+
+        $http.post('ProductDefination.aspx/UpdateProducts',
+        { 'ProductID': ProductID,
+            'Product': angular.toJson(Products),
+            'CapmanRecords': angular.toJson(MultiDrop[0]),
+            'PhaseAttributes': angular.toJson(Phase_Attributes)
+        })
+         .success(function (data) {
+
+         }).error(function (data) {
+
+         });
+
+    }
+    //======================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    SLA.getProducts().success(function (data) {
+        $scope.ProductsList = data.d;
+    });
+
+    $scope.AssignInterface = function (interfaces) {
+
+        interfaces.forEach(function (interface) {
+            $scope.InterfaceName = $.grep($scope.ServiceTypes.Interfaces, (function (element) { return element.Interface_CHAR_ID == interface }));
+            $scope.ServiceTypes.PreferredInterfaces.push({ "INTERFACE_CHAR_ID": interface,
+                "INTERFACE_CHAR_NAME": $scope.InterfaceName[0].Interface_NAME
+            });
+        });
+    };
+
+    $scope.DeAssignInterface = function (interfaces) {
+        interfaces.forEach(function (interface) {
+            $scope.ServiceTypes.PreferredInterfaces.forEach(function (funinterface, key) {
+                {
+                    if (funinterface.INTERFACE_CHAR_ID == interface) {
+                        $scope.ServiceTypes.PreferredInterfaces.splice(key, 1);
+                    }
+                }
+            });
+        });
+    };
+
+    $scope.AssignPreInterface = function (preInterfaces) {
+        preInterfaces.forEach(function (pinterface, key) {
+            $scope.pInterfaceName = $.grep($scope.ServiceTypes.PreferredInterfaces, (function (element) { return element.INTERFACE_CHAR_ID == pinterface }));
+            $scope.ServiceTypes.OptionalInterfaces.push($scope.pInterfaceName[0]);
+        });
+
+        $scope.ServiceTypes.PreferredInterfaces.forEach(function (funinterface, key) {
+            preInterfaces.forEach(function (pinterface) {
+                if (funinterface.INTERFACE_CHAR_ID == pinterface) {
+                    $scope.ServiceTypes.PreferredInterfaces.splice(key, 1);
+                    key = 0;
+                }
+            });
+        });
+
+
+        //        for (var i = 0; i < $scope.ServiceTypes.PreferredInterfaces.length; i++) {
+        //            var check = true;
+        //            $scope.a_id = $scope.ServiceTypes.PreferredInterfaces[0].INTERFACE_CHAR_ID;
+        //            preInterfaces.forEach(function (pinterface) {
+        //                if (check == true) {
+        //                    if ($scope.a_id == pinterface) {
+        //                        $scope.ServiceTypes.PreferredInterfaces.splice(i, 1);
+        //                        i = 0;
+        //                        check = false;
+        //                    }
+        //                }
+        //            });
+        //        }
+
+
+
+
+
+
+
+    }
+
+    $scope.DeAssignPreInterface = function (Ointerfaces) {
+        Ointerfaces.forEach(function (Ointerface, key) {
+            $scope.OInterfaceName = $.grep($scope.ServiceTypes.OptionalInterfaces, (function (element) { return element.INTERFACE_CHAR_ID == Ointerface }));
+            $scope.ServiceTypes.PreferredInterfaces.push($scope.OInterfaceName[0]);
+        });
+        $scope.ServiceTypes.OptionalInterfaces.forEach(function (ointerface) {
+            Ointerfaces.forEach(function (pinterface) {
+                if (funinterface.INTERFACE_CHAR_ID == pinterface) {
+                    $scope.ServiceTypes.OptionalInterfaces.splice(key, 1);
+                }
+            });
+        });
+    };
+
+
+
+
+    //    $scope.updateMappedInterfaces = function (AccesSpeeds) {
+    //        $scope.dyn_Html = "";
+
+    //    $scope.Access_Item = $.grep($scope.ServiceTypes.Access_Speed, function (element) {
+    //                element.Access_CHAR_ID == AccesSpeed;
+    //            })[0];
+    //            $scope.dyn_Html += "<tr>"
+    //            $scope.dyn_Html += "<td><span id=" + AccesSpeed + " ng-bind=" + Access_Item.Access_CHAR_NAME + "></span></td>"
+    //            $scope.dyn_Html += "<td><select   ng-model='preferredItem_" + key + "' size='9' "
+    //            $scope.dyn_Html += "ng-options='p_interface.P_Interface_CHAR_ID as p_interface.P_Interface_Name for p_interface in ServiceTypes.PreferredInterfaces'"
+    //            $scope.dyn_Html += "</select></td>"
+    //            $scope.dyn_Html += "<td><select      ng-model='Optional_interface_Item_" + key + "' size='9'"
+    //            $scope.dyn_Html += "ng-options='p_interface.P_Interface_CHAR_ID as p_interface.P_Interface_Name for p_interface in ServiceTypes.OptionalInterfaces'>"
+    //            $scope.dyn_Html += "</td>"
+    //            $scope.dyn_Html += "</tr>"
+    //        });
+    //        angular.element("#divMappedInterfaces #tblMappedInterfaces tbody").html($compile($scope.dyn_Html)($scope));
+    //    };
+
+
+    function Interfaces(ProductID, AccessSpeeds, PreferredInterfaces, PreferredFlag) {
+        AccessSpeeds.forEach(function (AccesSpeed) {
+            PreferredInterfaces.forEach(function (PreferredInterface) {
+                $scope.Interfaces.push({
+                    "PRODUCT_CD": ProductID,
+                    "ACCESS_CHAR_ID": AccesSpeed,
+                    "INTERFACE_CHAR_ID": PreferredInterface.INTERFACE_CHAR_ID,
+                    "PREFERRED_FLAG": PreferredFlag
+                });
+            });
+        });
+        return true;
+    }
+
+
+    $scope.updateMappedInterfaces = function (ProductId, AccesSpeeds, PreferredInterfaces, OptionalInterfaces, AvailableInterfaces) {
+        $scope.Interfaces = [];
+        AccesSpeeds.forEach(function (AccesSpeed) {
+            //            $scope.Access_Item = $.grep($scope.ServiceTypes.Access_Speed, function (element) {
+            //                return element.Access_CHAR_ID == AccesSpeed;
+            //            })[0];
+            //            $scope.MappedInterfacesTable.data.unshift(
+            //                    {
+            //                        "AccessSpeed_ID": $scope.Access_Item.Access_CHAR_ID,
+            //                        "AccessSpeed_Name": $scope.Access_Item.Access_CHAR_NAME,
+            //                        "Final_P_Interface": $scope.ServiceTypes.PreferredInterfaces,
+            //                        "Final_O_Interface": $scope.ServiceTypes.OptionalInterfaces
+            //                    });
+        });
+        if (Interfaces(ProductId, AccesSpeeds, PreferredInterfaces, 1) == true) {
+            Interfaces(ProductId, AccesSpeeds, OptionalInterfaces, 0)
+        }
+
+        $("#pageLoaderOverlay").show();
+        $http.post("ProductDefination.aspx/InsertProductAccessInterfaces", { 'Interfaces': angular.toJson($scope.Interfaces) }).success(function (data) {
+
+
+
+
+
+
+            $scope.Config = [];
+            var keys = [];
+            $scope.OKeys = [];
+            $scope.M_interfaces = [];
+            $scope.MappedInterfacesTable = [];
+
+            $scope.OriginalMappedInterfacesTable1 = angular.fromJson(data.d).MappedInterface.Table1;
+            $scope.OriginalMappedInterfacesTable1.forEach(function (value, key) {
+                if (key == 0) {
+                    keys.push({ "A_Char_id": value.ACCESS_CHAR_ID, "A_Char_Name": value.ACCESS_NAME });
+                }
+                if (key >= 1) {
+                    if ($scope.OriginalMappedInterfacesTable1[key].ACCESS_CHAR_ID
+                    != $scope.OriginalMappedInterfacesTable1[key - 1].ACCESS_CHAR_ID)
+                        keys.push({ "A_Char_id": value.ACCESS_CHAR_ID, "A_Char_Name": value.ACCESS_NAME });
+                }
+            });
+
+            $scope.OKeys = keys;
+            $scope.e_AccessSpeed_ID = 0;
+            $scope.e_AccessSpeed_Name = "";
+            angular.forEach($scope.OKeys, function (element, key) {
+                $scope.e_AccessSpeed_ID = element.A_Char_id,
+                $scope.e_AccessSpeed_Name = element.A_Char_Name
+                $scope.M_interfaces = $.grep($scope.OriginalMappedInterfacesTable1,
+                function (ele) {
+                    return ele.ACCESS_CHAR_ID == element.A_Char_id
+                });
+
+                var Temp_P_Array = [];
+                var Temp_O_Array = [];
+
+                $scope.M_interfaces.forEach(function (interface, key) {
+                    if (interface.PREFERRED_FLAG == 1) {
+                        Temp_P_Array.push({ "INTERFACE_CHAR_ID": interface.INTERFACE_CHAR_ID,
+                            "INTERFACE_CHAR_NAME": interface.INTERFACE_CHAR_NAME
+                        })
+                    }
+                    if (interface.PREFERRED_FLAG == 0) {
+                        Temp_O_Array.push({ "INTERFACE_CHAR_ID": interface.INTERFACE_CHAR_ID,
+                            "INTERFACE_CHAR_NAME": interface.INTERFACE_CHAR_NAME
+                        })
+                    }
+                });
+                $scope.Config.push(
+                { "  ACCESS_CHAR_ID": $scope.e_AccessSpeed_ID,
+                    "ACCESS_NAME": $scope.e_AccessSpeed_Name,
+                    "Final_P_Interface": Temp_P_Array,
+                    "Final_O_Interface": Temp_O_Array
+                })
+            });
+
+            $scope.MappedInterfacesTable = new NgTableParams({}, { 'dataset': $scope.Config });
+
+            console.log("Success");
+            $("#pageLoaderOverlay").hide();
+
+        });
+
+        // $http.post('ProductDefination.aspx/GetProducstsList', { 'ProductID': product })
+
+
+        //        $scope.dyn_Html += "<tr ng-repeat='item in $data'>"
+        //        // $scope.dyn_Html += "<td><span ng-bind='item.AccesSpeed'></span></td>"
+        //        $scope.dyn_Html += "<td><span>{{item.AccesSpeed}}</span></td>"
+        //        //        $scope.dyn_Html += "<td><select   ng-model='item.PInterfaces' size='9' "
+        //        //        $scope.dyn_Html += "ng-options='p_interface.P_Interface_CHAR_ID as p_interface.P_Interface_Name for p_interface in ServiceTypes.PreferredInterfaces'"
+        //        //        $scope.dyn_Html += "</select></td>"
+        //        $scope.dyn_Html += "</tr>"
+        //        angular.element("#divMappedInterfaces #tblMappedInterfaces tbody").html($compile($scope.dyn_Html)($scope));
+        //        $scope.MappedInterfacesTable.reload();
+    }
+
+
+
+
+
+
+    $scope.GetProducts = function (product) {
+        $scope.pageLoad = true;
+        $('.pageLoaderOverlay').show();
+        $http.post('ProductDefination.aspx/GetProducstsList', { 'ProductID': product })
+        .success(function (data) {
+            $scope.Loader = true;
+            console.log($scope.EditProduct);
+            if ($scope.EditProduct != {}) {
+                $('#tblEditProduct select').select2('destroy');
+            }
+
+
+            //-------------------------capmanplatform
+            $scope.ECapmanPlatforms = angular.fromJson(data.d).getProducts.Table2;
+            $scope.MasterCapmanPlatforms = $scope.ServiceTypes.CAPMAN_PLATFORMS;
+            //$scope.dummydata = angular.extend({}, $scope.MasterCapmanPlatforms, $scope.ECapmanPlatforms);
+            $scope.dummydata = $scope.MasterCapmanPlatforms.concat($scope.ECapmanPlatforms);
+
+            $scope.dummydata.sort(function (a, b) { return a.CAPMAN_PLATFORM_ID - b.CAPMAN_PLATFORM_ID; });
+            for (var i = 0; i < $scope.dummydata.length - 1; i++) {
+                if ($scope.dummydata[i] != null) {
+                    if ($scope.dummydata[i].CAPMAN_PLATFORM_ID == $scope.dummydata[i + 1].CAPMAN_PLATFORM_ID) {
+                        delete $scope.dummydata[i];
+                        delete $scope.dummydata[i + 1];
+                    }
+                }
+            }
+            $scope.CapmanUniqueRecords = $scope.dummydata.filter(function (el) { return (typeof el !== "undefined"); });
+            //-------------------------
+
+
+
+            //---------------------------
+            $scope.EEthernet = angular.fromJson(data.d).getProducts.Table3;
+            //---------------------------
+
+
+
+            //---------------------------supported
+            $scope.SupportUniqueRecords = angular.fromJson(data.d).getProducts.Table4;
+            $scope.MasterSupported = $scope.ServiceTypes.CSU_PHASE_ATTRIBUTE;
+            $scope.dummydata1 = $scope.MasterSupported.concat($scope.SupportUniqueRecords);
+
+            $scope.dummydata1.sort(function (a, b) { return a.ID - b.ID; });
+            for (var i = 0; i < $scope.dummydata1.length - 1; i++) {
+                if ($scope.dummydata1[i] != null) {
+                    if ($scope.dummydata1[i].ID == $scope.dummydata1[i + 1].ID) {
+                        delete $scope.dummydata1[i];
+                        delete $scope.dummydata1[i + 1];
+                    }
+                }
+            }
+            $scope.SupportDuplicateRecords = $scope.dummydata1.filter(function (el) { return (typeof el !== "undefined"); });
+
+            //----------Configure the Access Speeds and Interfaces
+
+            $scope.OriginalMappedInterfacesTable = angular.fromJson(data.d).getProducts.Table6;
+
+            $scope.PreferIfaces = [];
+            $scope.OptionalIface = [];
+
+            //----------------------------------------Get the values of ACCESS_CHAR_ID for all the objects in array.
+
+            var keys = [];
+            $scope.OriginalMappedInterfacesTable.forEach(function (value, key) {
+                if (key == 0) {
+                    keys.push({ "A_Char_id": value.ACCESS_CHAR_ID, "A_Char_Name": value.ACCESS_NAME });
+                }
+                if (key >= 1) {
+                    if ($scope.OriginalMappedInterfacesTable[key].ACCESS_CHAR_ID
+                    != $scope.OriginalMappedInterfacesTable[key - 1].ACCESS_CHAR_ID)
+                        keys.push({ "A_Char_id": value.ACCESS_CHAR_ID, "A_Char_Name": value.ACCESS_NAME });
+                }
+            });
+
+
+            $scope.OKeys = keys;
+            $scope.Config = [];
+            $scope.e_AccessSpeed_ID = 0;
+            $scope.e_AccessSpeed_Name = "";
+            angular.forEach($scope.OKeys, function (element, key) {
+                $scope.e_AccessSpeed_ID = element.A_Char_id,
+                $scope.e_AccessSpeed_Name = element.A_Char_Name
+                $scope.M_interfaces = $.grep($scope.OriginalMappedInterfacesTable,
+                function (ele) {
+                    return ele.ACCESS_CHAR_ID == element.A_Char_id
+                });
+
+                var Temp_P_Array = [];
+                var Temp_O_Array = [];
+
+                $scope.M_interfaces.forEach(function (interface, key) {
+                    if (interface.PREFERRED_FLAG == 1) {
+                        Temp_P_Array.push({ "INTERFACE_CHAR_ID": interface.INTERFACE_CHAR_ID,
+                            "INTERFACE_CHAR_NAME": interface.INTERFACE_CHAR_NAME
+                        })
+                    }
+                    if (interface.PREFERRED_FLAG == 0) {
+                        Temp_O_Array.push({ "INTERFACE_CHAR_ID": interface.INTERFACE_CHAR_ID,
+                            "INTERFACE_CHAR_NAME": interface.INTERFACE_CHAR_NAME
+                        })
+                    }
+                });
+                $scope.Config.push(
+                { "  ACCESS_CHAR_ID": $scope.e_AccessSpeed_ID,
+                    "ACCESS_NAME": $scope.e_AccessSpeed_Name,
+                    "Final_P_Interface": Temp_P_Array,
+                    "Final_O_Interface": Temp_O_Array
+                })
+            });
+
+
+            // $scope.MappedInterfacesTable = angular.copy($scope.Config);
+            $scope.MappedInterfacesTable = new NgTableParams({}, { 'dataset': $scope.Config });
+
+            $scope.MappedInterfacesTable.AccessSpeeds = [];
+            $scope.MappedInterfacesTable.PreferredInterfaces = [];
+            $scope.MappedInterfacesTable.OptionalInterfaces = [];
+
+
+            //-----------------------------------Main Product
+            $scope.MasterEditProduct = {};
+            $scope.MasterEditProduct.COUNTRY_ID = 0;
+            $scope.EditProduct1 = angular.fromJson(data.d).getProducts.Table1[0];
+            $scope.MasterEditProduct.COUNTRY_ID = $scope.EditProduct1.COUNTRY_CD;
+
+            delete $scope.EditProduct1.COUNTRY_CD;
+            angular.extend($scope.MasterEditProduct, $scope.EditProduct1, { "COUNTRY_ID": $scope.MasterEditProduct.COUNTRY_ID });
+
+            $scope.UpdateEditProduct = {};
+            $scope.UpdateEditProduct.ACCESS_METHOD_REQUIRED = parseInt($scope.MasterEditProduct.ACCESS_METHOD_REQUIRED);
+            $scope.UpdateEditProduct.DISPLAY_MPLS_PRODUCT = parseInt($scope.MasterEditProduct.DISPLAY_MPLS_PRODUCT);
+            $scope.UpdateEditProduct.EFM_REQUIRED = parseInt($scope.MasterEditProduct.EFM_REQUIRED);
+            $scope.UpdateEditProduct.USE_CPE_PRODUCT = parseInt($scope.MasterEditProduct.USE_CPE_PRODUCT);
+            $scope.UpdateEditProduct.VALIDATE_PARENT_PORTSPEED = parseInt($scope.MasterEditProduct.VALIDATE_PARENT_PORTSPEED);
+
+            $scope.EditProduct = angular.merge($scope.MasterEditProduct, $scope.UpdateEditProduct)
+
+            $timeout(function () {
+                $(".editProduct").select2();
+            }, 100);
+
+
+            //Assigned ProductsList in validmapping model
+            $scope.Assigned_Access_Speeds = angular.fromJson(data.d).getProducts.Table7;
+
+            //UnAssigned ProductsList in validmapping model
+            $scope.UnAssigned_Access_Speeds = angular.fromJson(data.d).getProducts.Table8;
+
+            //---------------------------------
+
+            $(".pageLoaderOverlay").hide();
+        })
+        .error(function (data) {
+            console.log(data);
+        })
+    }
+
+
+
+
+    //====================================DisPlay PoP Charcterstic=========================================//
+
+    $scope.DisplayPoPcharacteristic = function (ProductID) {
+        $(".pageLoaderOverlay").show();
+        $http.post('ProductDefination.aspx/GetPoPCharctersticsforProduct', { 'ProductID': ProductID })
+        .success(function (data) {
+            $scope.DummyPoPCharcterstics = [];
+            $scope.PoPCharcterstics = angular.fromJson(data.d).getPoPCharcterstics;
+            angular.copy($scope.PoPCharcterstics, $scope.DummyPoPCharcterstics);
+
+            $scope.ModelPoPUp = '';
+            $scope.ModelPoPUp += '<div class="vertical-alignment-helper">';
+            $scope.ModelPoPUp += '<div class="modal-dialog vertical-align-center" style="width: 100%">';
+            $scope.ModelPoPUp += ' <div class="modal-content" style="width:63%">';
+            $scope.ModelPoPUp += ' <div class="modal-header">';
+            $scope.ModelPoPUp += '  <button class="close" type="button" data-dismiss="modal">';
+            $scope.ModelPoPUp += '         <span aria-hidden="true">×</span><span class="sr-only">Close</span>';
+            $scope.ModelPoPUp += '     </button>';
+            $scope.ModelPoPUp += '    <h4 class="modal-title" id="H1">';
+            $scope.ModelPoPUp += '          DisplayPoPCharcterstic';
+            $scope.ModelPoPUp += '       </h4>';
+            $scope.ModelPoPUp += '    </div>';
+            $scope.ModelPoPUp += '   <div class="container">';
+            $scope.ModelPoPUp += '      <div class="modal-body">';
+            $scope.ModelPoPUp += '       <table class="table-bordered table-striped">';
+            $scope.ModelPoPUp += '<thead><tr>';
+            $scope.ModelPoPUp += ' <th>PoP Characteristics</th><th>Display Order</th>';
+            $scope.ModelPoPUp += ' <th>Display in Search results, Define case, Case details screen</th><th>Display in Product tab of Standard report</th>';
+            $scope.ModelPoPUp += ' </tr></thead>';
+            $scope.ModelPoPUp += '<tbody>';
+            $scope.ModelPoPUp += '   <tr ng-repeat="PoPItem in PoPCharcterstics ">';
+            $scope.ModelPoPUp += '     <td ng-show="false">';
+            $scope.ModelPoPUp += '       <span ng-bind="PoPItem.CHAR_ID"></span>';
+            $scope.ModelPoPUp += '    </td>';
+            $scope.ModelPoPUp += '     <td>';
+            $scope.ModelPoPUp += '       <span ng-bind="PoPItem.CHAR_NAME"></span>';
+            $scope.ModelPoPUp += '    </td>';
+            $scope.ModelPoPUp += '     <td>';
+            $scope.ModelPoPUp += '         <input type="text" ng-model="PoPItem.DISPLAY_ORDER" />';
+            $scope.ModelPoPUp += '       </td>';
+            $scope.ModelPoPUp += '    <td>';
+            $scope.ModelPoPUp += '         <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="PoPItem.DISPLAY_SEARCH" />';
+            $scope.ModelPoPUp += '    </td>';
+            $scope.ModelPoPUp += '     <td>';
+            $scope.ModelPoPUp += '         <input type="checkbox" ng-true-value="1" ng-false-value="0" ng-model="PoPItem.DISPLAY_REPORTS" />';
+            $scope.ModelPoPUp += '     </td>';
+            $scope.ModelPoPUp += ' </tr></tbody>';
+            $scope.ModelPoPUp += '  </table>';
+            $scope.ModelPoPUp += '    </div>';
+            $scope.ModelPoPUp += '   </div>';
+            $scope.ModelPoPUp += '  <div class="modal-footer">';
+            $scope.ModelPoPUp += '    <input type="button" class="btn btn-sm btn-primary" value="Update" ng-click="UpdatePoPCharcterstic()"/>';
+            $scope.ModelPoPUp += '   <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>';
+            $scope.ModelPoPUp += '  </div>';
+            $scope.ModelPoPUp += '  </div>';
+            $scope.ModelPoPUp += '  </div>';
+            $scope.ModelPoPUp += ' </div>';
+
+            angular.element("#DisplayPoPCharctersticModal").html($compile($scope.ModelPoPUp)($scope));
+            $(".pageLoaderOverlay").hide();
+
+        })
+        .error(function (data) {
+        });
+    }
+
+
+
+    // $scope.LatestPoPCharcterstics = [];
+    $scope.UpdatePoPCharcterstic = function () {
+        $scope.LatestPoPCharcterstics = [];
+        $(".pageLoaderOverlay").show();
+        $scope.popcharcterstic = 0;
+        $scope.dummypop = 0;
+        if (!angular.equals($scope.DummyPoPCharcterstics, $scope.PoPCharcterstics)) {
+            while (($scope.popcharcterstic < $scope.PoPCharcterstics.length) && ($scope.dummypop < $scope.DummyPoPCharcterstics.length)) {
+                if (!angular.equals($scope.PoPCharcterstics[$scope.popcharcterstic], $scope.DummyPoPCharcterstics[$scope.dummypop])) {
+                    $scope.LatestPoPCharcterstics.push($scope.PoPCharcterstics[$scope.popcharcterstic]);
+                }
+                $scope.popcharcterstic++;
+                $scope.dummypop++;
+
+            }
+
+            $http.post('ProductDefination.aspx/UpdatePoPCharcterstic', {
+                'PoPs': angular.toJson($scope.LatestPoPCharcterstics),
+                'ProductID': $scope.DDL_PL_Product,
+                'UpdateEmpId': 609645343
+            })
+         .success(function (data) {
+             console.log(data);
+             $(".pageLoaderOverlay").hide();
+         }).error(function (data) {
+             console.log(data);
+             $(".pageLoaderOverlay").hide();
+         });
+        }
+
+
+    }
+
+
+    //========================================================================================================//
+
+
+
+
+
+    //==================================Valid Mapped Model===================================================//
+
+    //    $scope.ValidMapped = function (ProductID) {
+    //        $http.post('ProductDefination.aspx/GetValidMappingforProduct', { 'ProductID': ProductID })
+    //         .success(function (data) {
+    //             console.log("success" + data.d);
+
+    //         })
+    //         .error(function (data) {
+    //             console.log("error" + data.d);
+
+    //         });
+
+    //    };
+
+
+    //    $scope.NaviagaionValidMapping = function (ProductID) {
+    //        $location.path('/ValidMapping').search({ 'ProductID': ProductID });
+
+    //    }
+
+    $scope.AccessMappingforProduct = [];
+    $scope.PortSpeedValidMapping = [];
+    $scope.LatestPortSpeeds = [];
+    $scope.copyValidMappedTable = [];
+    $scope.LatestPortSpeedObj = [];
+    $scope.Final_Port_Speed = [];
+    $scope.Final_Access_Speed = [];
+    $scope.MasterPortSpeedValidMapping = [];
+    $scope.copyAccessMappingforProduct = [];
+    $scope.Final_Port_Speed = [];
+
+
+
+    //=============================================Mappings Load ===========================================================
+    function PrepareMasterValidMappingObject(MasterValidMapping) {
+
+        var keys = [];
+        MasterValidMapping.forEach(function (value, key) {
+            if (key == 0) {
+                keys.push({ "M_PORT_SPEED_CHAR_ID": value.PORT_SPEED_CHAR_ID, "M_PORTSPEED": value.PORTSPEED });
+            }
+            if (key >= 1) {
+                if (MasterValidMapping[key].PORT_SPEED_CHAR_ID
+                    != MasterValidMapping[key - 1].PORT_SPEED_CHAR_ID)
+                    keys.push({ "M_PORT_SPEED_CHAR_ID": value.PORT_SPEED_CHAR_ID, "M_PORTSPEED": value.PORTSPEED });
+            }
+        });
+        $scope.OKeys = keys;
+        $scope.Config = [];
+        $scope.e_PORT_SPEED_CHAR_ID = 0;
+        $scope.e_PORTSPEED = "";
+
+        angular.forEach($scope.OKeys, function (element, key) {
+            $scope.e_PORT_SPEED_CHAR_ID = element.M_PORT_SPEED_CHAR_ID,
+            $scope.e_PORTSPEED = element.M_PORTSPEED
+            $scope.M_Port_Speeds = $.grep(MasterValidMapping,
+                function (ele) {
+                    return ele.PORT_SPEED_CHAR_ID == element.M_PORT_SPEED_CHAR_ID
+                });
+
+            var Temp_P_Array = [];
+            $scope.M_Port_Speeds.forEach(function (PortSpeed, key) {
+
+                Temp_P_Array.push({ "MappedAccessSpeed": PortSpeed.MAPPED_ACCESS_SPEED,
+                    "IsValid": PortSpeed.VALID
+                })
+            });
+            $scope.Config.push(
+                { " PORT_SPEED_CHAR_ID": $scope.e_PORT_SPEED_CHAR_ID,
+                    "PORTSPEED": $scope.e_PORTSPEED,
+                    "Final_ValidMapped": Temp_P_Array
+                })
+        });
+        //$log.log($scope.Config);
+        //console.log($scope.Config);
+        return $scope.Config
+    }
+
+
+    function PrepareAccessMappingObject(MasterAccessValidMapping) {
+        var keys = [];
+        MasterAccessValidMapping.forEach(function (value, key) {
+            if (key == 0) {
+                //access_speed_char_id
+                keys.push({ "M_Access_SPEED_CHAR_ID": value.ACCESS_SPEED_CHAR_ID, "M_Access_SPEED": value.ACCSPEED, "M_CUSTOM_ACCESSSPEED": value.CUSTOM_ACCESSSPEED });
+            }
+            if (key >= 1) {
+                if (!angular.equals(MasterAccessValidMapping[key].CUSTOM_ACCESSSPEED.trim(), MasterAccessValidMapping[key - 1].CUSTOM_ACCESSSPEED.trim()))
+                    keys.push({ "M_Access_SPEED_CHAR_ID": value.ACCESS_SPEED_CHAR_ID, "M_Access_SPEED": value.ACCSPEED, "M_CUSTOM_ACCESSSPEED": value.CUSTOM_ACCESSSPEED });
+            }
+        });
+        $scope.OKeys = keys;
+        $scope.Config = [];
+        $scope.e_Access_SPEED_CHAR_ID = 0;
+        $scope.e_AccessSPEED = "";
+
+        angular.forEach($scope.OKeys, function (element, key) {
+            $scope.e_Access_SPEED_CHAR_ID = element.M_Access_SPEED_CHAR_ID,
+            $scope.e_AccessSPEED = element.M_CUSTOM_ACCESSSPEED
+            $scope.M_Access_Speeds = $.grep(MasterAccessValidMapping,
+                function (ele) {
+                    return ele.CUSTOM_ACCESSSPEED == element.M_CUSTOM_ACCESSSPEED
+                });
+
+            var Temp_P_Array = [];
+            $scope.M_Access_Speeds.forEach(function (AccessSpeed, key) {
+                Temp_P_Array.push({
+                    "INTERFACE_CHAR_ID": AccessSpeed.INTERFACE_CHAR_ID,
+                    "INTERFACE": AccessSpeed.INTERFACE,
+                    "IsValid": AccessSpeed.VALID
+                })
+            });
+            $scope.Config.push(
+                { "Access_SPEED_CHAR_ID": $scope.e_Access_SPEED_CHAR_ID,
+                    "AccessSPEED": $scope.e_AccessSPEED,
+                    "Final_AccessMapped": Temp_P_Array
+                })
+        });
+        $log.log($scope.Config);
+        return $scope.Config
+    }
+
+    $scope.ValidMapped = function (ProductID) {
+        $(".pageLoaderOverlay").show();
+        if ($scope.MasterPortSpeedValidMapping.length != 0) {
+            //if (!angular.toJson($scope.copyValidMappedTable).equals(angular.toJson($scope.MasterPortSpeedValidMapping))) {
+            // LoadValidMapping($scope.copyValidMappedTable);
+            LoadValidMapping();
+            //}
+        }
+        else {
+            $http.post('ProductDefination.aspx/GetValidMappingforProduct', { 'ProductID': ProductID })
+        .success(function (data) {
+            $scope.PortSpeedValidMapping = angular.fromJson(data.d).getValidMapping;
+            $scope.MasterPortSpeedValidMapping = PrepareMasterValidMappingObject($scope.PortSpeedValidMapping);
+            angular.copy($scope.MasterPortSpeedValidMapping, $scope.copyValidMappedTable);
+            $scope.Tabname = "PortSpeedTab"
+            LoadValidMapping($scope.MasterPortSpeedValidMapping);
+        }).
+        error(function (data) {
+        });
+        }
+    }
+
+    $scope.AccessSpeedsLoad = function (ProductID, AccessMappedTable, PortMappedtable) {
+        //  $scope.Tabname = "PortSpeedTab";
+        $scope.Tabname = "AccessSpeedTab";
+        $(".pageLoaderOverlay").show();
+        $scope.DummyPortMappedTable = [];
+        angular.copy(PortMappedtable, $scope.DummyPortMappedTable);
+
+        if (angular.isDefined($scope.DummyAccessMappedTable)) {
+            LoadValidMapping($scope.DummyAccessMappedTable);
+        }
+        else {
+            $http.post('ProductDefination.aspx/GetAccessMappingforProduct', { 'ProductID': $scope.DDL_PL_Product })
+        .success(function (data) {
+            $scope.AccessMappingforProduct = angular.fromJson(data.d).getAccessSpeedMapping;
+            $scope.MasterGetAccessMapped = PrepareAccessMappingObject($scope.AccessMappingforProduct);
+            $scope.copyAccessMappingforProduct = angular.copy($scope.AccessMappingforProduct);
+            LoadValidMapping($scope.ngAccesSpeedMapping);
+            $(".pageLoaderOverlay").hide();
+        })
+             .error(function (data) { $(".pageLoaderOverlay").hide(); });
+        }
+
+    }
+    //========================================================================================================================
+
+
+
+    //======================================For update PortSpeeds & PortSpeedOperations========================================//+
+
+
+
+    $scope.PortSpeedsLoad = function (ProductID, PortMappedtable, AccessMappedTable) {
+        //$scope.TabName = "AccessSpeedTab"; 
+        $scope.Tabname = "PortSpeedTab";
+        $scope.DummyAccessMappedTable = [];
+        angular.copy(AccessMappedTable, $scope.DummyAccessMappedTable);
+        if (angular.isDefined($scope.DummyAccessMappedTable)) {
+            $scope.ngValidMappedtable = new NgTableParams({}, { 'dataset': PortMappedtable });
+        }
+        LoadValidMapping(PortMappedtable);
+    }
+
+    $scope.PreparePortSpeedObjectforUpdate = function () {
+        $scope.LatestPortSpeedObj = [];
+        angular.forEach($scope.MasterPortSpeedValidMapping, function (value, key) {
+            angular.forEach($scope.MasterPortSpeedValidMapping[key].Final_ValidMapped, function (childvalue, childkey) {
+                $scope.LatestPortSpeedObj.push({
+                    "PORT_SPEED_CHAR_ID": value[" PORT_SPEED_CHAR_ID"],
+                    "VALID": childvalue.IsValid
+                });
+            });
+        });
+        return $scope.LatestPortSpeedObj;
+    }
+
+    $scope.UpdatePortSpeeds = function (LatestPortSpeeds) {
+        $scope.LatestPortSpeeds = $scope.PreparePortSpeedObjectforUpdate();
+        $scope.LatestPort = 0;
+        $scope.PortSpeed = 0;
+        if (!angular.equals($scope.LatestPortSpeeds, $scope.PortSpeedValidMapping)) {
+            while (($scope.LatestPort < $scope.LatestPortSpeeds.length)
+            && ($scope.PortSpeed < $scope.PortSpeedValidMapping.length)) {
+                if (!angular.equals($scope.LatestPortSpeeds[$scope.LatestPort].VALID, $scope.PortSpeedValidMapping[$scope.PortSpeed].VALID)) {
+                    $scope.CommonPortSpeed = angular.merge($scope.PortSpeedValidMapping[$scope.PortSpeed], $scope.LatestPortSpeeds[$scope.LatestPort])
+                    $scope.Final_Port_Speed.push($scope.CommonPortSpeed);
+                }
+                $scope.PortSpeed++;
+                $scope.LatestPort++;
+            }
+        }
+        $http.post('ProductDefination.aspx/UpdatePortSpeedsMapping',
+         {
+             'PortSpeeds': angular.toJson($scope.Final_Port_Speed),
+             'ProductID': $scope.DDL_PL_Product,
+             'UpdateEmpId': 609645343
+         })
+        .success(function (data) {
+
+        }).error(function (data) {
+
+        });
+    };
+
+
+
+    //=========================================================================================================//
+
+
+
+    //======================================For update Access Speeds========================================//+
+
+
+    $scope.Prepare_Access_SpeedObjectforUpdate = function () {
+        $scope.Latest_Access_SpeedObj = [];
+        angular.forEach($scope.MasterGetAccessMapped, function (value, key) {
+            // debugger;
+            angular.forEach($scope.MasterGetAccessMapped[key].Final_AccessMapped, function (childvalue, childkey) {
+                $scope.Latest_Access_SpeedObj.push({
+                    "VALID": childvalue.IsValid
+                });
+            });
+        });
+        return $scope.Latest_Access_SpeedObj;
+    }
+
+    $scope.UpdateAccessSpeeds = function () {
+        //$scope.MasterGetAccessMapped
+
+        $scope.Latest_Access_Speeds = $scope.Prepare_Access_SpeedObjectforUpdate();
+        $scope.Latest_Access = 0;
+        $scope.Access_Speed = 0;
+        if (!angular.equals($scope.Latest_Access_Speeds, $scope.copyAccessMappingforProduct)) {
+            while (($scope.Latest_Access < $scope.Latest_Access_Speeds.length)
+                 && ($scope.Access_Speed < $scope.AccessMappingforProduct.length)) {
+                if (!angular.equals($scope.Latest_Access_Speeds[$scope.Latest_Access].VALID, $scope.copyAccessMappingforProduct[$scope.Access_Speed].VALID)) {
+                    $scope.Common_Access_Speed = angular.merge($scope.copyAccessMappingforProduct[$scope.Access_Speed], $scope.Latest_Access_Speeds[$scope.Latest_Access])
+                    $scope.Final_Access_Speed.push($scope.Common_Access_Speed);
+                }
+                $scope.Access_Speed++;
+                $scope.Latest_Access++;
+            }
+        }
+        $http.post('ProductDefination.aspx/UpdateAccessSpeedsMapping',
+              {
+                  'AccessSpeeds': angular.toJson($scope.Final_Access_Speed),
+                  'ProductID': $scope.DDL_PL_Product,
+                  'UpdateEmpId': 609645343
+              })
+             .success(function (data) {
+
+             }).error(function (data) {
+
+             });
+    };
+
+
+    //======================================================================================================
+
+
+    function LoadValidMapping() {
+        $(".pageLoaderOverlay").show();
+
+
+        $scope.ValidModelPoPup = '';
+        $scope.ValidModelPoPup += '<div class="vertical-alignment-helper">';
+        $scope.ValidModelPoPup += '<div class="modal-dialog vertical-align-center" style="width: 100%">';
+        $scope.ValidModelPoPup += '<div class="modal-content" style="width:100%">';
+
+        $scope.ValidModelPoPup += ' <div class="modal-header">';
+        $scope.ValidModelPoPup += '  <button class="close" type="button" data-dismiss="modal">';
+        $scope.ValidModelPoPup += '         <span aria-hidden="true">×</span><span class="sr-only">Close</span>';
+        $scope.ValidModelPoPup += '     </button>';
+        $scope.ValidModelPoPup += '    <h4 class="modal-title">';
+        $scope.ValidModelPoPup += '          DisplayValidMapping';
+        $scope.ValidModelPoPup += '     </h4>';
+        $scope.ValidModelPoPup += ' </div>';
+
+        $scope.ValidModelPoPup += '   <div class="container">';
+        $scope.ValidModelPoPup += '   <div class="modal-body">';
+
+
+
+        //=======================================Assigned and Unassigned AccessSpeeds=========================================
+
+        $scope.ValidModelPoPup += ' <div class="col-md-12" style="margin-left:22px">';
+
+        $scope.ValidModelPoPup += '  <div class="col-md-2" style="width: 200px">';
+        $scope.ValidModelPoPup += ' <ol data-draggable="target">';
+        $scope.ValidModelPoPup += '       <li ng-model="UnAssignedItem" ng-repeat="item in UnAssigned_Access_Speeds track by item.CHAR_ID" data-draggable="item">';
+        $scope.ValidModelPoPup += '          <p style="display: none">';
+        $scope.ValidModelPoPup += '               {{item.CHAR_ID}}</p>';
+        $scope.ValidModelPoPup += '         {{item.SPEED_VALUE}} </li>';
+        $scope.ValidModelPoPup += '  </ol>';
+        $scope.ValidModelPoPup += ' </div>';
+
+        $scope.Assigned_Access_Speeds
+        $scope.ValidModelPoPup += '<div class="col-md-2" style="width: 200px">';
+        $scope.ValidModelPoPup += '<ol data-draggable="target">';
+        $scope.ValidModelPoPup += '     <li ng-model="AssignedItem" ng-repeat="item in Assigned_Access_Speeds track by item.ACCESS_SPEED_CHAR_ID" data-draggable="item">';
+        $scope.ValidModelPoPup += '           <p style="display: none">';
+        $scope.ValidModelPoPup += '              {{item.ACCESS_SPEED_CHAR_ID}}</p>';
+        $scope.ValidModelPoPup += '            {{item.SPEED_VALUE}} </li>';
+        $scope.ValidModelPoPup += '    </ol>';
+        $scope.ValidModelPoPup += '  </div>';
+
+        $scope.ValidModelPoPup += '</div>';
+
+        $scope.ValidModelPoPup += '<div class="col-md-12">';
+        $scope.ValidModelPoPup += '<input class="btn btn-primary col-md-6" type="button" ng-click="Submit(AssignedItem)" value="Submit">';
+        $scope.ValidModelPoPup += '<input class="btn btn-primary col-md-2" type="button" ng-click="Reset(AssignedItem)" value="Reset"></div>';
+
+
+        $scope.ValidModelPoPup += '';
+        $scope.ValidModelPoPup += '<a style="margin-right:7px" class="btn btn-primary" ng-click="PortSpeedsLoad(ProductID,ngValidMappedtable,ngAccesSpeedMapping)">PortSpeed</a></li> ';
+        $scope.ValidModelPoPup += '<a class="btn btn-primary" ng-click="AccessSpeedsLoad(ProductID,ngAccesSpeedMapping,ngValidMappedtable)">AccessSpeed</a></li>';
+
+
+        //==========================================================================================================================
+
+
+
+        //===================================Valid Mapping Table==========================================================================
+
+        //$scope.ValidModelPoPup += '<div id="tabPortSpeed" class="tab-pane active ">';
+        //$scope.Tabname == "PortSpeedTab";
+        if ($scope.Tabname == "PortSpeedTab") {
+
+            $scope.ngValidMappedtable = new NgTableParams({}, { 'dataset': $scope.MasterPortSpeedValidMapping });
+
+            $scope.ValidModelPoPup += '<div id="tabPortSpeed" class="tab-pane active">';
+            $scope.ValidModelPoPup += '<table ng-table="ngValidMappedtable" class="table-bordered table-striped" style="width:100%">';
+            $scope.ValidModelPoPup += '<tr ng-repeat="PortMapped in $data" >';
+            //$scope.ValidModelPoPup += '<td data-title="'Port Speed'" filter="{ 'PortSpeed': 'text'}">{{Mapped.PORT_SPEED_CHAR_ID}} </td>';
+            $scope.ValidModelPoPup += '<td>{{PortMapped.PORTSPEED}} </td>';
+            $scope.ValidModelPoPup += '<td>';
+            $scope.ValidModelPoPup += '<table width="100%" class="innertable table-bordered">';
+            $scope.ValidModelPoPup += '<tr ng-repeat="ValidMap in PortMapped.Final_ValidMapped">';
+            $scope.ValidModelPoPup += '<td>{{ValidMap.MappedAccessSpeed}}</td>';
+            //$scope.ValidModelPoPup += '<td><input type="checkbox" ng-checked="ValidMap.IsValid"  ng-change=UpdatePortspeedMapping(PortMapped)/></td>';
+            $scope.ValidModelPoPup += '<td><input type="checkbox" ng-model="ValidMap.IsValid" ng-true-value="1" ng-false-value="0" ng-checked="ValidMap.IsValid==1"/></td>';
+            $scope.ValidModelPoPup += '</tr>';
+            $scope.ValidModelPoPup += '</table>';
+            $scope.ValidModelPoPup += '</td>';
+            $scope.ValidModelPoPup += '</tr>';
+            $scope.ValidModelPoPup += '</table>';
+            $scope.ValidModelPoPup += '</div>';
+            $scope.ValidModelPoPup += '    <input type="button" class="btn btn-sm btn-primary" value="Update" ng-click="UpdatePortSpeeds()"/>';
+
+        }
+
+        //=======================================AccessMappedInterfaceTable===============================================================
+
+        if ($scope.Tabname == "AccessSpeedTab") {
+
+            $scope.ngAccesSpeedMapping = new NgTableParams({}, { 'dataset': $scope.MasterGetAccessMapped });
+
+            $scope.ValidModelPoPup += '<div id="tabAccessSpeed" class="tab-pane">';
+            $scope.ValidModelPoPup += '<table ng-table="ngAccesSpeedMapping"  class="table-bordered table-striped" style="width:100%">';
+            $scope.ValidModelPoPup += '<tr ng-repeat="AccessMapped in $data" >';
+            // $scope.ValidModelPoPup += '<td data-title=' + "Access Speed" + ' filter="{ ' + "PortSpeed" + ': ' + "text" + '}">';
+            $scope.ValidModelPoPup += '<td>{{AccessMapped.AccessSPEED}}</td>';
+            $scope.ValidModelPoPup += '<td>';
+            $scope.ValidModelPoPup += '<table width="100%" class="innertable table-bordered">';
+            $scope.ValidModelPoPup += '<tr ng-repeat="AccessMap in AccessMapped.Final_AccessMapped">';
+            $scope.ValidModelPoPup += '<td>{{AccessMap.INTERFACE}}</td>';
+            $scope.ValidModelPoPup += '<td><input type="checkbox" ng-model="AccessMap.IsValid" ng-true-value="1" ng-false-value="0" ng-checked="AccessMap.IsValid==1"/></td>';
+            $scope.ValidModelPoPup += '</tr>';
+            $scope.ValidModelPoPup += '</table>';
+            $scope.ValidModelPoPup += '</td>';
+            $scope.ValidModelPoPup += '</tr>';
+            $scope.ValidModelPoPup += '</table>';
+            $scope.ValidModelPoPup += '</div>';
+            $scope.ValidModelPoPup += '    <input type="button" class="btn btn-sm btn-primary" value="Update" ng-click="UpdateAccessSpeeds($data)"/>';
+        }
+
+        $scope.ValidModelPoPup += '</div>';
+        $scope.ValidModelPoPup += '</div>';
+        $scope.ValidModelPoPup += '   </div>';
+        $scope.ValidModelPoPup += '  <div class="modal-footer">';
+        $scope.ValidModelPoPup += '   <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>';
+        $scope.ValidModelPoPup += '  </div>';
+        $scope.ValidModelPoPup += '  </div>';
+
+
+        angular.element("#ValidMappedModal").html($compile($scope.ValidModelPoPup)($scope));
+        $(".pageLoaderOverlay").hide();
+    }
+
+    //===================================================================================================================================
+
+
+
+
+    //=============================================================FlexiPort================================================================
+
+
+    function FetchFlexPortRecords(ProductID) {
+        $http.post("ProductDefination.aspx/GetFlexPorts", { 'ProductID': ProductID }).
+        success(function (data) {
+            $scope.FlexPorts = angular.fromJson(data.d).GetFlexPorts;
+            var i = 1;
+            var Acces_Type = [];
+            var count = 0;
+            $scope.IsChecked = 0;
+            //============================================Setting Table by using mathematical calculations=======================================
+            angular.forEach($scope.FlexPorts.Table1, function (element, key) {
+                if (key == 0) {
+                    Acces_Type.push({ 'IsSelection': 0, 'ACCESS_TYPE_ID': element.CHAR_ID, 'ACCESS_TYPE_NAME': element.CHAR_NAME });
+                    $scope.FlexPorts.Table1[key]["Access_type"] = Acces_Type;
+                }
+                if (key > 0) {
+                    var looping = 1;
+                    while (!angular.isDefined($scope.FlexPorts.Table1[key - looping])) {
+                        looping++;
+                    }
+                    if ($scope.FlexPorts.Table1[key].COUNTRY_ID == $scope.FlexPorts.Table1[key - looping].COUNTRY_ID) {
+                        Acces_Type.push({ 'IsSelection': 0, 'ACCESS_TYPE_ID': element.CHAR_ID, 'ACCESS_TYPE_NAME': element.CHAR_NAME });
+                        $scope.FlexPorts.Table1[key - looping]["Access_type"] = Acces_Type;
+                        delete $scope.FlexPorts.Table1[key];
+                    }
+                    else {
+                        Acces_Type = [];
+                        Acces_Type.push({ 'IsSelection': 0, 'ACCESS_TYPE_ID': element.CHAR_ID, 'ACCESS_TYPE_NAME': element.CHAR_NAME });
+                        $scope.FlexPorts.Table1[key]["Access_type"] = Acces_Type;
+                    }
+                }
+            });
+            //========================================================================================================================================
+
+            $scope.filer_Master_FlexPort = $scope.FlexPorts.Table1;
+            $scope.Master_FlexPort = [];
+            angular.copy($scope.filer_Master_FlexPort, $scope.Master_FlexPort)
+            $scope.Master_FlexPort = $scope.Master_FlexPort.filter(function (element) {
+                return !!element;
+            });
+            $scope.Master_FlexPort = new NgTableParams({}, { 'dataset': $scope.Master_FlexPort });
+            $(".pageLoaderOverlay").hide();
+        })
+    }
+
+
+
+    $scope.FlexPort = function (ProductID) {
+        $(".pageLoaderOverlay").show();
+        FetchFlexPortRecords(ProductID);
+
+        $scope.FlexiPort = '';
+        $scope.FlexiPort += '<div class="vertical-alignment-helper">';
+        $scope.FlexiPort += '<div class="modal-dialog vertical-align-center" style="width: 100%">';
+        $scope.FlexiPort += '<div class="modal-content" style="width:100%">';
+
+        $scope.FlexiPort += ' <div class="modal-header">';
+        $scope.FlexiPort += '  <button class="close" type="button" data-dismiss="modal">';
+        $scope.FlexiPort += '         <span aria-hidden="true">×</span><span class="sr-only">Close</span>';
+        $scope.FlexiPort += '     </button>';
+        $scope.FlexiPort += '    <h4 class="modal-title">';
+        $scope.FlexiPort += '         Define Flexiport Availability for Country, Access Types ';
+        $scope.FlexiPort += '     </h4>';
+        $scope.FlexiPort += ' </div>';
+
+        $scope.FlexiPort += '   <div class="container">';
+        $scope.FlexiPort += '   <div class="modal-body">';
+
+        $scope.FlexiPort += '<div class="form-group col-md-12">';
+        $scope.FlexiPort += '                   <label class="control-label col-md-5">';
+        $scope.FlexiPort += '                          Country&nbsp;<span style="color: Red">*</span></label>';
+        $scope.FlexiPort += '                   <div class="col-md-5">';
+        $scope.FlexiPort += '                      <select class="clsddlProducttype" ng-model="Flex.COUNTRY_ID" ng-options="item.COUNTRY_ID as item.COUNTRY_NAME for item in FlexPorts.CSU_COUNTRY">';
+        $scope.FlexiPort += '                         <span ng-show="pageLoad" ng-if="FlexPort.Country==null||FlexPort.Country==undefined">';
+        $scope.FlexiPort += '                           Please Select Product Type</span> <option value="">&nbsp;&nbsp;--Select--</option>';
+        $scope.FlexiPort += '                    </select>';
+        $scope.FlexiPort += '               </div>';
+        $scope.FlexiPort += '           </div>';
+        $scope.FlexiPort += '            <div class="form-group col-md-12">';
+        $scope.FlexiPort += '               <label class="control-label  col-md-5">';
+        $scope.FlexiPort += '                    Availability&nbsp;<span style="color: Red">*</span></label>';
+        $scope.FlexiPort += '                <div class="col-md-5">';
+        $scope.FlexiPort += '                 <select class="clsddlProducttype" ng-model="Flex.AVAIL_CD" ng-options="item.AVAIL_CD as item.AVAIL_DESC for item in FlexPorts.CSU_REF_AVAILABILITY">';
+        $scope.FlexiPort += '                   <option value="">&nbsp;&nbsp;--Select--</option>';
+        $scope.FlexiPort += '                   </select>';
+        $scope.FlexiPort += '              </div>';
+        $scope.FlexiPort += '        </div>';
+        $scope.FlexiPort += '         <div class="form-group col-md-12">';
+        $scope.FlexiPort += '             <label class="control-label col-md-5">';
+        $scope.FlexiPort += '               Access Type&nbsp;<span style="color: Red">*</span></label>';
+        $scope.FlexiPort += '          <div class="col-md-5">';
+        $scope.FlexiPort += '             <select class="clsddlProducttype"  multiple size="9" ng-model="Flex.CHAR_ID" ng-options="item.CHAR_ID as item.CHAR_NAME for item in FlexPorts.CSU_REF_VALID_CHAR">';
+        $scope.FlexiPort += '               <option value="">&nbsp;&nbsp;--Select--</option>';
+        $scope.FlexiPort += '           </select>';
+        $scope.FlexiPort += '       </div>';
+        $scope.FlexiPort += '    </div>';
+
+
+        $scope.FlexiPort += '<div class="form-group col-md-12">';
+        $scope.FlexiPort += '   <input type="button" class="btn btn-sm btn-primary col-md-2" value="Submit" ng-click="AddFlexPort(Flex)"/>';
+        $scope.FlexiPort += '              </div>';
+
+        $scope.FlexiPort += '       <table ng-table="Master_FlexPort" class="table-bordered table-striped">';
+        $scope.FlexiPort += '<tbody>';
+        $scope.FlexiPort += '   <tr ng-repeat="F_Port in $data">';
+
+        $scope.FlexiPort += '     <td>';
+        $scope.FlexiPort += '       <input type="checkbox" ng-model="F_Port.IsSelection" ng-change=SelectionRecords(F_Port,F_Port.IsSelection) ng-true-value="1" ng-false-value="0">';
+        $scope.FlexiPort += '    </td>';
+        $scope.FlexiPort += '     <td><span ng-hide="true">{{F_Port.COUNTRY_ID}}</span>';
+        $scope.FlexiPort += '       <span ng-bind="F_Port.COUNTRY_NAME"></span>';
+        $scope.FlexiPort += '    </td>';
+        $scope.FlexiPort += '     <td> <span ng-hide="true">{{F_Port.AVAIL_CD}}</span>';
+        $scope.FlexiPort += '       <span ng-bind="F_Port.AVAIL_DESC"></span>';
+        $scope.FlexiPort += '     </td>';
+        $scope.FlexiPort += '     <td>';
+        $scope.FlexiPort += '        <ul style="list-style-type: none">';
+        $scope.FlexiPort += '           <li ng-repeat="accesstype in F_Port.Access_type">{{accesstype.ACCESS_TYPE_NAME}}<li>';
+        $scope.FlexiPort += '</ul>';
+        $scope.FlexiPort += '     </td>';
+        $scope.FlexiPort += '     <td>';
+        $scope.FlexiPort += '         <input type="button" class="btn btn-primary" value="Select" ng-click="SelectRecord()" />';
+        $scope.FlexiPort += '    </td>';
+        $scope.FlexiPort += ' </tr></tbody>';
+        $scope.FlexiPort += '  </table>';
+
+
+        $scope.FlexiPort += ' <div class="modal-footer">';
+        $scope.FlexiPort += '                   <input type="button" class="btn  btn-primary" value="Delete" ng-click="DeleteFlexPortRecords()"/>';
+        $scope.FlexiPort += '                  <button class="btn btn-default" type="button" data-dismiss="modal">';
+        $scope.FlexiPort += '                  Close</button>';
+        $scope.FlexiPort += '            </div>';
+
+        angular.element("#FlexPortModal").html($compile($scope.FlexiPort)($scope));
+    }
+
+
+    $scope.O_Records = [];
+    var count = 0;
+
+    $scope.SelectionRecords = function (SelectionRecords, IsSelection) {
+        $scope.Records = {};
+        if (IsSelection == 1) {
+            angular.copy(SelectionRecords, $scope.Records);
+            $scope.O_Records.push($scope.Records);
+        }
+        //        if (IsSelection == 0) {
+        //            $.map($scope.O_Records, function (obj, index) {
+        //                if (obj.COUNTRY_ID == SelectionRecords.COUNTRY_ID) {
+        //                    $scope.O_Records.splice(index, 1);
+        //                    return false;
+        //                }
+        //            })
+        //        }
+    }
+
+    $scope.DeleteFlexPortRecords = function () {
+        $(".pageLoaderOverlay").show();
+        $http.post("ProductDefination.aspx/DeleteFlexPort", { 'FlexPortJson': angular.toJson($scope.O_Records) })
+        .success(function (data) {
+
+            //angular.forEach($scope.Master_FlexPort, function (element, index) {
+            //                var IsExits = $.grep($scope.O_Records, function (childele) {
+            //                    return childele.COUNTRY_ID == element.COUNTRY_ID
+            //                });
+            //                if (IsExits > 0) {
+            //                    $scope.Master_FlexPort.splice(index, 1);
+            //                }
+            //            });
+            //            console.log("success");
+            //            $http.post("ProductDefination.aspx/GetFlexPorts", { 'ProductID': ProductID }).
+            //        success(function (data) {
+            //            
+            FetchFlexPortRecords($scope.DDL_PL_Product);
+
+        });
+
+        //        })
+        //        .error(function (data) {
+        //            console.log("error");
+        //        })
+    }
+
+
+    $scope.AddFlexPort = function (FlexPort) {
+        $(".pageLoaderOverlay").show();
+        var CharId = "";
+        CharId = String(FlexPort.CHAR_ID)
+        delete FlexPort.CHAR_ID;
+        FlexPort.PRODUCT_ID = $scope.DDL_PL_Product;
+        $scope.AddFlexPorts = [];
+        $scope.AddFlexPorts.push(FlexPort);
+        $http.post("ProductDefination.aspx/AddFlexPort", { 'FlexPortJson': angular.toJson($scope.AddFlexPorts), 'CharId': CharId }).success(function () {
+            FetchFlexPortRecords($scope.DDL_PL_Product);
+            $(".pageLoaderOverlay").hide();
+            console.log("success");
+        }).error(function () {
+            console.log("error");
+        }); ;
+    }
+    //========================================================================================================================================
+
+
+
+
+
+    //=============================================================UnBundled NNI===============================================================
+
+
+    $scope.UnBundledNNI = '';
+    $scope.UnBundledNNI += '<div class="vertical-alignment-helper">';
+    $scope.UnBundledNNI += '<div class="modal-dialog vertical-align-center" style="width: 100%">';
+    $scope.UnBundledNNI += '<div class="modal-content" style="width:100%">';
+
+    $scope.UnBundledNNI += ' <div class="modal-header">';
+    $scope.UnBundledNNI += '  <button class="close" type="button" data-dismiss="modal">';
+    $scope.UnBundledNNI += '         <span aria-hidden="true">×</span><span class="sr-only">Close</span>';
+    $scope.UnBundledNNI += '     </button>';
+    $scope.UnBundledNNI += '    <h4 class="modal-title">';
+    $scope.UnBundledNNI += '         Define Flexiport Availability for Country, Access Types ';
+    $scope.UnBundledNNI += '     </h4>';
+    $scope.UnBundledNNI += ' </div>';
+
+    $scope.UnBundledNNI += '   <div class="container">';
+    $scope.UnBundledNNI += '   <div class="modal-body">';
+
+    $scope.UnBundledNNI += '<div class="form-group col-md-12">';
+    $scope.UnBundledNNI += '                   <label for="inputDescription" class="control-label col-md-5">';
+    $scope.UnBundledNNI += '                          Country&nbsp;<span style="color: Red">*</span></label>';
+    $scope.UnBundledNNI += '                   <div class="col-md-5">';
+    $scope.UnBundledNNI += '                      <select class="clsddlProducttype" name="lstProductType" ng-model="Product.PRODUCT_TYPE" ng-options="item.PRODUCT_TYPE as item.PRODUCT_DESC for item in ServiceTypes.CSU_PRODUCT_TYPE">';
+    $scope.UnBundledNNI += '                         <span ng-show="pageLoad" ng-if="Product.PRODUCT_TYPE==null||Product.PRODUCT_TYPE==undefined">';
+    $scope.UnBundledNNI += '                           Please Select Product Type</span> <option value="">&nbsp;&nbsp;--Select--</option>';
+    $scope.UnBundledNNI += '                    </select>';
+    $scope.UnBundledNNI += '               </div>';
+    $scope.UnBundledNNI += '           </div>';
+    $scope.UnBundledNNI += '            <div class="form-group col-md-12">';
+    $scope.UnBundledNNI += '               <label for="inputDescription" class="control-label  col-md-5">';
+    $scope.UnBundledNNI += '                    Supplier&nbsp;<span style="color: Red">*</span></label>';
+    $scope.UnBundledNNI += '                <div class="col-md-5">';
+    $scope.UnBundledNNI += '                 <select class="clsddlProducttype" name="lstCountryId" ng-model="Product.COUNTRY_CD" ng-options="item.COUNTRY_ID as item.COUNTRY_NAME for item in ServiceTypes.CSU_COUNTRY">';
+    $scope.UnBundledNNI += '                   <option value="">&nbsp;&nbsp;--Select--</option>';
+    $scope.UnBundledNNI += '                   </select>';
+    $scope.UnBundledNNI += '              </div>';
+    $scope.UnBundledNNI += '        </div>';
+    $scope.UnBundledNNI += '         <div class="form-group col-md-12">';
+    $scope.UnBundledNNI += '             <label for="inputDescription" class="control-label col-md-5">';
+    $scope.UnBundledNNI += '               Access Type&nbsp;<span style="color: Red">*</span></label>';
+    $scope.UnBundledNNI += '          <div class="col-md-5">';
+    $scope.UnBundledNNI += '             <select class="clsddlProducttype" name="lstServiceType" multiple size="9" ng-model="Product.SERVICE_TYPE_CD" ng-options=" item.SERVICE_TYPE_CD as item.SERVICE_TYPE_DESC for item in ServiceTypes.CSU_REF_SERVICE_TYPE">';
+    $scope.UnBundledNNI += '               <option value="">&nbsp;&nbsp;--Select--</option>';
+    $scope.UnBundledNNI += '           </select>';
+    $scope.UnBundledNNI += '       </div>';
+    $scope.UnBundledNNI += '    </div>';
+    $scope.UnBundledNNI += '         <div class="form-group col-md-12">';
+    $scope.UnBundledNNI += '             <label for="inputDescription" class="control-label col-md-5">';
+    $scope.UnBundledNNI += '               Availability&nbsp;<span style="color: Red">*</span></label>';
+    $scope.UnBundledNNI += '          <div class="col-md-5">';
+    $scope.UnBundledNNI += ' <input type="checkbox" ng-model="" ng-true-value="1" ng-false-value="0">  ';
+    $scope.UnBundledNNI += '       </div>';
+    $scope.UnBundledNNI += '    </div>';
+    $scope.UnBundledNNI += '<div class="form-group col-md-12">';
+    $scope.UnBundledNNI += '   <input type="button" class="btn btn-sm btn-primary col-md-2" value="Submit" ng-click="AddFlexPort(Product)"/>';
+    $scope.UnBundledNNI += '              </div>';
+
+    $scope.UnBundledNNI += '       <table class="table-bordered table-striped">';
+    $scope.UnBundledNNI += '<thead><tr>';
+    $scope.UnBundledNNI += ' <th></th>';
+    $scope.UnBundledNNI += ' <th>Country</th>';
+    $scope.UnBundledNNI += ' <th>Supplier</th>';
+    $scope.UnBundledNNI += ' <th>Access Type</th>';
+    $scope.UnBundledNNI += ' <th>Select for Update</th>';
+    $scope.UnBundledNNI += '  <th>Availability</th>';
+    $scope.UnBundledNNI += ' </tr></thead>';
+    $scope.UnBundledNNI += '<tbody>';
+    $scope.UnBundledNNI += '   <tr ng-repeat="PoPItem in PoPCharcterstics ">';
+    $scope.UnBundledNNI += '     <td>';
+    $scope.UnBundledNNI += '       <input type="checkbox" ng-model="" ng-true-value="1" ng-false-value="0"> ';
+    $scope.UnBundledNNI += '    </td>';
+    $scope.UnBundledNNI += '     <td>';
+    $scope.UnBundledNNI += '       <span ng-bind="PoPItem.CHAR_ID"></span>';
+    $scope.UnBundledNNI += '    </td>';
+    $scope.UnBundledNNI += '     <td>';
+    $scope.UnBundledNNI += '       <span ng-bind="PoPItem.CHAR_NAME"></span>';
+    $scope.UnBundledNNI += '    </td>';
+    $scope.UnBundledNNI += '     <td>';
+    $scope.UnBundledNNI += '        <span ng-bind="PoPItem.CHAR_NAME"></span>';
+    $scope.UnBundledNNI += '       </td>';
+    $scope.UnBundledNNI += '    <td>';
+    $scope.UnBundledNNI += '         <input type="button" value="Select" ng-click="" />';
+    $scope.UnBundledNNI += '    </td>';
+    $scope.UnBundledNNI += ' </tr></tbody>';
+    $scope.UnBundledNNI += '  </table>';
+
+    $scope.UnBundledNNI += ' <div class="modal-footer">';
+    $scope.UnBundledNNI += '                   <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click="AddProduct(Product)"';
+    $scope.UnBundledNNI += '                       />';
+    $scope.UnBundledNNI += '                  <input type="button" class="btn btn-sm btn-primary" value="Reset" />';
+    $scope.UnBundledNNI += '                  <button class="btn btn-default" type="button" data-dismiss="modal">';
+    $scope.UnBundledNNI += '                  Close</button>';
+    $scope.UnBundledNNI += '            </div>';
+
+
+    //==========================================================================================================================================
+
+});

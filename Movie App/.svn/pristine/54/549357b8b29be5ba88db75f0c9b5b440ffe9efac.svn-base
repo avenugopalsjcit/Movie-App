@@ -1,0 +1,210 @@
+﻿<div ng-controller="Controllers.CharactericsticTypeCtrl as vm">
+   <div class="container">
+        <h2>
+            <span style="float: left; cursor: default">Characteristic type</span></h2>
+    </div>
+    <br />
+
+    <div class="row">
+      <div style="margin-left: 5%">
+      <h3>
+            <a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#newAdminCharViewModal">
+                Add New Characteristic Type </a></h3>
+        </div>
+    </div>
+    <br />
+
+    <table ng-table="vm.tableParams" class="table" show-filter="true" class="table table-striped table-bordered">
+
+
+           <tr ng-repeat="CharType in $data" id="CharType{{$index}}">
+                <td  data-title="'Service'" filter="{ CHAR_TYPE_NAME: 'text'}" sortable="'name'" style="width:25em">
+                    {{CharType.CHAR_TYPE_NAME}}
+                </td>
+                <td data-title="'Valid'" sortable="'name'">
+                    <input type="checkbox" ng-checked="CharType.CHAR_TYPE_VALID_CD" />
+                </td>
+                <td data-title="'Created'" filter="{ CREATED_EMP_ID: 'text'}" sortable="'name'">
+                    {{CharType.CREATED_EMP_ID}} {{CharType.CREATED_DT}}
+                </td>
+                <td data-title="'Updated'" filter="{ UPDATED_EMP_ID : 'text'}" sortable="'name'">
+                    {{CharType.UPDATED_EMP_ID}} {{CharType.UPDATED_DT}}
+                </td>
+                
+                
+                <td>
+                    <div ng-show="Edit">
+                        <button class="btn btn-default btn-sm" ng-click="ServiceCharEdit('CharType'+$index,CharType);Edit=false;Delete=false;Cancel=true;Save=true">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                    </div>
+                    <div ng-show="Save">
+                        <button class="btn btn-primary btn-sm" ng-click="UpdateCharRecord('CharType'+$index,CharType);Save=false;Edit=true;Delete=true;Cancel=false">
+                            <span class="glyphicon glyphicon-ok"></span>
+                        </button>
+                    </div>
+                </td>
+
+                <td data-title="'Delete'" style="width: 8%">
+                    <button ng-show="Delete" class="btn btn-sm btn-danger" ng-click="DeleteCharType($index,CharType.CHAR_TYPE_CD);"
+                        data-toggle="modal">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                    <button ng-show="Cancel" class="btn btn-default btn-sm" ng-click="CancelRecord($index,$event,item);Edit=true;Delete=true;Cancel=false;Save=false">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </td>
+
+
+            </tr>
+        </table>
+   
+    <div tabindex="-1" class="modal fade in" id="newAdminCharViewModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H1">
+                            Add New Characteristic Type </h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-11">
+                                <label class="control-label col-md-2" for="inputDescription">
+                                    Name</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" value="">
+                                </div>
+                            </div>
+                            <div>
+                            <div class="form-group col-md-11">
+                                    <label class="control-label col-md-2" for="inputDescription">
+                                    Type</label>
+                                        <div class="col-md-8">
+                                            <select class="drpAdminValidCharView" style="width: 325px">
+                                                <option>Display Availability Status/Fixed Value (Drop Down)</option>
+                                                <option>Text Field</option>
+                                                <option>Range of Values</option>
+                                                <option>Single Select (Drop Down)</option>
+                                                <option>Multi Select (Drop Down)</option>
+                                                <option>Text field which allows URL</option>
+                                                <option>Memo (This will allow users to attach files)</option>
+                                                <option>Speeds(Down/Up)</option>
+                                            </select>       
+                                        </div>
+                                  </div>
+                            </div>
+                            <div class="form-group col-md-11">
+                                    <label class="control-label col-md-3" for="inputDescription">
+                                        Valid</label>
+                                <div class="col-md-8">
+                                    <div style="margin-left: 0%">
+                                        <input type="checkbox">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click=""/>
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset"ng-click=""/>
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in" id="updateAdminCharViewModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H2">
+                            Edit New Characteristic Type</h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-2" for="inputDescription">
+                                    Name</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" value="7 x 24 Access Circuit Restoration">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12" style="margin-left: -27px;">
+                                <div class="col-md-2">
+                                    <label class="control-label">
+                                    </label>
+                                </div>
+                                              <div class="form-group col-md-12" style="margin-left: -27px;">
+                                                     <div class="col-md-2">
+                                                            <select class="drpAdminValidCharView" style="width: 450px">
+                                                                <option>Display Availability Status/Fixed Value (Drop Down)</option>
+                                                                <option>Text Field</option>
+                                                                <option>Range of Values</option>
+                                                                <option>Single Select (Drop Down)</option>
+                                                                <option>Multi Select (Drop Down)</option>
+                                                                <option>Text field which allows URL</option>
+                                                                <option>Memo (This will allow users to attach files)</option>
+                                                                <option>Speeds(Down/Up)</option>
+                                                            </select>
+                                                            </div>
+                                                    </div>
+                                
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-2">
+                                    <label class="control-label col-md-3" for="inputDescription">
+                                        Valid</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="checkbox" checked="true">
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <div class="form-horizontal" style="font-size: 13px; padding-left: 3%">
+                            <div class="form-group col-md-12">
+                                <div class="col-md-3">
+                                    <u><b><span>Created by</span></b></u><br>
+                                    <span>MacGamwell,John</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <u><b><span>Created Date</span></b></u><br>
+                                    <span>21-MAY-1999 09:58:12 AM&nbsp;GMT</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <u><b><span>Updated by</span></b></u><br>
+                                    <span>Prasad, Achutha</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <u><b><span>Date Last Updated</span></b></u><br>
+                                    <span>18-DEC-2003 06:47:38 PM&nbsp;GMT</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Update" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Delete" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

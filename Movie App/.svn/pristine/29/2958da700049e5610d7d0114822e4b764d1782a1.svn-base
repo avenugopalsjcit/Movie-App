@@ -1,0 +1,74 @@
+﻿
+
+app.controller('AccessSupplierReportCtrl', function ($scope, $http) {
+    $(".pageLoaderOverlay").show();
+    $http.post("Reports.aspx/FetchCountries", {})
+        .success(function (data) {
+            $scope.FetchCountreis = JSON.parse(data.d).FetchCountreis;
+            $("#DDL_PL_Country").select2(
+           {
+           });
+            $(".pageLoaderOverlay").hide(); 
+        })
+        .error(function (e) {
+            alert(e);
+        });
+
+       
+    $scope.getAccessReports = function (CountryId) {
+        $(".pageLoaderOverlay").show();
+        $http.post("Reports.aspx/FetchAccesByReportByCountryId", { 'CountryId': CountryId })
+        .success(function (data) {
+            $("#accessReporttbl thead tr").remove();
+            $("#accessReporttbl tbody tr").remove();
+
+            var Keys = [];
+            var dyn_html = "";
+            if (JSON.parse(data.d).FetchAccesByReportByCountryId.length == 1) {
+                dyn_html += "<tr>"
+                for (var i = 0; i < JSON.parse(data.d).FetchAccesByReportByCountryId.length; i++) {
+                    Keys = Object.keys(JSON.parse(data.d).FetchAccesByReportByCountryId[i])
+                    for (var ii = 0; ii < Keys.length; ii++) {
+                        var key = Keys[ii];
+                        dyn_html += "<th>" + key + "</th>";
+                    }
+                    dyn_html += "</tr>";
+                }
+                $("#accessReporttbl thead").append(dyn_html);
+                $(".pageLoaderOverlay").hide();
+            }
+
+            if (JSON.parse(data.d).FetchAccesByReportByCountryId.length > 1) {
+                $(".pageLoaderOverlay").show();
+                var dyn_html3 = "";
+
+                dyn_html3 += "<tr>"
+                Keys = Object.keys(JSON.parse(data.d).FetchAccesByReportByCountryId[JSON.parse(data.d).FetchAccesByReportByCountryId.length - 1])
+                for (var ii = 0; ii < Keys.length; ii++) {
+                    var key = Keys[ii];
+                    dyn_html3 += "<th>" + key + "</th>";
+                }
+                dyn_html3 += "</tr>";
+                $("#accessReporttbl thead").append(dyn_html3);
+
+                var dyn_html4 = ""
+                for (var i = 0; i < JSON.parse(data.d).FetchAccesByReportByCountryId.length - 1; i++) {
+                    Keys = Object.keys(JSON.parse(data.d).FetchAccesByReportByCountryId[i])
+                    dyn_html4 = "<tr>"
+                    for (var ii = 0; ii < Keys.length; ii++) {
+
+                        var key = Keys[ii];
+                        var IsNull = JSON.parse(data.d).FetchAccesByReportByCountryId[i][key] || "";
+                        dyn_html4 += "<td>" + IsNull + "</td>";
+                    }
+                    dyn_html4 += "</tr>";
+                }
+                $("#accessReporttbl tbody").append(dyn_html4);
+                $(".pageLoaderOverlay").hide();
+            }
+        })
+        .error(function (e) {
+            alert("fail");
+        });
+    }
+})

@@ -1,0 +1,567 @@
+// -----------------------------------------------------------------------------------------------------------------
+// Modification Log
+// -----------------------------------------------------------------------------------------------------------------
+// Version     Date            Modified by            Comments
+//             DD/MM/YY        Infosys ID
+// -----------------------------------------------------------------------------------------------------------------
+// 1.8         28/11/07        madhav_shenoy            Added new function for data intiation
+// 1.7         13/08/07        akshita_saxena           Added new variable for ACCESS
+// 1.4         13/06/07        madhav_shenoy            Added new field to check if chars parent portspeed and access 
+//                                                      supplier have been added
+// 1.3         15/06/07        akshita_saxena           Added new field to check if accessspeeda have been selected
+// 1.2         15/06/07        akshita_saxena           Added new field to check if portspeeds have been selected
+// 1.1         13/06/07        madhav_shenoy            Added new field to check if pos have been added
+// 1.0         06/06/07        madhav_shenoy            Created
+// -----------------------------------------------------------------------------------------------------------------
+
+#region Imported Namespaces
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+using System.Collections;
+using PCDataAccess;
+using PCDataAccess_V;
+using System.ComponentModel; 
+#endregion
+namespace SCAdminBAL.MCU
+{
+    /// <summary>
+    /// Summary description for MCUSession
+    /// </summary>
+    [Serializable]
+    public class MCUSession
+    {
+        #region Private Variables
+        private Guid _CacheId;
+        private Int32 _ProductCd = 76;   //16- generic voice info - country level       
+        private String _ProductName = String.Empty;
+        private Int32 _SubProductCd = -1;
+        private String _SubProductName = String.Empty;
+        private String sUser_Id = String.Empty;
+        private String sFirstName = String.Empty;
+        private String sLastName = String.Empty;
+        private String sEmail = String.Empty;
+        private String sPhone = String.Empty;
+        private String sMobile = String.Empty;
+        private String sPager = String.Empty;
+        private Int32 sDistributorId = -1;
+        private Int32 sOpsId = -1;
+        private String sUserName = String.Empty;
+        private String sVBCURL = String.Empty;
+        //Infosys - kiruthika - Drop 3.8 - Begins - Add - 11/12/2007
+        private Int32 _Multipoint = -1;
+        private Int32 _AllPOPFlag = -1;
+        //Infosys - kiruthika - Drop 3.8 - End - Add - 11/12/2007
+        // 1.1 Add Begins
+        private Boolean _PopsSelected = false;
+        // 1.1 Add Ends
+        //1.2 Addition for PortSelection
+        private Boolean _PortSpeedSelected = false;
+        //1.2 ends
+        //1.3 Addition for AccessSelection
+        private Boolean _AccessSuppSelected = false;
+        //1.3 ends    
+        //1.4 Add begins
+        private Boolean _AccessSupplierSelected = false;
+        private Boolean _ParentPortSpeedSelected = false;
+        //1.4 Add ends
+        //1.5 add begins
+        private Boolean _SelectionSaved = false;
+        private Int32 _ValidPort = -1;
+        private Int32 _ValidCase = -1;
+        private Int32 _PortAvail = -1;
+        private Int32 _AccessAvail = -1;
+        private Int32 _CaseAvail = -1;
+        private Int32 _LeadTime = -1;
+        private Int32 _ParentProductCd = -1;
+        //1.5 ends
+        //1.6 starts
+        //private Int32 _LocLevel = -1;
+        private Int32 _LocLevel = 4;
+
+        //1.6 ends
+        private Int32 _HasPortSpeed = -1;
+
+        //added for GSCE-85484 
+        private Int32 _CountryId;
+        private int _mode;
+        //ended GSCE-85484 
+
+        #endregion
+
+        #region Public Properties
+
+        //added for GSCE-85484 
+        public Int32 CountryId
+        {
+            get
+            {
+                return _CountryId;
+            }
+            set
+            {
+                _CountryId = value;
+            }
+        }
+        public Int32 Mode
+        {
+            get
+            {
+                return _mode;
+            }
+            set
+            {
+                _mode = value;
+            }
+        }
+        //ended GSCE-85484 
+        public String SubProductName
+        {
+            get
+            {
+                return _SubProductName;
+            }
+            set
+            {
+                _SubProductName = value;
+            }
+
+        }
+
+        public Int32 HasPortSpeed
+        {
+            get
+            {
+                return _HasPortSpeed;
+            }
+            set
+            {
+                _HasPortSpeed = value;
+            }
+        }
+        //Infosys-kiruthika-Begin Add-20-Nov-2007
+        public Int32 Multipoint
+        {
+            get
+            {
+                return _Multipoint;
+            }
+            set
+            {
+                _Multipoint = value;
+            }
+        }
+        public Int32 AllPOPFlag
+        {
+            get
+            {
+                return _AllPOPFlag;
+            }
+            set
+            {
+                _AllPOPFlag = value;
+            }
+        }
+        //Infosys-kiruthika-End Add-20-Nov-2007
+        //1.6 starts
+        public Int32 LocLevel
+        {
+            get
+            {
+                return _LocLevel;
+            }
+            set
+            {
+                _LocLevel = value;
+            }
+        }
+
+        //1.6 ends
+        public Int32 ParentProductCd
+        {
+            get
+            {
+                return _ParentProductCd;
+            }
+            set
+            {
+                _ParentProductCd = value;
+            }
+        }
+        public string ProductName
+        {
+            get
+            {
+                return _ProductName;
+            }
+            set
+            {
+                _ProductName = value;
+            }
+        }
+        public Int32 LeadTime
+        {
+            get
+            {
+                return _LeadTime;
+            }
+            set
+            {
+                _LeadTime = value;
+            }
+        }
+        public Int32 ValidPort
+        {
+            get
+            {
+                return _ValidPort;
+            }
+            set
+            {
+                _ValidPort = value;
+            }
+        }
+        public Int32 ValidCase
+        {
+            get
+            {
+                return _ValidCase;
+            }
+            set
+            {
+                _ValidCase = value;
+            }
+        }
+        public Int32 PortAvail
+        {
+            get
+            {
+                return _PortAvail;
+            }
+            set
+            {
+                _PortAvail = value;
+            }
+        }
+        public Int32 AccessAvail
+        {
+            get
+            {
+                return _AccessAvail;
+            }
+            set
+            {
+                _AccessAvail = value;
+            }
+        }
+        public Int32 CaseAvail
+        {
+            get
+            {
+                return _CaseAvail;
+            }
+            set
+            {
+                _CaseAvail = value;
+            }
+        }
+
+        public Boolean SelectionSaved
+        {
+            get
+            {
+                return _SelectionSaved;
+            }
+            set
+            {
+                _SelectionSaved = value;
+            }
+        }
+        public Int32 OpsId
+        {
+            get
+            {
+                return sOpsId;
+            }
+            set
+            {
+                sOpsId = value;
+            }
+        }
+        public String VBCURL
+        {
+            get
+            {
+                return sVBCURL;
+            }
+            set
+            {
+                sVBCURL = value;
+            }
+        }
+        public String UserName
+        {
+            get
+            {
+                return sUserName;
+            }
+            set
+            {
+                sUserName = value;
+            }
+        }
+        public Int32 DistributorId
+        {
+            get
+            {
+                return sDistributorId;
+            }
+            set
+            {
+                sDistributorId = value;
+            }
+        }
+        public String Pager
+        {
+            get
+            {
+                return sPager;
+            }
+            set
+            {
+                sPager = value;
+            }
+        }
+        public String Mobile
+        {
+            get
+            {
+                return sMobile;
+            }
+            set
+            {
+                sMobile = value;
+            }
+        }
+        public String Phone
+        {
+            get
+            {
+                return sPhone;
+            }
+            set
+            {
+                sPhone = value;
+            }
+        }
+        public String Email
+        {
+            get
+            {
+                return sEmail;
+            }
+            set
+            {
+                sEmail = value;
+            }
+        }
+        public String LName
+        {
+            get
+            {
+                return sLastName;
+            }
+            set
+            {
+                sLastName = value;
+            }
+        }
+        public String FNAme
+        {
+            get
+            {
+                return sFirstName;
+            }
+            set
+            {
+                sFirstName = value;
+            }
+        }
+
+        public String UserId
+        {
+            get
+            {
+                return sUser_Id;
+            }
+            set
+            {
+                sUser_Id = value;
+            }
+        }
+        //1.4 Add Begins
+        public Boolean ParentPortSpeedSelected
+        {
+            get
+            {
+                return _ParentPortSpeedSelected;
+            }
+            set
+            {
+                _ParentPortSpeedSelected = value;
+            }
+        }
+        public Boolean AccessSupplierSelected
+        {
+            get
+            {
+                return _AccessSupplierSelected;
+            }
+            set
+            {
+                _AccessSupplierSelected = value;
+            }
+        }
+        //1.4 Add Ends
+        // 1.1 Add Begins
+        public Boolean PopsSelected
+        {
+            get
+            {
+                return _PopsSelected;
+            }
+            set
+            {
+                _PopsSelected = value;
+            }
+        }
+        // 1.1 Add Ends
+        //1.2 PortspeedSelection addition
+        public Boolean PortSpeedSelected
+        {
+            get
+            {
+                return _PortSpeedSelected;
+            }
+            set
+            {
+                _PortSpeedSelected = value;
+            }
+        }
+
+        //1.2 ends
+        //1.3 PortspeedSelection addition
+        public Boolean AccessSuppSelected
+        {
+            get
+            {
+                return _AccessSuppSelected;
+            }
+            set
+            {
+                _AccessSuppSelected = value;
+            }
+        }
+
+        //1.3 ends
+        public Int32 SubProductCd
+        {
+            get
+            {
+                return _SubProductCd;
+            }
+            set
+            {
+                _SubProductCd = value;
+            }
+        }
+        public Int32 ProductCd
+        {
+            get
+            {
+                return _ProductCd;
+            }
+            set
+            {
+                _ProductCd = value;
+            }
+        }
+
+        public Guid CacheId
+        {
+            get
+            {
+                return _CacheId;
+            }
+            set
+            {
+                _CacheId = value;
+            }
+        }
+
+        public Cases oCases { get; set; }
+        public DataTable dtRegion { get; set; }
+        public DataTable dtCountry { get; set; }
+        public DataTable dtPoPs { get; set; }
+        public DataSet dsPortSpeed { get; set; }
+        public DataSet dsAccessFilter { get; set; }
+
+        public CaseArray CaseArray { get; set; }
+        private int value = 9999;
+        public int prevStateSelection {
+            get { return this.value; }
+            set { this.value = value; }
+        }
+        #endregion
+
+        public MCUSession()
+        {
+            //
+            // TODO: Add constructor logic here
+            //
+        }
+        #region Public Methods
+        //1.8 Add Begins
+        public void GetInitiationData()
+        {
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString").ToString());
+            ArrayList oGetData = new ArrayList();
+            oGetData = oDataAccess.GetInitiationData(_ProductCd, _SubProductCd);
+            _HasPortSpeed = Convert.ToInt32(oGetData[0].ToString());
+            _LocLevel = Convert.ToInt32(oGetData[1].ToString());
+            _ProductName = oGetData[2].ToString();
+            if (oGetData[3].ToString() != "null")
+            {
+                _SubProductName = oGetData[3].ToString();
+            }
+            _ParentProductCd = Convert.ToInt32(oGetData[4].ToString());
+            _Multipoint = Convert.ToInt32(oGetData[5].ToString());
+            _AllPOPFlag = Convert.ToInt32(oGetData[6].ToString());
+
+        }
+        //1.8 Add Ends
+        //added GSCE-85484 
+        public void GetInitiationDataHvpn()
+        {
+            DataRetrieval_V oDataAccess = new DataRetrieval_V(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString").ToString());
+            ArrayList oGetData = new ArrayList();
+            oGetData = oDataAccess.GetInitiationDataHvpn(_ProductCd, _SubProductCd);
+            _HasPortSpeed = Convert.ToInt32(oGetData[0].ToString());
+            _LocLevel = Convert.ToInt32(oGetData[1].ToString());
+            _ProductName = oGetData[2].ToString();
+            if (oGetData[3].ToString() != "null")
+            {
+                _SubProductName = oGetData[3].ToString();
+            }
+            _ParentProductCd = Convert.ToInt32(oGetData[4].ToString());
+            // _Multipoint = Convert.ToInt32(oGetData[5].ToString());
+            // _AllPOPFlag = Convert.ToInt32(oGetData[6].ToString());
+
+        }
+        //ended GSCE-85484 
+        #endregion
+
+
+    }
+}

@@ -1,0 +1,54 @@
+﻿
+
+
+
+app.controller('Controllers.CharactericsticCtrl', function ($scope, NgTableParams) {
+
+
+    $scope.smaple = "madan";
+
+    $(".drpAdminValidCharView").select2(
+            {
+                placeholder: "Select a State",
+                allowClear: true
+
+            });
+
+    var self = this;
+    var data3 = [{ Name: "	7 x 24 Access Circuit Restoration	" },
+{ Name: "	7 x 24 Access Circuit Restoration #1" },
+{ Name: "	7 x 24 Access Circuit Restoration #1" },
+{ Name: "	7 x 24 Access Circuit Restoration#2	" },
+{ Name: "	7 x 24 Access Circuit Restoration#22" },
+{ Name: "	7 x 24 Access Circuit Restoration#23	" },
+{ Name: "	7 x 24 Access Circuit Restoration#24	" },
+{ Name: "	7 x 24 Access Circuit Restoration#241	" },
+{ Name: "	7 x 24 Access Circuit Restoration#241	" },
+{ Name: "	7 x 24 Access Circuit Restoration#245	" },
+{ Name: "	7 x 24 Access Circuit Restoration#25	" },
+{ Name: "	7 x 24 Access Circuit Restoration#32	" },
+{ Name: "	7 x 24 Access Circuit Restoration#31	" },
+{ Name: "	7 x 24 Access Circuit Restoration#01	" },
+{ Name: "	7 x 24 Access Circuit Restoration#12	" },
+{ Name: "	7 x 24 Access Circuit Restoration#1	" },
+{ Name: "	7 x 24 Access Circuit Restoration#21	" },
+{ Name: "	7 x 24 Access Circuit Restoration#11	" },
+{ Name: "	7 x 24 Access Circuit Restoration#001	" },
+{ Name: "	7 x 24 Access Circuit Restoration#10	" },
+{ Name: "	7 x 24 Access Circuit Restoration#1	" },
+{ Name: "	7 x 24 Access Circuit Restoration#1	" },
+{ Name: "	7 x 24 Access Circuit Restoration#1	" },
+{ Name: "	7 x 24 Access Circuit Restoration#-	" },
+{ Name: "	7 x 24 Access Circuit Restoration#1	" },
+{ Name: "	7 x 24 Access Circuit Restoration#!	" },
+{ Name: "	7 x 24 Access Circuit Restoration#1	" },
+{ Name: "	7 x 24 Access Circuit Restoration#qw	" },
+{ Name: "	7 x 24 Access Circuit Restoration#1	" },
+{ Name: "	7 x 24 Access Circuit Restoration#a	" },
+{ Name: "	7 x 24 Access Circuit Restoration#qa	" },
+]
+
+    self.tableParams = new NgTableParams({},
+         { dataset: data3 });
+
+})

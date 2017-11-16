@@ -1,0 +1,53 @@
+﻿(function (ng, app) {
+    app.controller("Controllers.WeeklyUsageReportCtrl", function ($scope, $http, WeeklyReport, NgTableParams) {
+
+        $scope.NoReportData = false;
+        $scope.WeeklyReportData = false;
+        $scope.modWeeklyReport = [];
+        WeeklyReport.GetWeeklyStartAndEndDates()
+        .success(function (data, headers, config) {
+            var result = [];
+            $scope.reportTypeWeeklyList = data.d;
+            $scope.GetWeeklyUsageReport(parseInt(modWeeklyReport));
+            $(".pageLoaderOverlay").hide();
+        })
+    .error(function (error) {
+        alert("Problem occured while loading Supplier Data; " + error);
+        $(".pageLoaderOverlay").hide();
+    });
+
+
+        $scope.GetWeeklyUsageReport = function () {
+
+            $(".pageLoaderOverlay").show();
+
+            WeeklyReport.GetWeeklyUsageReport($scope.modWeeklyReport).success(function (data) {
+                if (data.d.WeeklyReports.length > 0) {
+                    $scope.WeeklyReportData = true;
+                    $scope.NoReportData = false;
+                    $scope.WeeklyUsageReportTable = new NgTableParams({}, { 'dataset': data.d.WeeklyReports });
+                    $scope.totalCount = data.d.totalCount;
+                    $scope.startDate = data.d.startDate;
+                    $scope.endDate = data.d.endDate;
+                    $(".pageLoaderOverlay").hide();
+                }
+                else {
+                    $scope.WeeklyReportData = false;
+                    $scope.NoReportData = true;
+                    $(".pageLoaderOverlay").hide();
+                }
+            })
+    .error(function (error) {
+        alert("Problem occured while loading Supplier Data; " + error);
+        $(".pageLoaderOverlay").hide();
+    });
+        }
+
+    });
+
+} (angular, app));
+
+
+
+
+

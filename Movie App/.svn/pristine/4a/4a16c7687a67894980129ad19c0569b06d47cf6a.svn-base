@@ -1,0 +1,436 @@
+<style>
+   label
+   {
+       font-size:12px;
+   }
+
+</style>
+<div ng-controller="Controllers.SubProductCtrl as vm">
+<div class="form-horizontal">
+       <div class="container">
+        <h2>
+            <span style="float: left; cursor: default">Sub Product</span></h2>
+    </div>
+    </div>
+    <br />
+     <br />
+    <div>
+        <div class="form-group col-md-12">
+          
+          
+           <label class="control-label col-md-3" for="drpProduct" style="font-size: 13px;  margin-left: 10px;">
+                Select the product type
+            </label>
+           
+            
+            <div class="col-md-6">
+                <select class="clsddlProducttype" style="width:250px">
+                    <option selected="selected">AC VPN ENCORE </option>
+                    <option>Access </option>
+                    <option>Assure Managed Devices </option>
+                    <option>BT Bandwidth Services </option>
+                    <option>BT Business Voice Select </option>
+                    <option>BT Business Voice VoicePort </option>
+                    <option>BT CCS Direct </option>
+                    <option>BT Contact Centre Service </option>
+                    <option>BT CPE </option>
+                    <option>BT Etherflow Global </option>
+                    <option>BT Finance Extranet </option>
+                    <option>BT Generic Voice Information </option>
+                    <option>BT GS Portfolio Database </option>
+                    <option>BT Internet Access </option>
+                    <option>BT Internet Connect Global </option>
+                    <option>BT IP Sec </option>
+                    <option>BT iVPN </option>
+                    <option>BT LAN SAN Extension Service </option>
+                    <option>BT Managed Firewall </option>
+                    <option>BT Media and Broadcast </option>
+                    <option>BT MessageScan </option>
+                    <option>BT MFS </option>
+                    <option>BT MobileXpress Mobile IPsec VPN </option>
+                    <option>BT MPLS </option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <a data-target="#addNewProductModal"
+                 data-toggle="modal"
+                 class="btn btn-primary btn-sm">
+                   Add New Service type</a>
+            </div>
+        </div>
+    </div>
+  
+  
+  
+    <div class="container">
+        <table ng-table="vm.tableParams" class="table" show-filter="true">
+            <tr ng-repeat="user in $data">
+                <td title="'Product Name'" filter="{ Name: 'text'}" sortable="'name'">
+                    <a data-target="#EditSubproductReferenceId" data-toggle="modal">{{user.Name}}
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+   
+
+
+
+
+    <div tabindex="-1" class="modal fade in modalalign" id="EditSubproductReferenceId" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Edit Sub-product Reference</h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Abbreviation</label>
+                                <div class="col-md-5">
+                                    <input type="text" value="AC VPN ENCORE #1" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label  col-md-5">
+                                    Name</label>
+                                <div class="col-md-5">
+                                    <input type="text" value="AC VPN ENCORE #1" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Parent</label>
+                                <div class="col-md-5">
+                                    <label for="inputDescription" class="control-label">
+                                        Access</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Sub-Product is Valid</label>
+                                <div class="col-md-5">
+                                    <input type="checkbox" checked="true" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Use CPE for Sub-Product</label>
+                                <div class="col-md-5">
+                                    <input type="checkbox" checked="true" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Make Parent Port speeds valid for Sub-Product</label>
+                                <div class="col-md-5">
+                                    <input type="checkbox" checked="true" />
+                                    &nbsp;&nbsp;&nbsp;<span>(This product does not have a parent product)</span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Display PoP characteristic for Sub-Product</label>
+                                <div class="col-md-7">
+                                    <input type="checkbox" checked="true" /><span>&nbsp;&nbsp;&nbsp;<u><a data-target="#popCharasticmdodalId"
+                                        data-toggle="modal">Click here to display PoP characteristic for Sub-Product</a></span></u>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Launch the Sub-Product for End-Users</label>
+                                <div class="col-md-5">
+                                    <input type="checkbox" checked="true" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Access Method Required</label>
+                                <div class="col-md-5">
+                                    <input type="checkbox" checked="true" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Supported Country Level Access Type</label>
+                                <div class="col-md-7">
+                                    <select class="js-example-basic-single" multiple="multiple" style="width: 75%">
+                                        <option value="180661">ADSL</option>
+                                        <option value="18261">ADSL over ISDN</option>
+                                        <option value="8281">ADSL over PSTN</option>
+                                        <option value="180662">ADSL2PLUS</option>
+                                        <option value="51261">ADSL2PLUS over PSTN</option>
+                                        <option value="180663">FTTC</option>
+                                        <option value="180664">FTTP</option>
+                                        <option value="5801">SDSL</option>
+                                        <option value="5802">VSAT</option>
+                                        <option value="20464">hVPN-Cable</option>
+                                        <option value="20465">hVPN-DSL</option>
+                                        <option value="20466">hVPN-Mobile</option>
+                                        <option value="20463">hVPN-PLC</option>
+                                        <option value="20462">hVPN-Satellite</option>
+                                        <option value="20461">hVPN-Wireless</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div class="form-horizontal" style="padding-left: 3%">
+                                <div class="form-group col-md-12">
+                                    
+                                    <div class="col-md-3">
+                                        <u><b><span>Created by</span></b></u><br />
+                                        <span>MacGamwell,John</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Created Date</span></b></u><br />
+                                        <span>21-MAY-1999 09:58:12 AM&nbsp;GMT</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Updated by</span></b></u><br />
+                                        <span>Prasad, Achutha</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <u><b><span>Date Last Updated</span></b></u><br />
+                                        <span>18-DEC-2003 06:47:38 PM&nbsp;GMT</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Update" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Delete" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div tabindex="-1" class="modal fade in md modalalign" id="addNewProductModal" role="dialog" aria-hidden="true"
+        aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H1">
+                            Add New Sub-product Reference</h4>
+                    </div>
+                  <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-4" for="inputDescription">
+                                    Abbreviation</label>
+                                <div class="col-md-5">
+                                    <input class="form-control" type="text" value="">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-4" for="inputDescription">
+                                    Name</label>
+                                <div class="col-md-7">
+                                    <textarea class="form-control" type="text" value="">
+                                    </textarea>
+                                    (Max 200 characters are allowed in Name)
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-4" for="inputDescription">
+                                    Parent</label>
+                                <div class="col-md-5">
+                                    <label class="control-label" for="inputDescription">
+                                        AC VPN ENCORE</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-4" for="inputDescription">
+                                    Valid</label>
+                                <div class="col-md-5">
+                                    <input type="checkbox" checked="true">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-4" for="inputDescription">
+                                    Access Method Required</label>
+                                <div class="col-md-5">
+                                    <input type="checkbox" checked="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Submit" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    <div tabindex="-1" class="modal fade in modalalign" id="popCharasticmdodalId" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H2">
+                            Edit Display of PoP characteristics</h4>
+                    </div>
+                 
+                    <div>
+                        <div class="modal-body">
+                            <div class="container">
+                                <table id="popTblId" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                PoP Characteristics
+                                            </th>
+                                            <th>
+                                                Display in Search results, Define case, Case details screen
+                                            </th>
+                                            <th>
+                                                Display in Sub-Product tab of Standard report
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <span>BRONZE_MULTICAST</span>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                            <td style="text-align:cener">
+                                                <input type="checkbox"  />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                BRONZE_SLA
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                CAVEAT
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                FAST CONVERGENCE
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                GOLD_CD
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                GOLD_CD_MULTICAST
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                CAVEAT
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                GOLD_SLA
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                IPV6_PE_COUNT_IA
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                     </div>
+                 
+                        <div class="modal-footer">
+                         <input type="button" class="btn btn-md btn-primary" value="Update" />
+                            <button class="btn btn-default" type="button" data-dismiss="modal">
+                                Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+   
+  
+</div>
+ 

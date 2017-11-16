@@ -1,0 +1,275 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SCAdminDAL;
+using System.Data;
+
+namespace SCAdminBAL
+{
+    public class CaseDefBAL
+    {
+        public DataSet GetProducts()
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetProducts();
+        }
+
+        public DataSet GetRegions()
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetRegions();
+        }
+
+        public DataSet GetCountries(int RegionID, int ProductID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetCountries(RegionID, ProductID);
+        }
+
+        public DataSet GetCases(int ProductID, int RegionID, int CountryID, int AccessLevel, int UserID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetCases(ProductID, RegionID, CountryID, AccessLevel, UserID);
+        }
+        public DataSet GetProductLevel(int ProductID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetProductLevel(ProductID);
+        }
+
+        public DataSet GetAvailDesc()
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetAvailDesc();
+        }
+
+        public DataSet GetPoPChars(int HubSiteID, int ProductID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetPoPChars(HubSiteID, ProductID);
+        }
+
+        public DataSet GetNetworkDetails(int CaseID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetNetworkDetails(CaseID);
+        }
+
+        public DataSet GetPoPCharValues(int HubSiteID, int ProductID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetPoPCharValues(HubSiteID, ProductID);
+        }
+        public DataSet GetCaseDetails(int CaseID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetCaseDetails(CaseID);
+        }
+
+        public DataSet GetStateProvinceFlag(int CountryID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetStateProvinceFlag(CountryID);
+        }
+
+        public DataSet GetHubSiteType(int CaseID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetHubSiteType(CaseID);
+        }
+
+        public DataSet GetSupplierDetails(int HubSiteID, int CaseID, int ProductID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetSupplierDetails(HubSiteID, CaseID, ProductID);
+        }
+
+        public DataSet GetSupplierDetails(int HubSiteID, int CaseID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetSupplierDetails(HubSiteID, CaseID);
+        }
+
+        public int SaveCaseDetails(int CaseID, int CityID, int StatePovinceID, int HubSiteID, string EmpID, string SiteAvailabilityDate, int SupportResilientPOP, int ExceptionRequired, string SelectedSuppliers, int Availability)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.SaveCaseDetails(CaseID, CityID, StatePovinceID, HubSiteID, EmpID, SiteAvailabilityDate, SupportResilientPOP, ExceptionRequired, SelectedSuppliers, Availability);
+        }
+
+        public int DeleteCaseDetails(int AccessLevel, int CaseID, int UserID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.DeleteCaseDetails(AccessLevel, CaseID, UserID);
+        }
+
+        public DataSet GetCaseCharDetails(int CaseID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetCaseCharDetails(CaseID);
+        }
+
+        public bool GetiDSLFlag(string ProductCd, string SubProductCd, string Level)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetiDSLFlag(ProductCd, SubProductCd, Level);
+        }
+        public DataSet GetParentPortSpeeds(int HubSiteID, int ParentID, int NetworkID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetParentPortSpeeds(HubSiteID, ParentID, NetworkID);
+        }
+
+        public DataSet GetParentPortSpeedMapping(string PortSpeedCharID, int CaseID, int HubSiteID, int ParentID, int ProductID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetParentPortSpeedMapping(PortSpeedCharID, CaseID, HubSiteID, ParentID, ProductID);
+        }
+
+        public DataSet GetPortInfo(int CaseID, int PortSpeedCharID, int AccessSpeedCharID, int AccessProductTypeID, int AccessSupplierNameID, int AccessSupplierCharID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetPortInfo(CaseID, PortSpeedCharID, AccessSpeedCharID, AccessProductTypeID, AccessSupplierNameID, AccessSupplierCharID);
+        }
+
+        public DataSet GetEnableMapping(int ProductID, int PortSpeedCharID, int AccessSpeedCharID, int AccessTypeCharID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetEnableMapping(ProductID, PortSpeedCharID, AccessSpeedCharID, AccessTypeCharID);
+        }
+
+        public DataSet GetParentSpeedsCount(int CaseID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetParentSpeedsCount(CaseID);
+        }
+
+        public DataSet ValidateParentPortSpeed(int ProductID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.ValidateParentPortSpeed(ProductID);
+        }
+
+
+        public DataSet GetCaseDetailsByFilter(string Supplier, string AccessType, string SupplierProduct, int PortSpeedCharID, int ProductID, int CaseID, int HubSiteID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetCaseDetailsByFilter(Supplier, AccessType, SupplierProduct, PortSpeedCharID, ProductID, CaseID, HubSiteID);
+        }
+
+        public DataSet GetPortSpeedCaseDetails(string Supplier, string AccessType, string SupplierProduct, string PortSpeedCharID, int ProductID, int CaseID, int HubSiteID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetPortSpeedCaseDetails(Supplier, AccessType, SupplierProduct, PortSpeedCharID, ProductID, CaseID, HubSiteID);
+        }
+
+        public List<CountryAccessCases> GetCountryAccessCasesByRegion(string ProductCd, string Region)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            DataTable dtCases = dal.GetCountryAccessCasesByRegion(ProductCd, Region).Tables[0];
+            List<CountryAccessCases> lstCountryAccessCases = new List<CountryAccessCases>();
+            foreach (DataRow dr in dtCases.Rows)
+            {
+                CountryAccessCases CountryAccessCases = new CountryAccessCases();
+                CountryAccessCases.CaseId = Convert.ToString(dr["case_id"]);
+                CountryAccessCases.CountryName = Convert.ToString(dr["country_name"]);
+                CountryAccessCases.CountryId = Convert.ToInt32(dr["country_id"]);
+                CountryAccessCases.Region = Convert.ToString(dr["region_name"]);
+                CountryAccessCases.CreatedBy = Convert.ToString(dr["Created_user"]);
+                CountryAccessCases.CreatedDate = Convert.ToString(dr["created_dt"]);
+                CountryAccessCases.UpdatedBy = Convert.ToString(dr["Updated_user"]);
+                CountryAccessCases.UpdatedDate = Convert.ToString(dr["updated_dt"]);
+                CountryAccessCases.Validity = Convert.ToString(dr["ShowValid"]);
+                CountryAccessCases.CaseAvailability = Convert.ToString(dr["CaseAvailability"]);
+                CountryAccessCases.CaseAvailCd = Convert.ToInt32(dr["case_avail_cd"]);
+                lstCountryAccessCases.Add(CountryAccessCases);
+            }
+            return lstCountryAccessCases;
+        }
+
+        public int GetParentProduct(int ProductID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetParentProduct(ProductID);
+        }
+
+        public DataSet GetCharTypeIDs(string strCharName)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetCharTypeIDs(strCharName);
+        }
+
+        public DataSet GetCharTypeValueCount(string CharTypeID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetCharTypeValueCount(CharTypeID);
+        }
+
+        public DataSet GetRecordsCount(string TableName, string CaseID, string PortSpeedCharID, string AccessSpeedID, string ProductTypeID, string SupplierNameID, string AccessSupplierID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetRecordsCount(TableName, CaseID, PortSpeedCharID, AccessSpeedID, ProductTypeID, SupplierNameID, AccessSupplierID);
+        }
+
+        public List<CaseAvailability> GetCaseAvailability()
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            DataTable dtCases = dal.GetCaseAvailability().Tables[0];
+            List<CaseAvailability> lstCaseAvailability = new List<CaseAvailability>();
+            foreach (DataRow dr in dtCases.Rows)
+            {
+                CaseAvailability CaseAvailability = new CaseAvailability();
+                CaseAvailability.CaseAvailCd = Convert.ToInt32(dr["avail_cd"]);
+                CaseAvailability.CaseAvailAbbr = Convert.ToString(dr["avail_abbr"]);
+                CaseAvailability.CaseAvailDesc = Convert.ToString(dr["avail_desc"]);
+                lstCaseAvailability.Add(CaseAvailability);
+            }
+            return lstCaseAvailability;
+        }
+
+        //public int GetParentProduct(int ProductID)
+        //{
+        //    CaseDefDAL dal = new CaseDefDAL();
+        //    return dal.GetParentProduct(ProductID);
+        //}    
+
+        public DataSet GetCities(int RegionID, int CountryID, string Filter,int PageNo,int PageSize,ref int Count)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetCities(RegionID, CountryID, Filter, PageNo, PageSize,ref Count);
+        }
+
+        public DataSet GetStates(int RegionID, int CountryID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetStates(RegionID, CountryID);
+        }
+
+        public DataSet GetFirstCity(int RegionID, int CountryID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetFirstCity(RegionID, CountryID);
+        }
+
+        public int GetCaseID()
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetCaseID();
+        }
+
+        public DataSet GetProductCharacteristics(int ProductID)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.GetProductCharacteristics(ProductID);
+        }
+
+        public int SaveCaseDetails(string strQry)
+        {
+            CaseDefDAL dal = new CaseDefDAL();
+            return dal.SaveCaseDetails(strQry);
+        }
+
+
+    }
+
+}

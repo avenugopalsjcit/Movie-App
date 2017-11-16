@@ -1,0 +1,347 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using SCAdminBAL;
+using System.Data;
+
+using System.Web.Security;
+using System.Web.Services;
+using System.Web.Script.Services;
+using System.Text;
+using System.Web.UI.WebControls.WebParts;
+using System.IO;
+using System.Web.Script.Serialization;
+//using System
+using Newtonsoft.Json;
+using System.Collections;
+using System.Reflection;
+using SCAdminDAL;
+using SCAdminBAL;
+using System.Data.OracleClient;
+using System.Web.UI;
+using System.Web.Security;
+using Newtonsoft.Json.Linq;
+
+
+
+namespace SCAdmin
+{
+    public partial class ProductDefination : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        #region Servicetypes
+        [WebMethod]
+        public static string getServicetype()
+        {
+            DataTable dt = SCAdminBAL.ProductDefinationBAL.getSeviceTypes();
+            var data = new
+            {
+                getServiceTypes = dt,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+        [WebMethod]
+
+        // Servicetype service, int UpdateId = 0, int InsertId = 0, int ServiceTypeId = 0
+        // public static int InsertSeviceTypes(string service, int UpdateId = 0, int InsertId = 0)
+
+        // Servicetype service, int UpdateId = 0, int InsertId = 0, int ServiceTypeId = 0
+        public static int InsertSeviceTypes(string Userid, string service, int UpdateId = 0, int InsertId = 0)
+        {
+            SCAdminDAL.Servicetype serviceData =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<SCAdminDAL.Servicetype>(service);
+            return ProductDefinationBAL.InsertSeviceTypes(Userid, serviceData, UpdateId, InsertId);
+        }
+
+        [WebMethod]
+        // Servicetype service, int UpdateId = 0, int InsertId = 0, int ServiceTypeId = 0
+        public static string DeleteServiceType(int ServiceTypeId)
+        {
+            return ProductDefinationBAL.DeleteServiceType(ServiceTypeId);
+        }
+        #endregion
+
+        [WebMethod]
+        public static string getCharType()
+        {
+            DataTable dt = SCAdminBAL.ProductDefinationBAL.getCharTypes();
+            var data = new
+            {
+                getCharTypes = dt,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+        public static int InsertCharTypes(string Userid, string service, int UpdateId = 0, int InsertId = 0)
+        {
+            SCAdminDAL.Chartype serviceData =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<SCAdminDAL.Chartype>(service);
+            return ProductDefinationBAL.InsertCharTypes(Userid, serviceData, UpdateId, InsertId);
+        }
+
+        [WebMethod]
+
+        public static string DeleteCharType(int CharTypeId)
+        {
+            return ProductDefinationBAL.DeleteCharType(CharTypeId);
+        }
+
+        #region Product
+
+        [WebMethod]
+        public static string getProducts()
+        {
+            DataSet ds = SCAdminBAL.ProductDefinationBAL.getProducts();
+            DataSet getProducts = new DataSet();
+            var data = new
+            {
+                getProducts = ds,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+        [WebMethod]
+        public static string AddProduct(string Product)
+        {
+            SCAdminDAL.Products productdata =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<SCAdminDAL.Products>(Product);
+            return ProductDefinationBAL.AddProduct(productdata);
+        }
+
+
+        [WebMethod]
+        public static string GetProducstsList(int ProductID)
+        {
+            DataSet ds = SCAdminBAL.ProductDefinationBAL.getProductsList(ProductID);
+            DataSet getProducts = new DataSet();
+            var data = new
+            {
+                getProducts = ds,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+        [WebMethod]
+        public static string UpdateProducts(string CapmanRecords, string Product, int ProductID, string SupportRecordNames, string SupportRecords)
+        {
+            //SCAdminDAL.Products MappedInterfaces =
+            //new System.Web.Script.Serialization.JavaScriptSerializer().
+            //Deserialize<SCAdminDAL.Products>(Product);
+
+
+            //JObject jObject4 = JObject.Parse(Product);
+            //JObject jToken4 = (JObject)jObject4.GetValue("Product");
+            //SCAdminDAL.Products array4 = jToken4.Value<SCAdminDAL.Products>();
+
+            //  dynamic jObject4 = JObject.Parse(Product);
+
+            List<SCAdminDAL.Products> Products =
+              new System.Web.Script.Serialization.JavaScriptSerializer().
+              Deserialize<List<SCAdminDAL.Products>>(Product);
+
+            JObject jObject1 = JObject.Parse(CapmanRecords);
+            JToken jToken1 = jObject1.GetValue("CapmanRecords");
+            int[] CapmanRecords1 = jToken1.Values<int>().ToArray();
+
+
+            JObject jObject2 = JObject.Parse(SupportRecords);
+            JToken jToken2 = jObject1.GetValue("SupportRecords");
+            int[] SupportRecords1 = jToken2.Values<int>().ToArray();
+
+
+            List<SCAdminDAL.csu_product_phase_attribute> phase_attribute =
+            new System.Web.Script.Serialization.JavaScriptSerializer().
+            Deserialize<List<SCAdminDAL.csu_product_phase_attribute>>(Product);
+
+
+            //JObject jObject3 = JObject.Parse(SupportRecordNames);
+            //JToken jToken3 = jObject3.GetValue("SupportRecordNames");
+            //string[] SupportRecordNames1 = jToken3.Values<string>().ToArray();
+
+
+            return ProductDefinationBAL.UpdateProducts(Products, CapmanRecords1, phase_attribute, ProductID);
+        }
+
+
+
+
+
+
+        [WebMethod]
+        public static string InsertProductAccessInterfaces(string Interfaces)
+        {
+
+            List<SCAdminDAL.AccessMappedInterfaces> MappedInterfaces =
+               new System.Web.Script.Serialization.JavaScriptSerializer().
+               Deserialize<List<SCAdminDAL.AccessMappedInterfaces>>(Interfaces);
+
+            DataSet MappedInterface = new DataSet();
+            DataSet MappedInterfacesList = SCAdminBAL.ProductDefinationBAL.InsertProductAccessInterfaces(MappedInterfaces);
+            var data = new
+            {
+                MappedInterface = MappedInterfacesList,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+
+        }
+
+
+        [WebMethod]
+        public static string GetPoPCharctersticsforProduct(int ProductID)
+        {
+            DataTable dt = SCAdminBAL.ProductDefinationBAL.GetPoPCharctersticsforProduct(ProductID);
+
+            var data = new
+            {
+                getPoPCharcterstics = dt,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+        [WebMethod]
+        public static string UpdatePoPCharcterstic(string PoPs,
+           int ProductID, int UpdateEmpId)
+        {
+            List<SCAdminDAL.PoPCharcterstic> PopsObj =
+              new System.Web.Script.Serialization.JavaScriptSerializer().
+              Deserialize<List<SCAdminDAL.PoPCharcterstic>>(PoPs);
+
+            return SCAdminBAL.ProductDefinationBAL.UpdatePoPCharcterstic(PopsObj, ProductID, UpdateEmpId);
+        }
+
+        // public static string getServicetype()
+        //{
+        //    DataTable dt = SCAdminBAL.ProductDefinationBAL.getSeviceTypes();
+        //    var data = new
+        //    {
+        //        getServiceTypes = dt,
+        //    };
+        //    return JsonConvert.SerializeObject(data, Formatting.Indented);
+        //}
+
+
+        [WebMethod]
+        public static string GetValidMappingforProduct(int ProductID)
+        {
+            DataTable dt = SCAdminBAL.ProductDefinationBAL.GetValidMappingforProduct(ProductID);
+
+            var data = new
+            {
+                getValidMapping = dt,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+        [WebMethod]
+        public static string GetAccessMappingforProduct(int ProductID)
+        {
+            DataTable dt = SCAdminBAL.ProductDefinationBAL.GetAccessMappingforProduct(ProductID);
+
+            var data = new
+            {
+                getAccessSpeedMapping = dt
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+        [WebMethod]
+        public static string UpdatePortSpeedsMapping(string PortSpeeds, int ProductID, int UpdateEmpId)
+        {
+
+            List<SCAdminDAL.PortSpeedMapping> PortSpeedObj =
+               new System.Web.Script.Serialization.JavaScriptSerializer().
+               Deserialize<List<SCAdminDAL.PortSpeedMapping>>(PortSpeeds);
+
+
+            return SCAdminBAL.ProductDefinationBAL.UpdatePortSpeedsMapping(PortSpeedObj, ProductID, UpdateEmpId);
+
+        }
+
+
+
+        [WebMethod]
+        public static string UpdateAccessSpeedsMapping(string AccessSpeeds, int ProductID, int UpdateEmpId)
+        {
+
+            List<SCAdminDAL.AccessSpeedMapping> AccessSpeedObj =
+               new System.Web.Script.Serialization.JavaScriptSerializer().
+               Deserialize<List<SCAdminDAL.AccessSpeedMapping>>(AccessSpeeds);
+
+            return SCAdminBAL.ProductDefinationBAL.UpdateAccessSpeedsMapping(AccessSpeedObj, ProductID, UpdateEmpId);
+
+        }
+
+
+        [WebMethod]
+        public static string GetFlexPorts(int ProductID)
+        {
+            DataSet ds = SCAdminBAL.ProductDefinationBAL.GetFlexPorts(ProductID);
+            DataSet getProducts = new DataSet();
+            var data = new
+            {
+                GetFlexPorts = ds,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+        //"ProductID": $scope.DDL_PL_Product,
+        //    "CountryID": FlexPort.Country,
+        //    "AvailabilityID": FlexPort.AVAIL_CD,
+        //    "AcceeTypeIDs": FlexPort.CHAR_ID
+        [WebMethod]
+        public static string AddFlexPort(string FlexPortJson, string CharId)
+        {
+
+            List<SCAdminDAL.csu_flexiport_availability> FlexPort =
+               new System.Web.Script.Serialization.JavaScriptSerializer().
+               Deserialize<List<SCAdminDAL.csu_flexiport_availability>>(FlexPortJson);
+
+            return SCAdminBAL.ProductDefinationBAL.AddFlexPort(FlexPort[0], CharId);
+
+        }
+
+        [WebMethod]
+        public static string DeleteFlexPort(string FlexPortJson)
+        {
+            List<SCAdminDAL.csu_flexiport_availability> FlexPort =
+             new System.Web.Script.Serialization.JavaScriptSerializer().
+             Deserialize<List<SCAdminDAL.csu_flexiport_availability>>(FlexPortJson);
+
+            return SCAdminBAL.ProductDefinationBAL.DeleteFlexPort(FlexPort);
+        }
+
+
+
+        [WebMethod]
+        public static string GetUnbundledNNI(int ProductID, int CountryID, int SupplierID)
+        {
+            DataSet ds = SCAdminBAL.ProductDefinationBAL.GetUnbundledNNI(ProductID, CountryID, SupplierID);
+            DataSet getProducts = new DataSet();
+            var data = new
+            {
+                GetUnbundledNNI = ds,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+
+        #endregion
+
+    }
+}

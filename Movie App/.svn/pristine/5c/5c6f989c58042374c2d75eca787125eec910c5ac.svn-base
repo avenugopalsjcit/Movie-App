@@ -1,0 +1,102 @@
+﻿//(function (ng, app) {
+
+
+app.controller("NotesAuditReportCtrl", function ($scope, $http, ServiceTypeProductMap, NgTableParams, NotesAuditReport, JSONToCSVConvertor) {
+    $(".pageLoaderOverlay").show();
+    $scope.ServiceTypes = [];
+    $scope.ServiceTypeProductMap = [];
+    $scope.Products = [];
+    $scope.NotesAuditData = [];
+    $scope.DisplayMessage = false;
+
+    ServiceTypeProductMap.GetServiceTypeProductMap("Notes").success(function (data) {
+
+        var serviceTypes = [];
+
+        $scope.ServiceTypeProductMap = data.d;
+
+        data.d.forEach(function (item) {
+            serviceTypes.push(item.ServiceType);
+        });
+
+        var lookup = {};
+        var result = [];
+
+        for (var item, i = 0; item = serviceTypes[i++]; ) {
+            var name = item;
+
+            if (!(name in lookup)) {
+                lookup[name] = 1;
+                result.push(name);
+            }
+        }
+        $scope.ServiceTypes = result;
+        $("#Select1").select2(
+            {
+            });
+        $("#Select2").select2(
+            {
+
+            });
+        $(".pageLoaderOverlay").hide();
+    });
+
+    $scope.GetProducts = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.Products = [];
+        $scope.ServiceTypeProductMap.forEach(function (item) {
+            if ($scope.modServiceType == item.ServiceType) {
+                $scope.Products.push({ ProductId: item.ProductId, ProductName: item.ProductName });
+            }
+        });
+        //        $('#ProductDiv .select2-chosen').html("  -- Select Product --");
+        $(".pageLoaderOverlay").hide();
+        $scope.NotesshowExport = false;
+    }
+
+    $scope.GetNotesAuditReport = function () {
+        if ($scope.modProduct != null) {
+            $(".pageLoaderOverlay").show();
+            NotesAuditReport.GetNotesAuditReport($scope.modProduct).success(function (data) {
+                $scope.NotesAuditData = new NgTableParams({}, { 'dataset': data.d });
+//                $scope.ExportNotesAuditData = data.d;
+                data.d.forEach(function (item) {
+                    $scope.ExportNotesAuditData.push({ 'Note ID': item.NoteId, 'Note Title': item.NoteTitle, 'Created User Name': item.CreatedBy, 'Created On': item.CreatedDate, 'Updated User Name': item.UpdatedBy, 'Updated On': item.UpdatedDate });
+                });
+
+                if (data.d.length == 0) {
+                    $scope.NotesAuditData = [];
+                    $scope.DisplayMessage = true;
+                    $scope.NotesshowExport = false;
+                }
+                else {
+                    $scope.NotesshowExport = true;
+                }
+                $(".pageLoaderOverlay").hide();
+            });
+        } else {
+            $scope.NotesAuditData = [];
+            $scope.DisplayMessage = false;
+        }
+    }
+    $scope.ExportNotesAuditData = [];
+
+
+
+    $scope.ExportNotesReport = function () {
+        JSONToCSVConvertor.ConvertJSONToCSV($scope.ExportNotesAuditData, true, "NotesReportData", "csvDownloadFrame");
+    }
+
+});
+
+app.factory('NotesAuditReport', function ($http) {
+
+    var NotesAuditReport = {};
+    NotesAuditReport.GetNotesAuditReport = function (productCode) {
+        return $http.post('Reports.aspx/GetNotesAuditReport', { productCode: productCode });
+    }
+
+    return NotesAuditReport;
+});
+
+//} (angular, app));

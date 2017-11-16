@@ -1,0 +1,157 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+   public class AdminAccessSupplierBAL
+    {
+
+       private AdminAccessSupplierDAL objSRD = new AdminAccessSupplierDAL();
+
+        public List<AdminAccessSupplier> GetGridAdminAccessSupplier()
+        {
+
+
+            List<AdminAccessSupplier> lstOrg = new List<AdminAccessSupplier>();
+            DataTable dtGridDistributor = objSRD.GetGridAdminAccessSupplierDAL();
+
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AdminAccessSupplier objOrg = new AdminAccessSupplier();
+
+                objOrg.suppliername = Convert.ToString(dr["Supplier_name"]);
+                objOrg.supplierid = Convert.ToInt32(dr["supplierid"]);
+                
+                if (Convert.ToString(dr["Created_By"]) == "")
+                {
+                    objOrg.CreatedBy = "Unknown";
+                }
+                else
+                {
+                    objOrg.CreatedBy = Convert.ToString(dr["Created_By"]);
+                }
+                objOrg.CreatedDate = Convert.ToString(dr["Created_dt"]);
+                objOrg.UpdatedBy = Convert.ToString(dr["Updated_By"]);
+                objOrg.UpdatedDate = Convert.ToString(dr["Updated_dt"]);
+
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+        public List<AdminAccessSupplierList> GetAdminAccessSupplierDistDAL(string supplierid)
+        {
+
+
+            List<AdminAccessSupplierList> lstOrg = new List<AdminAccessSupplierList>();
+            DataTable dtGridDistributor = objSRD.GetAdminAccessSupplierDistDAL(supplierid);
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AdminAccessSupplierList objOrg = new AdminAccessSupplierList();
+
+                objOrg.name = Convert.ToString(dr["name"]);
+                objOrg.id = Convert.ToInt32(dr["id"]);
+                objOrg.shortname = Convert.ToString(dr["short"]);
+              
+                objOrg.valid = Convert.ToBoolean(dr["valid"]);
+              
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+
+        public List<AdminAccessSupplierList> GetAdminAccessSupplierAssignDistDAL(string supplierid)
+        {
+
+
+            List<AdminAccessSupplierList> lstOrg = new List<AdminAccessSupplierList>();
+            DataTable dtGridDistributor = objSRD.GetAdminAccessSupplierAssignDistDAL(supplierid);
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AdminAccessSupplierList objOrg = new AdminAccessSupplierList();
+
+                objOrg.name = Convert.ToString(dr["name"]);
+                objOrg.id = Convert.ToInt32(dr["id"]);
+                objOrg.shortname = Convert.ToString(dr["short"]);
+              
+                objOrg.valid = Convert.ToBoolean(dr["valid"]);
+
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+        public List<AdminAccessSupplierList> GetAdminAccessSupplierCountryDAL(string supplierid)
+        {
+
+
+            List<AdminAccessSupplierList> lstOrg = new List<AdminAccessSupplierList>();
+            DataTable dtGridDistributor = objSRD.GetAdminAccessSupplierCountryDAL(supplierid);
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AdminAccessSupplierList objOrg = new AdminAccessSupplierList();
+
+                objOrg.countryid = Convert.ToInt32(dr["country_id"]);
+                objOrg.countryname = Convert.ToString(dr["country_name"]);
+                if (dr["priority"] != DBNull.Value)
+                {
+                    
+                        objOrg.priority = Convert.ToInt32(dr["priority"]);
+                }
+               
+
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+        public List<AdminAccessSupplierList> GetAdminAccessSupplierAssignCountryDAL(string supplierid)
+        {
+
+
+            List<AdminAccessSupplierList> lstOrg = new List<AdminAccessSupplierList>();
+            DataTable dtGridDistributor = objSRD.GetAdminAccessSupplierAssignCountryDAL(supplierid);
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AdminAccessSupplierList objOrg = new AdminAccessSupplierList();
+
+               
+                objOrg.countryid = Convert.ToInt32(dr["country_id"]);
+                objOrg.countryname = Convert.ToString(dr["country_name"]);
+                if (dr["priority"] != DBNull.Value)
+                {
+                    objOrg.priority = Convert.ToInt32(dr["priority"]);
+                }
+               
+
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+    }
+}

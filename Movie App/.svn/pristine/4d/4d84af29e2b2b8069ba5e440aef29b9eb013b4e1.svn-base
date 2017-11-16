@@ -1,0 +1,161 @@
+﻿app.factory('AdminAccessSupplierFactory', function ($http) {
+
+    var AdminAccessSupplierFactory = {};
+
+    AdminAccessSupplierFactory.GetSuppGridlst = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminAccessSupplierView', { });
+
+    }
+
+    return AdminAccessSupplierFactory;
+});
+
+app.factory('AdminAccessSupplierDistributorFactory', function ($http) {
+
+    var AdminAccessSupplierDistributorFactory = {};
+
+    AdminAccessSupplierDistributorFactory.GetSuppDistlst = function (supplierid) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminAccessSupplierDistDAL', { 'supplierid': supplierid });
+
+    }
+
+    return AdminAccessSupplierDistributorFactory;
+});
+
+app.factory('AdminAccessSupplierAssDistFactory', function ($http) {
+
+    var AdminAccessSupplierAssDistFactory = {};
+
+    AdminAccessSupplierAssDistFactory.GetSuppAssDistlst = function (supplierid) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminAccessSupplierAssignDistDAL', { 'supplierid': supplierid });
+
+    }
+
+    return AdminAccessSupplierAssDistFactory;
+});
+
+app.factory('AdminAccessSupplierCountryFactory', function ($http) {
+
+    var AdminAccessSupplierCountryFactory = {};
+
+    AdminAccessSupplierCountryFactory.GetSuppCountrylst = function (supplierid) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminAccessSupplierCountryDAL', { 'supplierid': supplierid });
+
+    }
+
+    return AdminAccessSupplierCountryFactory;
+});
+
+app.factory('AdminAccessSupplierAssCountryFactory', function ($http) {
+
+    var AdminAccessSupplierAssCountryFactory = {};
+
+    AdminAccessSupplierAssCountryFactory.GetSuppAssCountrylst = function (supplierid) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminAccessSupplierAssignCountryDAL', { 'supplierid': supplierid });
+
+    }
+
+    return AdminAccessSupplierAssCountryFactory;
+});
+
+
+app.controller('AdminAccessSupplierCtrl', ['$scope', 'AdminAccessSupplierFactory', 'NgTableParams', 'AdminAccessSupplierDistributorFactory', 'AdminAccessSupplierAssDistFactory', 'AdminAccessSupplierCountryFactory', 'AdminAccessSupplierAssCountryFactory', function ($scope, AdminAccessSupplierFactory, NgTableParams, AdminAccessSupplierDistributorFactory, AdminAccessSupplierAssDistFactory, AdminAccessSupplierCountryFactory, AdminAccessSupplierAssCountryFactory) {
+
+
+
+    $scope.country = function () {
+        $('#countrylstid').val;
+        $('#Asscountryid').val;
+
+    }
+    $scope.Asscountry = function () {
+        $('#countrylstid').val;
+        $('#Asscountryid').val;
+    }
+
+
+    AdminAccessSupplierFactory.GetSuppGridlst().success(function (data) {
+        $scope.flag = 1;
+        //$scope.CurrentDate = new Date();
+
+        $scope.AddressGrid = data;
+
+
+
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+            //            $timeout(function () {
+            //                $('.ng-talbe-pager').hide();
+            //            }, 3000);
+        }
+    });
+
+    $scope.EditRecord = function (category) {
+        $scope.supplierid = category.supplierid;
+        AdminAccessSupplierDistributorFactory.GetSuppDistlst($scope.supplierid).success(function (data) {
+            $scope.distributorlist = data.d
+            AdminAccessSupplierAssDistFactory.GetSuppAssDistlst($scope.supplierid).success(function (data) {
+                $scope.Assdistributorlist = data.d
+                AdminAccessSupplierCountryFactory.GetSuppCountrylst($scope.supplierid).success(function (data) {
+                    $scope.countrylist = data.d
+                    AdminAccessSupplierAssCountryFactory.GetSuppAssCountrylst($scope.supplierid).success(function (data) {
+
+                        $scope.Asscountrylist = data.d
+                        $(".pageLoaderOverlay").hide();
+                    });
+
+                });
+
+            });
+
+        });
+
+
+
+    }
+
+} ]);
+ 
+
+
+app.directive('contenteditable', function() {
+      return {
+        require: 'ngModel',
+        restrict: 'A',
+        link: function(scope, elm, attr, ngModel) {
+
+          function updateViewValue() {
+            ngModel.$setViewValue(this.innerHTML);
+          }
+          //Binding it to keyup, lly bind it to any other events of interest 
+          //like change etc..
+//          elm.on('keyup', updateViewValue);
+
+//          scope.$on('$destroy', function() {
+//            elm.off('keyup', updateViewValue);
+//          });
+
+          ngModel.$render = function(){
+             elm.html(ngModel.$viewValue);
+          }
+
+        }
+    }
+});
+ 

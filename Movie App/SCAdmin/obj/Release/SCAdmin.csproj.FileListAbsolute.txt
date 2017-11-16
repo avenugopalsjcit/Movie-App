@@ -1,0 +1,4 @@
+C:\testfordep\SCAdmin\obj\Release\SCAdmin.csprojResolveAssemblyReference.cache
+C:\testfordep\SCAdmin\obj\Release\SCAdmin.csproj.CoreCompileInputs.cache
+C:\testfordep\SCAdmin\obj\Release\SCAdmin.dll
+C:\testfordep\SCAdmin\obj\Release\SCAdmin.pdb

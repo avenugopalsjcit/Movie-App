@@ -1,0 +1,459 @@
+﻿<div ng-controller="Controllers.CharactericsticCtrl as vm">
+    <div class="form-horizontal">
+        <!-- <div style="text-align: center">
+            <h3>
+                <u><a href="#">Admin Valid Charcterstic View</a></u>
+            </h3>
+        </div>-->
+        <div class="container">
+            <h2>
+                <span style="float: left; cursor: default">Admin Valid Charcterstic View</span></h2>
+        </div>
+    </div>
+    <br />
+    <br />
+    <div>
+        <div class="form-group col-md-12">
+            <div class="col-md-2">
+                <label style="float: left; margin-left: 6px" class="control-label" for="drpAdminValidCharView">
+                    Select the CharType
+                </label>
+            </div>
+            <div class="col-md-6">
+                <select class="drpAdminValidCharView" style="width: 450px">
+                    <option>7 x 24 Access Circuit Restoration </option>
+                    <option>A/B End Sales </option>
+                    <option>Access </option>
+                    <option>Access Connector Type </option>
+                    <option>Access Display Interface </option>
+                    <option>Access Framing Type </option>
+                    <option>Access Interface </option>
+                    <option>Access Method </option>
+                    <option>Access Model </option>
+                    <option>ACCESS MODEL BASELINE </option>
+                    <option>Access Number </option>
+                    <option>Access Provider </option>
+                    <option>Access Provider Service Name </option>
+                    <option>Access Restriction </option>
+                    <option>Access Speed </option>
+                    <option>Access Speed (D/U) </option>
+                    <option>Access Supplier </option>
+                    <option>Access Supplier Product Restrictions </option>
+                    <option>Access Type </option>
+                    <option>Application Letter Required </option>
+                    <option>Application Software </option>
+                    <option>Application Software - One Touch Dial Solution </option>
+                    <option>Application Version </option>
+                    <option>Application Version - One Touch Dial Solution </option>
+                    <option>Availability </option>
+                    <option>Basic Service </option>
+                    <option>BT Supported PBXs </option>
+                    <option>Call Restrictions </option>
+                    <option>Caller Access Type </option>
+                    <option>Carrier </option>
+                    <option>Carrier Pre-Select </option>
+                    <option>Carrier Select </option>
+                    <option>Check for URL </option>
+                    <option>CIR </option>
+                    <option>Circuit Maintenance Support </option>
+                    <option>Class of Service </option>
+                    <option>Class of Service Supported ( DSCP 6 CoS Model) </option>
+                    <option>CLI </option>
+                    <option>Closure Notice </option>
+                    <option>Competitive Offerings </option>
+                    <option>Concert IAS Availability </option>
+                    <option>Contention Ratio </option>
+                    <option>Core Features </option>
+                    <option>COS ASSIGNMENT </option>
+                    <option>Country Level Access Provider </option>
+                    <option>Country Level Port Types </option>
+                    <option>CPE </option>
+                    <option>CPE Access Types </option>
+                    <option>CPE Bundles </option>
+                    <option>CPE Country Parts </option>
+                    <option>CPE Hardware </option>
+                    <option>CPE Maintenance Options </option>
+                    <option>CPE Notes </option>
+                    <option>CPE Part Families </option>
+                    <option>CPE Part Subfamilies </option>
+                    <option>CPE Parts </option>
+                    <option>CPE Pricing Types </option>
+                    <option>CPE RESILIENCE </option>
+                    <option>CPE Routers </option>
+                    <option>CPE Splitter </option>
+                    <option>CPE Supplier Types </option>
+                    <option>CPE Suppliers </option>
+                    <option>CS Fallback Center </option>
+                    <option>Customer Service Hours </option>
+                    <option>Customer Service Language </option>
+                    <option>Customer Service Provider </option>
+                    <option>Data </option>
+                    <option>Devise Functionality </option>
+                    <option>Devise Functionality - Automatic Dial Solution </option>
+                    <option>Dial Speed </option>
+                    <option>Dialing Format </option>
+                    <option>Display Placeholder </option>
+                    <option>Display Placeholder 2 </option>
+                    <option>Display Placeholder 3 </option>
+                    <option>Distributor </option>
+                    <option>Distributor Type </option>
+                    <option>DNS and News </option>
+                    <option>DSL Access </option>
+                    <option>DSL Checker Availability </option>
+                    <option>DSL Notes </option>
+                    <option>DSL Notes(SP+) </option>
+                    <option>DSL Package </option>
+                    <option>DSL Supply Type </option>
+                    <option>Encapsulation </option>
+                    <option>Encryption </option>
+                    <option>Encryption Regulation </option>
+                    <option>End To End Relationship </option>
+                    <option>Fast Turn Up </option>
+                    <option>Field Service </option>
+                    <option>Global/National/Domestic </option>
+                    <option>Homing GPOP </option>
+                    <option>Installation </option>
+                    <option>Interconnect Design </option>
+                    <option>Interconnect Type </option>
+                    <option>Interface </option>
+                    <option>Internet Connect Transit </option>
+                    <option>IPL Availability </option>
+                    <option>IPL CPE </option>
+                    <option>ISDN Around the Cloud </option>
+                    <option>ISDN Dial Back-Up </option>
+                    <option>LAN SAN Service </option>
+                    <option>Lead Time </option>
+                    <option>Letter Type </option>
+                    <option>Local Loop Type </option>
+                    <option>Location </option>
+                    <option>Micro 20 Features </option>
+                    <option>Mobile Access </option>
+                    <option>Mobile Access Number with Announcement </option>
+                    <option>Mobile Access Number without Announcement </option>
+                    <option>N*E1/T1 IMA Access </option>
+                    <option>Node Type </option>
+                    <option>NOTE </option>
+                    <option>NOTE with value </option>
+                    <option>Number Retention </option>
+                    <option>Offer Availability </option>
+                    <option>On-Site Support </option>
+                    <option>One Stop Shopping Options </option>
+                    <option>One Voice Anywhere </option>
+                    <option>One Voice global VPN </option>
+                    <option>One Voice global VPN - hVPN </option>
+                    <option>One Voice SIP trunking </option>
+                    <option>One Voice SIP trunking - hVPN </option>
+                    <option>Port Speed </option>
+                    <option>Port Speeds(Down/Up) </option>
+                    <option>Portability in Foreign Country </option>
+                    <option>Pricing Availability </option>
+                    <option>Primary DVB POP </option>
+                    <option>Primary Terra POP </option>
+                    <option>Product Availability via BT Internet Connect Global </option>
+                    <option>Product Feature </option>
+                    <option>PVC Options </option>
+                    <option>Regulatory </option>
+                    <option>Regulatory Information </option>
+                    <option>Resiliency Types </option>
+                    <option>ROUTING TYPE </option>
+                    <option>RSA </option>
+                    <option>Secondary DVB POP </option>
+                    <option>Secondary Terra POP </option>
+                    <option>Security Enhancements </option>
+                    <option>Service Availability </option>
+                    <option>Service Delivery </option>
+                    <option>Service Provider </option>
+                    <option>Services Supported </option>
+                    <option>Signaling </option>
+                    <option>SIP Trunking </option>
+                    <option>SLA BAND </option>
+                    <option>SLA Category </option>
+                    <option>SLA TYPE </option>
+                    <option>Sla2+ Site Availability </option>
+                    <option>SLAs </option>
+                    <option>Software Supported </option>
+                    <option>Supplier </option>
+                    <option>Supplier Product Name </option>
+                    <option>Support Region </option>
+                    <option>Switch </option>
+                    <option>Telephone Number </option>
+                    <option>Termination </option>
+                    <option>Tertiary DVB POP </option>
+                    <option>test chartype </option>
+                    <option>Test Mpls 7 </option>
+                    <option>test1 </option>
+                    <option>TestFileUpload </option>
+                    <option>Test_Char1 </option>
+                    <option>test_WD1 </option>
+                    <option>Text Field </option>
+                    <option>TIR Value </option>
+                    <option>Transport Medium </option>
+                    <option>URL link for "BT GS Portfolio Database" product </option>
+                    <option>Voice Class (EF) Supported Speeds </option>
+                </select>
+            </div>
+            <div class="col-md-2" style="margin-left: 118px;">
+                <a href="#" data-target="#addAdminValidCharViewModal" data-toggle="modal" class="btn btn-primary">
+                    <span class="">Add New Characteristic </span></a>
+                <!--glyphicon glyphicon-plus-->
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="form-horizontal">
+        <div class="container">
+            <h4>
+                <span style="float: left; cursor: default">View Charcter Reference</span></h4>
+        </div>
+        <div class="container">
+            <table ng-table="vm.tableParams" class="table" show-filter="true">
+                <tr ng-repeat="user in $data">
+                    <td filter="{ Name: 'text'}" sortable="'name'">
+                        <a data-target="#updateAdminValidCharViewModal" data-toggle="modal">{{user.Name}}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div tabindex="-1" class="modal fade in" id="addAdminValidCharViewModal" role="dialog"
+            aria-hidden="true" aria-labelledby="myModalLabel">
+            <div class="vertical-alignment-helper">
+                <div class="vertical-alignment-helper">
+                    <div class="modal-dialog vertical-align-center" style="width: 75%;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button class="close" type="button" data-dismiss="modal">
+                                    <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                                </button>
+                                <h4 class="modal-title" id="H2">
+                                    Add Characteristic Reference
+                                </h4>
+                            </div>
+                            <div class="container">
+                                <div class="modal-body">
+                                    <div class="form-group col-md-12">
+                                        <div class="col-md-4">
+                                            <label class="control-label" for="inputDescription">
+                                                Characteristic Type</label>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="control-label" for="inputDescription">
+                                                7 x 24 Access Circuit Restoration</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <div class="col-md-4">
+                                            <label class="control-label" for="Textarea1">
+                                                Name</label>
+                                        </div>
+                                        <div class="form-group col-md-7">
+                                            <textarea class="form-control" id="Textarea2" rows="4"></textarea>
+                                            (Max 4000 characters are allowed in Name)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <div class="col-md-4">
+                                            <label class="control-label" for="comment1">
+                                                Description
+                                            </label>
+                                        </div>
+                                        <div class="form-group col-md-7">
+                                            <textarea class="form-control" id="Textarea3" rows="4"></textarea>
+                                            (Max 200 characters are allowed in Description)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <div class="col-md-4">
+                                            <label class="control-label" for="actualValueId">
+                                                Value</label>
+                                        </div>
+                                        <div class="form-group col-md-7" id="Div1">
+                                            <input class="form-control col-md-5" type="text" value="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <div class="col-md-4">
+                                            <label class="control-label">
+                                                Unit of Measure</label>
+                                        </div>
+                                        <div class="form-group col-md-7">
+                                            <label>
+                                                No Units of Measure on file for this Characteristic Type
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <div class="col-md-4">
+                                            <label class="control-label" for="inputDescription">
+                                                Valid</label>
+                                        </div>
+                                        <div class="form-group col-md-7">
+                                            <input type="checkbox">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <div class="col-md-4">
+                                            <label class="control-label" for="inputDescription">
+                                                Propagate Value to Case Details?</label>
+                                        </div>
+                                        <div class="form-group col-md-7">
+                                            <input type="checkbox">
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <br>
+                                    <div class="form-horizontal" style="font-size: 13px; padding-left: 3%">
+                                        <div class="form-group col-md-12">
+                                            <div class="col-md-3">
+                                                <u><b><span>Created by</span></b></u><br>
+                                                <span>MacGamwell,John</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <u><b><span>Created Date</span></b></u><br>
+                                                <span>21-MAY-1999 09:58:12 AM&nbsp;GMT</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <u><b><span>Updated by</span></b></u><br>
+                                                <span>Prasad, Achutha</span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <u><b><span>Date Last Updated</span></b></u><br>
+                                                <span>18-DEC-2003 06:47:38 PM&nbsp;GMT</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <input class="btn btn-primary btn-sm " type="button" value="Update">
+                                <input class="btn btn-primary btn-sm " type="button" value="Delete">
+                                <input class="btn btn-primary btn-sm" type="button" value="Reset">
+                                <button class="btn btn-default" type="button" data-dismiss="modal">
+                                    Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div tabindex="-1" class="modal fade in" id="updateAdminValidCharViewModal" role="dialog"
+            aria-hidden="true" aria-labelledby="myModalLabel" style="padding-left: 17px;">
+            <div class="vertical-alignment-helper">
+                <div class="modal-dialog vertical-align-center" style="width: 75%;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button class="close" type="button" data-dismiss="modal">
+                                <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                            </button>
+                            <h4 class="modal-title" id="H1">
+                                Edit Characteristic Reference
+                            </h4>
+                        </div>
+                        <div class="container">
+                            <div class="modal-body">
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="inputDescription">
+                                            Characteristic Type</label>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label" for="inputDescription">
+                                            7 x 24 Access Circuit Restoration</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="Textarea1">
+                                            Name</label>
+                                    </div>
+                                    <div class="form-group col-md-7">
+                                        <textarea class="form-control" id="Textarea1" rows="4">7 x 24 Access Circuit Restoration</textarea>
+                                        (Max 4000 characters are allowed in Name)
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="comment1">
+                                            Description
+                                        </label>
+                                    </div>
+                                    <div class="form-group col-md-7">
+                                        <textarea class="form-control" id="Textarea5" rows="4">7 x 24 Access Circuit Restoration</textarea>
+                                        (Max 200 characters are allowed in Description)
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="actualValueId">
+                                            Value</label>
+                                    </div>
+                                    <div class="form-group col-md-7" id="Div4">
+                                        <input class="form-control col-md-5" type="text" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label">
+                                            Unit of Measure</label>
+                                    </div>
+                                    <div class="form-group col-md-7">
+                                        <label>
+                                            No Units of Measure on file for this Characteristic Type
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="inputDescription">
+                                            Valid</label>
+                                    </div>
+                                    <div class="form-group col-md-7">
+                                        <input type="checkbox" checked="true">
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-md-4">
+                                        <label class="control-label" for="inputDescription">
+                                            Propagate Value to Case Details?</label>
+                                    </div>
+                                    <div class="form-group col-md-7">
+                                        <input type="checkbox" checked="true">
+                                    </div>
+                                </div>
+                                <br>
+                                <br>
+                                <div class="form-horizontal" style="font-size: 13px; padding-left: 3%">
+                                    <div class="form-group col-md-12">
+                                        <div class="col-md-3">
+                                            <u><b><span>Created by</span></b></u><br>
+                                            <span>MacGamwell,John</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <u><b><span>Created Date</span></b></u><br>
+                                            <span>21-MAY-1999 09:58:12 AM&nbsp;GMT</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <u><b><span>Updated by</span></b></u><br>
+                                            <span>Prasad, Achutha</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <u><b><span>Date Last Updated</span></b></u><br>
+                                            <span>18-DEC-2003 06:47:38 PM&nbsp;GMT</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input class="btn btn-primary btn-sm " type="button" value="Update">
+                            <input class="btn btn-primary btn-sm " type="button" value="Delete">
+                            <input class="btn btn-primary btn-sm" type="button" value="Reset">
+                            <button class="btn btn-default" type="button" data-dismiss="modal">
+                                Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

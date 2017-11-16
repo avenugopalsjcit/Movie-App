@@ -1,0 +1,213 @@
+﻿app.UpdateCasesCountryLevel = function ($scope, MCUHelper, $ngBootbox) {
+    $('.pageLoaderOverlay').show();
+
+    $scope.updateCaseParam = {}
+    $scope.updateCaseParam.iPopId = [];
+    $scope.updateCaseParam.iCaseId = [];
+    $scope.updateCaseParam.selPortID = [];
+    $scope.updateCaseParam.portAvailCd = [];
+    $scope.updateCaseParam.portValidCd = [];
+    $scope.updateCaseParam.portLeadTime = [];
+    $scope.updateCaseParam.AccSpeedCharId = [];
+    $scope.updateCaseParam.AccSuppId = [];
+    $scope.updateCaseParam.AccTypeId = [];
+    $scope.updateCaseParam.AccNameId = [];
+    $scope.updateCaseParam.pCPESupplier = [];
+    $scope.updateCaseParam.pCarrier = [];
+    $scope.updateCaseParam.pCharCount = [];
+    $scope.updateCaseParam.iaccessspeedcharcount = [];
+    $scope.updateCaseParam.pportspeedcharcount = [];
+    $scope.updateCaseParam.pAccessSupplierCount = [];
+    $scope.updateCaseParam.pParentportSpeedCount = [];
+
+    //charecteristics
+    $scope.updateCaseParam.pcharid = [];
+    $scope.updateCaseParam.pcharavailcd = [];
+    $scope.updateCaseParam.pchartypeid = [];
+    $scope.updateCaseParam.pcharvalue = [];
+    $scope.updateCaseParam.pcharvalue2 = [];
+    $scope.updateCaseParam.pchardetailvalidcd = [];
+    //char access supp
+    $scope.updateCaseParam.paccesssupplierid = [];
+    $scope.updateCaseParam.paccesssuppliervalid = [];
+    //char Parent port speed
+    $scope.updateCaseParam.pparentportspeeds = []
+    $scope.updateCaseParam.pparentportspeedvalid = [];
+
+    //port speed
+    $scope.updateCaseParam.pportspeedcharid = [];
+    $scope.updateCaseParam.pportavailability = [];
+    $scope.updateCaseParam.pportvalidity = [];
+    $scope.updateCaseParam.paccessspeedcharcount = [];
+
+    //access speed
+    $scope.updateCaseParam.paccessspeedcharid = [];
+    $scope.updateCaseParam.psuppliercharid = [];
+    $scope.updateCaseParam.ptypecharid = [];
+    $scope.updateCaseParam.pnamecharid = [];
+    $scope.updateCaseParam.paccessavailability = [];
+
+    var icount = 0;
+    var iaccessspeedcharcount = 0;
+    var count = 0
+
+    $scope.updateCaseParam.pavailcd = [];
+    $scope.updateCaseParam.pcasevalidcd = [];
+    $scope.updateCaseParam.pparentaccessproducttypeid = [];
+    $scope.updateCaseParam.pparentaccesssuppliernameid = [];
+    $scope.updateCaseParam.pparentaccesssuppliercharid = [];
+    $scope.updateCaseParam.pparentaccessspeedcharid = [];
+    $scope.updateCaseParam.poffnetleadtime = [];
+
+
+    var pAccessSupplierCount = 0;
+    var pParentportSpeedCount = 0;
+    $scope.CaseArray.forEach(function (item, index) {
+        $scope.updateCaseParam.iPopId.push(item.popID);
+        $scope.updateCaseParam.iCaseId.push(item.caseId);
+        $scope.updateCaseParam.pcasevalidcd.push(item.caseValidID);
+        $scope.updateCaseParam.pavailcd.push(item.CaseAvailID);
+        $scope.updateCaseParam.pCPESupplier.push(0);
+        $scope.updateCaseParam.pCarrier.push(-1); //AccessSupplierCharId
+        item.savedCharList.forEach(function (charItem) {
+            if (charItem.Type == '') {
+                $scope.updateCaseParam.pcharid.push(charItem.CharId);
+                $scope.updateCaseParam.pcharavailcd.push(charItem.CharAvailCd);
+                $scope.updateCaseParam.pchardetailvalidcd.push(charItem.ValidCd);
+                $scope.updateCaseParam.pchartypeid.push(charItem.CharTypeId);
+                $scope.updateCaseParam.pcharvalue.push(charItem.CharValue);
+                $scope.updateCaseParam.pcharvalue2.push(charItem.CharValue2);
+                count++
+            }
+
+            if (charItem.Type == 'AccSupp') {
+                $scope.updateCaseParam.paccesssupplierid.push(charItem.CharId);
+                $scope.updateCaseParam.paccesssuppliervalid.push(charItem.ValidCd);
+                pAccessSupplierCount++;
+            }
+
+            if (charItem.Type == 'ParentPortSpeed') {
+                $scope.updateCaseParam.pparentportspeeds.push(charItem.CharId.split('/')[0]);
+                $scope.updateCaseParam.pparentportspeedvalid.push(charItem.ValidCd);
+                $scope.updateCaseParam.pparentaccessproducttypeid.push(charItem.CharId.split('/')[3]);
+                $scope.updateCaseParam.pparentaccesssuppliernameid.push(charItem.CharId.split('/')[4]);
+                $scope.updateCaseParam.pparentaccesssuppliercharid.push(charItem.CharId.split('/')[2]);
+                $scope.updateCaseParam.pparentaccessspeedcharid.push(charItem.CharId.split('/')[1]);
+
+                pParentportSpeedCount++;
+            }
+        })
+
+        if (count != 0)
+            $scope.updateCaseParam.pCharCount.push(count);
+        else
+            $scope.updateCaseParam.pCharCount.push(1);
+
+        if (pAccessSupplierCount != 0)
+            $scope.updateCaseParam.pAccessSupplierCount.push(pAccessSupplierCount);
+        else
+            $scope.updateCaseParam.pAccessSupplierCount.push(1);
+
+        if (pParentportSpeedCount != 0)
+            $scope.updateCaseParam.pParentportSpeedCount.push(pParentportSpeedCount);
+        else
+            $scope.updateCaseParam.pParentportSpeedCount.push(1);
+
+        var AccAvailability = 0;
+        item.portspeedList.forEach(function (portspeedItem) {
+            $scope.updateCaseParam.pportspeedcharid.push(portspeedItem.CharId);
+            $scope.updateCaseParam.pportavailability.push(portspeedItem.PortAvailability);
+            $scope.updateCaseParam.pportvalidity.push(portspeedItem.validPort);
+            $scope.updateCaseParam.poffnetleadtime.push(portspeedItem.LeadTime);
+
+            
+            item.AccessSuppCharList.forEach(function (accessSpeedItem) {
+                $scope.updateCaseParam.paccessavailability.push(portspeedItem.AccAvailability);
+                $scope.updateCaseParam.paccessspeedcharid.push(accessSpeedItem.AccessId);
+                $scope.updateCaseParam.psuppliercharid.push(accessSpeedItem.SupplierId);
+                $scope.updateCaseParam.ptypecharid.push(accessSpeedItem.AccessTypeId);
+                $scope.updateCaseParam.pnamecharid.push(accessSpeedItem.SupplierNameId);
+                iaccessspeedcharcount = iaccessspeedcharcount + 1;
+            });
+
+            $scope.updateCaseParam.paccessspeedcharcount.push(iaccessspeedcharcount);
+            icount++;
+        });
+
+        $scope.updateCaseParam.pportspeedcharcount.push(icount);
+    });
+
+    $scope.updateParam = {};
+    $scope.updateParam.LocLevel = $scope.MCUSession.LocLevel;
+    $scope.updateParam.ProductCd = $scope.MCUSession.ProductCd;
+    $scope.updateParam.SubProductCd = $scope.MCUSession.SubProductCd;
+    $scope.updateParam.UserId = $scope.MCUSession.UserId == "" ? '607963746' : $scope.MCUSession.UserId;
+    $scope.updateParam.iPopId = $scope.updateCaseParam.iPopId;
+    $scope.updateParam.iCaseId = $scope.updateCaseParam.iCaseId;
+    $scope.updateParam.pavailcd = $scope.updateCaseParam.pavailcd;
+    $scope.updateParam.pcasevalidcd = $scope.updateCaseParam.pcasevalidcd;
+    $scope.updateParam.pcharid = $scope.updateCaseParam.pcharid;
+    $scope.updateParam.pcharavailcd = $scope.updateCaseParam.pcharavailcd;
+    $scope.updateParam.pchartypeid = $scope.updateCaseParam.pchartypeid;
+    $scope.updateParam.pcharvalue = $scope.updateCaseParam.pcharvalue;
+    $scope.updateParam.pcharvalue2 = $scope.updateCaseParam.pcharvalue2;
+    $scope.updateParam.pportspeedcharid = $scope.updateCaseParam.pportspeedcharid;
+    $scope.updateParam.paccessspeedcharid = $scope.updateCaseParam.paccessspeedcharid;
+    $scope.updateParam.psuppliercharid = $scope.updateCaseParam.psuppliercharid;
+    $scope.updateParam.ptypecharid = $scope.updateCaseParam.ptypecharid;
+    $scope.updateParam.pnamecharid = $scope.updateCaseParam.pnamecharid;
+    $scope.updateParam.pportavailability = $scope.updateCaseParam.pportavailability;
+    $scope.updateParam.pportvalidity = $scope.updateCaseParam.pportvalidity;
+    $scope.updateParam.pportspeedcharcount = $scope.updateCaseParam.pportspeedcharcount;
+    $scope.updateParam.paccessspeedcharcount = $scope.updateCaseParam.paccessspeedcharcount;
+    $scope.updateParam.pchardetailvalidcd = $scope.updateCaseParam.pchardetailvalidcd;
+    $scope.updateParam.poffnetleadtime = $scope.updateCaseParam.poffnetleadtime;
+    $scope.updateParam.paccesssupplierid = $scope.updateCaseParam.paccesssupplierid;
+    $scope.updateParam.paccesssuppliervalid = $scope.updateCaseParam.paccesssuppliervalid;
+    $scope.updateParam.pparentportspeeds = $scope.updateCaseParam.pparentportspeeds;
+    $scope.updateParam.pparentportspeedvalid = $scope.updateCaseParam.pparentportspeedvalid;
+    $scope.updateParam.pparentaccessproducttypeid = $scope.updateCaseParam.pparentaccessproducttypeid;
+    $scope.updateParam.pparentaccesssuppliernameid = $scope.updateCaseParam.pparentaccesssuppliernameid;
+    $scope.updateParam.pparentaccesssuppliercharid = $scope.updateCaseParam.pparentaccesssuppliercharid;
+    $scope.updateParam.pparentaccessspeedcharid = $scope.updateCaseParam.pparentaccessspeedcharid;
+    $scope.updateParam.pCharCount = $scope.updateCaseParam.pCharCount;
+    $scope.updateParam.pAccessSupplierCount = $scope.updateCaseParam.pAccessSupplierCount;
+    $scope.updateParam.pParentportSpeedCount = $scope.updateCaseParam.pParentportSpeedCount;
+    $scope.updateParam.pCarrier = $scope.updateCaseParam.pCarrier;
+    $scope.updateParam.pCPESupplier = $scope.updateCaseParam.pCPESupplier;
+    //Exception parameter
+    $scope.updateParam.strInsertCaseIds = [];
+    $scope.updateParam.strRemoveCaseIds = [];
+    $scope.updateParam.pPlatformcharid = [];
+    $scope.updateParam.pCountryID = [];
+    $scope.updateParam.paccessavailability = $scope.updateCaseParam.paccessavailability;
+
+    $scope.param = JSON.stringify($scope.updateParam);
+    $scope.updateParam = {};
+    $scope.updateCaseParam = {};
+    MCUHelper.UpdateCasesHVPN($scope.param).success(function (data) {
+        $('.pageLoaderOverlay').hide();
+
+        $ngBootbox.alert("Case updated successfully").then(function () {
+            $("#leftpanel").show();
+            $("#rightpanel").show();
+            $("#savecontinuepanel").show();
+            $("#processChanges").show();
+            $("#cancelcase").hide();
+            $("#updatecase").hide();
+            $('#saveddetailspanel').show();
+            $('#FinalSelectedGrid').hide();
+            $scope.resetAllScopeValue();
+            //  $scope.$broadcast('loadTree', { resetCase: { caseValidity: $scope.state == undefined ? $scope.formData.resetCase : $scope.state} });
+            $scope.$broadcast('loadTree', { resetCase: { caseValidity: 1} });
+        });
+
+
+    }).error(function () {
+        $ngBootbox.alert("Failed to update Cases. Please contact sales catalogue support team.").then(function () {
+
+        });
+        $('.pageLoaderOverlay').hide();
+    })
+
+}

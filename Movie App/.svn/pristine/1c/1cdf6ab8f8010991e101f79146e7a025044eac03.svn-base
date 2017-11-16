@@ -1,0 +1,263 @@
+﻿
+app.controller('UserAccessCntrl', function ($scope, $http, NgTableParams, $rootScope, GetUsersfactory) {
+    var self = this;
+    $scope.superadmin = 1;
+
+    $(".pageLoaderOverlay").show();
+
+
+
+    GetUsersfactory.GetUsers().success(function (data) {
+        $(".pageLoaderOverlay").hide();
+        $scope.SuperAdminData = new NgTableParams({}, { 'dataset': data.d.SuperAdminData });
+        $scope.tableParams = new NgTableParams({
+            sorting: {
+                UserName: 'asc'
+            }
+        }, {
+            getData: function ($defer, params) {
+                $defer.resolve($filter('orderBy')($scope.SuperAdminData, params.orderBy()));
+            }
+        });
+
+        $scope.ProductOwnerData = new NgTableParams({}, { 'dataset': data.d.ProductOwnerData });
+        $scope.tableParams = new NgTableParams({
+            sorting: {
+                UserName: 'asc'
+            }
+        }, {
+            getData: function ($defer, params) {
+                $defer.resolve($filter('orderBy')($scope.ProductOwnerData, params.orderBy()));
+            }
+        });
+
+        $scope.EndUserData = new NgTableParams({}, { 'dataset': data.d.EndUserData });
+        $scope.tableParams = new NgTableParams({
+            sorting: {
+                UserName: 'asc'
+            }
+        }, {
+            getData: function ($defer, params) {
+                $defer.resolve($filter('orderBy')($scope.EndUserData, params.orderBy()));
+            }
+        });
+    });
+
+
+    $scope.prodOwner = 0;
+
+    $http.post("UserAccess.aspx/UserCatagoriesDetails", {})
+     .success(function (data, status, headers, config) {
+
+         $scope.UserCatagoriesData = data.d;
+
+
+     });
+
+    $http.post("UserAccess.aspx/UserStatusDetails", {})
+     .success(function (data, status, headers, config) {
+
+         $scope.StatusData = data.d;
+
+     });
+
+
+    $scope.OpenPopup = function (user) {
+        var selTabText = $('.nav-tabs .active').text();
+
+        var HeaderText = 'Edit ' + selTabText;
+        $scope.prodOwner = 0;
+        $scope.UserName = user.UserName;
+        $scope.UserCategory = user.UserCategoryCD;
+        $scope.UserStatus = user.UserStatusId;
+        $scope.EmpID = user.EmpID;
+        $scope.UserEmailID = "";
+        $scope.HeaderText = HeaderText;
+        if (selTabText == 'End User') {
+            $scope.UserEmailID = user.UserEmailID;
+        }
+        if (user.UserEmail == 0) {
+            $scope.email = false;
+        }
+        else {
+            $scope.email = true;
+        }
+    }
+
+
+    $scope.GetUsersList = function () {
+
+        $http.post("UserAccess.aspx/UserAccessDetais", {}).success(function (data) {
+
+            $(".pageLoaderOverlay").hide();
+            $scope.SuperAdminData = new NgTableParams({}, { 'dataset': data.d.SuperAdminData });
+
+            $scope.ProductOwnerData = new NgTableParams({}, { 'dataset': data.d.ProductOwnerData });
+
+            $scope.EndUserData = new NgTableParams({}, { 'dataset': data.d.EndUserData });
+
+
+        });
+
+    }
+
+    $scope.ProductSelection = [];
+    $scope.SubmitProductOwner = function () {
+
+        if ($scope.ProductSelection.length == 0) {
+            bootbox.alert("Please select products");
+            return;
+        }
+
+        $(".pageLoaderOverlay").show();
+        $http.post("UserAccess.aspx/SaveProductOwners", { 'ProductIds': $scope.ProductSelection.join(), 'CreatedBy': $rootScope.User_Id, 'EmpID': $scope.EmpID, 'UpdatedBy': $rootScope.User_Id }).success(function (data) {
+
+            $scope.prodOwner = 0;
+            $scope.ProductSelection = [];
+            $("#divshowData").hide();
+            $(".modal-backdrop").hide();
+
+            GetUsersfactory.GetUsers().success(function (data) {
+                $(".pageLoaderOverlay").hide();
+                $scope.SuperAdminData = new NgTableParams({}, { 'dataset': data.d.SuperAdminData });
+
+                $scope.ProductOwnerData = new NgTableParams({}, { 'dataset': data.d.ProductOwnerData });
+
+                $scope.EndUserData = new NgTableParams({}, { 'dataset': data.d.EndUserData });
+            });
+            bootbox.alert("User access has been changed successfully!");
+
+
+        });
+
+        return;
+    }
+
+    $scope.toggleProductSelection = function (ProductID) {
+
+        var idx = $scope.ProductSelection.indexOf(ProductID);
+
+        // is currently selected
+        if (idx > -1) {
+            $scope.ProductSelection.splice(idx, 1);
+        }
+
+        // is newly selected
+        else {
+            $scope.ProductSelection.push(ProductID);
+        }
+    }
+
+
+    $scope.UpdateUserAccess = function () {
+        //int catId, string UserStatuID, string UserEmail, int UserID, int EmpId
+
+        $(".pageLoaderOverlay").show();
+        var email = 0;
+        if (!angular.isUndefined($scope.email) && $scope.email == true) {
+            email = 1;
+        }
+
+        $http.post("UserAccess.aspx/UpdateUserAccess", { 'catId': $scope.UserCategory, 'UserStatusID': $scope.UserStatus, 'UserEmail': email, 'UserID': $rootScope.User_Id, 'EmpId': $scope.EmpID }).success(function (data) {
+
+            if (data.d == 2) {
+                $(".pageLoaderOverlay").hide();
+                $("#divshowData").hide();
+                $(".modal-backdrop").hide();
+                bootbox.alert("The user is the Primary contact for their product. You must assign a new primary contact before you can make this user invalid.");
+                return;
+            }
+            else {
+
+                if ($scope.UserCategory == 2) {
+
+                    $scope.prodOwner = 1;
+                    $http.post("UserAccess.aspx/GetProducts", { 'EmpID': $scope.EmpID }).success(function (data) {
+
+                        $scope.Products = data.d;
+                        angular.forEach(data.d, function (item) {
+
+                            if (item.ProductAssigned != '0') {
+                                $scope.ProductSelection.push(item.ProductID)
+                            }
+                        });
+                        $(".pageLoaderOverlay").hide();
+
+                    });
+
+
+                }
+                else {
+
+                    GetUsersfactory.GetUsers().success(function (data) {
+                        $(".pageLoaderOverlay").hide();
+                        $scope.SuperAdminData = new NgTableParams({}, { 'dataset': data.d.SuperAdminData });
+
+                        $scope.ProductOwnerData = new NgTableParams({}, { 'dataset': data.d.ProductOwnerData });
+
+                        $scope.EndUserData = new NgTableParams({}, { 'dataset': data.d.EndUserData });
+                    });
+                    $("#divshowData").hide();
+                    $(".modal-backdrop").hide();
+
+                    bootbox.alert("User access has been changed successfully");
+                }
+
+            }
+
+        });
+    }
+
+
+    $scope.DeleteUserAccess = function () {
+        $(".pageLoaderOverlay").show();
+        $http.post("UserAccess.aspx/DeleteUserAccess", { 'EmpId': $scope.EmpID }).success(function (data) {
+
+            if (data.d == 1) {
+                GetUsersfactory.GetUsers().success(function (data) {
+                    $(".pageLoaderOverlay").hide();
+
+                    $scope.SuperAdminData = new NgTableParams({}, { 'dataset': data.d.SuperAdminData });
+
+                    $scope.ProductOwnerData = new NgTableParams({}, { 'dataset': data.d.ProductOwnerData });
+
+                    $scope.EndUserData = new NgTableParams({}, { 'dataset': data.d.EndUserData });
+                })
+
+
+                $("#divshowData").hide();
+                $(".modal-backdrop").hide();
+
+                bootbox.alert("User access deleted successfully");
+
+            }
+            else if (data.d == 2) {
+                $(".pageLoaderOverlay").hide();
+                $("#divshowData").hide();
+                $(".modal-backdrop").hide();
+                bootbox.alert("The user is the Primary contact for their product. You must assign a new primary contact before you can delete this user.");
+            }
+
+
+        })
+         .error(function (error) {
+             alert("Problem occured while loading DeleteUserAccess" + error);
+             $(".pageLoaderOverlay").hide();
+         });
+    }
+
+
+});
+
+
+
+app.factory('GetUsersfactory', function ($http) {
+
+    var GetUsersfactory = {};
+    GetUsersfactory.GetUsers = function () {
+        
+        return $http.post("UserAccess.aspx/UserAccessDetails", {});
+    }
+
+    return GetUsersfactory;
+});

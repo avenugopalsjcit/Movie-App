@@ -1,0 +1,247 @@
+﻿app.SavedCaseDetails = function ($scope, MCUHelper) {
+    //    var portAvail = getStringArray($scope.savedCaseDetails, 'portAvailID');
+    //    var portValid = getStringArray($scope.savedCaseDetails, 'portValidID');
+    //    var portLeadTime = getStringArray($scope.savedCaseDetails, 'leadTime');
+    //    if ($scope.portspeedAdded || (portAvail.indexOf($scope.modportavail.AVAIL_CD) == -1 ||
+    //         portValid.indexOf($scope.modvalidport.id) == -1 ||
+    //         portLeadTime.indexOf($scope.modportspeedleadtime) == -1)) {
+    $('.pageLoaderOverlay').show();
+
+    var savedCases = getStringArray($scope.CaseArray, 'caseId');
+
+
+    MCUHelper.CaseIdExists(savedCases).success(function (data) {
+        $scope.caseIdExistsList = JSON.parse(data.d);
+
+        $scope.MCU_TreeViewScope.sessionPoP.forEach(function (item) {
+            $scope.IsCaseIdExists = false;
+
+            $scope.CaseArray.forEach(function (caseItem) {
+                if (caseItem.popID == item.PoPID) {
+
+
+                    var regionID = item.RegionID;
+                    var region = $.grep($scope.MCU_TreeViewScope.lstRegion, function (e) { return e.RegionID == item.RegionID });
+                    var regionName = region[0].RegionName;
+                    var countryID = item.CountryID;
+                    var country = $.grep($scope.MCU_TreeViewScope.lstCountry, function (e) { return e.CountryID == item.CountryID });
+                    var countryName = country[0].CountryName;
+                    var stateID = item.stateID;
+                    var state = $.grep($scope.MCU_TreeViewScope.sessionState, function (e) { return e.stateID == item.stateID });
+                    if (state.length > 0)
+                        var stateName = state[0].stateName;
+                    else
+                        var stateName = '';
+                    var cityID = item.CityID;
+                    var city = $.grep($scope.MCU_TreeViewScope.sessionCity, function (e) { return e.CityID == item.CityID });
+                    if (stateName != '')
+                        var cityName = city[0].CityName + " (" + stateName + ")";
+                    else
+                        var cityName = city[0].CityName;
+                    var popID = item.PoPID;
+                    var popName = item.PoPName;
+                    var caseID = item.caseID;
+                    var caseValidCD = item.caseValidCd;
+                    var hasCase = item.hasCase;
+                    var platForm = $.grep($scope.MCU_TreeViewScope.sessionPlatform, function (e) { return e.caseID == item.caseID });
+                    var platformID = platForm[0].capmanPlatformID;
+                    var platformName = platForm[0].capmanPlatformName;
+
+
+                    $scope.IsCaseIdExists = function () {
+                        if ($.grep($scope.caseIdExistsList, function (e) {
+                            return e.CASE_ID == item.caseID;
+                        }) != '') {
+                            return true;
+                        }
+                        return false;
+                    } ();
+
+                    var prevPortAvailId = '';
+                    var prevPortValidId = '';
+                    var prevPortLeadTime = '';
+
+                    if (caseItem.portspeedList.length == 0) {
+                        $scope.savedCaseDetails.push({ 'regionID': regionID,
+                            'regionName': regionName,
+                            'countryID': countryID,
+                            'countryName': countryName,
+                            'stateID': stateID,
+                            'stateName': stateName,
+                            'cityID': cityID,
+                            'cityName': cityName,
+                            'popID': popID,
+                            'popName': popName,
+                            'caseID': caseID,
+                            'caseValidCD': caseValidCD,
+                            'hasCase': hasCase,
+                            'platformID': platformID,
+                            //case availalability and validity
+                            'platformName': platformName,
+                            'CaseAvailtxt': caseItem.CaseAvailtxt,
+                            'CaseAvailID': caseItem.CaseAvailID,
+                            'caseValidID': caseItem.caseValidID,
+                            'caseValidText': caseItem.caseValidText,
+                            'portAvailID': "",
+                            'portAvailText': "",
+                            'portValidID': "",
+                            'portValidText': "",
+                            'leadTime': "",
+                            // 'portSpeedID': getStringArray($scope.portspeedList, 'CharId'),
+                            'IsCaseIdExists': $scope.IsCaseIdExists
+                        });
+                    }
+
+
+
+
+                    caseItem.portspeedList.forEach(function (portItem) {
+                        if (prevPortAvailId != portItem.PortAvailability || prevPortValidId != portItem.validPort || prevPortLeadTime != portItem.LeadTime) {
+                            $scope.savedCaseDetails.push({ 'regionID': regionID,
+                                'regionName': regionName,
+                                'countryID': countryID,
+                                'countryName': countryName,
+                                'stateID': stateID,
+                                'stateName': stateName,
+                                'cityID': cityID,
+                                'cityName': cityName,
+                                'popID': popID,
+                                'popName': popName,
+                                'caseID': caseID,
+                                'caseValidCD': caseValidCD,
+                                'hasCase': hasCase,
+                                'platformID': platformID,
+                                //case availalability and validity
+                                'platformName': platformName,
+                                'CaseAvailtxt': caseItem.CaseAvailtxt,
+                                'CaseAvailID': caseItem.CaseAvailID,
+                                'caseValidID': caseItem.caseValidID,
+                                'caseValidText': caseItem.caseValidText,
+                                'portAvailID': portItem.PortAvailability,
+                                'portAvailText': portItem.PortAvailabilityName,
+                                'portValidID': portItem.validPort,
+                                'portValidText': portItem.ValidPortName,
+                                'leadTime': portItem.LeadTime,
+                                // 'portSpeedID': getStringArray($scope.portspeedList, 'CharId'),
+                                'IsCaseIdExists': $scope.IsCaseIdExists
+                            });
+                        }
+                        prevPortAvailId = portItem.PortAvailability;
+                        prevPortValidId = portItem.validPort;
+                        prevPortLeadTime = portItem.LeadTime;
+                    });
+
+                }
+            });
+
+        });
+
+
+        //    MCUHelper.CaseIdExists($scope.selectedCases).success(function (data) {
+        //        $scope.caseIdExistsList = JSON.parse(data.d);
+
+        //        $scope.MCU_TreeViewScope.sessionPoP.forEach(function (item) {
+        //            $scope.IsCaseIdExists = false;
+
+        //            if ($scope.MCU_TreeViewScope.selectedPoPs.indexOf(item.PoPID) != -1) {
+
+
+        //                var regionID = item.RegionID;
+        //                var region = $.grep($scope.MCU_TreeViewScope.lstRegion, function (e) { return e.RegionID == item.RegionID });
+        //                var regionName = region[0].RegionName;
+        //                var countryID = item.CountryID;
+        //                var country = $.grep($scope.MCU_TreeViewScope.lstCountry, function (e) { return e.CountryID == item.CountryID });
+        //                var countryName = country[0].CountryName;
+        //                var stateID = item.stateID;
+        //                var state = $.grep($scope.MCU_TreeViewScope.sessionState, function (e) { return e.stateID == item.stateID });
+        //                if (state.length > 0)
+        //                    var stateName = state[0].stateName;
+        //                else
+        //                    var stateName = '';
+        //                var cityID = item.CityID;
+        //                var city = $.grep($scope.MCU_TreeViewScope.sessionCity, function (e) { return e.CityID == item.CityID });
+        //                if (stateName != '')
+        //                    var cityName = stateName + " (" + city[0].CityName + ")";
+        //                else
+        //                    var cityName = city[0].CityName;
+        //                var popID = item.PoPID;
+        //                var popName = item.PoPName;
+        //                var caseID = item.caseID;
+        //                var caseValidCD = item.caseValidCd;
+        //                var hasCase = item.hasCase;
+        //                var platForm = $.grep($scope.MCU_TreeViewScope.sessionPlatform, function (e) { return e.caseID == item.caseID });
+        //                var platformID = platForm[0].capmanPlatformID;
+        //                var platformName = platForm[0].capmanPlatformName;
+        //                var caseValidity = '';
+        //                var caseAvail = '';
+        //                var portValid = '';
+        //                var portAvail = '';
+
+        //                $scope.IsCaseIdExists = function () {
+        //                    if ($.grep($scope.caseIdExistsList, function (e) {
+        //                        return e.CASE_ID == item.caseID;
+        //                    }) != '') {
+        //                        return true;
+        //                    }
+        //                    return false;
+        //                } ();
+
+        //                $scope.savedCaseDetails.push({ 'regionID': regionID,
+        //                    'regionName': regionName,
+        //                    'countryID': countryID,
+        //                    'countryName': countryName,
+        //                    'stateID': stateID,
+        //                    'stateName': stateName,
+        //                    'cityID': cityID,
+        //                    'cityName': cityName,
+        //                    'popID': popID,
+        //                    'popName': popName,
+        //                    'caseID': caseID,
+        //                    'caseValidCD': caseValidCD,
+        //                    'hasCase': hasCase,
+        //                    'platformID': platformID,
+        //                    //case availalability and validity
+        //                    'platformName': platformName,
+        //                    'CaseAvailtxt': $scope.modCaseAvail.AVAIL_DESC,
+        //                    'CaseAvailID': $scope.modCaseAvail.AVAIL_CD,
+        //                    'caseValidID': $scope.modValidCase.id,
+        //                    'caseValidText': $scope.modValidCase.text,
+        //                    'portAvailID': $scope.modportavail.AVAIL_CD,
+        //                    'portAvailText': $scope.modportavail.AVAIL_DESC,
+        //                    'portValidID': $scope.modvalidport.id,
+        //                    'portValidText': $scope.modvalidport.text,
+        //                    'leadTime': $scope.modportspeedleadtime,
+        //                    // 'portSpeedID': getStringArray($scope.portspeedList, 'CharId'),
+        //                    'IsCaseIdExists': $scope.IsCaseIdExists
+        //                });
+        //            }
+
+        //        });
+
+        //reset port speed/access speed selection
+        $scope.modportspeed = [];
+        $scope.modAccSpeed = [];
+        $scope.modvalidport.id = -1;
+        $scope.modvalidport.text = "--No Change--";
+        $("#s2id_portvalidity .select2-chosen").html("--No Change--");
+        $scope.modportavail.AVAIL_CD = 0;
+        $scope.modportavail.AVAIL_DESC = "--No Change--";
+        $("#s2id_ddlPortAvail .select2-chosen").html("--No Change--");
+        $scope.modportspeedleadtime = '';
+
+
+        //to bind the case object to savedSelection grid
+
+        //  $scope.EthernetCntrl.savedCaseDetails = $scope.savedCaseDetails;
+        if ($scope.savedCaseDetails.length == 0) {
+            $(".tblSavedDetails").hide();
+        } else {
+            $(".tblSavedDetails").show();
+        }
+        $('.pageLoaderOverlay').hide();
+    });
+    // }
+
+
+
+}

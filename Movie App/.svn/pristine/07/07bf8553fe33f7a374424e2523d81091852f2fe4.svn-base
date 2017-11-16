@@ -1,0 +1,110 @@
+﻿app.controller("PopCaseListCtrl", function ($http, $scope, NgTableParams, $rootScope, $location, CaseFactory, $stateParams, ProductDet, $log, CountryAccessCasesFactory) {
+
+    $(".pageLoaderOverlay").show();
+    
+    $scope.Product = $stateParams.ProductID;
+    $scope.Country = $stateParams.CountryID;
+    $scope.ProductName = $stateParams.ProductName;
+    $scope.CountryName = $stateParams.CountryName;
+    $scope.Region = $stateParams.RegionID;
+    $scope.ProdName = $stateParams.RegionName;
+
+    ProductDet.setProductName($scope.ProductName);
+
+
+    if ($scope.Product == 63) {
+        CaseFactory.GetCPECases($scope.Product, $scope.Region, $scope.Country, $rootScope.User_Id, $rootScope.AccessLevel).success(function (data) {
+
+            $scope.CaseData = new NgTableParams({}, { 'dataset': data.d });
+
+            $(".pageLoaderOverlay").hide();
+
+            $log.log("Done Cases")
+            $log.log(data.d.length)
+            //$scope.CaseData = data.d;
+        });
+    } else {
+        CaseFactory.GetCases($scope.Product, $scope.Region, $scope.Country, $rootScope.User_Id, $rootScope.AccessLevel).success(function (data) {
+
+            $scope.CaseData = new NgTableParams({}, { 'dataset': data.d });
+
+            $(".pageLoaderOverlay").hide();
+
+            $log.log("Done Cases")
+            $log.log(data.d.length)
+            //$scope.CaseData = data.d;
+        });
+    }
+
+    $scope.EditCPECaseDetails = function (CaseID) {
+        $location.path('/CaseDefinition/AdminCPECase').search({ 'CaseId': CaseID });
+
+    }
+    $scope.EditCaseDetails = function (casedet) {
+
+        $scope.editcase = 1;
+        $scope.CaseID = casedet.CaseID;
+        $scope.HubSiteID = casedet.HubSiteID;
+        $scope.CityID = casedet.CityID;
+        $scope.CountryID = casedet.CountryID;
+        $scope.StateProvinceID = casedet.StateProvinceID;
+        $scope.CityName = casedet.CityName;
+        $scope.POPName = casedet.HubSiteName;
+        $scope.StateProvinceName = casedet.StateName;
+
+
+
+        if (casedet.ShowValid == "VALID") {
+            $scope.CaseValid = 1;
+        }
+        else if (casedet.ShowValid == "INVALID") {
+            $scope.CaseValid = 0;
+        }
+
+        $scope.CountryAccess = true;
+
+
+        $location.path('/CaseDefinition/EditCase').search({ 'ProductID': $scope.Product, 'RegionID': $scope.Region, 'CountryID': $scope.Country, 'ProductName': $scope.ProductName, 'RegionName': $scope.RegionName, 'CountryName': $scope.CountryName, 'CaseID': $scope.CaseID, 'HubSiteID': $scope.HubSiteID, 'CityID': $scope.CityID, 'StateProvinceID': $scope.StateProvinceID, 'CityName': $scope.CityName, 'POPName': $scope.POPName, 'StateProvinceName': $scope.StateProvinceName, 'CaseValid': $scope.CaseValid, 'SiteAvailability': casedet.SiteAvailability });
+
+
+        //POPCharacteristicsData
+    }
+
+    $scope.ShowCaseDetails = function (casedet) {
+
+        var AvailSelected = $("#lstBoxAvailability option:selected").text();
+
+
+        if (casedet.ShowValid == "VALID") {
+            $scope.CaseValid = 1;
+        }
+        else if (casedet.ShowValid == "INVALID") {
+            $scope.CaseValid = 0;
+        }
+
+        $scope.CountryAccess = true;
+        $scope.editcase = 1;
+
+        $location.path('/CaseDefinition/EditPopCase').search({ 'CaseID': casedet.CaseID, 'CountryID': $scope.Country, 'ProdName': $scope.ProductName, 'RegName': $scope.RegionName, 'CountName': $scope.CountryName, 'CityName': casedet.CityName, 'POPName': casedet.HubSiteName, 'Valid': $scope.CaseValid, 'POPCode': '', 'NetworkName': '', 'ProductID': $scope.Product, 'HubSiteID': casedet.HubSiteID, 'Availability': '' });
+
+    }
+
+
+    $scope.AddCaseDetails = function () {
+        $scope.CountryAccess = true;
+        $scope.editcase = 1;
+        $location.path('/CaseDefinition/AddCase').search({ 'ProductID': $scope.Product, 'RegionID': $scope.Region, 'CountryID': $scope.Country, 'ProductName': $scope.ProductName, 'RegionName': $scope.RegionName, 'CountryName': $scope.CountryName }); ;
+    }
+
+
+});
+
+app.factory('CountryAccessCasesFactory', function ($http) {
+
+    var CountryAccessCasesFactory = {};
+
+    CountryAccessCasesFactory.GetCountryAccessCases = function (ProductID, Region, CountryId) {
+        return $http.post('SingleCase.aspx/GetCountryAccessCases', { 'ProductCd': ProductID, 'Region': Region, 'CountryId': CountryId });
+    }
+    return CountryAccessCasesFactory;
+});

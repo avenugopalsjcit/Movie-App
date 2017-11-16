@@ -1,0 +1,84 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+
+namespace SCAdminDAL
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Data;
+   
+    
+   
+    public class ProductOwnerDAL
+    {
+
+        public DataTable GetProductOwnersDetails()
+        {
+            string query = string.Empty;
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            //query = "Select p.product_cd, p.product_name, b.emp_id, b.primary_cd, b.user_name,b.user_email_ID,Case when b.user_name is not null then (b.user_name  ||  ' - ' || b.emp_id) ELSE '' END as FullName  From CSU_Product p LEFT JOIN (Select b.product_cd,b.emp_id, a.user_name, b.primary_cd,a.user_email_ID From CSU_User a, CSU_User_Product_Owner b Where a.emp_id = b.emp_id And a.user_status_cd = 1 And b.PRODUCT_OWNER_STATUS_CD = 1) b ON b.product_cd = p.product_cd Order by  p.product_name, b.user_name";  
+           // query = "Select p.product_cd, p.product_name, b.emp_id, b.primary_cd, b.user_name, case when b.primary_cd=1 then b.user_email_ID else '' end as    user_email_ID,Case when b.user_name is not null then (b.user_name  ||  ' - ' || b.emp_id ||')') ELSE '' END as FullName  From CSU_Product p LEFT JOIN (Select b.product_cd,b.emp_id, a.user_name, b.primary_cd,a.user_email_ID From CSU_User a, CSU_User_Product_Owner b Where a.emp_id = b.emp_id And a.user_status_cd = 1 And b.PRODUCT_OWNER_STATUS_CD = 1) b ON b.product_cd = p.product_cd Order by  p.product_name, b.user_name"; 
+            query = "Select p.product_cd, p.product_name, b.emp_id, b.primary_cd, b.user_name, b.user_email_ID as    user_email_ID,Case when b.user_name is not null then (b.user_name  ||  ' (' || b.emp_id ||')') ELSE '' END as FullName  From CSU_Product p LEFT JOIN (Select b.product_cd,b.emp_id, a.user_name, b.primary_cd,a.user_email_ID From CSU_User a, CSU_User_Product_Owner b Where a.emp_id = b.emp_id And a.user_status_cd = 1 And b.PRODUCT_OWNER_STATUS_CD = 1) b ON b.product_cd = p.product_cd Order by  p.product_name, b.user_name"; 
+
+            return objGetDataFromDB.GetDataTable(query.ToString());
+        }
+
+
+        public int UpdateProductOwnerDetails(int ProductCode, string CurrentProductOwner, string OldProductOwner)
+        {
+            OracleConnection oConn = null;
+            int count = 0;
+            int status = 0;
+            try
+            {
+               oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+                oConn.Open();
+                string str = string.Empty;
+
+
+              
+
+                str = @"Update CSU_User_Product_Owner set Primary_cd= '0' , Updated_Dt = to_char(sysdate, 'dd-Mon-yy') " + ", Updated_Emp_Id='609699124' where Product_Cd=" + ProductCode;
+                OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+                status = cmd.ExecuteNonQuery();
+
+
+                if (CurrentProductOwner != OldProductOwner)
+                {
+                    if (CurrentProductOwner != string.Empty)
+                    {
+
+                        str = @"Update CSU_User_Product_Owner set Primary_cd= '1' , Updated_Dt= to_char(sysdate, 'dd-Mon-yy') " + ", Updated_Emp_Id='609699124' where Product_Cd=" + ProductCode + " And Emp_ID=" + "'" + CurrentProductOwner + "'";
+                        OracleCommand cmdUpdation = new OracleCommand(str.ToString(), oConn);
+                        status = cmdUpdation.ExecuteNonQuery();
+
+
+                    }
+
+                }
+
+                if (OldProductOwner == string.Empty)
+                {
+                    str = @"INSERT INTO CSU_User_Product_Owner VALUES (" + CurrentProductOwner + "," + CurrentProductOwner + "," + '1' + "," + "'609699124'" + "," + " to_char(sysdate, 'dd-Mon-yy') " + "," + "'609699124'" + ", to_char(sysdate, 'dd-Mon-yy')" + "," + '1' + ")";
+                    OracleCommand cmdInsertion = new OracleCommand(str.ToString(), oConn);
+                    status = cmdInsertion.ExecuteNonQuery();
+
+                }
+            }
+            catch (Exception ex) { throw; }
+            finally { oConn.Close(); }
+
+            return count;
+
+        }
+
+
+    
+    }
+}

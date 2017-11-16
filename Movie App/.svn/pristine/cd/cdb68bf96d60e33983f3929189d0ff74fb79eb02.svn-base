@@ -1,0 +1,436 @@
+﻿<!DOCTYPE html>
+<html lang="en" ng-app='app'>
+<head>
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <link href="Styles/bootstrap/bootstrap2.min.css" rel="stylesheet" type="text/css" />
+    <link href="Styles/mui.css" rel="stylesheet" type="text/css" />
+    <link href="Styles/modalpopup.css" rel="stylesheet" type="text/css" />
+    <link href="Styles/select2/select2.css" rel="stylesheet" type="text/css" />
+    <link href="Styles/bootstrap/styles.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .ng-table-pager div
+        {
+            margin: 20px 0px 20px 0px;
+        }
+        table a
+        {
+            color: Blue;
+            text-decoration: underline;
+        }
+        
+        .dropdown > a > span
+        {
+            font-weight: bold;
+            width: 20px;
+        }
+        .dropdown > a
+        {
+            cursor: pointer;
+        }
+    </style>
+
+    
+
+</head>
+<body ng-controller="adminController" style="padding-right: 0px">
+    <header>
+		<div role="navigation" class="navbar navbarAndLogo">
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-11 col-sm-11 col-md-11 col-lg-11 logo-txt text-left Arrow">Sales Catalogue</div>
+                    
+                    <div  class="col-xs-1 col-sm-1 col-md-1 col-lg-1"><a class="logo-close pull-right newclass" href="#" onclick="javascript:var win = window.open('', '_self');win.close();return false;">Close</a></div>
+				</div>
+			</div>
+		</div>
+	</header>
+    <!--Left hand side Menu-->
+    <div class="body-wrap" style="margin-top: -20px">
+        <div class="">
+            <nav class="navbar navbar-inverse" role="navigation">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle navbar-brand" data-toggle="dropdown" padding-right:"25px"><span>Product Definition<span class=""></span></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#/Servicetype"><i class="icon-double-angle-right"></i><span>Service type</span> </a></li>
+                <li><a href="#/Product"><i class="icon-double-angle-right"></i><span>Product</span> </a></li>
+                            <li ><a href="#/DistributorProductMapping" ng-click="ChangeAcive(3)"><i
+                                class="icon-double-angle-right"></i><span>Distributor Product Mapping</span> </a>
+                            </li>
+                            <li ><a href="" ng-click="ChangeAcive(4)"><i
+                                class="icon-double-angle-right"></i><span>BTGFR Product Mapping</span> </a></li>
+                            <li ><a href="" ng-click="ChangeAcive(5)"><i
+                                class="icon-double-angle-right"></i><span>ORG Sub Product Mapping</span> </a>
+                            </li>
+                            <li ><a href="#/SubProduct"
+                                ng-click="ChangeAcive(8)"><i class="icon-double-angle-right"></i><span>SubProduct</span>
+                            </a></li>
+                            <li ><a href="#/ProductLocationLevel"
+                                ng-click="ChangeAcive(6)"><i class="icon-double-angle-right"></i><span>Product Location
+                                    Level</span> </a></li>
+                            <li ><a href="#/CharactericsticType"
+                                ng-click="ChangeAcive(7)"><i class="icon-double-angle-right"></i><span>Characteristic
+                                    type</span> </a></li>
+                            <li ><a href="#/Charactericstic"
+                                ng-click="ChangeAcive(32)"><i class="icon-double-angle-right"></i><span>Characteristic</span>
+                            </a></li>
+                            <li><a href="#/DefineProduct"
+                                ng-click="ChangeAcive(33)"><i class="icon-double-angle-right"></i><span>Define Product</span>
+                            </a></li>
+                            <li><a href="#/DisplayOrder"
+                                ng-click="ChangeAcive(34)"><i class="icon-double-angle-right"></i><span>Display Order</span>
+                            </a></li>
+                            <li><a href="" ng-click="ChangeAcive(37)"><i
+                                class="icon-double-angle-right"></i><span>Multi Point Product</span> </a></li>
+                            <li><a href="#/PopTypeMapping"
+                                ng-click="ChangeAcive(38)"><i class="icon-double-angle-right"></i><span>PoP Charsteic
+                                    Type</span> </a></li>
+              </ul>
+            </li>
+
+           
+
+
+               <li class="dropdown">
+              <a href="#" class="dropdown-toggle navbar-brand" data-toggle="dropdown"  padding-right:"25px"><span>CPE<span class=""></span></span></a>
+              <ul class="dropdown-menu">
+                   <li ng-class="{ active: ( subview == 'CPECountryAvailability' ) }"><a href="#/CPECountryAvailibity"
+                                ng-click="ChangeAcive(7)"><i class="icon-double-angle-right"></i><span>CPE Country Availability</span>
+                            </a></li>
+                            <li ng-class="{ active: ( subview == 'CPELeadTimeStatus' ) }"><a href="#/CPELeadTime&Status"
+                                ng-click="ChangeAcive(31)"><i class="icon-double-angle-right"></i><span>CPE Lead Time
+                                    & Status</span> </a></li>
+                            <li ng-class="{ active: ( subview == 'CPEBundles' ) }"><a href="#/CPEBundlesCtrl"
+                                ng-click="ChangeAcive(8)"><i class="icon-double-angle-right"></i><span>CPE Bundles</span>
+                            </a></li>
+                            <li ng-class="{ active: ( subview == 'CPESupplier' ) }"><a href="#/CPESupplierCtrl"
+                                ng-click="ChangeActive(100)"><i class="icon-double-angle-right"></i><span>CPE Supplier</span>
+                            </a></li>
+                            <li ng-class="{ active: ( subview == 'CPESupplierReport' ) }"><a href="#/CPESupplierReportCtrl"
+                                ng-click="ChangeAcive(9)"><i class="icon-double-angle-right"></i><span>CPE Supplier
+                                    Report</span> </a></li>
+                            <li ng-class="{ active: ( subview == 'ManufacturerDistriMaint' ) }"><a href="#/CPEMaintSuppReport"
+                                ng-click="ChangeAcive(10)"><i class="icon-double-angle-right"></i><span>Manufacturer–Distri–Maint</span>
+                            </a></li>
+              </ul>
+            </li>
+
+
+
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle navbar-brand" data-toggle="dropdown"  padding-right:"25px"><span>Case Definition<span class=""></span></span></a>
+              <ul class="dropdown-menu">
+                   <li ng-class="{ active: ( subview == 'listsettings' ) }">
+                            <a href="#/CaseDefinition">
+                                <i class="icon-double-angle-right"></i><span>Define Case</span>
+                            </a>
+                        </li>
+                        <li ng-class="{ active: ( subview == 'treesettings' ) }"><a href="#/MCU" ng-click="ChangeAcive(12)">
+                                <i class="icon-double-angle-right"></i><span>Mass Case Update</span> </a></li>
+              </ul>
+            </li>
+
+
+
+            
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle navbar-brand" data-toggle="dropdown"  padding-right:"25px"><span>Users<span class=""></span></span></a>
+              <ul class="dropdown-menu">
+                  <li ng-class="{ active: ( subview == 'UserAccess' ) }"><a href="#/UserAccess"><i
+                                class="icon-double-angle-right"></i><span>User Access</span> </a></li>
+                            <li ng-class="{ active: ( subview == 'UserDetails' ) }"><a href="#/UserDetails"><i
+                                class="icon-double-angle-right"></i><span>User Details</span> </a></li>
+                            <li ng-class="{ active: ( subview == 'UsersData' ) }"><a href="#/UsersData"><i class="icon-double-angle-right">
+                            </i><span>Users Data</span> </a></li>
+                            <li ng-class="{ active: ( subview == 'PrimaryProductOwner' ) }"><a href="#/PrimaryProductOwner">
+                                <i class="icon-double-angle-right"></i><span>Primary Product Owner</span> </a>
+                            </li>
+              </ul>
+            </li>
+
+
+              
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle navbar-brand" data-toggle="dropdown"  padding-right:"25px"><span>SLA Builder<span class=""></span></span></a>
+              <ul class="dropdown-menu">
+                  <li ng-class="{ active: ( subview == 'ProductLevelSLA' ) }"><a href="#/ProductLevelSLA">
+                                <i class="icon-double-angle-right"></i><span>Product Level SLA</span> </a></li>
+                            <li ng-class="{ active: ( subview == 'SLAMaster' ) }"><a href="#/SLAMaster"><i class="icon-double-angle-right">
+                            </i><span>Product SLA Master</span> </a></li>
+                            <li ng-class="{ active: ( subview == 'SLABuilderFile' ) }"><a href="#/SLABuilderFile"
+                                ng-click="ChangeAcive(36)"><i class="icon-double-angle-right"></i><span>Download
+                                    SLA</span> </a></li>
+              </ul>
+            </li>
+
+
+
+
+               
+            <li class="dropdown"  padding-right:"25px">
+            <a class="accordion-toggle navbar-brand" data-parent="#adminTreeMenu" href="#/supplierRestriction">
+                        <span>Restrictions </span></a>
+              
+            </li>
+
+
+                  
+            <li class="dropdown"  padding-right:"25px">
+               <a class="accordion-toggle navbar-brand" data-parent="#adminTreeMenu" href="#/UpdateAnnouncements">
+                        <span>Announcements</span> </a>
+              
+            </li>
+
+
+
+                  <li class="dropdown"  padding-right:"25px">
+              <a href="#" class="dropdown-toggle navbar-brand" data-toggle="dropdown"><span>Global References<span class=""></span></span> </a>
+              <ul class="dropdown-menu">
+                    <li ng-class="{ active: ( subview == 'AdminAvailView' ) }"><a href="#/AdminAvailView"><i
+                                class="icon-double-angle-right"></i><span>Availability</span> </a></li>
+                               
+                           
+                            <li ng-class="{ active: ( subview == 'AdminBtgfrView' ) }"><a href="#/AdminBtgfrView"><i
+                                class="icon-double-angle-right"></i><span>BT GFR</span> </a></li>
+                            
+
+                             <!--    <li ng-class="{ active: ( subview == 'AdminAddressView' ) }"><a href="#/AdminAddressView"><i
+                                class="icon-double-angle-right"></i><span>Admin Address View</span> </a></li>-->
+                                <li ng-class="{ active: ( subview == 'AdminDocumentationView' ) }"><a href="#/AdminDocumentationView"><i
+                                class="icon-double-angle-right"></i><span>Documentation </span> </a></li>
+                                    <li ng-class="{ active: ( subview == 'AdminGlossary' ) }"><a href="#/AdminGlossary"><i
+                                class="icon-double-angle-right"></i><span>Admin Glossary</span> </a></li>
+                                 <li ng-class="{ active: ( subview == 'CallerAccess_Supplier' ) }"><a href="#/CallerAccess_Supplier"><i
+                                class="icon-double-angle-right"></i><span>Caller Access / Supplier</span> </a></li>
+                                <!-- <li ng-class="{ active: ( subview == 'Notes' ) }"><a href="#/Notes"><i
+                                class="icon-double-angle-right"></i><span>Notes</span> </a></li>-->
+                                  <li ng-class="{ active: ( subview == 'NotesCategory' ) }"><a href="#/NotesCategory"><i
+                                class="icon-double-angle-right"></i><span>Notes Category</span> </a></li>
+                                  <li ng-class="{ active: ( subview == 'NotesPriority' ) }"><a href="#/NotesPriority"><i
+                                class="icon-double-angle-right"></i><span>Notes Priority</span> </a></li>
+                                <li ng-class="{ active: ( subview == 'OrderAccessSpeed' ) }"><a href="#/OrderAccessSpeed"><i
+                                class="icon-double-angle-right"></i><span>Order Access Speed</span> </a></li>
+                                <li ng-class="{ active: ( subview == 'OrderPortSpeed' ) }"><a href="#/OrderPortSpeed"><i
+                                class="icon-double-angle-right"></i><span>Order Port Speed</span> </a></li>
+                                 <li ng-class="{ active: ( subview == 'Unit of Measure' ) }"><a href="#/UnitofMeasure"><i
+                                class="icon-double-angle-right"></i><span>Unit of Measure</span> </a></li>
+                              <li ng-class="{ active: ( subview == 'MapUnitsofMeasure' ) }"><a href="#/MapUnitsofMeasure"><i
+                                class="icon-double-angle-right"></i><span>Map Units of Measure</span> </a></li>
+
+                                 <li ng-class="{ active: ( subview == 'DistributorCompanies' ) }"><a href="#/DistributorCompanies"><i
+                                class="icon-double-angle-right"></i><span>Distributor / Companies</span> </a></li>
+                                 <!--   <li ng-class="{ active: ( subview == 'AccessSupplier' ) }"><a href="#/AccessSupplier"><i
+                                class="icon-double-angle-right"></i><span>Access Supplier</span> </a></li>-->
+              </ul>
+            </li>
+
+
+
+
+                 <li class="dropdown"  padding-right:"25px">
+              <a href="#" class="dropdown-toggle navbar-brand" data-toggle="dropdown"><span>Reports<span class=""></span></span></a>
+              <ul class="dropdown-menu">
+                <li ng-class="{ active: ( subview == 'StandardReports' ) }"><a href="#/StandardReports"><i
+                                class="icon-double-angle-right"></i><span>Standard Reports</span> </a></li>
+                  <li ng-class="{ active: ( subview == 'UsageReport' ) }"><a href="#/UsageReport"><i
+                                class="icon-double-angle-right"></i><span>Usage Report</span> </a></li>
+
+                           <!-- <li ng-class="{ active: ( subview == 'NotesAuditReport' ) }"><a href="#/NotesAuditReport">
+                                <i class="icon-double-angle-right"></i><span>Notes Audit Report</span> </a></li>
+                            <li ng-class="{ active: ( subview == 'CaseAuditReport' ) }"><a href="#/CaseAuditReport">
+                                <i class="icon-double-angle-right"></i><span>Case Audit Report</span> </a></li>-->
+                            <li ng-class="{ active: ( subview == 'AccessSupplierReport' ) }"><a href="#/AccessSupplierReport">
+                                <i class="icon-double-angle-right"></i><span>Access Supplier Report</span> </a></li>
+
+                            <li ng-class="{ active: ( subview == 'NotesAuditReport' ) }"><a href="#/NotesAuditReport"><i
+                                class="icon-double-angle-right"></i><span>Notes Audit Report</span> </a></li>
+                                   <li ng-class="{ active: ( subview == 'CaseAuditReport' ) }"><a href="#/CaseAuditReport"><i
+                                class="icon-double-angle-right"></i><span>Case Audit Report</span> </a></li>
+                                   <li ng-class="{ active: ( subview == 'BatchCaseAuditReport' ) }"><a href="#/BatchCaseAuditReport"><i
+                                class="icon-double-angle-right"></i><span>Batch Case Audit Report</span> </a></li>
+                                <!--<li ng-class="{ active: ( subview == 'CapmanReport' ) }"><a href="#/CapmanReport"><i
+                                class="icon-double-angle-right"></i><span>Capman Report</span> </a></li>-->
+                                 <li ng-class="{ active: ( subview == 'CapmanReports' ) }"><a href="#/CapmanReports"><i
+                                class="icon-double-angle-right"></i><span>CapMan Report</span> </a></li>
+                                <li ng-class="{ active: ( subview == 'DefineStandardReport' ) }"><a href="#/DefineStandardReport"><i
+                                class="icon-double-angle-right"></i><span>Define Standard Report</span> </a></li>
+                                <li ng-class="{ active: ( subview == 'StandardReports_New' ) }"><a href="#/StandardReports_New"><i
+                                class="icon-double-angle-right"></i><span>Standard Reports New</span> </a></li>
+                                
+              </ul>
+            </li>
+
+
+             <li class="dropdown">
+               <a class="accordion-toggle navbar-brand" data-parent="#adminTreeMenu" href="#/FileUploads">
+                        <span>File Upload</span></a>
+            </li>
+
+
+
+          </ul>
+
+         
+        </div>
+
+        <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+        </div>
+    </div>
+    <!--Right hand side menu-->
+    <div>
+        <div class="container-fluid container-nopadding">
+            <!-- Here we can put the title-->
+            <div class="row-fluid">
+                <div class="span12">
+                    <div ui-view>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.1.0/moment.min.js"></script>
+        <script src="Scripts/angular/angular.min.js" type="text/javascript"></script>
+        <script src="Scripts/angular/angular-route.min.js" type="text/javascript"></script>
+        <script src="Scripts/angular/angular-resource.js" type="text/javascript"></script>
+        <script src="Scripts/angular-ui/ui-bootstrap-tpls.min.js" type="text/javascript"></script>
+        <script src="Scripts/angular-ui/ui-bootstrap.min.js" type="text/javascript"></script>
+        <!--<script src="Scripts/angular/angular-ui-router.js" type="text/javascript"></script>-->
+        <script src="http://angular-ui.github.io/ui-router/release/angular-ui-router.min.js"></script>
+        <script src="Scripts/bootstrap/bootbox.min.js" type="text/javascript"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="Scripts/select2/select2.min.js" type="text/javascript"></script>
+        <script src="Scripts/ngtable/ng-table.min.js" type="text/javascript"></script>
+        <script src="Scripts/bootstrap/bootstrap-notify.min.js" type="text/javascript"></script>
+        <script src="Styles/ngBootbox.js"></script>
+        <script src="app.js" type="text/javascript"></script>
+        <script src="AdminCtrl.js" type="text/javascript"></script>
+        <!--ProductDefinations-->
+
+        <script src="Controllers/ProductDefinations/ServicetypeCtrl.js" type="text/javascript"></script>
+       <!-- <script src="Controllers/ProductDefinations/CharactericsticCtrl.js" type="text/javascript"></script>-->
+        <script src="Controllers/ProductDefinations/CharactericsticTypeCtrl.js" type="text/javascript"></script>
+       <!-- <script src="Controllers/ProductDefinations/DefineProductCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/ProductDefinations/DisplayOrderCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/ProductDefinations/PopTypeMappingCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/ProductDefinations/ProductLocationLevelCtrl.js" type="text/javascript"></script>-->
+        <script src="/Controllers/ProductDefinations/ProductCtrl.js" type="text/javascript"></script>
+       
+       
+        <!-- <script src="Controllers/ServicetypeCtrl.js" type="text/javascript"></script>-->
+        <script src="Controllers/SubProductCtrl.js" type="text/javascript"></script>
+        <!--CPEscripts-->
+        <script src="Controllers/CPEBundlesCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/CPECountryAvailibityCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/CPELeadTimeStatusCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/CPESupplierCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/CPESupplierReportCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/ManufacturerDistributorMaintainerReportCtrl.js" type="text/javascript"></script>
+        <!--UserScripts-->
+        <script src="Controllers/UserDetailsCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/PrimaryProductOwnerCntrl.js" type="text/javascript"></script>
+        <script src="Controllers/UsersDataCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/UserAccessCtrl.js" type="text/javascript"></script>
+        <!--Restrictions-->
+        <script src="Controllers/RestrictionsCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/Distributor.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/AdminAvailView.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/AdminBtgfrView.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/AdminNotesCategory.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/AdminNotespriority.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/AdminUnitofMeasure.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/AdminOrderAccessSpeed.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/AdminDocumentationView.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/AdminOrderPortSpeed.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/CallerAccessSupplier.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/AdminGlossaryView.js" type="text/javascript"></script>
+        <!--<script src="Controllers/GlobalReferences/MapUnitsOfMeasure.js" type="text/javascript"></script>-->
+        <script src="Controllers/GlobalReferences/AdminNotes.js" type="text/javascript"></script>
+        <script src="Controllers/GlobalReferences/DistributorCompanies.js" type="text/javascript"></script>
+        <!--UpdateAnnouncements-->
+        <!--FileUpload scripts-->
+        <script src="Controllers/FileUploads.js" type="text/javascript"></script>
+        <!--UpdateAnnouncements-->
+        <script src="Controllers/UpdateAnnouncements.js" type="text/javascript"></script>
+        <!--ReportsScripts-->
+        <script src="Controllers/StandardReportsCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/MonthlyUsaseReportCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/WeeklyUsageReportCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/NotesAuditReportCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/CaseAuditReportCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/CaseDetailAuditReportCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/BatchCaseAuditReport.js" type="text/javascript"></script>
+        <script src="Controllers/AdminDSLCase.js" type="text/javascript"></script>
+        <script src="Controllers/CaseDefination.js" type="text/javascript"></script>
+        <script src="Controllers/AdminDSLCaseUpdateCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/EditPoPLevelCaseDetails.js" type="text/javascript"></script>
+       <script src="Controllers/AdminCPECaseCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/AdminCPECaseDetailsCtrl.js" type="text/javascript"></script>
+        <script src="JSONToCSVConvertor.js" type="text/javascript"></script>
+        <script src="Controllers/StandardReportsNewCtrl.js" type="text/javascript"></script>
+        <!--<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">-->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/css/bootstrap-datepicker.css"
+            rel="Stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.0/js/bootstrap-datepicker.min.js"></script>
+        <!-- to change direction of collapsable arrow-->
+        <script src="Scripts/CollapsiblePanel.js" type="text/javascript"></script>
+        <!--mass case update-->
+        <script src="Controllers/Mass case update/MCU.js"></script>
+        <script src="Controllers/Mass case update/updateCasesContryLevel.js"></script>
+         <script src="Controllers/Mass case update/PortSpeed.js"></script>
+         <script src="Controllers/Mass case update/SavedCaseDetails.js"></script>
+          <script src="Controllers/Mass case update/AccessSupp.js"></script>
+          <script src="Controllers/Mass case update/BindCaseArray.js"></script>
+           <script src="Controllers/Mass case update/BindCaseArrayHVPN.js"></script>
+           <script src="Controllers/Mass case update/displaySavedDetailsHVPN.js"></script>
+           <script src="Controllers/Mass case update/AccessSuppHVPN.js"></script>
+           <script src="Controllers/Mass case update/DisplaySelectedCharDetails.js"></script>
+          <script src="Controllers/Mass case update/UpdateCasesPoPLevel.js"></script>
+        <script src="Controllers/Mass case update/EthernetCtrl.js"></script>
+        <script src="Controllers/Mass case update/MCU_TreeView.js"></script>
+        <script src="Controllers/Mass case update/PortAccessJSON.js"></script> 
+        <script src="Controllers/Mass case update/MCUCountryLevel.js"></script>
+        <script src="Controllers/Mass case update/MCU_HVPN_TreeView.js"></script>
+        <script src="Controllers/Mass case update/MCUCountryNoPort.js"></script>
+        <script src="Controllers/Mass case update/AccessCntrl.js"></script>
+        <script src="Controllers/Mass case update/MultipopCntrl.js"></script>
+        <script src="Controllers/Mass case update/MCUCitylevel.js"></script>
+        <script src="Controllers/SLAMasterCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/SLABuilderFileCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/ProductLevelSLACtrl.js" type="text/javascript"></script>
+        <script src="Controllers/AccessSupplierReportCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/CapmanReportCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/DistributorProductMappingCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/CapmanAccessReportCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/DefineStandardReportCtrl.js" type="text/javascript"></script>
+        <script src="Controllers/AddCaseCntrl.js" type="text/javascript"></script>
+        <script src="Controllers/PopCaseListCntrl.js" type="text/javascript"></script>
+        <script src="Controllers/EditCaseCntrl.js" type="text/javascript"></script>
+
+
+
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+﻿app.bindPortSpeed = function ($scope) {
+
+    if ($scope.portspeedList.length == 0) {
+        if ($scope.modportspeed != undefined) {
+            $scope.modportspeed.forEach(function (item) {
+                $scope.portspeedList.push({
+                    CharId: item.PSPEED_ID,
+                    CharName: item.PSPEED_NAME,
+                    CharTypeId: 28,
+                    UnitOfMeasure: item.PSPEED_UOM,
+                    ActualValue: item.PSPEED_ACT_VAL,
+                    ValidCd: item.PSPEED_VALID_CD,
+                    NumValue: item.PSPEED_NUM_VAL,
+                    LeadTime: $scope.modportspeedleadtime,
+                    PortAvailability: $scope.modportavail.AVAIL_CD,
+                    PortAvailabilityName: $scope.modportavail.AVAIL_DESC,
+                    AccAvailability: $scope.modAccSpeedavail == undefined ? '' : $scope.modAccSpeedavail.AVAIL_CD,
+                    AccAvailabilityName: $scope.modAccSpeedavail == undefined ? '' : $scope.modAccSpeedavail.AVAIL_DESC,
+                    validPort: $scope.modvalidport.id,
+                    ValidPortName: $scope.modvalidport.text,
+                    CaseId: $scope.selectedCases,
+                    PopId: $scope.selectedPoPs
+                });
+                $scope.portspeedAdded = true;
+            });
+
+        }
+
+    } else {
+        var insertedPortID = getStringArray($scope.portspeedList, 'CharId')
+        $scope.modportspeed.forEach(function (item) {
+            if (insertedPortID.indexOf(item.PSPEED_ID) == -1) {
+                $scope.portspeedList.push({
+                    CharId: item.PSPEED_ID,
+                    CharName: item.PSPEED_NAME,
+                    CharTypeId: 28,
+                    UnitOfMeasure: item.PSPEED_UOM,
+                    ActualValue: item.PSPEED_ACT_VAL,
+                    ValidCd: item.PSPEED_VALID_CD,
+                    NumValue: item.PSPEED_NUM_VAL,
+                    LeadTime: $scope.modportspeedleadtime,
+                    PortAvailability: $scope.modportavail.AVAIL_CD,
+                    PortAvailabilityName: $scope.modportavail.AVAIL_DESC,
+                    AccAvailability: $scope.modAccSpeedavail == undefined ? '' : $scope.modAccSpeedavail.AVAIL_CD,
+                    AccAvailabilityName: $scope.modAccSpeedavail == undefined ? '' : $scope.modAccSpeedavail.AVAIL_DESC,
+                    validPort: $scope.modvalidport.id,
+                    ValidPortName: $scope.modvalidport.text,
+                    CaseId: $scope.selectedCases,
+                    PopId: $scope.selectedPoPs
+                });
+                $scope.portspeedAdded = true;
+            }
+        });
+    }
+}

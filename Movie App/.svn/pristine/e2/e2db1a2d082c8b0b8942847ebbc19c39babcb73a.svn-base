@@ -1,0 +1,96 @@
+﻿<style>
+    li
+    {
+        list-style-type: none;
+    }
+</style>
+<div ng-controller="Controllers.SLABuilderFileCtrl">
+  <!--  <nav class="navbar navbar-default center" role="navigation">
+  <div class="navbar-header ">
+    <a class="navbar-brand" style="text-align: center" href="#"> </a>
+
+    </div>
+    </nav>-->
+      <h3>
+        <span style="float: left;cursor:default">SLA Download Files</span></h3>
+    <br />
+    <br />
+
+    <div class="container">
+       <!-- <label style="cursur:pointer"><h4>Download </h4></label>-->
+        </br>
+        <div class="form-group col-md-12">
+            <div class="col-md-1">
+                <label>
+                    Product&nbsp;<span style="color: Red">*</span></label>
+            </div>
+            <div class="col-md-6" style="margin-left:-9px">
+                <select id="DDL_Product" ng-model="item1" ng-options="item.product_id as item.ProductName for item in ProductsList"
+                    style="width: 60%" name="DDL_Product" ng-change="ProdChange(item1)">
+                    <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;--</option>
+                </select>
+                <span id="prodspan" style="display:none;color:Red">&nbsp;&nbsp;Please Select Product</span>
+            </div>
+        </div>
+        <div class="form-group col-md-9">
+            <div class="col-md-2">
+                <label>
+                    File Type</label>
+            </div>
+            <div class="col-md-5" style="margin-left: -52px">
+                <!--<li ng-repeat="item in Filetypes"><a ng-click="SelectedItemFiletype($index)">{{item}}</a></li>-->
+
+                <!--<li ng-repeat="item in Filetypes"><a ng-click="ProdChange1(item1)" href="FileDownload.aspx?productID={{item1}}&FileTypeId={{$index}}">-->
+               <!-- <li ng-repeat="item in Filetypes"><a  ng-href="/FileDownload.aspx?productID=item1&FileTypeId=$index">-->
+
+               <!-- <li ng-repeat="item in Filetypes"><a href="FileDownload.aspx?productID={{item1}}&FileTypeId={{$index}}">
+
+                    {{item}}</a></li>-->
+
+                     <li ng-repeat="item in Filetypes"><a ng-click="SelectedItemFiletype($index)">
+
+                    {{item}}</a></li>
+              
+            </div>
+        </div>
+        <!--  <div class="form-group col-md-12" style="margin-left: 23%">
+            <div class="col-md-3">
+                <input type="button" class="btn btn-primary" value="Download file" ng-click="eventFileUpload()" />
+            </div>
+        </div>-->
+    </div>
+    <!--  <div class="container">
+        <legend><b>Upload </b></legend>
+        <div class="form-group col-md-12">
+            <div class="col-md-2">
+                <label>
+                    File type:</label>
+            </div>
+            <div class="col-md-7">
+                <select class="form-control" style="width: 60%" id="Select1" name="DDL_Product">
+                    <option selected value="All">BTBaseLine</option>
+                    <option value="25">Costable1</option>
+                    <option value="128">Costable4</option>
+                    <option value="58">Costale5</option>
+                    <option value="62">SLAMaster</option>
+                </select>
+            </div>
+        </div>
+        <br />
+        <br />
+        <br />
+        <div class="form-group col-md-12" style="margin-left: 16%;">
+            <div class="col-md-4">
+                <input name="fileUploadDocument" id="fileUploadDocument" style="width: 122%; height: 25px;"
+                    type="file" />
+            </div>
+        </div>
+        <div class="form-group col-md-12" style="margin-left: 23%">
+            <div class="col-md-3">
+                <input type="button" class="btn btn-primary" value="Upload" ng-click="eventFileUpload()" />
+            </div>
+        </div>
+    </div>-->
+    <div id="Go1" class="pageLoaderOverlay">
+    </div>
+</div>

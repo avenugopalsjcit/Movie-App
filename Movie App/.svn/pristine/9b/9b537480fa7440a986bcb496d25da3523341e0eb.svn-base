@@ -1,0 +1,384 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SCAdminDAL;
+using System.Data;
+
+namespace SCAdminBAL
+{
+   public class CpeSupplierAdminBAL
+    {
+
+       private CpeSupplierAdminDAL objCpeSupplierAdminDAL = new CpeSupplierAdminDAL();
+
+
+       public List<SLAAccSupp> GetCPESuppliers()
+       {
+           DataTable dtsupplier = objCpeSupplierAdminDAL.GetCPESuppliers();
+
+           List<SLAAccSupp> lstsupplier = new List<SLAAccSupp>();
+           try
+           {
+               foreach (DataRow dr in dtsupplier.Rows)
+               {
+                   SLAAccSupp objCpeSuppliers = new SLAAccSupp();
+
+                   objCpeSuppliers.supplierId = Convert.ToString(dr["CHAR_ID"]);
+                   objCpeSuppliers.supplierName = Convert.ToString(dr["CHAR_NAME"]);
+                   lstsupplier.Add(objCpeSuppliers);
+               }
+           }
+           catch(Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstsupplier;
+       }
+
+
+       public List<SLAAccSupp> GetCPESupplierType()
+       {
+
+           DataTable dtSupplierType = objCpeSupplierAdminDAL.GetCPESupplierType();
+
+           List<SLAAccSupp> lstSupplierType = new List<SLAAccSupp>();
+           try
+           {
+               foreach (DataRow dr in dtSupplierType.Rows)
+               {
+                   SLAAccSupp objSupplierType = new SLAAccSupp();
+
+                   objSupplierType.supplierId = Convert.ToString(dr["CHAR_ID"]);
+                   objSupplierType.supplierName = Convert.ToString(dr["CHAR_NAME"]);
+                   lstSupplierType.Add(objSupplierType);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstSupplierType;
+       }
+
+
+       public List<SLAAccSupp> GetCPEPricingTypes()
+       {
+
+           DataTable dtpricingtype = objCpeSupplierAdminDAL.GetCPEPricingTypes();
+           List<SLAAccSupp> lstpricingtypes = new List<SLAAccSupp>();
+           try
+           {
+               foreach (DataRow dr in dtpricingtype.Rows)
+               {
+                   SLAAccSupp objpricingtype = new SLAAccSupp();
+                   objpricingtype.supplierId = Convert.ToString(dr["CHAR_ID"]);
+                   objpricingtype.supplierName = Convert.ToString(dr["CHAR_NAME"]);
+                   lstpricingtypes.Add(objpricingtype);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstpricingtypes;
+       }
+
+       public List<ProductDetails> GetProductBasedonSupplier(int supplierId)
+       {
+           DataTable dtprodSupplier = objCpeSupplierAdminDAL.GetProductBasedonSupplier(supplierId);
+           List<ProductDetails> lstprodSupplier = new List<ProductDetails>();
+           try
+           {
+               foreach (DataRow dr in dtprodSupplier.Rows)
+               {
+                   ProductDetails objprodSupplier = new ProductDetails();
+                   objprodSupplier.ProductId = Convert.ToInt32(dr["product_cd"]);
+                   objprodSupplier.ProductName = Convert.ToString(dr["product_name"]);
+                   lstprodSupplier.Add(objprodSupplier);
+               }
+
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+    
+           return lstprodSupplier;
+       }
+
+
+       public List<SLAAccSupp> GetSuppandPricesBasedonProd(int supplierId, int ProductID)
+       {
+           List<SLAAccSupp> lstSuppPrices = new List<SLAAccSupp>();
+           try
+           {
+               DataTable dtSuppPrices = objCpeSupplierAdminDAL.GetSuppandPricesBasedonProd(supplierId, ProductID);
+
+               foreach (DataRow dr in dtSuppPrices.Rows)
+               {
+                   SLAAccSupp objSuppPrices = new SLAAccSupp();
+                   objSuppPrices.supplierId = Convert.ToString(dr["char_id"]);
+                   objSuppPrices.supplierName = Convert.ToString(dr["char_name"]);
+                   lstSuppPrices.Add(objSuppPrices);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstSuppPrices;
+       }
+
+
+
+       public List<SLAAccSupp> GetPricingTypesBasedonProd(int supplierId, int ProductID)
+       {
+           List<SLAAccSupp> lstPricingTypes = new List<SLAAccSupp>();
+           try
+           {
+               DataTable dtPricingTypes = objCpeSupplierAdminDAL.GetPricingTypesBasedonProd(supplierId, ProductID);
+
+               foreach (DataRow dr in dtPricingTypes.Rows)
+               {
+                   SLAAccSupp objPricingTypes = new SLAAccSupp();
+                   objPricingTypes.supplierId = Convert.ToString(dr["char_id"]);
+                   objPricingTypes.supplierName = Convert.ToString(dr["char_name"]);
+                   lstPricingTypes.Add(objPricingTypes);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstPricingTypes;
+       }
+
+       public List<string> OnSelectionSupptypeandPriceType(string supptype, string pricingtype)
+       {
+           return objCpeSupplierAdminDAL.OnSelectionSupptypeandPriceType(supptype, pricingtype);
+       }
+
+       public int GetNonStandardConfiguration(int supplierId,int ProductID, string supptype, string pricingtype)
+       {
+           return objCpeSupplierAdminDAL.GetNonStandardConfiguration(supplierId,ProductID, supptype, pricingtype);
+       }
+
+       public List<string> GetInstallerandMaintainerFlags(int supplierId)
+       {
+           return objCpeSupplierAdminDAL.GetInstallerandMaintainerFlags(supplierId);
+       }
+
+       public List<CountryRestrictionDropDown> UnassignedCPESupplierCountries(int supplierId, string supptype, string pricingtype)
+       {
+           List<CountryRestrictionDropDown> lstcntry = new List<CountryRestrictionDropDown>();
+           try
+           {
+               DataTable dtUnassignedCPESupplier = objCpeSupplierAdminDAL.UnassignedCPESupplierCountries(supplierId, supptype, pricingtype);
+               foreach (DataRow dr in dtUnassignedCPESupplier.Rows)
+               {
+                   CountryRestrictionDropDown objcountry = new CountryRestrictionDropDown();
+                   objcountry.CountryId = Convert.ToInt32(dr["COUNTRY_ID"]);
+                   objcountry.CountryName = Convert.ToString(dr["COUNTRY_NAME"]);
+                   lstcntry.Add(objcountry);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return lstcntry;
+       }
+
+       public List<AccessType> AssignedAccessTypes(int supplierId, string supptype)
+       {
+           List<AccessType> lstAssigAccType = new List<AccessType>();
+           try
+           {
+               DataTable dtAssigAccType = objCpeSupplierAdminDAL.AssignedAccessTypes(supplierId, supptype);
+               if (dtAssigAccType != null && dtAssigAccType.Rows.Count > 0)
+               {
+                   foreach (DataRow dr in dtAssigAccType.Rows)
+                   {
+                       AccessType AccType = new AccessType();                    
+                       AccType.Type = Convert.ToString(dr["Access_type"]);
+                       lstAssigAccType.Add(AccType);
+                   }
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstAssigAccType;
+       }
+
+       public List<CountryRestrictionDropDown> AssignedCPESupplierCountries(int supplierId, int ProductID, string supptype, string pricingtype)
+       {
+           List<CountryRestrictionDropDown> lstassignedCPESupplier = new List<CountryRestrictionDropDown>();
+           try
+           {
+               DataTable dt = objCpeSupplierAdminDAL.AssignedCPESupplierCountries(supplierId, ProductID, supptype, pricingtype);
+               if (dt != null && dt.Rows.Count > 0)
+               {
+                   foreach (DataRow dr in dt.Rows)
+                   {
+                       CountryRestrictionDropDown objAssignedcntry = new CountryRestrictionDropDown();
+                       objAssignedcntry.CountryId = Convert.ToInt32(dr["COUNTRY_ID"]);
+                       objAssignedcntry.CountryName = Convert.ToString(dr["COUNTRY_NAME"]);
+                       lstassignedCPESupplier.Add(objAssignedcntry);
+                   }
+
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return lstassignedCPESupplier;
+       }
+
+       public List<ProductDetails> ValidOwnerCPEProducts()
+       {
+           List<ProductDetails> lstValidOwnerproduct = new List<ProductDetails>();
+           try
+           {
+               DataTable dtValidOwnerproduct = objCpeSupplierAdminDAL.ValidOwnerCPEProducts();
+               if (dtValidOwnerproduct != null && dtValidOwnerproduct.Rows.Count > 0)
+               {
+                   foreach (DataRow dr in dtValidOwnerproduct.Rows)
+                   {
+                       ProductDetails productdetails = new ProductDetails();
+                       productdetails.ProductId = Convert.ToInt32(dr["PRODUCT_CD"]);
+                       productdetails.ProductName = Convert.ToString(dr["PRODUCT_NAME"]);
+                       lstValidOwnerproduct.Add(productdetails);
+                   }
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+           return lstValidOwnerproduct;
+       }
+
+
+       public List<EmailsforCPEproducts> RetrieveEmailId(int SupplierId, int CountryId, string ProductIDs)
+       {
+           List<EmailsforCPEproducts> lstemails = new List<EmailsforCPEproducts>();
+           try
+           {
+               DataTable dt = objCpeSupplierAdminDAL.RetrieveEmailId(SupplierId, CountryId, ProductIDs);
+               if (dt != null && dt.Rows.Count > 0)
+               {
+                   foreach (DataRow dr in dt.Rows)
+                   {
+                       EmailsforCPEproducts objemails = new EmailsforCPEproducts();
+                       objemails.EmailID = Convert.ToString(dr["email_id"]);
+                       objemails.ProductID = Convert.ToString(dr["product_id"]);
+                       lstemails.Add(objemails);
+                   }
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstemails;
+       }
+
+       public List<CPESupplierfootertblData> GetAllFooterTableDetails(int SupplierId)
+       {
+           List<CPESupplierfootertblData> lstfootertblData = new List<CPESupplierfootertblData>();
+
+           try
+           {
+              
+               DataTable dtcpesupplier = objCpeSupplierAdminDAL.CPESUPPLIERFooterGridDetails(SupplierId);
+               DataTable dtcntryCreated = objCpeSupplierAdminDAL.CntryAssignCreatedGridData(SupplierId);
+               DataTable dtcntryUpdated = objCpeSupplierAdminDAL.CntryAssignUpdatedGridData(SupplierId);
+               CPESupplierfootertblData objfootertblData = new CPESupplierfootertblData();
+               if (dtcpesupplier != null && dtcpesupplier.Rows.Count > 0)
+               {
+
+                   objfootertblData.SUPPLIER_CREATED_DT = dtcpesupplier.Rows[0]["SUPPLIER_CREATED_DT"].ToString();
+                   objfootertblData.SUPPLIER_CREATED_BY = dtcpesupplier.Rows[0]["SUPPLIER_CREATED_BY"].ToString().Replace("N_99999", @"PMF Admin");
+                   objfootertblData.SUPPLIER_UPDATED_DT = dtcpesupplier.Rows[0]["SUPPLIER_UPDATED_DT"].ToString();
+                   objfootertblData.SUPPLIER_UPDATED_BY = dtcpesupplier.Rows[0]["SUPPLIER_UPDATED_BY"].ToString().Replace("N_99999", @"PMF Admin");
+               }
+
+               if (dtcntryCreated != null && dtcntryCreated.Rows.Count > 0)
+               {
+                   objfootertblData.cnt_assign_created_dt = dtcntryCreated.Rows[0]["cnt_assign_created_dt"].ToString();
+                   objfootertblData.CNT_assign_CREATED_BY = dtcntryCreated.Rows[0]["CNT_ASSIGN_CREATED_BY"].ToString().Replace("N_99999", @"PMF Admin");
+                   
+
+               }
+
+               if (dtcntryUpdated != null && dtcntryUpdated.Rows.Count > 0)
+               {
+                   objfootertblData.cnt_assign_updated_dt = dtcntryUpdated.Rows[0]["cnt_assign_updated_dt"].ToString();
+                   objfootertblData.CNT_assign_UPDATED_BY = dtcntryUpdated.Rows[0]["cnt_assign_updated_by"].ToString().Replace("N_99999", @"PMF Admin");
+               }
+               
+               lstfootertblData.Add(objfootertblData);
+                      
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstfootertblData;
+       }
+       public List<CPESupplierfootertblData> EmailAssignUnAssignGridData(int supplierId)
+       {
+           List<CPESupplierfootertblData> lstEmailAssignUnAssign = new List<CPESupplierfootertblData>();
+           try
+           {
+               DataTable dtEmailassign = objCpeSupplierAdminDAL.EmailAssignUnAssignGridData(supplierId);
+               DataTable dtEmailUpdated = objCpeSupplierAdminDAL.EmailAssignUnAssignUpdatedGrid(supplierId);
+               DataTable dtAggCreated = objCpeSupplierAdminDAL.ACCTYPECREATED(supplierId);
+               DataTable dtAggUpdated = objCpeSupplierAdminDAL.ACCTYPEUpdated(supplierId);
+               CPESupplierfootertblData objEmailAssignUnAssign = new CPESupplierfootertblData();
+               if (dtEmailassign != null && dtEmailassign.Rows.Count > 0)
+               {
+                   objEmailAssignUnAssign.SUP_EMAIL_CREATED_DT = dtEmailassign.Rows[0]["SUP_EMAIL_CREATED_DT"].ToString();
+                   objEmailAssignUnAssign.SUP_EMAIL_CREATED_BY = dtEmailassign.Rows[0]["SUP_EMAIL_CREATED_BY"].ToString().Replace("N_99999", @"PMF Admin");              
+               }
+               if (dtEmailUpdated != null && dtEmailUpdated.Rows.Count > 0)
+               {
+                   objEmailAssignUnAssign.SUP_EMAIL_UPDATED_DT = dtEmailUpdated.Rows[0]["SUP_EMAIL_UPDATED_DT"].ToString();
+                   objEmailAssignUnAssign.SUP_EMAIL_UPDATED_BY = dtEmailUpdated.Rows[0]["SUP_EMAIL_UPDATED_BY"].ToString().Replace("N_99999", @"PMF Admin");
+               }
+
+               if (dtAggCreated != null && dtAggCreated.Rows.Count > 0)
+               {
+                   objEmailAssignUnAssign.ACC_TYPE_CREATED_DT = dtAggCreated.Rows[0]["ACC_TYPE_CREATED_DT"].ToString();
+                   objEmailAssignUnAssign.ACC_TYPE_CREATED_BY = dtAggCreated.Rows[0]["ACC_TYPE_CREATED_BY"].ToString().Replace("N_99999", @"PMF Admin");
+               }
+               if (dtAggUpdated != null && dtAggUpdated.Rows.Count > 0)
+               {
+                   objEmailAssignUnAssign.ACC_TYPE_UPDATED_DT = dtAggUpdated.Rows[0]["ACC_TYPE_UPDATED_DT"].ToString();
+                   objEmailAssignUnAssign.ACC_TYPE_UPDATED_BY = dtAggUpdated.Rows[0]["ACC_TYPE_UPDATED_BY"].ToString();
+               }
+
+               lstEmailAssignUnAssign.Add(objEmailAssignUnAssign);
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstEmailAssignUnAssign;
+          
+       }
+    }
+}

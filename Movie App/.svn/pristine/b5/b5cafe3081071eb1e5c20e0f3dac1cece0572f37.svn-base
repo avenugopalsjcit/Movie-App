@@ -1,0 +1,28 @@
+﻿<div class="panel panel-primary mcu-panel">
+    <div class="panel-heading mcu-panel-heading-height">
+        <div class="panel-title">
+            Characteristic Type
+        </div>
+    </div>
+    <div class="panel-body small-padding-panel">
+        <select style="width: 100%" multiple size="9" ng-model="modSelectedchar" ng-options="option.CHAR_TYPE_NAME for option in lstCharecteristics track by option.CHAR_TYPE_ID">
+        </select>
+        <span>
+            <button class="btn btn-primary" ng-click="addSelectedChar()" id="charAdd">
+                Add</button>
+            <button class="btn btn-primary" ng-click="resetCharBtn()">
+                Reset</button>
+        </span>
+    </div>
+</div>
+<div class="panel panel-primary mcu-panel">
+    <div class="panel-heading mcu-panel-heading-height">
+        <div class="panel-title">
+            Characteristics
+        </div>
+    </div>
+    <div class="panel-body small-padding-panel  overflowScroll" style="height: 321px">
+        <div id="selectedChar">
+        </div>
+    </div>
+</div>

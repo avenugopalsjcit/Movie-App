@@ -1,0 +1,566 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SCAdminDAL;
+using System.Data;
+using AutoMapper;
+
+namespace SCAdminBAL
+{
+    public class CountryAccessCaseDefBAL
+    {
+        public CountryAccessCases UpdateCountryAccessCase(string CaseId, bool CaseValidCD, int CaseAvailCD, string UserId)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            int count = dal.UpdateCountryAccessCase(CaseId, CaseValidCD, CaseAvailCD, UserId);
+            if (count > 0)
+            {
+                return GetCountryAccessCasesByRegion(CaseId);
+            }
+            else
+            {
+                return new CountryAccessCases();
+            }
+        }
+
+        public CountryAccessCases GetCountryAccessCasesByRegion(string CaseId)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtCases = dal.GetCountryAccessCasesByCaseId(CaseId).Tables[0];
+            CountryAccessCases CountryAccessCases = new CountryAccessCases();
+            foreach (DataRow dr in dtCases.Rows)
+            {
+                CountryAccessCases.CaseId = Convert.ToString(dr["case_id"]);
+                CountryAccessCases.CountryName = Convert.ToString(dr["country_name"]);
+                CountryAccessCases.CountryId = Convert.ToInt32(dr["country_id"]);
+                CountryAccessCases.Region = Convert.ToString(dr["region_name"]);
+                CountryAccessCases.CreatedBy = Convert.ToString(dr["Created_user"]);
+                CountryAccessCases.CreatedDate = Convert.ToString(dr["created_dt"]);
+                CountryAccessCases.UpdatedBy = Convert.ToString(dr["Updated_user"]);
+                CountryAccessCases.UpdatedDate = Convert.ToString(dr["updated_dt"]);
+                CountryAccessCases.Validity = Convert.ToString(dr["ShowValid"]);
+                CountryAccessCases.CaseAvailability = Convert.ToString(dr["CaseAvailability"]);
+                CountryAccessCases.CaseAvailCd = Convert.ToInt32(dr["case_avail_cd"]);
+            }
+            return CountryAccessCases;
+        }
+
+        public int DeleteCountryAccessCase(int CaseId, int AccessLevel, int UserId)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            return dal.DeleteCountryAccessCase(CaseId, AccessLevel, UserId);
+        }
+
+        public List<DSLPackages> GetCountryAccessDSLPackages(string CaseId, bool CaseValidCD, string PackageType, string CountryName)
+        {
+
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtPackages = dal.GetCountryAccessDSLPackages(CaseId, CaseValidCD, PackageType).Tables[0];
+
+            List<DSLPackages> lstDSLPackages = new List<DSLPackages>();
+            foreach (DataRow dr in dtPackages.Rows)
+            {
+                DSLPackages DSLPackages = new DSLPackages();
+                DSLPackages.CasePkgCd = Convert.ToInt32(dr["CASE_PKG_ID"]);
+                DSLPackages.CharId = Convert.ToString(dr["CHAR_ID"]);
+                DSLPackages.CharName = Convert.ToString(dr["CHAR_NAME"]);
+                lstDSLPackages.Add(DSLPackages);
+            }
+
+            int count = dal.GetVSATPackage(CountryName);
+            if (count > 0)
+            {
+                DSLPackages DSLPackages1 = new DSLPackages();
+                foreach (DSLPackages dslPkg in lstDSLPackages)
+                {
+                    DSLPackages1.CasePkgCd = dslPkg.CasePkgCd;
+                    DSLPackages1.CharId = dslPkg.CharId;
+                    DSLPackages1.CharName = "VSAT";
+                }
+                lstDSLPackages.Add(DSLPackages1);
+            }
+            return lstDSLPackages;
+        }
+
+        public string GetTunnelingNote(string CountryName)
+        {
+
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtTunnelingNote = dal.GetTunnelingNote(CountryName).Tables[0];
+
+            string tunnelingNote = string.Empty;
+
+            foreach (DataRow dr in dtTunnelingNote.Rows)
+            {
+                tunnelingNote = Convert.ToString(dr["split_tunneling"]);
+            }
+            return tunnelingNote;
+        }
+
+        public int GetCountryAccessParentCD(int ProductId, int CountryId)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtCountryAccessParentCD = dal.GetCountryAccessParentCD(ProductId, CountryId).Tables[0];
+
+            int countryAccessParentCD = 0;
+
+            foreach (DataRow dr in dtCountryAccessParentCD.Rows)
+            {
+                countryAccessParentCD = Convert.ToInt32(dr["parent_cd"]);
+            }
+            return countryAccessParentCD;
+
+        }
+
+        public int GetCasePackageId(int CaseId, int PackageId)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtCasePackageId = dal.GetCasePackageId(CaseId, PackageId).Tables[0];
+
+            int casePackageId = 0;
+
+            foreach (DataRow dr in dtCasePackageId.Rows)
+            {
+                casePackageId = Convert.ToInt32(dr["case_pkg_id"]);
+            }
+            return casePackageId;
+        }
+
+
+
+        public int GetPortTypeCasePackageId(int CaseId, int PortTypeId, int AccessSetId)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtCasePackageId = dal.GetPortTypeCasePackageId(CaseId, PortTypeId, AccessSetId).Tables[0];
+
+            int casePortTypePackageId = 0;
+
+            foreach (DataRow dr in dtCasePackageId.Rows)
+            {
+                casePortTypePackageId = Convert.ToInt32(dr["case_pkg_id"]);
+            }
+            return casePortTypePackageId;
+        }
+
+        public int GetVSATCharId()
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtCasePackageId = dal.GetVSATCharId().Tables[0];
+
+            int vsatCharId = 0;
+
+            foreach (DataRow dr in dtCasePackageId.Rows)
+            {
+                vsatCharId = Convert.ToInt32(dr["char_id"]);
+            }
+            return vsatCharId;
+        }
+
+        public List<GPOPInterConnect> GetGPOPInterConnect(int CaseId, int PackageId, int VSATCharId, int CasePackageId, int CountryId, bool IsVSAT)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtPackages = dal.GetGPOPInterConnect(CaseId, PackageId, VSATCharId, CasePackageId, CountryId, IsVSAT).Tables[0];
+
+            List<GPOPInterConnect> lstGPOPInterConnect = new List<GPOPInterConnect>();
+            foreach (DataRow dr in dtPackages.Rows)
+            {
+                GPOPInterConnect GPOPInterConnect = new GPOPInterConnect();
+                GPOPInterConnect.HubSiteId = Convert.ToInt32(dr["hub_site_id"]);
+                GPOPInterConnect.HubSiteName = Convert.ToString(dr["hub_site_name"]);
+                lstGPOPInterConnect.Add(GPOPInterConnect);
+            }
+
+            return lstGPOPInterConnect;
+        }
+
+
+        public int GetCharLevelcharacteristics(int ProductCD, bool IsHybrid)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtCasePackageId = dal.GetCharLevelcharacteristics(ProductCD, IsHybrid).Tables[0];
+
+            int count = 0;
+
+            foreach (DataRow dr in dtCasePackageId.Rows)
+            {
+                count = Convert.ToInt32(dr["count"]);
+            }
+            return count;
+        }
+
+        public List<DSLCharacteristics> GetDSLCharacteristics(int CaseId, int CasePackageId, string UserId, string IsHybrid)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtPackages = dal.GetDSLCharacteristics(CaseId, CasePackageId, UserId, IsHybrid).Tables[0];
+
+            List<DSLCharacteristics> lstDSLCharacteristics = new List<DSLCharacteristics>();
+            foreach (DataRow dr in dtPackages.Rows)
+            {
+                DSLCharacteristics DSLCharacteristics = new DSLCharacteristics();
+                DSLCharacteristics.CharacteristicType = Convert.ToString(dr["char_type_name"]);
+                DSLCharacteristics.Characteristic = Convert.ToString(dr["char_name"]);
+                DSLCharacteristics.CharAvailCd = Convert.ToInt32(dr["char_avail_cd"]);
+                DSLCharacteristics.CharTypeValueCount = Convert.ToInt32(dr["char_type_value_count"]);
+                DSLCharacteristics.CharacteristicValue = Convert.ToString(dr["char_value"]);
+                DSLCharacteristics.IsValid = Convert.ToBoolean(dr["case_detail_valid_cd"]);
+                DSLCharacteristics.MatrixId = Convert.ToInt32(dr["option_matrix_id"]);
+                lstDSLCharacteristics.Add(DSLCharacteristics);
+            }
+
+            return lstDSLCharacteristics;
+        }
+
+        public List<HVPNProductPortTypes> GetHVPNProductPortTypes(int CaseId, int CasePackageId, int CountryId, string UserId, int PackageId, int GPOP, string IsHybrid, string IsVsat)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtHVPNProductPortTypes = dal.GetHVPNProductPortTypes(CaseId, CasePackageId, CountryId, UserId, PackageId, GPOP, IsHybrid, IsVsat).Tables[0];
+
+            List<HVPNProductPortTypes> lstHVPNProductPortTypes = new List<HVPNProductPortTypes>();
+            foreach (DataRow dr in dtHVPNProductPortTypes.Rows)
+            {
+                HVPNProductPortTypes HVPNProductPortTypes = new HVPNProductPortTypes();
+                HVPNProductPortTypes.SupplierProductId = Convert.ToInt32(dr["SUPPLIER_PROD_ID"]);
+                if (IsHybrid.ToUpper() == "TRUE")
+                {
+                    HVPNProductPortTypes.PortSpeed = Convert.ToString(dr["PORT_SPEED"]);
+                    HVPNProductPortTypes.PortSpeedId = Convert.ToInt32(dr["PORT_SPEED_ID"]);
+                    HVPNProductPortTypes.GPOPInterconnect = Convert.ToString(dr["GPOP_INTERCONNECT"]);
+                    HVPNProductPortTypes.GPOPInterconnectId = Convert.ToInt32(dr["GPOP_INTERCONNECT_ID"]);
+                    HVPNProductPortTypes.PortSpeedAvailabilityId = Convert.ToInt32(dr["PORT_SPEED_AVAIL_CD"]);
+                }
+                else
+                {
+                    HVPNProductPortTypes.CharacteristicType = Convert.ToString(dr["char_type"]);
+                    if (!(dr["DSL_TECHNOLOGY_TYPE"] is DBNull))
+                    {
+                        HVPNProductPortTypes.DSLTechnologyTypeId = Convert.ToInt32(dr["DSL_TECHNOLOGY_TYPE"]);
+                    }
+                    else
+                    {
+                        HVPNProductPortTypes.DSLTechnologyTypeId = 0;
+                    }
+                    HVPNProductPortTypes.InterconnectDesign = GetInterconnectDesignName(PackageId, HVPNProductPortTypes.SupplierProductId);
+                }
+                HVPNProductPortTypes.AccessType = Convert.ToString(dr["ACCESS_TYPE"]);
+                HVPNProductPortTypes.AccessTypeId = Convert.ToInt32(dr["ACCESS_TYPE_Id"]);
+                HVPNProductPortTypes.Supplier = Convert.ToString(dr["SUPPLIER_NAME"]);
+                HVPNProductPortTypes.SupplierId = Convert.ToInt32(dr["SUPPLIER_ID"]);
+                HVPNProductPortTypes.SupplierProduct = Convert.ToString(dr["SUPPLIER_PROD"]);
+                HVPNProductPortTypes.PortTypeId = Convert.ToInt32(dr["PORT_TYPE_ID"]);
+                string PortType = Convert.ToString(dr["PORT_TYPE"]);
+                string[] portTypeArray = PortType.Split('/');
+                HVPNProductPortTypes.AccessSpeed = portTypeArray[0] + " / " + portTypeArray[1];
+                HVPNProductPortTypes.Interface = portTypeArray[3];
+                HVPNProductPortTypes.Framing = portTypeArray[5];
+                HVPNProductPortTypes.Connector = portTypeArray[7];
+                HVPNProductPortTypes.AccessAvailabilityId = Convert.ToInt32(dr["PORT_TYPE_AVAIL_CD"]);
+                HVPNProductPortTypes.IsValid = Convert.ToBoolean(dr["PORT_VALID_CD"]);
+
+                lstHVPNProductPortTypes.Add(HVPNProductPortTypes);
+            }
+            return lstHVPNProductPortTypes;
+        }
+
+        public string GetInterconnectDesignName(int PackageId, int SupplierProdId)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtCasePackageId = dal.GetInterconnectDesignName(PackageId, SupplierProdId).Tables[0];
+
+            string InterconnectDesignName = string.Empty;
+
+            foreach (DataRow dr in dtCasePackageId.Rows)
+            {
+                InterconnectDesignName = Convert.ToString(dr["desgname"]);
+            }
+            return InterconnectDesignName;
+        }
+
+        public List<DSLCharacteristics> GetDSLParentCharacteristics(int CaseId, int CasePackageId, int CountryId, int childproductcd, string UserId, int PackageId, string IsHybrid)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtPackages = dal.GetDSLParentCharacteristics(CaseId, CasePackageId, CountryId, childproductcd, UserId, PackageId, IsHybrid).Tables[0];
+
+            List<DSLCharacteristics> lstDSLCharacteristics = new List<DSLCharacteristics>();
+            foreach (DataRow dr in dtPackages.Rows)
+            {
+                DSLCharacteristics DSLCharacteristics = new DSLCharacteristics();
+                DSLCharacteristics.CharacteristicType = Convert.ToString(dr["char_type_name"]);
+                DSLCharacteristics.Characteristic = Convert.ToString(dr["char_name"]);
+                DSLCharacteristics.Availability = Convert.ToString(dr["avail_desc"]);
+                DSLCharacteristics.CharacteristicValue = Convert.ToString(dr["char_value"]);
+                DSLCharacteristics.IsValid = Convert.ToBoolean(dr["case_detail_valid_cd"]);
+                DSLCharacteristics.MatrixId = Convert.ToInt32(dr["option_matrix_id"]);
+                lstDSLCharacteristics.Add(DSLCharacteristics);
+            }
+
+            return lstDSLCharacteristics;
+        }
+
+        public List<HVPNProductPortTypes> GetHVPNProductParentPortTypes(int CaseId, int CasePackageId, int CountryId, int childproductcd, string UserId, int PackageId, string IsHybrid)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtHVPNProductPortTypes = dal.GetHVPNProductParentPortTypes(CaseId, CasePackageId, CountryId, childproductcd, UserId, PackageId, IsHybrid).Tables[0];
+
+            List<HVPNProductPortTypes> lstHVPNProductPortTypes = new List<HVPNProductPortTypes>();
+            foreach (DataRow dr in dtHVPNProductPortTypes.Rows)
+            {
+                HVPNProductPortTypes HVPNProductPortTypes = new HVPNProductPortTypes();
+                //HVPNProductPortTypes.PortSpeed = Convert.ToString(dr["PORT_SPEED"]);
+                //HVPNProductPortTypes.AccessType = Convert.ToString(dr["ACCESS_TYPE"]);
+                //HVPNProductPortTypes.Supplier = Convert.ToString(dr["SUPPLIER_NAME"]);
+                //HVPNProductPortTypes.SupplierProduct = Convert.ToString(dr["SUPPLIER_PROD"]);
+                //HVPNProductPortTypes.GPOPInterconnect = Convert.ToString(dr["GPOP_INTERCONNECT"]);
+                //string PortType = Convert.ToString(dr["PORT_TYPE"]);
+                //string[] portTypeArray = PortType.Split('/');
+                //HVPNProductPortTypes.AccessSpeed = portTypeArray[0] + " / " + portTypeArray[1];
+                //HVPNProductPortTypes.Interface = portTypeArray[3];
+                //HVPNProductPortTypes.Framing = portTypeArray[5];
+                //HVPNProductPortTypes.Connector = portTypeArray[7];
+                //HVPNProductPortTypes.AccessAvailability = Convert.ToString(dr["AVAIL_DESC"]);
+                //HVPNProductPortTypes.PortSpeedAvailability = Convert.ToString(dr["PORT_SPEED_AVAIL_DESC"]);
+
+                if (IsHybrid.ToUpper() == "TRUE")
+                {
+                    HVPNProductPortTypes.PortSpeed = Convert.ToString(dr["PORT_SPEED"]);
+                    HVPNProductPortTypes.GPOPInterconnect = Convert.ToString(dr["GPOP_INTERCONNECT"]);
+                    HVPNProductPortTypes.PortSpeedAvailability = Convert.ToString(dr["port_speed_avail_desc"]);
+                }
+                else
+                {
+                    HVPNProductPortTypes.CharacteristicType = Convert.ToString(dr["char_type"]);
+                    if (!(dr["DSL_TECHNOLOGY_TYPE"] is DBNull))
+                    {
+                        HVPNProductPortTypes.DSLTechnologyTypeId = Convert.ToInt32(dr["DSL_TECHNOLOGY_TYPE"]);
+                    }
+                    else
+                    {
+                        HVPNProductPortTypes.DSLTechnologyTypeId = 0;
+                    }
+                    int SupplierProdId = Convert.ToInt32(dr["SUPPLIER_PROD_ID"]);
+                    HVPNProductPortTypes.InterconnectDesign = GetInterconnectDesignName(PackageId, SupplierProdId);
+                }
+                HVPNProductPortTypes.AccessType = Convert.ToString(dr["ACCESS_TYPE"]);
+                HVPNProductPortTypes.Supplier = Convert.ToString(dr["SUPPLIER_NAME"]);
+                HVPNProductPortTypes.SupplierProduct = Convert.ToString(dr["SUPPLIER_PROD"]);
+                string PortType = Convert.ToString(dr["PORT_TYPE"]);
+                string[] portTypeArray = PortType.Split('/');
+                HVPNProductPortTypes.AccessSpeed = portTypeArray[0] + " / " + portTypeArray[1];
+                HVPNProductPortTypes.Interface = portTypeArray[3];
+                HVPNProductPortTypes.Framing = portTypeArray[5];
+                HVPNProductPortTypes.Connector = portTypeArray[7];
+                HVPNProductPortTypes.AccessAvailability = Convert.ToString(dr["avail_desc"]);
+                HVPNProductPortTypes.IsValid = Convert.ToBoolean(dr["PORT_VALID_CD"]);
+
+                lstHVPNProductPortTypes.Add(HVPNProductPortTypes);
+            }
+            return lstHVPNProductPortTypes;
+        }
+
+        public List<AdminDetailsPortDropdownData> GetAdminDetailsPortDropdownData(int CaseId, int CasePackageId, int CountryId, int PackageId, string IsHybrid)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtPackages = dal.GetAdminDetailsPortDropdownData(CaseId, CasePackageId, CountryId, PackageId, IsHybrid).Tables[0];
+
+            List<AdminDetailsPortDropdownData> lstAdminDetailsPortDropdownData = new List<AdminDetailsPortDropdownData>();
+            foreach (DataRow dr in dtPackages.Rows)
+            {
+                AdminDetailsPortDropdownData AdminDetailsPortDropdownData = new AdminDetailsPortDropdownData();
+                AdminDetailsPortDropdownData.CharName = Convert.ToString(dr["CHAR_NAME"]);
+                //AdminDetailsPortDropdownData.AccessTypeId = Convert.ToInt32(dr["ACCESS_TYPE_ID"]);
+                //AdminDetailsPortDropdownData.SupplierId = Convert.ToInt32(dr["SUPPLIER_ID"]);
+                //AdminDetailsPortDropdownData.SupplierProdId = Convert.ToInt32(dr["SUPPLIER_PROD_ID"]);
+                //AdminDetailsPortDropdownData.GPOPInterconnectId = Convert.ToInt32(dr["GPOP_INTERCONNECT_ID"]);
+                AdminDetailsPortDropdownData.PortTypeId = Convert.ToInt32(dr["PORT_TYPE_ID"]);
+                AdminDetailsPortDropdownData.AccessSetId = Convert.ToInt32(dr["ACCESS_SET_ID"]);
+                //AdminDetailsPortDropdownData.AccessPortId = Convert.ToInt32(dr["ACCESS_PORT_ID"]);
+                lstAdminDetailsPortDropdownData.Add(AdminDetailsPortDropdownData);
+            }
+
+            //var test = lstAdminDetailsPortDropdownData.Select(a => new AdminDetailsPortDropdownData { a.CharName, a.PortTypeId }).Distinct().ToList();
+            lstAdminDetailsPortDropdownData = lstAdminDetailsPortDropdownData.GroupBy(p => new { p.CharName, p.PortTypeId }).Select(g => g.First()).ToList();
+
+            return lstAdminDetailsPortDropdownData.Distinct().ToList();
+        }
+
+        public List<DSLCharacteristics> GetPortTypeCharacteristics(int CaseId, int PortTypeId, int AccessSetId, string UserId, string IsHybrid)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtPackages = dal.GetPortTypeCharacteristics(CaseId, PortTypeId, AccessSetId, UserId, IsHybrid).Tables[0];
+
+            List<DSLCharacteristics> lstDSLCharacteristics = new List<DSLCharacteristics>();
+            foreach (DataRow dr in dtPackages.Rows)
+            {
+                DSLCharacteristics DSLCharacteristics = new DSLCharacteristics();
+                DSLCharacteristics.CharacteristicType = Convert.ToString(dr["char_type_name"]);
+                DSLCharacteristics.Characteristic = Convert.ToString(dr["char_name"]);
+                DSLCharacteristics.CharAvailCd = Convert.ToInt32(dr["char_avail_cd"]);
+                DSLCharacteristics.CharTypeValueCount = Convert.ToInt32(dr["char_type_value_count"]);
+                DSLCharacteristics.CharacteristicValue = Convert.ToString(dr["char_value"]);
+                DSLCharacteristics.IsValid = Convert.ToBoolean(dr["case_detail_valid_cd"]);
+                DSLCharacteristics.MatrixId = Convert.ToInt32(dr["option_matrix_id"]);
+                lstDSLCharacteristics.Add(DSLCharacteristics);
+            }
+
+            return lstDSLCharacteristics;
+        }
+
+        public List<DSLCharacteristics> GetPortTypeParentCharacteristics(int CaseId, int PortTypeId, int AccessSetId, int ParentId, string UserId, string IsHybrid)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtPackages = dal.GetPortTypeParentCharacteristics(CaseId, PortTypeId, AccessSetId, ParentId, UserId, IsHybrid).Tables[0];
+
+            List<DSLCharacteristics> lstDSLCharacteristics = new List<DSLCharacteristics>();
+            foreach (DataRow dr in dtPackages.Rows)
+            {
+                DSLCharacteristics DSLCharacteristics = new DSLCharacteristics();
+                DSLCharacteristics.CharacteristicType = Convert.ToString(dr["char_type_name"]);
+                DSLCharacteristics.Characteristic = Convert.ToString(dr["char_name"]);
+                DSLCharacteristics.Availability = Convert.ToString(dr["avail_desc"]);
+                DSLCharacteristics.CharacteristicValue = Convert.ToString(dr["char_value"]);
+                DSLCharacteristics.IsValid = Convert.ToBoolean(dr["case_detail_valid_cd"]);
+                DSLCharacteristics.MatrixId = Convert.ToInt32(dr["option_matrix_id"]);
+                lstDSLCharacteristics.Add(DSLCharacteristics);
+            }
+
+            return lstDSLCharacteristics;
+        }
+
+        public int GetPortTypeParentCharacteristicsParentId(int CaseId, int AccessSetId, int PortTypeId)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtCasePackageId = dal.GetPortTypeParentCharacteristicsParentId(CaseId, AccessSetId, PortTypeId).Tables[0];
+
+            int parentCd = 0;
+
+            foreach (DataRow dr in dtCasePackageId.Rows)
+            {
+                parentCd = Convert.ToInt32(dr["parent_cd"]);
+            }
+            return parentCd;
+        }
+
+        public int UpdateDSLCharacteristics(DSLCharacteristicsUpdate DSLCharacteristicsData, bool IsParent)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+
+            Mapper.CreateMap<CaseUpdate, SCAdminDAL.CaseUpdate>().ReverseMap();
+            SCAdminDAL.CaseUpdate CaseUpdateIds = Mapper.Map<CaseUpdate, SCAdminDAL.CaseUpdate>(DSLCharacteristicsData.CaseUpdateIds);
+
+            Mapper.CreateMap<DSLCharacteristics, SCAdminDAL.DSLCharacteristics>().ReverseMap();
+            List<SCAdminDAL.DSLCharacteristics> DSLCharacteristics = Mapper.Map<List<DSLCharacteristics>, List<SCAdminDAL.DSLCharacteristics>>(DSLCharacteristicsData.DSLCharacteristics.ToList());
+
+            SCAdminDAL.DSLCharacteristicsUpdate DSLCharacteristicsData1 = new SCAdminDAL.DSLCharacteristicsUpdate();
+            DSLCharacteristicsData1.CaseUpdateIds = CaseUpdateIds;
+            DSLCharacteristicsData1.DSLCharacteristics = DSLCharacteristics;
+            return dal.UpdateDSLCharacteristics(DSLCharacteristicsData1, IsParent);
+        }
+
+        public int UpdatePortTypeCharacteristics(DSLCharacteristicsUpdate DSLCharacteristicsData, bool IsParent)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+
+            Mapper.CreateMap<CaseUpdate, SCAdminDAL.CaseUpdate>().ReverseMap();
+            SCAdminDAL.CaseUpdate CaseUpdateIds = Mapper.Map<CaseUpdate, SCAdminDAL.CaseUpdate>(DSLCharacteristicsData.CaseUpdateIds);
+
+            Mapper.CreateMap<DSLCharacteristics, SCAdminDAL.DSLCharacteristics>().ReverseMap();
+            List<SCAdminDAL.DSLCharacteristics> DSLCharacteristics = Mapper.Map<List<DSLCharacteristics>, List<SCAdminDAL.DSLCharacteristics>>(DSLCharacteristicsData.DSLCharacteristics.ToList());
+
+            SCAdminDAL.DSLCharacteristicsUpdate DSLCharacteristicsData1 = new SCAdminDAL.DSLCharacteristicsUpdate();
+            DSLCharacteristicsData1.CaseUpdateIds = CaseUpdateIds;
+            DSLCharacteristicsData1.DSLCharacteristics = DSLCharacteristics;
+            return dal.UpdatePortTypeCharacteristics(DSLCharacteristicsData1, IsParent);
+        }
+
+
+        public int UpdateHVPNPortTypes(HVPNProductPortTypesUpdate HVPNProductPortTypesData, bool IsHybrid, bool IsParent)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            Mapper.CreateMap<CaseUpdate, SCAdminDAL.CaseUpdate>().ReverseMap();
+            SCAdminDAL.CaseUpdate CaseUpdateIds = Mapper.Map<CaseUpdate, SCAdminDAL.CaseUpdate>(HVPNProductPortTypesData.CaseUpdateIds);
+
+            Mapper.CreateMap<HVPNProductPortTypes, SCAdminDAL.HVPNProductPortTypes>().ReverseMap();
+            List<SCAdminDAL.HVPNProductPortTypes> HVPNProductPortTypes = Mapper.Map<List<HVPNProductPortTypes>, List<SCAdminDAL.HVPNProductPortTypes>>(HVPNProductPortTypesData.HVPNProductPortTypes.ToList());
+
+            SCAdminDAL.HVPNProductPortTypesUpdate HVPNProductPortTypesData1 = new SCAdminDAL.HVPNProductPortTypesUpdate();
+            HVPNProductPortTypesData1.HVPNProductPortTypes = HVPNProductPortTypes;
+            HVPNProductPortTypesData1.CaseUpdateIds = CaseUpdateIds;
+            return dal.UpdateHVPNPortTypes(HVPNProductPortTypesData1, IsHybrid, IsParent);
+        }
+
+        public CaseUpdateTimeLines GetCaseDetailsUpdatedDates(int CaseId, int CasePkgId)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtCasePackageId = dal.GetCaseDetailsUpdatedDates(CaseId, CasePkgId).Tables[0];
+
+            CaseUpdateTimeLines CaseUpdateTimeLines = new CaseUpdateTimeLines();
+
+            foreach (DataRow dr in dtCasePackageId.Rows)
+            {
+                if (dr["Created_Emp_id"] != null && Convert.ToString(dr["Created_Emp_id"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.CreatedById = dr["Created_Emp_id"].ToString();
+                }
+                if (dr["Created_user"] != null && Convert.ToString(dr["Created_user"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.CreatedBy = Convert.ToString(dr["Created_user"]);
+                }
+                if (dr["Updated_emp_id"] != null && Convert.ToString(dr["Updated_emp_id"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.UpdatedById = dr["Updated_emp_id"].ToString();
+                }
+                if (dr["Updated_user"] != null && Convert.ToString(dr["Updated_user"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.UpdatedBy = Convert.ToString(dr["Updated_user"]);
+                }
+                if (dr["Created_dt"] != null && Convert.ToString(dr["Created_dt"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.CreatedDate = Convert.ToString(dr["Created_dt"]);
+                }
+                if (dr["Updated_dt"] != null && Convert.ToString(dr["Updated_dt"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.UpdatedDate = Convert.ToString(dr["Updated_dt"]);
+                }
+            }
+            return CaseUpdateTimeLines;
+        }
+
+        public CaseUpdateTimeLines GetCaseDetailsPortTypesUpdatedDates(int CaseId, int CasePkgId)
+        {
+            CountryAccessCaseDefDAL dal = new CountryAccessCaseDefDAL();
+            DataTable dtCasePackageId = dal.GetCaseDetailsPortTypesUpdatedDates(CaseId, CasePkgId).Tables[0];
+
+            CaseUpdateTimeLines CaseUpdateTimeLines = new CaseUpdateTimeLines();
+
+            foreach (DataRow dr in dtCasePackageId.Rows)
+            {
+                if (dr["Created_Emp_id"] != null && Convert.ToString(dr["Created_Emp_id"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.CreatedById = dr["Created_Emp_id"].ToString();
+                }
+                if (dr["Created_user"] != null && Convert.ToString(dr["Created_user"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.CreatedBy = Convert.ToString(dr["Created_user"]);
+                }
+                if (dr["Updated_emp_id"] != null && Convert.ToString(dr["Updated_emp_id"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.UpdatedById = dr["Updated_emp_id"].ToString();
+                }
+                if (dr["Updated_user"] != null && Convert.ToString(dr["Updated_user"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.UpdatedBy = Convert.ToString(dr["Updated_user"]);
+                }
+                if (dr["Created_dt"] != null && Convert.ToString(dr["Created_dt"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.CreatedDate = Convert.ToString(dr["Created_dt"]);
+                }
+                if (dr["Updated_dt"] != null && Convert.ToString(dr["Updated_dt"]) != string.Empty)
+                {
+                    CaseUpdateTimeLines.UpdatedDate = Convert.ToString(dr["Updated_dt"]);
+                }
+
+            }
+            return CaseUpdateTimeLines;
+        }
+    }
+}

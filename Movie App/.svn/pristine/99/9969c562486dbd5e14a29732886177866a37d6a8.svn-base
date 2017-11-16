@@ -1,0 +1,107 @@
+﻿<div ng-controller="CaseDefinitionCtrl" class="container">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                Define Case
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label cus-text-left">
+                        Product &nbsp; <span style="color: Red">*</span>
+                    </label>
+                    <div class="col-sm-3" style="margin-left: -70px" id="divProductList">
+                        <select id="ddlProduct" ng-change="GetRegions()" ng-model="Product" ng-options="prod.ProductID as prod.ProductName for prod in productdata"
+                            style="width: 90%">
+                            <option value="">--- Select Product ---</option>
+                        </select>
+                        <span style="display: none; color: Red;" id="ProductError" class="Arrow">Please select
+                            Product</span>
+                    </div>
+                    <!--  </div>
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label cus-text-left">
+                                Region &nbsp; <span style="color: Red">*</span>
+                            </label>
+                            <div class="col-sm-3" style="margin-left:-70px">
+                                <select id="ddlRegion" ng-change="GetRegions()" ng-show="Regiondata" ng-model="Region" ng-options="Reg.RegionID as Reg.RegionName for Reg in Regiondata"
+                                    style="width:90%">
+                                    <option value="">--- Select Region ---</option>
+                                </select>
+                                <span style="display: none; color: Red;" id="RegionError" class="Arrow">Please select
+                                    region</span>
+                            </div>-->
+                    <label for="" class="col-sm-2 control-label cus-text-left" ng-show="Countrydata">
+                        Country &nbsp; <span style="color: Red">*</span>
+                    </label>
+                    <div class="col-sm-3" ng-show="Countrydata" id="divCountryList" style="margin-left: -70px">
+                        <select id="ddlCountry" ng-change="GetRegionByCountry()" ng-model="Country" ng-options="cnt.CountryID as cnt.CountryName for cnt in Countrydata"
+                            style="width: 90%">
+                            <option value="">--- Select Country ---</option>
+                        </select>
+                        <span style="display: none; color: Red;" id="CountryError" class="Arrow">Please select
+                            Country</span>
+                    </div>
+                </div>
+                <div class="form-group" >
+                    
+                    <label for="" class="col-sm-2 control-label cus-text-left" ng-show="Product != 108 && Product != 79">
+                       &nbsp;
+                    </label>
+                    <div class="col-sm-3" style="margin-left: -70px" id="div1" ng-show="Product != 108 && Product != 79">
+                     &nbsp;
+                    </div>
+                    <label for="" class="col-sm-2 control-label cus-text-left" ng-show="Product == 108 || Product == 79">
+                        Sub Product <!--&nbsp; <span style="color: Red">*</span>-->
+                    </label>
+                    
+                    <div class="col-sm-3" style="margin-left: -70px" id="divSubProduct" ng-show="Product == 108 || Product == 79">
+                        <select id="ddlSubProduct" ng-change="SubProdSelected()" ng-model="SubProduct" ng-options="prod.SubProductID as prod.SubProductName for prod in SubProductdata"
+                            style="width: 90%">
+                            <option value="">--- Select Sub Product ---</option>
+                        </select>
+                        
+                    </div>
+                    <div class="col-sm-3" id="subViewDIv"  ng-show="Product>0">
+                        <a href="#" class="btn btn-primary btn-lg" ng-click="SearchCases()">Get Cases</a>
+                        <!--<a href="#" class="btn btn-primary btn-lg" ng-click="GetCasesCountryAccess()" ng-show="iDSLFlag">
+                                    Country Access</a>-->
+                    </div>
+                </div>
+               <!-- <div ng-show="Product>0" class="form-group text-center">
+                    <div class="col-sm-5" id="subViewDIv" style="width: 100%;">
+                        <a href="#" class="btn btn-primary btn-lg" ng-click="SearchCases()">Get Cases</a>
+                        <!--<a href="#" class="btn btn-primary btn-lg" ng-click="GetCasesCountryAccess()" ng-show="iDSLFlag">
+                                    Country Access</a>
+                    </div>
+                </div>--->
+            </div>
+            <!--<div class="modal-footer"></div>-->
+         
+        </div>
+    </div>
+       <div ng-show="LoadCasesData" style="width: 105%;">
+                <ul class="nav nav-tabs">
+                    <li class="active" ng-show="!OnlyCountryAccess" id="liMonthlyUR"><a data-toggle="tab" data-target="#divMonthlyUR"
+                        ng-click="SearchCases()">Case Reference</a> </li>
+                    <li ng-show="iDSLFlag" id="liWeeklyUR"><a data-toggle="tab" class="Show_HVPN clickable1"
+                        data-target="#divWeeklyUR" ng-click="GetCasesCountryAccess()">Country Access</a>
+                    </li>
+                </ul>
+                <div class="tab-content clearfix ">
+                    <div id="divMonthlyUR" class="tab-pane active" ng-show="!OnlyCountryAccess">
+                        <div ui-view>
+                        </div>
+                    </div>
+                    <div id="divWeeklyUR" class="tab-pane" ng-show="iDSLFlag">
+                        <div ui-view="AdminDSLCase">
+                        </div>
+                    </div>
+                </div>
+            </div>
+    <div class="pageLoaderOverlay">
+    </div>
+</div>

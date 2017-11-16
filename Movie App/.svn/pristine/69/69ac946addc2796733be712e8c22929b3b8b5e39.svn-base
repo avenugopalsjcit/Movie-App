@@ -1,0 +1,71 @@
+﻿
+<div class="container" ng-controller="CPESupplierReportCtrl">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                CPE Supplier Report
+            </h3>
+        </div>
+    </div>
+    <br />
+    <div class="row text-left Arrow">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <p class="red"><span class="color-black">Note : </span>Red color dates are indicating supplier has crossed EoC,EoM date for a given country.</p>
+        </div>
+    </div>
+   
+    
+        <table ng-table="usersTable" class="table  table-bordered table-striped">
+            
+            <tr id="testpagination" ng-repeat="user in $data">
+                <td sortable="'countryName'" data-title="'Country'" filter="{ countryName : 'text'}">
+                    {{user.countryName}}
+                </td>
+                <td sortable="'ManufacturerName'" data-title="'Manufacturer'" filter="{ manufacturerName : 'text'}">
+                    {{user.manufacturerName}}
+                </td>
+                <td sortable="'supplier'" data-title="'Supplier'" filter="{ supplier : 'text'}">
+                    {{user.supplier}}
+                </td>
+                <td sortable="'productName'" data-title="'Product'" filter="{ productName : 'text'}">
+                    {{user.productName}}
+                </td>
+                <td sortable="'SupplierType'" data-title="'Supplier Type'">
+                    {{user.SupplierType}}
+                </td>
+                <td sortable="'CountryAvailability'" data-title="'Country Availability'">
+                    {{user.CountryAvailability}}
+                </td>
+                <td sortable="'MaintenanceOptions'" data-title="'MO Availability'">
+                    {{user.MaintenanceOptions}}
+                </td>
+                <td sortable="'CPELeadTime'" data-title="'CPE Lead Time'" style="text-align:right">
+                    {{user.CPELeadTime}}
+                </td>
+                <td sortable="'CPELeadTimeStatus'" data-title="'CPE Lead Time Status'">
+                    {{user.CPELeadTimeStatus}}
+                </td>
+                <td sortable="'CountrySupplierValidity'" data-title="'Country Supplier Validity'" filter="{ CountrySupplierValidity : 'text'}">
+                    {{user.CountrySupplierValidity}}
+                </td>
+                <td sortable="'EndofContractDate'" data-title="'End of Contract'">
+                   <span ng-class="{'color-red':user.color === 'Red','color-black':user.color==='Black'}"> {{user.EndofContractDate}}</span>
+                </td>
+                <td sortable="'EndofMigrationDate'" data-title="'End of Migration'">
+                   <span ng-class="{'color-red':user.color === 'Red','color-black':user.color==='Black'}"> {{user.EndofMigrationDate}}</span>
+                </td>
+                <td sortable="'CPECeaseLeadTime'" data-title="'CPE Cease Lead Time'" style="text-align:right">
+                    {{user.CPECeaseLeadTime}}
+                </td>
+                <td sortable="'CPECeaseLeadTimeStatus'" data-title="'CPE Cease Lead Time Status'">
+                    {{user.CPECeaseLeadTimeStatus}}
+                </td>
+            </tr>
+        </table>
+    
+    <div class="pageLoaderOverlay">
+</div>
+
+</div>
+<!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/esvit/ng-table/v1.0.0/dist/ng-table.js"></script>-->

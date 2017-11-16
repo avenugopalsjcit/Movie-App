@@ -1,0 +1,5 @@
+﻿app.controller("Controller.AccessCntrl",function () {
+    $("#lstRegionlist").select2();
+    $("#CaseAvailDDL").select2();
+    $("#ValidCaseDDL").select2();
+});

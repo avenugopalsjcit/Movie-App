@@ -1,0 +1,117 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+   public class AdminDocumentationBAL
+    {
+       private AdminDocumentationDAL objSRD = new AdminDocumentationDAL();
+        public List<Documentation> GetGridAdminDocumentationView(string AccessLevel,string User_id)
+        {
+
+
+            List<Documentation> lstOrg = new List<Documentation>();
+            DataTable dtGridDistributor = objSRD.GetGridAdminDocumentation(AccessLevel, User_id);
+
+              
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                Documentation objOrg = new Documentation();
+
+                objOrg.DocumentId = Convert.ToInt32(dr["DOCUMENT_ID"]);
+                objOrg.DocumentTitle = Convert.ToString(dr["DOCUMENT_TITLE"]);
+                objOrg.ProductId = Convert.ToInt32(dr["PRODUCT_CD"]);
+                objOrg.ProductLevelCD = Convert.ToInt32(dr["product_loc_level_cd"]);
+                //objOrg.ProductName = Convert.ToString(dr["PRODUCT_NAME"]);
+                objOrg.DocumentURL = Convert.ToString(dr["DOCUMENT_URL"]);
+                objOrg.DocumentDesc = Convert.ToString(dr["DOCUMENT_DESC"]);
+               
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+
+        public List<Documentation> GetProductsDocumentationView(string AccessLevel, string User_id)
+        {
+
+
+            List<Documentation> lstOrg = new List<Documentation>();
+            DataTable dtGridDistributor = objSRD.GetProductsDocumentation(AccessLevel, User_id);
+
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                Documentation objOrg = new Documentation();
+
+                objOrg.ProductId = Convert.ToInt32(dr["PRODUCT_CD"]);
+                objOrg.ProductName = Convert.ToString(dr["PRODUCT_NAME"]);
+
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        } 
+       
+      
+
+        public int InsertAdminDocumentation(int DocumentId, int ProductId, int ProductLevelCd, string DocumentTitle, string DocumentURL, string DocumentDesc, string User_id)
+        {
+
+            int count = objSRD.AdminDocumentationInsert(DocumentId, ProductId, ProductLevelCd, DocumentTitle, DocumentURL, DocumentDesc, User_id);
+
+
+
+            return count;
+        }
+
+        public int UpdateAdminDocumentation(int ProductId, int ProductLevelCd, string DocumentTitle, string DocumentURL, string DocumentDesc, int User_id, int DocumentId)
+        {
+
+            int count = objSRD.AdminDocumentationUpdate(ProductId, ProductLevelCd, DocumentTitle, DocumentURL, DocumentDesc, User_id, DocumentId);
+
+
+
+            return count;
+        }
+
+        public int DeleteAdminDocumentation(string strAvailCd)
+        {
+
+            int count = objSRD.AdminDocumentationDelete(strAvailCd);
+
+
+
+            return count;
+        }
+        public int GetMDocCD()
+        {
+            //AvailabilityGrid objOrg = new AvailabilityGrid();
+            return objSRD.MaxDocCD();
+
+        }
+         public int GetProductLevelCD(int ProductId)
+        {
+            //AvailabilityGrid objOrg = new AvailabilityGrid();
+            return objSRD.productLevelCD(ProductId);
+
+        }
+    }
+}

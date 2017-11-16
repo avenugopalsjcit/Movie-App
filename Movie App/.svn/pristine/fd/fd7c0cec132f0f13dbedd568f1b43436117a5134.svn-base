@@ -1,0 +1,151 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+    public class MapUnitofMeasureDAL
+    {
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+        public DataTable GetGridMapUOMDetails()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"Select char_type_id, 
+                    char_type_name 
+                    from CSU_REF_CHAR_TYPE  ";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }  
+       
+        public DataTable GetDropDownMapUOMDetails(string CharTypeId)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"select a.uom_id, uom_name 
+                from csu_char_type_uom a, csu_ref_uom b 
+                 where   char_type_id =" + CharTypeId +" and b.uom_id = a.uom_id";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public DataTable GetListBoxMapUOMDetails(string CharTypeId)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"  select uom_id, uom_name from csu_ref_uom 
+                minus (select a.uom_id, uom_name 
+                from csu_char_type_uom a, csu_ref_uom b 
+                 where char_type_id=  " + CharTypeId+") order by uom_name";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+        
+        public DataTable GetUOMSubsetMapUOMDetails(string CharTypeId,string UOMId)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @" 	select uom_subset_id, uom_name 
+		                from csu_char_type_uom a, 
+			            csu_ref_uom b 
+		                where char_type_id = " + CharTypeId + " and b.uom_id = "+UOMId+" and b.uom_id = a.uom_id order by uom_name";
+             
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public int AdminMapUOMDelete(string UOM_Subset_Id)
+        {
+
+            string str = @" delete from CSU_CHAR_TYPE_UOM where uom_subset_id = " + UOM_Subset_Id;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+
+       
+
+        public int GetGridMapUOMMAXDetails()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"Select CSU_UOM_SUBSET_ID_S.NEXTVAL from dual";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str));
+        }
+
+        public int AdminMapMapUOMInsert(string UOMSubsetId, string CharTypeId, string UOMId,string User_id)
+        {
+
+            int status=0;
+            oConn.Open();
+            string[] UOMIds = UOMId.Split(',');
+            for (int i = 0; i < UOMIds.Length; i++)
+            {
+                if (i > 0)
+                {
+                    UOMSubsetId = UOMSubsetId + 1;
+                }
+                string str = @"Insert into csu_char_type_uom
+                        (
+                      uom_subset_id, 
+                       char_type_id, 
+                        uom_id, 
+                        created_emp_id, 
+                        created_dt,
+                       updated_emp_id, 
+                        updated_dt 
+                        )
+                         VALUES  (" + UOMSubsetId + "," + CharTypeId + " ," + UOMIds[i] + " ,'"
+                            + User_id + "',sysdate,'" + User_id + "',sysdate)";
+                OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+               
+                 status = cmd.ExecuteNonQuery();
+            }
+            oConn.Close();
+            return status;
+        }
+
+        public DataTable AdminMapUOMPopupGrid(string UOMId, string CharTypeId)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"SELECT CREATED_EMP_ID,  TO_CHAR(CREATED_DT,'DD-MON-YYYY HH24:MI') AS CREATED_DT,  UPDATED_EMP_ID,  TO_CHAR(UPDATED_DT,'DD-MON-YYYY HH24:MI') AS UPDATED_DT FROM csu_char_type_uom
+                            WHERE uom_id=" + UOMId+"and char_type_id="+CharTypeId;
+            //OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+        }
+    }
+}

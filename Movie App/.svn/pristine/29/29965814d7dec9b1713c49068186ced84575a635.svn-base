@@ -1,0 +1,62 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Services;
+using SCAdminBAL;
+using System.Web.Script.Services;
+
+
+namespace SCAdmin
+{
+    public partial class UpdateAnnouncements : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+
+        [WebMethod]
+        public static List<AnnouncementsGrid> GetGridAnnouncementsDetails()
+        {
+            UpdateAnnouncementsBAL objSLAInfoBAL = new UpdateAnnouncementsBAL();
+            return objSLAInfoBAL.GetGridAnnouncementsDetails();
+        }
+
+
+
+
+        [WebMethod]
+        public static int SaveAndDelete1(string annid)
+        {
+            UpdateAnnouncementsBAL objSLAInfoBAL = new UpdateAnnouncementsBAL();
+            return objSLAInfoBAL.SaveDeleteItems(annid);
+
+        }
+
+        [WebMethod]
+        public static int AddNewAnnouncement(string anndate, string annenddate,string anncreateddate, string title, string announcement)
+        {
+            UpdateAnnouncementsBAL objAnnBAL = new UpdateAnnouncementsBAL();
+
+            return objAnnBAL.AddAnnouncementsDetails(anndate, annenddate, anncreateddate,title, announcement);
+           
+
+        }
+
+
+        [WebMethod]
+        public static int UpdateNewAnnouncement(string anndate, string annenddate, string anncreateddate, string title, string announcement,string annid)
+        {
+            UpdateAnnouncementsBAL objAnnBAL = new UpdateAnnouncementsBAL();
+
+            return objAnnBAL.UpdateAnnouncementsDetails(anndate, annenddate, anncreateddate, title, announcement,annid);
+
+
+        }
+
+    }
+}

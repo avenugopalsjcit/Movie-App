@@ -1,0 +1,36 @@
+c:\users\607980620\documents\visual studio 2010\Projects\SCAdmin\SCAdmin\bin\SCAdmin.dll
+c:\users\607980620\documents\visual studio 2010\Projects\SCAdmin\SCAdmin\bin\SCAdmin.pdb
+c:\users\607980620\documents\visual studio 2010\Projects\SCAdmin\SCAdmin\obj\Debug\SCAdmin.dll
+c:\users\607980620\documents\visual studio 2010\Projects\SCAdmin\SCAdmin\obj\Debug\SCAdmin.pdb
+C:\Users\607980620\Desktop\SCAdminForDemo\SCAdmin\obj\Debug\SCAdmin.csprojResolveAssemblyReference.cache
+C:\Users\607980620\Desktop\SCAdminForDemo\SCAdmin\obj\Debug\SCAdmin.dll
+C:\Users\607980620\Desktop\SCAdminForDemo\SCAdmin\obj\Debug\SCAdmin.pdb
+C:\Users\607980620\Desktop\SCAdminForDemo\SCAdmin\bin\SCAdmin.dll
+C:\Users\607980620\Desktop\SCAdminForDemo\SCAdmin\bin\SCAdmin.pdb
+C:\Users\607980620\Desktop\SCAdminForDemo\SCAdmin\bin\SCAdminBAL.dll
+C:\Users\607980620\Desktop\SCAdminForDemo\SCAdmin\bin\SCAdminDAL.dll
+C:\Users\607980620\Desktop\SCAdminForDemo\SCAdmin\bin\Oracle.DataAccess.dll
+C:\Users\607980620\Desktop\SCAdminForDemo\SCAdmin\bin\SCAdminBAL.pdb
+C:\Users\607980620\Desktop\SCAdminForDemo\SCAdmin\bin\SCAdminDAL.pdb
+C:\Users\609686964\testfordep\SCAdmin\obj\Debug\SCAdmin.csprojResolveAssemblyReference.cache
+C:\Users\609686964\testfordep\SCAdmin\bin\SCAdmin.dll
+C:\Users\609686964\testfordep\SCAdmin\bin\SCAdmin.pdb
+C:\Users\609686964\testfordep\SCAdmin\bin\SCAdminBAL.dll
+C:\Users\609686964\testfordep\SCAdmin\bin\SCAdminDAL.dll
+C:\Users\609686964\testfordep\SCAdmin\bin\PCDataAccess.dll
+C:\Users\609686964\testfordep\SCAdmin\bin\PCDataAccess_V.dll
+C:\Users\609686964\testfordep\SCAdmin\bin\Oracle.DataAccess.dll
+C:\Users\609686964\testfordep\SCAdmin\bin\AutoMapper.dll
+C:\Users\609686964\testfordep\SCAdmin\bin\SCAdminBAL.pdb
+C:\Users\609686964\testfordep\SCAdmin\bin\SCAdminDAL.pdb
+C:\Users\609686964\testfordep\SCAdmin\obj\Debug\SCAdmin.dll
+C:\Users\609686964\testfordep\SCAdmin\obj\Debug\SCAdmin.pdb
+C:\testfordep\SCAdmin\bin\SCAdmin.dll.config
+C:\testfordep\SCAdmin\bin\SCAdmin.dll
+C:\testfordep\SCAdmin\bin\SCAdmin.pdb
+C:\testfordep\SCAdmin\bin\Newtonsoft.Json.dll
+C:\testfordep\SCAdmin\obj\Debug\SCAdmin.csproj.CoreCompileInputs.cache
+C:\testfordep\SCAdmin\obj\Debug\SCAdmin.dll
+C:\testfordep\SCAdmin\obj\Debug\SCAdmin.pdb
+C:\testfordep\SCAdmin\bin\itextsharp.dll
+C:\testfordep\SCAdmin\bin\itextsharp.xml

@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7C072E36-AAEC-4EFF-897E-7C858F9A7CCB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SCAdminBAL</RootNamespace>
+    <AssemblyName>SCAdminBAL</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AutoMapper">
+      <HintPath>obj\Debug\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Oracle.DataAccess">
+      <HintPath>..\..\SCSearchLatest\New Dlls\Oracle.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="PCDataAccess, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Mass Case Update New-29-02-16\Bin\PCDataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="PCDataAccess_V">
+      <HintPath>..\..\Mass Case Update New-29-02-16\Bin\PCDataAccess_V.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CaseDefBAL.cs" />
+    <Compile Include="Class1.cs" />
+    <Compile Include="CountryAccessCaseDefBAL.cs" />
+    <Compile Include="CPEBundlesBAL.cs" />
+    <Compile Include="CpeCountryAvailibityBAL.cs" />
+    <Compile Include="CpeLeadTimeBAL.cs" />
+    <Compile Include="CpeSupplierAdminBAL.cs" />
+    <Compile Include="CpeSupplierReportBAL.cs" />
+    <Compile Include="GlobalReferences\AdminAddressViewBAL.cs" />
+    <Compile Include="GlobalReferences\AdminAvailabilityViewBAL.cs" />
+    <Compile Include="GlobalReferences\AdminCallerAccessSupplierBAL.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GlobalReferences\AdminDocumentationBAL.cs" />
+    <Compile Include="GlobalReferences\AdminGlossaryViewBAL.cs" />
+    <Compile Include="GlobalReferences\AdminNotesBAL.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GlobalReferences\AdminNotesCategoryBAL.cs" />
+    <Compile Include="GlobalReferences\AdminNotesPriorityBAL.cs" />
+    <Compile Include="GlobalReferences\AdminUnitOfMeasureBAL.cs" />
+    <Compile Include="GlobalReferences\DistributorCompaniesBAL.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GlobalReferences\MapUnitofMeasureBAL.cs" />
+    <Compile Include="GlobalReferences\OrderAccessSpeedBAL.cs" />
+    <Compile Include="GlobalReferences\OrderPortSpeedBAL.cs" />
+    <Compile Include="Mass case update\AccessSuppChar.cs" />
+    <Compile Include="Mass case update\CapmanPlatform.cs" />
+    <Compile Include="Mass case update\CaseData.cs" />
+    <Compile Include="Mass case update\CaseDataCollection.cs" />
+    <Compile Include="Mass case update\Cases.cs" />
+    <Compile Include="Mass case update\Charecteristics.cs" />
+    <Compile Include="Mass case update\City.cs" />
+    <Compile Include="Mass case update\Country.cs" />
+    <Compile Include="Mass case update\getAccessSpeed.cs" />
+    <Compile Include="Mass case update\MCUSession.cs" />
+    <Compile Include="Mass case update\MCUSessionHelper.cs" />
+    <Compile Include="Mass case update\MCUUtility.cs" />
+    <Compile Include="Mass case update\Popsite.cs" />
+    <Compile Include="MCUBAL.cs" />
+    <Compile Include="ProductDefinationBAL.cs" />
+    <Compile Include="ProductOwnerBAL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportsBAL.cs" />
+    <Compile Include="SLABuilderBAL.cs" />
+    <Compile Include="SupplierRestrictionBAL.cs" />
+    <Compile Include="UpdateAnnouncementsBAL.cs" />
+    <Compile Include="UploadFileHistoryBAL.cs" />
+    <Compile Include="UsersBAL.cs" />
+    <Compile Include="Utility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fonts\glyphicons-halflings-regular.eot" />
+    <None Include="fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="fonts\glyphicons-halflings-regular.woff" />
+    <None Include="fonts\glyphicons-halflings-regular.woff2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SCAdminDAL\SCAdminDAL.csproj">
+      <Project>{9522E003-582B-4AF5-A959-AE5D8C0F254E}</Project>
+      <Name>SCAdminDAL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

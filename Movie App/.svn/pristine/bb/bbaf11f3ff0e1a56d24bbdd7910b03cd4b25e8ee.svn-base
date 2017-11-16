@@ -1,0 +1,124 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System;
+using System.IO;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Text.RegularExpressions;
+using System.Web;
+
+namespace SCAdminDAL
+{
+    public class UploadFileHistoryDAL
+    {
+        public DataTable GetFileHistoryRecords()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder stringQry = new StringBuilder();
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                stringQry.Append(" SELECT  a.description as Title , b.App_Id,a.attachment, a.Upload_server_path, a.Upload_client_filename,");
+                stringQry.Append(" to_char(b.Created_dt,'DD-MON-YYYY HH24:MI') as Created_Dt, c.User_Name as Originator");
+                stringQry.Append("  FROM Approvals a, Approval_Details b, CSU_User c ");
+                stringQry.Append(" WHERE a.Originator_Id = c.Emp_Id AND a.App_Id = b.App_Id ");
+                stringQry.Append("  AND b.Sequence_Id = (Select Max(b2.Sequence_Id) From Approval_Details b2 Where b2.App_Id = b.App_id) ");
+                stringQry.Append("  ORDER BY b.App_ID desc ");
+
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+
+            }
+
+            return objGetDataFromDB.GetDataTable(stringQry.ToString());
+        }
+
+        public int DeleteFileRecord(int ApprovalID)
+        {
+            int status = 0;
+            try
+            {
+                string Query = @"delete from Approval_Details where app_id =" + ApprovalID;
+                OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+                OracleCommand cmd = new OracleCommand(Query.ToString(), con);
+                con.Open();
+                status = cmd.ExecuteNonQuery();
+               
+                con.Close();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return status;
+        }
+
+
+        public int fileUpload(HttpPostedFile file, string title,string userID)
+        {
+            HttpFileCollection files = HttpContext.Current.Request.Files;
+            HttpPostedFile uploadfile = files[0];
+            string fname;
+            fname = uploadfile.FileName;
+            string SaveLocation = string.Empty;
+            string ServerPath = string.Empty;
+            //ServerPath = HttpContext.Current.Server.MapPath("~/prodcat22/PCUploads/");
+            string root = HttpContext.Current.Server.MapPath(".");
+
+            root = root.Replace("\\SCAdmin", "\\ProdCat22");
+            ServerPath = root + "\\PCUploads\\";
+           // ServerPath = HttpContext.Current.Server.MapPath("~/prodcat22/PCUploads/");
+            if (!Directory.Exists(ServerPath))
+            {
+                Directory.CreateDirectory(ServerPath);
+            }
+            string uploadedFileExtension = Path.GetExtension(uploadfile.FileName);
+            string filefullPath = Path.GetFullPath(uploadfile.FileName);
+            string filename = Path.GetFileNameWithoutExtension(uploadfile.FileName);
+            var TargetFileName = Path.Combine(ServerPath, fname);
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            string query = string.Empty;
+            int status = 0;
+            int? approval_id = null;
+
+            string product_abbr = string.Empty;
+           
+            string commandQuery = @"Select approval_id.NEXTVAL from DUAL";
+            OracleDataReader dr = OracleDataAccess.ExecuteReader(con, CommandType.Text, commandQuery);
+
+            if (dr.HasRows)
+            {
+                while (dr.Read())
+                {
+                    approval_id = Convert.ToInt32(dr.GetValue(0));
+                }
+
+            }
+
+            //copying file on server
+            string fileId = Convert.ToSingle(approval_id) + "_1" + uploadedFileExtension;
+            var targetFile = System.IO.Path.Combine(ServerPath, fileId);
+            uploadfile.SaveAs(targetFile);
+
+            commandQuery = string.Empty;
+            query = @"insert into approval_details(APP_ID,SEQUENCE_ID,CREATED_DT,STATUS,COMMENTS) values(" + approval_id + ",1,sysdate,'Submitted','Not Found')";
+
+            status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+            query = string.Empty;
+            commandQuery = string.Empty;
+            //  query = @"insert into approvals (APP_ID,ORIGINATOR_ID,DESCRIPTION,ATTACHMENT,UPLOAD_DATE,UPLOAD_SERVER_PATH,UPLOAD_CLIENT_PATH,UPLOAD_CLIENT_FILENAME) values(" + approval_id + ",'" + userID + "','" + description + "','" + approval_id.ToString() + "_1" + fileExtension + "',sysdate,'" + fileSavePath + "','" + filePath + "','" + file + "')";
+            query = @"insert into approvals (APP_ID,ORIGINATOR_ID,DESCRIPTION,ATTACHMENT,UPLOAD_DATE,UPLOAD_SERVER_PATH,UPLOAD_CLIENT_PATH,UPLOAD_CLIENT_FILENAME) values(" + approval_id + ",'" + userID + "','" + title + "','" + fileId + "',sysdate,'" + targetFile + "','" + filefullPath + "','" + filename + uploadedFileExtension + "')";
+
+            status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+            return status;
+        }
+
+    }
+}

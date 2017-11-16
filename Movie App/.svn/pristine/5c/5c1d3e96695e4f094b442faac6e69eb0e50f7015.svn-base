@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>BT Onevoice </title>
+</head>
+<body ng-app="appModule">
+    <div  ng-controller='BTOneVoice'>
+        <div class="col-md-12 col-lg-12 text-center marTop10 red">
+            <p class="Arrow">
+                Features not entered into Sales Catalogue should be considered Not Available.</p>
+        </div>
+       
+            <div class="row" ng-hide="mdprodId==108">
+               <!-- <div class="col-md-6 col-lg-6">
+                    &nbsp;</div>-->
+                <div class="col-md-6 col-lg-6 text-left PaddingBottom" ng-hide="caseId=='0'">
+                    <a class="btn-link" ng-click="openCpeInformationpopup()">
+                        View CPE Information</a>
+                        </div>
+                <div id="cpeinformation">
+                    <div class="modal fade" id="mymodal" role="dialog" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        &times;</button>
+                                    <h4 class="modal-title" id="myModalLabel">
+                                        CPE Bundle Details
+                                    </h4>
+                                </div>
+                                <div class="modal-body" id="content" style="height: 600px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-show="mdprodId==108"></div>
+        <div id="documents" ng-hide="ShowBTOneVoiceProductDocLinks==0">
+            <div class="panel panel-primary">
+                <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#BTOneVoiceDocuments">
+                    <h3 class="panel-title">
+                        Product Documents</h3>
+                    <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i>
+                    </span>
+                </div>
+                 <div id="BTOneVoiceDocuments" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div ng-controller="DocumentLinkscntrl" id="ProductDocLinks">
+                        <div class="row">
+                            <div class="col-md-6 col-lg-6 text-left">
+                                <table>
+                                    <tr ng-repeat="dc in DocumentslinksData">
+                                        <td>
+                                            <a href="{{dc.DocumentUrl}}" target="_blank">{{dc.DocumentTitle}}</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#BTOneVoiceprod">
+                    <h3 class="panel-title">
+                        Product Details</h3>
+                        <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i>
+                    </span>
+                </div>
+                <div id="BTOneVoiceprod" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                Service Available
+                            </td>
+                            <td width="60%" class="Arrow">
+                                {{serviceAvailable}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                </div>
+            </div>
+            <div class="panel panel-primary" ng-repeat='item in charList'>
+                <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#OnevoiceChar{{$index}}">
+                    <h3 class="panel-title">
+                        {{item.Item1}}</h3>
+                        <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="panel-body collapse " id="OnevoiceChar{{$index}}">
+                    <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                        <tr>
+                            <td width="40%" class="Arrow">
+                                {{item.Item1}}
+                            </td>
+                            <td width="60%" class="Arrow">
+                                {{item.Item2}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="panel panel-default" ng-repeat='item in OneVoiceCategory'>
+                <div class="panel-heading Arrow">
+                    <h3 class="panel-title">
+                        <b>{{item.PRODUCT_CAT_NAME}}</b></h3>
+                        
+                   
+                </div>
+                <div class="panel-body" ng-repeat='item1 in item.PRODUCTList'>
+                    <label ng-if="item1.validCaseCount!=0" style="cursor: pointer" ng-click="goToSearchPage(item1.ProductID,item1.ProductName)" >
+                        <u style="color:Blue">{{item1.ProductName}}</u></label>
+                    <label ng-if="item1.validCaseCount == 0">
+                        {{item1.ProductName}}</label>
+                    <!--<a style="cursor: pointer" href="../Index.htm/{{item1.ProductID}}">
+                    {{item1.ProductName}}</a>-->
+                </div>
+            </div>
+        
+        <div class="pageLoaderOverlay">
+    </div>
+    </div>
+</body>
+</html>

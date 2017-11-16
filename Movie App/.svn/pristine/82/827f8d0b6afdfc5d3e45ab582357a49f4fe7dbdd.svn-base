@@ -1,0 +1,433 @@
+﻿
+app.controller("CPESupplierCtrl", ["$scope", "$http", "CPESuppliersfactory", "CPESuppTypefactory", "CPEPricingfactory", "ProductsFactory", "suppandpricesfactory", "ProductPricingfactory", "InstandMaintFlagFactory", "UnassignCPESuppCntryFactory", "AssignedCPESuppCntryFactory", "ValidOwnerCPEProdFactory", "FooterDetailsfact", function ($scope, $http, CPESuppliersfactory, CPESuppTypefactory, CPEPricingfactory, ProductsFactory, suppandpricesfactory, ProductPricingfactory, InstandMaintFlagFactory, UnassignCPESuppCntryFactory, AssignedCPESuppCntryFactory, ValidOwnerCPEProdFactory, FooterDetailsfact) {
+    $(".pageLoaderOverlay").show();
+
+    CPESuppliersfactory.GetSupp().success(function (data) {
+        $scope.cpesuppliers = data.d;
+        $scope.CPESupplieritem = "5847";
+
+        ProductsFactory.GetProducts($scope.CPESupplieritem).success(function (data1) {
+
+            $scope.products = data1.d;
+            $("#ddlCPESupplier").select2({
+
+            });
+            $("#ddlProduct").select2({
+
+            });
+            $("#ddlSupplierType").select2({
+
+            });
+            $("#ddlPricingType").select2({
+
+            });
+            $("#ddlcntry").select2({
+            });
+        });
+        InstandMaintFlagFactory.GetStatus($scope.CPESupplieritem).success(function (data2) {
+            $scope.supplierItems = [];
+            $.each(data2.d, function (index, element) {
+                $scope.supplierItems.push(element);
+                console.log(element + ":");
+            });
+
+        });
+
+        $scope.SupplierTypeitem = "15564";
+        $scope.PricingTypeitem = "15567";
+
+        UnassignCPESuppCntryFactory.CPESuppCntry($scope.CPESupplieritem, $scope.SupplierTypeitem, $scope.PricingTypeitem).success(function (data3) {
+
+            $(".pageLoaderOverlay").hide();
+            $scope.UnassignedCPECountries = data3.d;
+        });
+
+        FooterDetailsfact.GetFooterDetails($scope.CPESupplieritem).success(function (data4) {
+
+            $(".pageLoaderOverlay").hide();
+            $scope.FooterGridTableDetails = data4.d;
+        });
+
+    }).error(function (error) {
+
+        alert("Problem occured while loading CPE Suppliers Data" + error);
+        $(".pageLoaderOverlay").hide();
+    });
+
+    //    var Suppliertype = $("#ddlSupplierType option:selected").text();
+    //    var Pricingtype = $("#ddlPricingType option:selected").text();
+    //    $('#divSupplierType .select2-chosen').html(Suppliertype);
+    //    $('#divPricingType .select2-chosen').html(Pricingtype);
+    CPESuppTypefactory.getsuppTypes().success(function (data) {
+        $(".pageLoaderOverlay").hide();
+        $scope.cpesuppliersTypes = data.d;
+        $('#divSupplierType .select2-chosen').html(data.d[0].supplierName);
+    }).error(function (error) {
+
+        alert("Problem occured while Loading Supplier Types" + error);
+        $(".pageLoaderOverlay").hide();
+
+    });
+
+    CPEPricingfactory.GetPrices().success(function (data) {
+        $(".pageLoaderOverlay").hide();
+        $scope.cpePricingTypes = data.d;
+        $('#divPricingType .select2-chosen').html(data.d[4].supplierName);
+    }).error(function (error) {
+
+        alert("Problem occured while Loading CPE Pricing types" + error);
+        $(".pageLoaderOverlay").hide();
+
+    });
+
+    $scope.ProductIds = [];
+    ValidOwnerCPEProdFactory.GetownerCPEProducts().success(function (data) {
+        $(".pageLoaderOverlay").hide();
+        $scope.ownerCPEProducts = data.d;
+
+        $.each(data.d, function (index, element) {
+            $scope.ProductIds.push(element.ProductId);
+        });
+
+    }).error(function (error) {
+        alert("Problem occured while Loading ValidOwnerCPEProducts" + error);
+        $(".pageLoaderOverlay").hide();
+
+    });
+
+
+    $scope.PopulateEmail = function (supplierID, countryID) {
+
+        $(".pageLoaderOverlay").show();
+        var ProductIDs = $scope.ProductIds.join();
+        var CntryId;
+        if ($scope.modCountries == null) {
+            CntryId = 0;
+        } else {
+            CntryId = $scope.modCountries;
+        }
+        $http.post("CPESupplierAdmin.aspx/RetrieveEmailId", { 'SupplierId': supplierID, 'CountryId': CntryId, 'ProductIDs': ProductIDs }).success(function (data) {
+            $scope.Email = data.d;
+            var EmailIds = [];
+            var emaildata;
+            $.each($scope.ownerCPEProducts, function (index, element) {
+                emaildata = { 'ProductName': element.ProductName, 'ProductId': element.ProductId };
+                $.each($scope.Email, function (index1, element1) {
+                    if (element.ProductId == element1.ProductID) {
+                        // EmailIds.push({ 'ProductName': element.ProductName, 'EmailID': element1.EmailID });
+                        emaildata.EmailID = element1.EmailID;
+                    }
+                });
+                EmailIds.push(emaildata);
+
+
+            });
+
+            $(".pageLoaderOverlay").hide();
+            $scope.ownerCPEProducts = EmailIds;
+        }).error(function (error) {
+            alert("Problem occured while Loading Email's" + error);
+            $(".pageLoaderOverlay").hide();
+
+        });
+
+    }
+
+    $scope.OnChangeSuppandPricingType = function (supptype, pricingtype) {
+        $(".pageLoaderOverlay").show();
+
+        $http.post("CPESupplierAdmin.aspx/OnSelectionSupptypeandPriceType", { "supptype": $scope.SupplierTypeitem, "pricingtype": $scope.PricingTypeitem }).success(function (data) {
+
+            $(".pageLoaderOverlay").hide();
+
+            $scope.PricingTypeitem = data.d[2];        
+            $('#divPricingType .select2-chosen').html(data.d[1]);
+        }).error(function (error) {
+            alert("Problem occured while Supplier or pricing types" + error);
+            $(".pageLoaderOverlay").hide();
+
+        });
+
+    }
+
+    $scope.FetchProducts = function (supplierId) {
+        $(".pageLoaderOverlay").show();
+        ProductsFactory.GetProducts($scope.CPESupplieritem).success(function (data) {
+
+            $scope.products = data.d;
+            $scope.productitems = "0";
+            $scope.FetchSuppandPrices();
+            $('#divproduct .select2-chosen').html("All");
+            $(".pageLoaderOverlay").hide();
+
+        }).error(function (error) {
+
+            alert("Problem occured while Loading CPE Products" + error);
+            $(".pageLoaderOverlay").hide();
+
+        });
+        InstandMaintFlagFactory.GetStatus($scope.CPESupplieritem).success(function (data) {
+            $(".pageLoaderOverlay").hide();
+            $scope.supplierItems = [];
+            $.each(data.d, function (index, element) {
+                $scope.supplierItems.push(element);
+                console.log(element + ":");
+            });
+        }).error(function (error) {
+            alert("Problem occured while Loading Flags" + error);
+            $(".pageLoaderOverlay").hide();
+
+        });
+
+        FooterDetailsfact.GetFooterDetails($scope.CPESupplieritem).success(function (data) {
+
+            $(".pageLoaderOverlay").hide();
+            $scope.FooterGridTableDetails = data.d;
+        }).error(function (error) {
+            alert("Problem occured while Loading FooterTableData" + error);
+            $(".pageLoaderOverlay").hide();
+        });
+
+    }
+
+    $scope.FetchSuppandPrices = function (supplierId, ProductID, supptype, pricingtype) {
+        $(".pageLoaderOverlay").show();
+        var Suppliertype = $("#ddlSupplierType option:selected").text();
+        var Pricingtype = $("#ddlPricingType option:selected").text();
+        var prodId;
+        if ($scope.productitems == null || $scope.productitems == "") {
+            prodId = 0;
+        } else {
+            prodId = $scope.productitems;
+        }
+
+        $("#ddlProduct").select2({
+
+        });
+        $("#ddlcntry").select2({
+        });
+        suppandpricesfactory.GetSuppandPrices($scope.CPESupplieritem, prodId).success(function (data) {
+
+            $(".pageLoaderOverlay").hide();
+            $scope.cpesuppliersTypes = data.d;
+            $scope.SupplierTypeitem = data.d[0].supplierId;
+            $('#divSupplierType .select2-chosen').html(data.d[0].supplierName);
+            $scope.AssignedAccessTypes = [];
+
+            $http.post("CPESupplierAdmin.aspx/AssignedAccessTypes", { "supplierId": $scope.CPESupplieritem, "supptype": data.d[0].supplierName }).success(function (data1) {
+
+                data1.d.forEach(function (item) {
+                    $scope.AssignedAccessTypes.push(item.Type);
+                });
+
+            });
+
+            ProductPricingfactory.GetPricingTypes($scope.CPESupplieritem, prodId).success(function (data2) {
+
+                $(".pageLoaderOverlay").hide();
+                $scope.cpePricingTypes = data2.d;
+                $scope.PricingTypeitem = data2.d[0].supplierId;
+                $('#divPricingType .select2-chosen').html(data2.d[0].supplierName);
+                AssignedCPESuppCntryFactory.AssignedCPESupp($scope.CPESupplieritem, prodId, data.d[0].supplierName, data2.d[0].supplierName)
+        .success(function (data3) {
+
+            $(".pageLoaderOverlay").hide();
+            $scope.AssignedCPECountries = data3.d;
+            $("#ddlcntry").select2({
+            });
+            $('#divcountry .select2-chosen').html("  -- Select Country --");
+
+        });
+            });
+
+
+
+        }).error(function (error) {
+            alert("Problem occured while loading supplier Types" + error);
+            $(".pageLoaderOverlay").hide();
+
+        });
+
+
+        $http.post("CPESupplierAdmin.aspx/GetNonStandardConfiguration", { "supplierId": $scope.CPESupplieritem, "ProductID": prodId, "supptype": Suppliertype, "pricingtype": Pricingtype }).success(function (data) {
+
+            $scope.chk_non_std_config = data.d;
+        });
+
+        $http.post("CPESupplierAdmin.aspx/EmailAssignUnAssignGridData", { "supplierId": $scope.CPESupplieritem }).success(function (data) {
+
+            $scope.EmailAssignUnassign = data.d;
+            $("#ddlCPESupplier").select2({
+
+            });
+            $("#ddlProduct").select2({
+
+            });
+            $("#ddlSupplierType").select2({
+
+            });
+            $("#ddlPricingType").select2({
+
+            });
+        });
+
+    }
+    var Suppliertype = $("#ddlSupplierType option:selected").text();
+    var Pricingtype = $("#ddlPricingType option:selected").text();
+
+    $scope.GetUnassignedCPECountries = function (supplierId, supptype, pricingtype) {
+        $(".pageLoaderOverlay").show();
+        UnassignCPESuppCntryFactory.CPESuppCntry($scope.CPESupplieritem, $scope.SupplierTypeitem, $scope.PricingTypeitem).success(function (data) {
+            $(".pageLoaderOverlay").hide();
+            $scope.UnassignedCPECountries = data.d;
+
+        }).error(function (error) {
+            alert("Problem occured while Loading UnassignedCPECountries" + error);
+            $(".pageLoaderOverlay").hide();
+
+        });
+
+        $http.post("CPESupplierAdmin.aspx/OnSelectionSupptypeandPriceType", { "supplierId": 0, "supptype": $scope.SupplierTypeitem, "pricingtype": $scope.PricingTypeitem }).success(function (data) {
+
+            $(".pageLoaderOverlay").hide();
+
+            $scope.PricingTypeitem = data.d[2];
+
+        });
+
+    }
+
+} ]);
+
+
+app.factory("CPESuppliersfactory", ["$http",function ($http) {
+    var CPESuppliersfactory = {};
+
+    CPESuppliersfactory.GetSupp = function () {
+
+
+        return $http.post("CPESupplierAdmin.aspx/GetCPESuppliers", {});
+    }
+
+    return CPESuppliersfactory;
+
+}]);
+
+app.factory("CPESuppTypefactory", ["$http", function ($http) {
+
+    var CPESuppTypefactory = {};
+
+    CPESuppTypefactory.getsuppTypes= function () {
+
+        return $http.post("CPESupplierAdmin.aspx/GetCPESupplierTypes", {});
+
+    }
+    return CPESuppTypefactory;
+}]);
+
+app.factory("CPEPricingfactory", ["$http", function ($http) {
+
+    var CPEPricingfactory = {};
+
+    CPEPricingfactory.GetPrices = function () {
+
+        return $http.post("CPESupplierAdmin.aspx/GetCPEPricingTypes", {});
+
+    };
+
+    return CPEPricingfactory;
+}]);
+
+app.factory("ProductsFactory", ["$http", function ($http) {
+   
+    var ProductsFactory = {};
+
+    ProductsFactory.GetProducts = function (supplierId) {
+
+
+        return $http.post("CPESupplierAdmin.aspx/GetProductBasedonSupplier", { "supplierId": supplierId });
+
+    };
+      return ProductsFactory;
+  } ]);
+
+  app.factory("suppandpricesfactory", ["$http", function ($http) {
+
+      var suppandpricesfactory = {};
+      suppandpricesfactory.GetSuppandPrices = function (supplierId, ProductID) {
+
+          return $http.post("CPESupplierAdmin.aspx/GetSuppandPricesBasedonProd", { "supplierId": supplierId, "ProductID": ProductID });
+      }
+
+      return suppandpricesfactory;
+  } ]);
+
+
+  app.factory("ProductPricingfactory", ["$http", function ($http) {
+
+      var ProductPricingfactory = {};
+      ProductPricingfactory.GetPricingTypes = function (supplierId, ProductID) {
+
+          return $http.post("CPESupplierAdmin.aspx/GetPricingTypesBasedonProd", { "supplierId": supplierId, "ProductID": ProductID });
+      }
+
+      return ProductPricingfactory;
+  } ]);
+
+  app.factory("InstandMaintFlagFactory", ["$http", function ($http) {
+
+      var InstandMaintFlagFactory = {};
+
+      InstandMaintFlagFactory.GetStatus = function (supplierId) {
+
+          return $http.post("CPESupplierAdmin.aspx/GetInstallerandMaintainerFlags", { "supplierId": supplierId });
+      };
+
+      return InstandMaintFlagFactory;
+
+  } ]);
+
+  app.factory("UnassignCPESuppCntryFactory", ["$http", function ($http) {
+
+      var UnassignCPESuppCntryFactory = {};
+
+      UnassignCPESuppCntryFactory.CPESuppCntry = function (supplierId, supptype, pricingtype) {
+
+          return $http.post("CPESupplierAdmin.aspx/UnassignedCPESupplierCountries", { "supplierId": supplierId, "supptype": supptype, "pricingtype": pricingtype });
+      };
+
+      return UnassignCPESuppCntryFactory;
+
+  } ]);
+
+  app.factory("AssignedCPESuppCntryFactory", ["$http", function ($http) {
+
+      var AssignedCPESuppCntryFactory = {};
+
+     AssignedCPESuppCntryFactory.AssignedCPESupp = function (supplierId,ProductID, supptype, pricingtype) {
+
+      return $http.post("CPESupplierAdmin.aspx/AssignedCPESupplierCountries",{"supplierId": supplierId,"ProductID": ProductID, "supptype": supptype, "pricingtype": pricingtype});
+      };
+
+      return AssignedCPESuppCntryFactory;
+  } ]);
+
+  app.factory("ValidOwnerCPEProdFactory", ["$http", function ($http) {
+      var ValidOwnerCPEProdFactory = {};
+      ValidOwnerCPEProdFactory.GetownerCPEProducts = function () {
+          return $http.post("CPESupplierAdmin.aspx/ValidOwnerCPEProducts", {});
+    }
+      return ValidOwnerCPEProdFactory;
+  } ]);
+
+  app.factory("FooterDetailsfact", ["$http", function ($http) {
+
+      var FooterDetailsfact = {};
+
+      FooterDetailsfact.GetFooterDetails = function (supplierId) {
+
+          return $http.post("CPESupplierAdmin.aspx/GetAllFooterTableDetails", { "supplierId": supplierId });
+      };
+
+      return FooterDetailsfact;
+  }]);

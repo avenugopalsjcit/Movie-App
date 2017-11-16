@@ -1,0 +1,84 @@
+﻿//(function (ng, app) {
+
+
+app.controller("NotesAuditReportCtrl", function ($scope, $http, ServiceTypeProductMap, NgTableParams, NotesAuditReport) {
+    $(".pageLoaderOverlay").show();
+    $scope.ServiceTypes = [];
+    $scope.ServiceTypeProductMap = [];
+    $scope.Products = [];
+    $scope.NotesAuditData = [];
+    $scope.DisplayMessage = false;
+
+    ServiceTypeProductMap.GetServiceTypeProductMap("Notes").success(function (data) {
+
+        var serviceTypes = [];
+
+        $scope.ServiceTypeProductMap = data.d;
+
+        data.d.forEach(function (item) {
+            serviceTypes.push(item.ServiceType);
+        });
+
+        var lookup = {};
+        var result = [];
+
+        for (var item, i = 0; item = serviceTypes[i++]; ) {
+            var name = item;
+
+            if (!(name in lookup)) {
+                lookup[name] = 1;
+                result.push(name);
+            }
+        }
+        $scope.ServiceTypes = result;
+        $("#Select1").select2(
+            {
+            });
+        $("#Select2").select2(
+            {
+
+            });
+        $(".pageLoaderOverlay").hide();
+    });
+
+    $scope.GetProducts = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.Products = [];
+        $scope.ServiceTypeProductMap.forEach(function (item) {
+            if ($scope.modServiceType == item.ServiceType) {
+                $scope.Products.push({ ProductId: item.ProductId, ProductName: item.ProductName });
+            }
+        });
+        $('#ProductDiv .select2-chosen').html("  -- Select Product --");     
+        $(".pageLoaderOverlay").hide();
+    }
+
+    $scope.GetNotesAuditReport = function () {
+        if ($scope.modProduct != null) {
+            $(".pageLoaderOverlay").show();
+            NotesAuditReport.GetNotesAuditReport($scope.modProduct).success(function (data) {
+                $scope.NotesAuditData = new NgTableParams({}, { 'dataset': data.d });
+                if (data.d.length == 0) {
+                    $scope.NotesAuditData = [];
+                    $scope.DisplayMessage = true;
+                }
+                $(".pageLoaderOverlay").hide();
+            });
+        } else {
+            $scope.NotesAuditData = [];
+            $scope.DisplayMessage = false;
+        }
+    }
+});
+
+app.factory('NotesAuditReport', function ($http) {
+
+    var NotesAuditReport = {};
+    NotesAuditReport.GetNotesAuditReport = function (productCode) {
+        return $http.post('Reports.aspx/GetNotesAuditReport', { productCode: productCode });
+    }
+
+    return NotesAuditReport;
+});
+
+//} (angular, app));

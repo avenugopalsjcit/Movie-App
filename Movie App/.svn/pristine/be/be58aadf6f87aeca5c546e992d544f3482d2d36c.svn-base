@@ -1,0 +1,387 @@
+﻿app.factory('AdminDocumentationGridFactory', function ($http) {
+
+    var AdminDocumentationGridFactory = {};
+
+    AdminDocumentationGridFactory.GetAdminAddressGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminDocumentationView', { 'AccessLevel': AccessLevel, 'User_id': User_id });
+
+    }
+
+    return AdminDocumentationGridFactory;
+});
+app.factory('CategoryProductsFactory', function ($http) {
+
+    var CategoryProductsFactory = {};
+
+    CategoryProductsFactory.GetProductsDetails = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetProductDocumentationView', { 'AccessLevel': AccessLevel, 'User_id': User_id });
+
+    }
+
+    return CategoryProductsFactory;
+});
+
+app.factory('DocumentInsertFactory', function ($http) {
+
+    var DocumentInsertFactory = {};
+
+    DocumentInsertFactory.GetDocInsert = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/InsertAdminDocumentation', { 'strAvailCd': strAvailCd, 'productID': productID, 'ProductLocLevelCd': ProductLocLevelCd, 'Title': Title, 'DocumentURL': DocumentURL, 'Description': Description, 'User_id': User_id });
+
+    }
+
+    return DocumentInsertFactory;
+});
+
+app.factory('DocumentUpdateFactory', function ($http) {
+
+    var DocumentUpdateFactory = {};
+
+    DocumentUpdateFactory.GetDocUpdate = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/UpdateAdminDocumentation', { 'productID': productID, 'ProductLocLevelCd': ProductLocLevelCd, 'Title': Title, 'DocumentURL': DocumentURL, 'Description': Description, 'User_id': User_id, 'strAvailCd': strAvailCd });
+
+    }
+
+    return DocumentUpdateFactory;
+});
+
+
+app.factory('DocumentDeleteFactory', function ($http) {
+
+    var DocumentDeleteFactory = {};
+
+    DocumentDeleteFactory.GetDocDelete = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/DeleteAdminDocumentation', { 'strAvailCd': strAvailCd });
+
+    }
+
+    return DocumentDeleteFactory;
+});
+
+app.factory('DocumentationMaxVal', function ($http) {
+
+    var DocumentationMaxVal = {};
+
+    DocumentationMaxVal.GetDocumentMaxval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxDocumentationCD', { });
+
+    }
+
+    return DocumentationMaxVal;
+});
+
+app.factory('DocumentationLocLevelVal', function ($http) {
+
+    var DocumentationLocLevelVal = {};
+
+    DocumentationLocLevelVal.GetDocumentLocLevelval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetProductLevelCDDocumentationCD', { "ProductId": ProductId });
+
+    }
+
+    return DocumentationLocLevelVal;
+});
+
+app.controller('AdminDocumentationCtrl', ['$scope', 'DocumentationLocLevelVal', 'AdminDocumentationGridFactory', 'NgTableParams', 'CategoryProductsFactory', 'DocumentInsertFactory', 'DocumentUpdateFactory', 'DocumentDeleteFactory', 'DocumentationMaxVal', function ($scope, DocumentationLocLevelVal, AdminDocumentationGridFactory, NgTableParams, CategoryProductsFactory, DocumentInsertFactory, DocumentUpdateFactory, DocumentDeleteFactory, DocumentationMaxVal) {
+
+
+
+    $scope.changevalid = function () {
+        var product = $('#divddlProduct .select2-chosen')[0].innerHTML;
+        if ($scope.Title == "" || angular.isUndefined($scope.Title) || angular.isUndefined($scope.DocumentURL) || angular.isUndefined($scope.Description) || $scope.DocumentURL == "" || $scope.Description == "" || product == "--- Select ---") {
+            $("#submitbtn").prop('disabled', true);
+        }
+        else {
+
+            $("#submitbtn").prop('disabled', false);
+        }
+    }
+
+
+
+
+
+
+
+
+    AccessLevel = User_id = ""
+    AccessLevel = $scope.AccessLevel;
+    User_id = $scope.User_Id;
+    var dataArray = [];
+    var dataArray1 = [];
+
+    CategoryProductsFactory.GetProductsDetails().success(function (data) {
+        $scope.Products = data.d;
+
+
+
+        $(".pageLoaderOverlay").hide();
+    });
+
+    AdminDocumentationGridFactory.GetAdminAddressGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+        $scope.AddressGrid = data;
+
+
+
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+    //$(".pageLoaderOverlay").hide();
+    productId = ProductLocLevelCD = DocumentId = Title = DocumentURL = Description = ""
+    //CategoryDescription = "", CategoryId = "";
+    $scope.addNewTask = function () {
+
+        // $scope.ProductId = productId = 0;
+        $scope.ProductName = "--- Select ---";
+        $("#ddlProduct").select2({
+        });
+        $('#divddlProduct .select2-chosen').html("--- Select ---");
+        //$scope.Products.selected = { ProductName: '--- Select ---' };
+
+
+        $scope.Title = "";
+        $scope.Description = "";
+        $scope.DocumentId = $scope.DocumentId;
+        $scope.DocumentURL = "";
+        $scope.ProductLocLevelCD = $scope.ProductLevelCD;
+        AccessLevel = $scope.AccessLevel;
+        User_id = $scope.User_Id;
+
+        $scope.Reset = 0;
+    }
+
+
+    $scope.EditRecord = function (category) {
+
+        //$scope.ProductName = category.ProductName;
+        $scope.DocumentId = category.DocumentId;
+        productId = category.ProductId;
+        $scope.DocumentId = category.DocumentId;
+        $scope.Title = category.DocumentTitle;
+        $scope.Description = category.DocumentDesc;
+        $scope.DocumentURL = category.DocumentURL;
+        $scope.ProductLocLevelCD = category.ProductLevelCD;
+        Title = category.DocumentTitle;
+        Description = category.DocumentDesc;
+        DocumentURL = category.DocumentURL;
+        $scope.Reset = 1;
+
+
+
+
+        AccessLevel = $scope.AccessLevel;
+        User_id = $scope.User_Id;
+
+        for (var i = 0; i < $scope.Products.length; i += 1) {
+            var result = $scope.Products[i];
+            if (result.ProductId === productId) {
+                ProductName = result.ProductName;
+            }
+        }
+        //var Product = $("#ddlProduct option:selected").text();
+        $("#ddlProduct").select2({
+        });
+        $('#divddlProduct .select2-chosen').html(ProductName);
+        $scope.ProductName = productId;
+    }
+
+
+
+
+
+
+
+    $scope.ResetRecord = function () {
+        $('#divddlProduct .select2-chosen').html(ProductName);
+        $scope.ProductName = productId;
+
+        $scope.Title = Title;
+        $scope.Description = Description;
+        $scope.DocumentURL = DocumentURL;
+
+    }
+
+
+
+    $scope.SaveAdminAvail = function (DocumentId) {
+
+
+
+        productID = $scope.ProductName;
+
+        ProductLocLevelCd = $scope.ProductLocLevelCD;
+        Title = $scope.Title;
+        Description = $scope.Description;
+        DocumentURL = $scope.DocumentURL;
+        strAvailCd = $scope.DocumentId;
+        //        strAvailAbbr = $scope.AvailabilityAbbr;
+        User_id = $scope.User_Id;
+
+        if (productID == 0 || $scope.Title == "" || $scope.DocumentURL == "" || $scope.Description == "") {
+        }
+        else {
+            DocumentationMaxVal.GetDocumentMaxval().success(function (data) {
+
+                // debugger;
+                strAvailCd = data.d;
+                ProductId = productID;
+                DocumentationLocLevelVal.GetDocumentLocLevelval().success(function (data) {
+                    //$http.post('GlobalReference.aspx/GetProductLevelCDDocumentationCD', { "ProductId": ProductId }).success(function (data) {
+
+                    ProductLocLevelCd = data.d;
+                    // });
+                    //strAvailCd = strAvailCd + 1;
+                    productID = productID;
+                    DocumentInsertFactory.GetDocInsert().success(function (data) {
+                        //alert("hi");
+                        // str = data.d;
+                        AdminDocumentationGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                        });
+
+                    });
+                });
+            });
+
+
+        }
+
+    }
+
+
+
+    $scope.UpdateAdminAvail = function (DocumentId) {
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to update Documentation?",
+            callback: function (result) {
+                if (result) {
+                    //DocumentId = category.DocumentId;
+                    productID = $scope.ProductName;
+
+                    ProductLocLevelCd = $scope.ProductLocLevelCD;
+                    Title = $scope.Title;
+                    Description = $scope.Description;
+                    DocumentURL = $scope.DocumentURL;
+                    strAvailCd = $scope.DocumentId;
+                    //        strAvailAbbr = $scope.AvailabilityAbbr;
+                    User_id = $scope.User_Id;
+
+
+
+                    DocumentUpdateFactory.GetDocUpdate().success(function (data) {
+                        AdminDocumentationGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+
+                            bootbox.alert({
+                                "message": "Documentation Updated Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+
+                        });
+
+                    });
+                }
+
+            }
+        });
+    }
+
+
+    $scope.DeleteAdminAvail = function (category) {
+        strAvailCd = category.DocumentId;
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Notes Category? " + category.DocumentDesc,
+            callback: function (result) {
+                if (result) {
+                    $(".pageLoaderOverlay").hide();
+                    DocumentDeleteFactory.GetDocDelete(strAvailCd).success(function (data) {
+
+
+
+                        AdminDocumentationGridFactory.GetAdminAddressGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                        });
+                    });
+                }
+
+            }
+        });
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+} ]);
+
+
+//app.directive('autoComplete', function ($timeout) {
+//    return function (scope, iElement, iAttrs) {
+//        iElement.autocomplete({
+//            source: scope[iAttrs.uiItems],
+//            select: function () {
+//                $timeout(function () {
+//                    iElement.trigger('input');
+//                }, 0);
+//            }
+//        });
+//    };
+//});
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

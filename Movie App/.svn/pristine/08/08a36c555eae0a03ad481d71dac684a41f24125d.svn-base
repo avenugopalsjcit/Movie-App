@@ -1,0 +1,346 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace SCAdminBAL.MCU
+{
+    class MCUUtility
+    {
+    }
+
+    public class TreeContents
+    {
+        public List<MCURegion> lstRegion { get; set; }
+        public List<MCUCountry> lstCountry { get; set; }
+        public List<MCUCity> lstCity { get; set; }
+        public List<MCUPoP> lstPoP { get; set; }
+        public List<MCUState> lstState { get; set; }
+        public List<MCUCapmanPlatform> lstPlatform { get; set; }
+    }
+
+    public class MCURegion
+    {
+        public string RegionID { get; set; }
+        public string RegionName { get; set; }
+        public string parentID { get; set; }
+        public string Type { get; set; }
+    }
+
+    public class MCUCountry
+    {
+        public string CountryID { get; set; }
+        public string CountryName { get; set; }
+        public string Type { get; set; }
+        public string statProvinceFlag { get; set; }
+        public string parentID { get; set; }
+
+    }
+
+    public class MCUState
+    {
+        public string stateID { get; set; }
+        public string stateName { get; set; }
+        public string RegionID { get; set; }
+        public string Type { get; set; }
+        public string statProvinceFlag { get; set; }
+        public string parentID { get; set; }
+    }
+
+    public class MCUCity
+    {
+        public string parentID { get; set; }
+        public string CityID { get; set; }
+        public string CityName { get; set; }
+        public string CountryID { get; set; }
+        public string Type { get; set; }
+        public string statProvinceFlag { get; set; }
+    }
+
+    public class MCUPoP
+    {
+        public string PoPID { get; set; }
+        public string PoPName { get; set; }
+        public string RegionID { get; set; }
+        public string RegionName { get; set; }
+        public string CountryID { get; set; }
+        public string CountryName { get; set; }
+        public string stateID { get; set; }
+        public string StateName { get; set; }
+        public string CityID { get; set; }
+        public string CityName { get; set; }
+        public string PlatfromID { get; set; }
+        public string PlatformName { get; set; }
+        public string parentID { get; set; }
+        public string Type { get; set; }
+        public string hasCase { get; set; }
+        public string caseID { get; set; }
+        public string caseValidCd { get; set; }
+        public string popType { get; set; }
+    }
+
+    public class MCUCapmanPlatform
+    {
+        public string capmanPlatformID { get; set; }
+        public string capmanPlatformName { get; set; }
+        public string caseID { get; set; }
+    }
+
+    public class AccessFilter
+    {
+        public List<MCUAccessSupp> lstAccSupp { get; set; }
+        public List<MCUSupplierProd> lstAccSuppProd { get; set; }
+        public List<MCUAccessTech> lstAccTech { get; set; }
+
+        public List<MCUAccessSupp> lstAccSuppAll { get; set; }
+        public List<MCUSupplierProd> lstAccSuppProdAll { get; set; }
+        public List<MCUAccessTech> lstAccTechAll { get; set; }
+    }
+
+
+    public class MCUAccessSupp
+    {
+        public string suppId { get; set; }
+        public string suppName { get; set; }
+        public string suppProdID { get; set; }
+        public string AccTechId { get; set; }
+    }
+
+    public class MCUSupplierProd
+    {
+        public string suppId { get; set; }
+        public string suppProdID { get; set; }
+        public string suppProdName { get; set; }
+        public string AccTechId { get; set; }
+    }
+
+    public class MCUAccessTech
+    {
+        public string AccTechId { get; set; }
+        public string AccTechName { get; set; }
+        public string suppId { get; set; }
+        public string suppProdID { get; set; }
+    }
+
+    public class AccessSpeed
+    {
+        public string AccessId { get; set; }
+        public string SupplierId { get; set; }
+        public string TypeId { get; set; }
+        public string NameId { get; set; }
+        public string AccessActualVal { get; set; }
+    }
+
+    public class PortSpeedCharacteristics
+    {
+        public int CharId { get; set; }
+        public string CharDesc { get; set; }
+        public string CharName { get; set; }
+        public int IsValidMapping { get; set; }
+
+
+    }
+
+    public class MCUUpdateCaseParam
+    {
+        public int LocLevel; public int ProductCd; public int SubProductCd; public string UserId; public int[] iPopId; public int[] iCaseId; public int[] pavailcd; public int[] pcasevalidcd;
+        public int[] pcharid; public int[] pcharavailcd;
+        public int[] pchartypeid; public string[] pcharvalue; public string[] pcharvalue2; public int[] pportspeedcharid; public int[] pportavailability; public int[] pportvalidity;
+        public string[] poffnetleadtime;
+        public int[] paccesssupplierid; public int[] paccesssuppliervalid; public int[] pparentportspeeds; public int[] pparentportspeedvalid;
+        public int[] pparentaccessproducttypeid; public int[] pparentaccesssuppliernameid; public int[] pparentaccesssuppliercharid; public int[] pparentaccessspeedcharid;
+        public int[] pportspeedcharcount; public int[] paccessspeedcharcount; public int[] pchardetailvalidcd; public int[] paccessspeedcharid;
+        public int[] psuppliercharid; public int[] ptypecharid; public int[] pnamecharid; public int[] pCharCount; public int[] pAccessSupplierCount;
+        public int[] pParentportSpeedCount; public int[] pCarrier; public int[] pCPESupplier;
+        public int[] strInsertCaseIds;
+        public int[] strRemoveCaseIds;
+        public int[] pPlatformcharid;
+        public int[] pCountryID;
+    }
+
+    public class MCUUpdateHVPNCaseParam
+    {
+        public int LocLevel; public int ProductCd; public int SubProductCd; public string UserId; public int[] iPopId; public int[] iCaseId; public int[] pavailcd; public int[] pcasevalidcd;
+        public int[] pcharid; public int[] pcharavailcd;
+        public int[] pchartypeid; public string[] pcharvalue; public string[] pcharvalue2; public int[] pportspeedcharid; public int[] pportavailability; public int[] pportvalidity;
+        public string[] poffnetleadtime;
+        public int[] paccesssupplierid; public int[] paccesssuppliervalid; public int[] pparentportspeeds; public int[] pparentportspeedvalid;
+        public int[] pparentaccessproducttypeid; public int[] pparentaccesssuppliernameid; public int[] pparentaccesssuppliercharid; public int[] pparentaccessspeedcharid;
+        public int[] pportspeedcharcount; public int[] paccessspeedcharcount; public int[] pchardetailvalidcd; public int[] paccessspeedcharid;
+        public int[] psuppliercharid; public int[] ptypecharid; public int[] pnamecharid; public int[] pCharCount; public int[] pAccessSupplierCount;
+        public int[] pParentportSpeedCount; public int[] pCarrier; public int[] pCPESupplier;
+        public int[] strInsertCaseIds;
+        public int[] strRemoveCaseIds;
+        public int[] pPlatformcharid;
+        public int[] pCountryID;
+        public int[] paccessavailability;
+    }
+
+    public class CaseArray
+    {
+        List<Case> oCases { get; set; }
+
+    }
+
+    class Case
+    {
+        int caseID { get; set; }
+        int popId { get; set; }
+        int caseValidCD { get; set; }
+        int caseAvailCd { get; set; }
+
+        List<PortSpeed> oPortSpeed { get; set; }
+        List<AccessSpeeds> oAccessSuppChar { get; set; }
+        List<Charecteristic> oChar { get; set; }
+    }
+
+    public class PortSpeed
+    {
+        public int CharId;
+        public string CharName;
+        public int CharTypeId;
+        public int UnitOfMeasure;
+        public int ActualValue;
+        public int ValidCd;
+        public int NumValue;
+        public int LeadTime;
+        public int PortAvailability;
+        public string PortAvailabilityName;
+        public int validPort;
+        public string ValidPortName;
+    }
+
+    public class Charecteristic
+    {
+        public String CharValue
+        {
+            get;
+            set;
+        }
+
+        public String CharValue2
+        {
+            get;
+            set;
+        }
+        public String CharAvailText
+        {
+            get;
+            set;
+        }
+        public Int32 CharAvailCd
+        {
+            get;
+            set;
+        }
+        public Int32 PopSiteId
+        {
+            get;
+            set;
+        }
+        public Int32 CharTypeValueCount
+        {
+            get;
+            set;
+        }
+        public Int32 NumValue
+        {
+            get;
+            set;
+        }
+        public Int32 ValidCd
+        {
+            get;
+            set;
+        }
+        public Int32 LowerRange
+        {
+            get;
+            set;
+        }
+        public Int32 UpperRange
+        {
+            get;
+            set;
+        }
+        public String ActualValue
+        {
+            get;
+            set;
+        }
+        public DateTime UpdatedDt
+        {
+            get;
+            set;
+        }
+        public DateTime CreatedDt
+        {
+            get;
+            set;
+        }
+        public String UpdatedEmpId
+        {
+            get;
+            set;
+        }
+        public String CreatedEmpId
+        {
+            get;
+            set;
+        }
+        public String UnitOfMeasure
+        {
+            get;
+            set;
+        }
+        public String CharDesc
+        {
+            get;
+            set;
+        }
+        public Int32 CharTypeId
+        {
+            get;
+            set;
+        }
+        public String CharName
+        {
+            get;
+            set;
+        }
+        public Int32 CharId
+        {
+            get;
+            set;
+        }
+    }
+
+    public class AccessSpeeds
+    {
+        public int CaseId;
+        public int PoPId;
+        public int PortAvailability;
+        public string PortAvailabilityName;
+        public int validPort;
+        public string ValidPortName;
+        public int LeadTime;
+        public string AccessId;
+        public int AccessName;
+        public int AccessValue;
+        public int SupplierId;
+        public string SupplierName;
+        public int AccessTypeId;
+        public string AccessTypeName;
+        public int SupplierNameId;
+        public string SupplierNameName;
+        public int AccessActualValue;
+        public string UOM;
+        List<ValidCombos> ValidCombos;
+    }
+
+    class ValidCombos
+    {
+        public int PortSpeed;
+        public int PoPId;
+    }
+}

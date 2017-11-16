@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="appModule">
+<head>
+    <title></title>
+</head>
+<body >
+
+<div class="container" ng-controller="HVPNPkgCntrl">
+        <div class="col-md-6 col-lg-6">
+            &nbsp;</div>
+        <div class="col-md-6 col-lg-6 text-right ">
+            <button type="button" class="close" ng-click="$dismiss()">
+                &times;</button><br />
+        </div>
+        <div class="row marTop25">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title text-center Arrow">
+                        Common Access and CPE Availability </h3>
+                </div>
+                <div class="panel-body">
+                 <div id="IPConnectNoData" class="alert alert-danger" role="alert" style="display: none">
+                    No Data Found</div>
+                    <table id="CPEAvailMatrixtbl" class="table table-bordered">
+                        <tr>
+                            <th class="Arrow">
+                                Country
+                            </th>
+                            <th class="Arrow">
+                                 Supplier
+                            </th>
+                            <th align="center" class="bodyTextBold Arrow">
+                                Access Type
+                            </th>
+                            <th class="Arrow">
+                                Access Technology
+                            </th>
+                            <th class="Arrow">
+                                Access and CPE Bundle
+                            </th>
+                            <th class="Arrow">
+                                Product
+                            </th>
+                            <th class="Arrow">
+                                Common Access and CPE Order
+                            </th>
+                        </tr>
+                        <tr ng-repeat="item in AccessCPEList">
+                            <td class="Arrow">
+                                {{item.Country}}
+                            </td>
+                            <td class="Arrow">
+                                {{item.Supplier}}
+                            </td>
+                            <td class="Arrow">
+                                {{item.AccessType}}
+                            </td>
+                            <td class="Arrow">
+                                {{item.AccessTechnology}}
+                            </td>
+                            <td class="Arrow">
+                                {{item.AccessCPEBundle}}
+                            </td>
+                            <td class="Arrow">
+                                {{item.Product}}
+                            </td>
+                            <td class="Arrow">
+                                {{item.AccessCPEOrder}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+      <div class="pageLoaderOverlay">
+                </div>
+    <script src="../Scripts/angular.js" type="text/javascript"></script>
+   
+    <script src="../Scripts/app/DispHVPNpkgDet.js" type="text/javascript"></script>
+</body>
+</html>

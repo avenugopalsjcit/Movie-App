@@ -1,0 +1,47 @@
+﻿<div ng-controller="Controllers.PrimaryProductOwnerCntrl" class="container">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                Primary Product Owner
+            </h3>
+        </div>
+    </div>
+    <table cellpadding="0" cellspacing="0" class="table table-bordered">
+        <tr>
+            <th class="Arrow">
+                Product
+            </th>
+            <th class="Arrow">
+                Product Owners
+            </th>
+             <th class="Arrow">
+                Current Primary Contact - Email
+            </th>
+            <th class="Arrow">
+                Current Primary Contact
+            </th>
+        </tr>
+        <tr ng-repeat="x in ProductAccurateAdminMapping">
+            <td class="Arrow">
+                {{ x.ProductName }}
+            </td>
+            <td>
+                 <input type="hidden"  class="hdnemailid"  ng-bind="Emailid[$index]" />
+                <select class="ddlProductOwnerscls" id="ddlProductOwners{{$index}}" ng-options="owner.FullName for owner in x.Owners track by owner.EmployeeId"
+                    ng-model="modOwner[$index]" ng-change="ddlProductOwnersChange(x.ProductId, modOwner[$index],
+                              x.CurrentPrimaryContactID,{{$index}}, Emailid[$index])" >
+                    <option></option>
+                </select>
+            </td>
+              <td class="Arrow CurrentEmailID{{$index}}">
+               {{ x.CurrentEmailID }}
+            </td>
+            <td class="Arrow CurrentPrimaryContact{{$index}}">
+                {{ x.CurrentPrimaryContact }}
+            </td>
+        </tr>
+    </table>
+   
+    <div class="pageLoaderOverlay">
+    </div>
+</div>

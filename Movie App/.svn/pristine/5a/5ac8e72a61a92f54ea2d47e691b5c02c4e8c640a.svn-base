@@ -1,0 +1,283 @@
+﻿<div ng-controller="CPESupplierCtrl" class="container">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                CPE Supplier
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <p style="color: Red;" class="Arrow">
+                <span style="color: Black">Note:</span> The below data is mastered in PMF system
+                and any changes required please contact PMF system administrator.
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="cpesupplier" class="col-sm-2 control-label cus-text-left">
+                        CPE Supplier &nbsp; <span style="color: Red">*</span></label>
+                    <div class="col-sm-3" style="left: -30px">
+                        <select name="CPESupplier" style="width: 20em;" ng-model="CPESupplieritem" ng-change="FetchProducts(CPESupplieritem)"
+                            ng-options="supp.supplierId as supp.supplierName for supp in cpesuppliers" id="ddlCPESupplier">
+                        </select>
+                    </div>
+                    <label for="Product" class="col-sm-2 control-label cus-text-left">
+                        Product &nbsp; <span style="color: Red">*</span>
+                    </label>
+                    <div class="col-sm-3" style="left: -30px" id="divproduct">
+                        <select name="CPEProduct" style="width: 20em;" ng-model="productitems" ng-change="FetchSuppandPrices(CPESupplieritem,productitems,SupplierTypeitem,PricingTypeitem)"
+                            ng-options="prod.ProductId as prod.ProductName for prod in products" id="ddlProduct">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="CpeSupplierType" class="col-sm-2 control-label cus-text-left">
+                        CPE Supplier Type</label>
+                    <div class="col-sm-3" style="left: -30px" id="divSupplierType">
+                        <select name="CPESupplierType" style="width: 20em;" ng-model="SupplierTypeitem" ng-options="SuppType.supplierId as SuppType.supplierName for SuppType in cpesuppliersTypes"
+                            ng-change="OnChangeSuppandPricingType(SupplierTypeitem,PricingTypeitem)" id="ddlSupplierType">
+                        </select>
+                    </div>
+                    <label for="CpeSupplierType" class="col-sm-2 control-label cus-text-left">
+                        CPE Pricing Type</label>
+                    <div class="col-sm-3" style="left: -30px" id="divPricingType">
+                        <select name="CPEPricingType" style="width: 20em;" ng-model="PricingTypeitem" ng-options="PriceType.supplierId as PriceType.supplierName for PriceType in cpePricingTypes"
+                            ng-change="GetUnassignedCPECountries(CPESupplieritem,SupplierTypeitem,PricingTypeitem)"
+                            id="ddlPricingType">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-xs-12 col-md-12 col-lg-12">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 cus-text-left" for="Type Of Supplier">
+                                Type Of Supplier</label>
+                            <div class="col-sm-2 " style="margin-left: -45px">
+                                <label class="col-sm-2 " for="Installer">
+                                    Installer</label>
+                            </div>
+                            <div class="col-sm-2" style="margin-left: -40px">
+                                <label class="col-sm-2 " for="Maintainer">
+                                    Maintainer</label>
+                            </div>
+                            <div class="col-sm-2" style="margin-left: -40px">
+                                <label class="col-sm-2 " for="Manufacturer">
+                                    Manufacturer</label>
+                            </div>
+                            <div class="col-sm-2" style="margin-left: -35px">
+                                <label class="col-sm-2 " for="Distributor">
+                                    Distributor</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 cus-text-left" for="">
+                                &nbsp;</label>
+                            <div class="col-sm-2 " ng-repeat="item in supplierItems track by $index" style="margin-left: -30px">
+                                {{item}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="UnassignedCountries" class="col-sm-2 control-label cus-text-left">
+                        Unassigned Country(s)
+                    </label>
+                    <div class="col-sm-3" style="left: -30px">
+                        <select class="form-control" name="Unassigned Countries" multiple size="10" ng-model="modUnassignedCountries"
+                            ng-options="countries.CountryId as countries.CountryName for countries in UnassignedCPECountries">
+                        </select>
+                    </div>
+                    <label for="AssignedCountries" class="col-sm-2 control-label cus-text-left">
+                        Assigned Country(s)
+                    </label>
+                    <div class="col-sm-3" style="left: -30px">
+                        <select class="form-control" name="AssignedCountries" multiple size="10" ng-model="modAssignedCountries"
+                            ng-options="countries.CountryId as countries.CountryName for countries in AssignedCPECountries">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="(SupplierTypeitem =='15564' && PricingTypeitem == '15567' &&(chk_non_std_config=='1' ||chk_non_std_config=='0')) || (SupplierTypeitem =='15565'&& PricingTypeitem=='15567' &&(chk_non_std_config=='1' ||chk_non_std_config=='0')) || (SupplierTypeitem =='35364'&& PricingTypeitem=='35365' &&(chk_non_std_config=='1' ||chk_non_std_config=='0'))">
+                    <label for="nonstdConfig" class="col-sm-2 control-label cus-text-left">
+                        Non Standard Configuration allowed
+                    </label>
+                    <div class="col-sm-3" style="margin-left: -30px">
+                        <input type="checkbox" id="NonStdChk" visible="true" checked="checked" disabled="disabled" />
+                    </div>
+                    <div class="col-sm-2">
+                        &nbsp;</div>
+                    <label for="" class="col-sm-1 control-label">
+                        &nbsp;
+                    </label>
+                </div>
+                <div class="form-group" ng-show="(SupplierTypeitem == '15566') && (productitems!=null)">
+                    <label for="UnassignedAccessType" class="col-sm-2 control-label cus-text-left">
+                        Unassigned Access Type(s)
+                    </label>
+                    <div class="col-sm-3" style="left: -30px">
+                        <select class="form-control" name="UnAssignedAccTypes" multiple size="10" ng-model="modUnAssignAccTypes">
+                        </select>
+                    </div>
+                    <label for="AssignedCountries" class="col-sm-2 control-label cus-text-left">
+                        Assigned Access Type(s)
+                    </label>
+                    <div class="col-sm-3" style="left: -30px">
+                        <select class="form-control" name="AssignedAccTypes" multiple size="10" ng-model="modAssignAccTypes"
+                            ng-options="item as item for item in AssignedAccessTypes">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-hide="((SupplierTypeitem == '15566') || (PricingTypeitem == '15569') || (PricingTypeitem == '15568' ))&& (productitems!=null)">
+                    <p style="color: Red;" class="Arrow">
+                        <span style="color: Black">Note:</span> 
+                        Select Country to view Supplier E-mail.
+                    </p>
+                </div>
+            </div>
+            <div class="row" ng-hide="((SupplierTypeitem == '15566') || (PricingTypeitem == '15569') || (PricingTypeitem == '15568' ))&& (productitems!=null)">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="form-horizontal">
+                        <div class="formgroup" ng-hide="(SupplierTypeitem == '15566') || (PricingTypeitem == '15569') || (PricingTypeitem == '15568' )">
+                            <label for="Country" class="col-sm-2 control-label cus-text-left" style="margin-left: -15px">
+                                Country
+                            </label>
+                            <div class="col-sm-3" id="divcountry" style="margin-left: -28px">
+                                <select name="AssignedCountries" ng-model="modCountries" style="width: 20em;" ng-options="countries.CountryId as countries.CountryName for countries in AssignedCPECountries"
+                                    ng-change="PopulateEmail(CPESupplieritem,modCountries)" id="ddlcntry">
+                                    <option value="">--Select Country--</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-hide="((SupplierTypeitem == '15566') || (PricingTypeitem == '15569') || (PricingTypeitem == '15568' )) && (productitems!=null)" style="margin-top:8px">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">                  
+                    <table cellpadding="0" cellspacing="0" class="table table-bordered" style="width:80%">
+                        <tr>
+                            <th  style="width:40%">
+                                Product
+                            </th>
+                            <th  style="width:40%">
+                                Supplier E-mail ID
+                            </th>
+                        </tr>
+                        <tr ng-repeat="prod in ownerCPEProducts">
+                            <td style="width:40%">
+                                <label>
+                                    {{prod.ProductName}}
+                                </label>
+                            </td>
+                            <td  style="width:40%">
+                                <label ng-model="prod.EmailID">
+                                    {{prod.EmailID}}
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+  
+    <table cellpadding="0" cellspacing="0" class="table  table-striped">
+        <tr>
+            <td class="Arrow">
+                Change 
+            </td>
+            <td class="Arrow">
+                Created Date (GMT)
+            </td>
+            <td class="Arrow">
+                Created By
+            </td>
+            <td class="Arrow">
+                Updated Date (GMT)
+            </td>
+            <td class="Arrow">
+                Updated By
+            </td>
+        </tr>
+        <tr ng-repeat="user in FooterGridTableDetails track by $index">
+            <td class="Arrow">
+                CPE Supplier
+            </td>
+            <td class="Arrow">
+                {{user.SUPPLIER_CREATED_DT}}
+            </td>
+            <td class="Arrow">
+                {{user.SUPPLIER_CREATED_BY}}
+            </td>
+            <td class="Arrow">
+                {{user.SUPPLIER_UPDATED_DT}}
+            </td>
+            <td class="Arrow">
+                {{user.SUPPLIER_UPDATED_BY}}
+            </td>
+        </tr>
+        <tr ng-repeat="user in FooterGridTableDetails track by $index">
+            <td class="Arrow">
+                Country Assign 
+            </td>
+            <td class="Arrow">
+                {{user.cnt_assign_created_dt}}
+            </td>
+            <td class="Arrow">
+                {{user.CNT_assign_CREATED_BY}}
+            </td>
+            <td class="Arrow">
+                {{user.cnt_assign_updated_dt}}
+            </td>
+            <td class="Arrow">
+                {{user.CNT_assign_UPDATED_BY}}
+            </td>
+        </tr>
+        <tr ng-repeat="user in EmailAssignUnassign track by $index" ng-show="(PricingTypeitem == '15567') && (productitems!=null)">
+            <td class="Arrow">
+                Email
+            </td>
+            <td class="Arrow">
+                {{user.SUP_EMAIL_CREATED_DT}}
+            </td>
+            <td class="Arrow">
+                {{user.SUP_EMAIL_CREATED_BY}}
+            </td>
+            <td class="Arrow">
+                {{user.SUP_EMAIL_UPDATED_DT}}
+            </td>
+            <td class="Arrow">
+                {{user.SUP_EMAIL_UPDATED_BY}}
+            </td>
+        </tr>
+        <tr ng-repeat="user in EmailAssignUnassign track by $index" ng-show="(PricingTypeitem == '15570') && (productitems!=null)">
+            <td class="Arrow">
+                Access Type Assign 
+            </td>
+            <td class="Arrow">
+                {{user.ACC_TYPE_CREATED_DT}}
+            </td>
+            <td class="Arrow">
+                {{user.ACC_TYPE_CREATED_BY}}
+            </td>
+            <td class="Arrow">
+                {{user.ACC_TYPE_UPDATED_DT}}
+            </td>
+            <td class="Arrow">
+                {{user.ACC_TYPE_UPDATED_BY}}
+            </td>
+        </tr>
+    </table>
+    <div class="pageLoaderOverlay">
+    </div>
+</div>

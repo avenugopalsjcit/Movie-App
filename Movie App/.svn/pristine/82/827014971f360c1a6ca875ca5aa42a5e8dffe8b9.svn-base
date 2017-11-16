@@ -1,0 +1,119 @@
+﻿
+app.controller("PoPTypeMappingCtrl", ["$scope", "$http", "BindListBoxFactory", "$timeout", function ($scope, $http, BindListBoxFactory, $timeout) {
+
+    $(".pageLoaderOverlay").show();
+    BindListBoxFactory.Bind().success(function (data) {
+        $scope.modPopType = [];
+        $scope.ModelGPOP = [];
+        $scope.ModelAPoP = [];
+        $scope.ModelLLPoP = [];
+        $scope.FieldValue = data.d;
+        $http.post("ProductDefLastTwolinks.aspx/UnassignAccessMethods", { "FieldValue": $scope.FieldValue }).success(function (data) {
+
+            $scope.PoPtypeData = data.d;
+
+            $http.post("ProductDefLastTwolinks.aspx/GetAllGPOPs", { "FieldValue": $scope.FieldValue }).success(function (data) {
+
+                $scope.GPOPsData = data.d;
+                $http.post("ProductDefLastTwolinks.aspx/GetAllAPOPs", { "FieldValue": $scope.FieldValue }).success(function (data) {
+
+                    $scope.APoPsData = data.d;
+                    $http.post("ProductDefLastTwolinks.aspx/GetAllLLPOPs", { "FieldValue": $scope.FieldValue }).success(function (data) {
+
+                        $scope.LLPoPsData = data.d;
+                        $(".pageLoaderOverlay").hide();
+                    });
+                });
+            });
+
+        });
+
+    }).error(function (error) {
+
+        alert(" Problem occured while loading data" + error);
+        $(".pageLoaderOverlay").hide();
+    });
+    
+} ]);
+
+app.factory("BindListBoxFactory", function ($http) {
+    var BindListBoxFactory = {};
+    BindListBoxFactory.Bind = function () {
+        return $http.post("ProductDefLastTwolinks.aspx/GetFieldValue", {});
+    }
+    return BindListBoxFactory;
+});
+
+function savedata(PoPTypeIDs, SourceID, TargetID) {
+    $(".pageLoaderOverlay").show();
+
+    if (PoPTypeIDs != "") {
+        PoPTypeIDs = PoPTypeIDs.substring(0, PoPTypeIDs.length - 1);
+
+         var PoPIDs = [];
+         PoPIDs = PoPTypeIDs.split(',');
+         //SourceID = SourceID.toString().replace(',', '');
+
+
+         if ((TargetID == "GPoP" || TargetID == "APoP" || TargetID == "LLPoP") && (SourceID == "GPoP" || SourceID == "APoP" || SourceID == "LLPoP")) {
+             $(".pageLoaderOverlay").hide();
+           //  bootbox.alert("");
+             return false;
+         }
+
+
+            if(TargetID=="GPoP" || TargetID =="APoP" || TargetID=="LLPoP")
+            {
+        $.ajax({
+            url: "ProductDefLastTwolinks.aspx/PoPTypesInsert",
+            type: "POST",
+            async: true,
+            contentType: 'application/json; charset=utf-8',
+           
+            //        contentType: false,
+            //        processData: false,
+            data: JSON.stringify({ PoPTypeIDs: PoPIDs, SourceID: SourceID.toString(), TargetID: TargetID.toString() }),
+            dataType: 'json',
+            // dataType: "json",
+            success: function (data) {
+
+                $(".pageLoaderOverlay").hide();
+                bootbox.alert("Items Assigned   successfully");
+
+                // alert(result);
+            },
+            error: function (err) {
+                //  alert(err.statusText);
+                $(".pageLoaderOverlay").hide();
+            }
+        });
+        }
+    else {
+
+        $.ajax({
+            url: "ProductDefLastTwolinks.aspx/PopTypesDelete",
+            type: "POST",
+            async: true,
+            contentType: 'application/json; charset=utf-8',
+
+            //        contentType: false,
+            //        processData: false,
+            data: JSON.stringify({ PoPTypeIDs: PoPIDs, SourceID: SourceID.toString(), TargetID: TargetID.toString() }),
+            dataType: 'json',
+            // dataType: "json",
+            success: function (data) {
+
+                $(".pageLoaderOverlay").hide();
+                bootbox.alert("Items De-Assigned  successfully");
+
+                // alert(result);
+            },
+            error: function (err) {
+                //  alert(err.statusText);
+                $(".pageLoaderOverlay").hide();
+            }
+        });
+
+    }
+}return true;
+}

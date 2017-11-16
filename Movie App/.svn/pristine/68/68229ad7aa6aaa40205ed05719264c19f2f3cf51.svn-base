@@ -1,0 +1,16 @@
+﻿<div  >
+<div ng-controller="CaseDefinationCtrl">
+
+    <table>
+        <tr>
+            <td>Product test</td>
+            <td>
+                <select id="prodname" ng-model="Product" ng-options="prod.ProductID as prod.ProductName for prod in productdata" class="form-control">
+                	<option value="">--- Select ---</option>
+				</select>
+            </td>
+        </tr>
+    </table>
+
+</div>
+</div>

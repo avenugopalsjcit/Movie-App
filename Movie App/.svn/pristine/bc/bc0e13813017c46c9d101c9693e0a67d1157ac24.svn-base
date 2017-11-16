@@ -1,0 +1,487 @@
+﻿
+//var app = angular.module('app1', ['ngTable']);
+
+app.factory('AnnouncementGridFactory', function ($http) {
+
+    var AnnouncementGridFactory = {};
+
+    AnnouncementGridFactory.GetAnnouncementGrid = function () {
+
+        return $http.post('UpdateAnnouncements.aspx/GetGridAnnouncementsDetails', {});
+
+    }
+
+    return AnnouncementGridFactory;
+});
+
+
+app.factory('deletedetailsInfo', function ($http) {
+    var deletedetailsInfo = {};
+    deletedetailsInfo.removeRows = function (annid) {
+
+        return $http.post('UpdateAnnouncements.aspx/SaveAndDelete1', { 'annid': annid });
+    }
+    return deletedetailsInfo;
+});
+
+
+app.factory('AddNewAnnouncementInfo', function ($http) {
+
+    var AddNewAnnouncementInfo = {};
+    AddNewAnnouncementInfo.addNewTask = function (date, annenddate, anncreateddate, title, disc) {
+
+        return $http.post('UpdateAnnouncements.aspx/AddNewAnnouncement', { 'anndate': date, 'annenddate': annenddate, 'anncreateddate': anncreateddate, 'title': title, 'announcement': disc });
+    }
+    return AddNewAnnouncementInfo;
+});
+
+
+app.factory('UpdateAnnouncementInfo', function ($http) {
+    
+    var UpdateAnnouncementInfo = {};
+    UpdateAnnouncementInfo.UpdateNewTask = function (date, annenddate, anncreateddate, title, disc,annid) {
+
+        return $http.post('UpdateAnnouncements.aspx/UpdateNewAnnouncement', { 'anndate': date, 'annenddate': annenddate, 'anncreateddate': anncreateddate, 'title': title, 'announcement': disc , 'annid':annid });
+    }
+    return UpdateAnnouncementInfo;
+});
+
+app.controller('tableController1', ['$scope', 'AnnouncementGridFactory', 'NgTableParams', 'filterFilter', 'deletedetailsInfo', 'AddNewAnnouncementInfo', 'UpdateAnnouncementInfo', '$filter', '$window', function ($scope, AnnouncementGridFactory, NgTableParams, filterFilter, deletedetailsInfo, AddNewAnnouncementInfo, UpdateAnnouncementInfo, $filter, $window) {
+    $(".pageLoaderOverlay").show();
+    var self = this;
+
+    //    $scope.mainScope = {};
+    //    $scope.mainScope.myDate = moment().toDate();
+    //    $scope.dateFormat = "MM/DD/YYYY";
+    //    $scope.dates = [new Date(), new Date(), new Date(), new Date()];
+
+
+    var month = (1 + new Date().getMonth()).toString();
+    month = month.length > 1 ? month : '0' + month;
+    var day = new Date().getDate().toString();
+    day = day.length > 1 ? day : '0' + day;
+    $scope.anndate = month + '/' + day + '/' + new Date().getFullYear();
+
+
+
+    $scope.showNodata = false;
+
+    $scope.date = $filter("date")(Date.now(), 'yyyy-MM-dd');
+
+
+    AnnouncementGridFactory.GetAnnouncementGrid().success(function (data) {
+
+        $scope.CurrentScopeDate = new Date();
+
+        $scope.sample111 = data;
+
+
+        //        $scope.announcements = data.d;
+
+        //        var jsondata = $scope.announcements;
+        //        self.tableParams = new NgTableParams({},
+        //         { dataset: jsondata });
+        
+        if (data.d.length == 0) {
+
+           
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "No available Announcement(s)";
+        }
+        else {
+           
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+//            $scope.tableParams = new NgTableParams({
+//                page: 1, // show first page
+//                total: 1, // value less than count hide pagination
+//                count: 5 // count per page
+//            }, {
+//                counts: [] // hide page counts control
+//            });
+
+//            $scope.$watch('tableParams', function (params) {
+//                $scope.users = data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+//            }, true);
+//            $('.ng-table-pager').hide();
+//            if (data.d.length > 10) {
+//                $('.ng-table-pager').show();
+//            }
+            //            $("div[ng-table-pagination = 'params']").remove();
+        }
+
+        $(".pageLoaderOverlay").hide();
+
+    });
+
+
+
+
+    $scope.closemodal = function () {
+
+
+        $scope.userForm.$setPristine();
+        $scope.annenddate = $scope.title = $scope.announcement = "";
+        $('#divduplicatetitleerror').hide();
+    }
+
+
+    $scope.btnaddannouncement = function () {
+
+        //$scope.localScopeDate = new Date();
+
+        // $scope.localScopeDate = new Date(2010, 10, 10);
+        $scope.showNodata = false;
+        $scope.mainScope = {};
+        $scope.mainScope.myDate = moment().toDate();
+        $scope.dateFormat = "MM/DD/YYYY";
+        $scope.dates = [new Date(), new Date(), new Date(), new Date()];
+
+
+
+
+
+
+    }
+
+
+
+
+    $scope.addNewTask = function () {
+
+
+        AddNewAnnouncementInfo.addNewTask($scope.anndate, $scope.annenddate, "", $scope.title, $scope.announcement).success(function (data) {
+
+
+            if (data.d == 1) {
+                AnnouncementGridFactory.GetAnnouncementGrid().success(function (data) {
+                    $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+
+                    $('#tblAnnouncements').show();
+                    $('#basicModal').modal('hide');
+                    $scope.userForm.$setPristine();
+                    $scope.annenddate = $scope.title = $scope.announcement = "";
+                });
+
+            }
+            else if (data.d == 2) {
+
+                $('#divduplicatetitleerror').show();
+
+
+            }
+
+
+        });
+
+    }
+
+    $scope.EditAnnouncements = function (announcement) {
+        $scope.userForm1.$setPristine();
+        $('#divduplicatetitleerror').hide();
+
+
+
+        $scope.Editannstartdate = announcement.anndate;
+        $scope.Editannenddate = announcement.annenddate;
+        $scope.Edittitle = announcement.title;
+        $scope.Editannouncement = announcement.announcement;
+        $scope.Editannouncementid = announcement.annid;
+
+    }
+
+    $scope.UpdateNewTask = function () {
+
+
+        annid = "";
+
+
+        var index = 0;
+
+        var comArr = eval($scope.announcements);
+
+        annid = $('#Text4').val();
+        $scope.anndate1 = $('#editinputDate').val();
+        $scope.annenddate1 = $('#editinputendDate').val();
+        $scope.title1 = $('#Text3').val();
+        $scope.announcement1 = $('#Textarea1').val();
+
+
+        if (annid == "") {
+
+            return false;
+        }
+
+
+
+
+
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Do you really want to Update this Announcement?",
+            callback: function (result) {
+
+                if (result) {
+
+                    UpdateAnnouncementInfo.UpdateNewTask($scope.anndate1, $scope.annenddate1, "", $scope.title1, $scope.announcement1, annid).success(function (data) {
+
+
+                        if (data.d == 2) {
+
+                            $('#divduplicatetitleerroredit').show();
+
+
+                        }
+
+
+                        if (data.d == 1) {
+                            AnnouncementGridFactory.GetAnnouncementGrid().success(function (data) {
+
+                                $(".pageLoaderOverlay").hide();
+
+
+
+
+
+                                $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+
+
+                                if (data.d.length == 0) {
+
+
+                                    $scope.showNodata = true;
+                                    $('#tblAnnouncements').hide();
+                                    $scope.Nodata = "There are no Announcement(s).";
+                                }
+                                $('#btncloseupdateann').trigger('click');
+                            })
+
+                        }
+
+
+                    }).error(function (error) {
+                        alert("Problem occured while Updating Announcement; " + error);
+                    });
+                }; //end if
+            }
+        }); //bootend
+    };
+
+
+    $scope.removeRows = function (event) {
+
+        annid = "";
+
+
+        var index = 0;
+
+        var comArr = eval($scope.announcements);
+
+
+        annid = event;
+
+
+        var anntitle = $(this)[0].$$watchers[1].last;
+
+        if (annid == "") {
+
+            return false;
+        }
+
+
+
+
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you OK to delete '" + anntitle + "'?",
+            callback: function (result) {
+
+                if (result) {
+
+                    deletedetailsInfo.removeRows(annid).success(function (data) {
+
+
+
+
+
+                        AnnouncementGridFactory.GetAnnouncementGrid().success(function (data) {
+                            $(".pageLoaderOverlay").hide();
+
+
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            if (data.d.length == 0) {
+
+
+                                $scope.showNodata = true;
+                                $('#tblAnnouncements').hide();
+                                $scope.Nodata = "There are no Announcement(s).";
+                            }
+
+                        })
+
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while deleting Announcement; " + JSON.stringify(error));
+        });
+
+
+
+
+                    }).error(function (error) {
+                        alert("Problem occured while deleting Announcement; " + error);
+                    });
+                };
+            }
+        });
+    }
+
+    $(function () {
+
+
+
+
+
+        $("#inputDate").datepicker({ startDate: new Date() });
+        $("#editinputDate").datepicker({ startDate: new Date() });
+
+        $("#inputendDate").datepicker({ startDate: new Date() });
+
+        $("#editinputendDate").datepicker({ startDate: new Date() });
+
+        $("#inputendDate").datepicker();
+
+        $('#btnstartdate').on('click', function () {
+
+            $("#inputDate").datepicker('show');
+        })
+
+        $('#btnenddate').on('click', function () {
+
+            $("#inputendDate").datepicker('show');
+        })
+
+
+        $('#btnstartdateupdate').on('click', function () {
+
+            $("#editinputDate").datepicker('show');
+        })
+
+        $('#btnenddateupdate').on('click', function () {
+
+            $("#editinputendDate").datepicker('show');
+        })
+
+
+        $("#inputendDate").datepicker().on('changeDate', function (ev) {
+
+            $('#inputDate').datepicker('setEndDate', new Date($(this).val()));
+            $("#inputendDate").datepicker('hide');
+
+
+
+        });
+
+        $("#inputDate").datepicker().on('changeDate', function (ev) {
+
+            //            $('.datepicker').hide();
+            $('#inputendDate').datepicker('setStartDate', new Date($(this).val()));
+            $("#inputDate").datepicker('hide');
+
+
+        });
+
+        $("#editinputendDate").datepicker().on('changeDate', function (ev) {
+
+            $('#updateannouncement').removeAttr('disabled');
+            $('#editinputDate').datepicker('setEndDate', new Date($(this).val()));
+            $("#editinputendDate").datepicker('hide');
+
+
+
+        });
+
+        $("#editinputDate").datepicker().on('changeDate', function (ev) {
+
+            //            $('.datepicker').hide();
+
+            $('#updateannouncement').removeAttr('disabled');
+            $('#editinputendDate').datepicker('setStartDate', new Date($(this).val()));
+            $("#editinputDate").datepicker('hide');
+
+
+        });
+
+
+
+
+        $("#inputtitle").keyup(function () {
+
+            $('#divduplicatetitleerror').hide();
+
+
+        });
+
+        $("#Text3").keyup(function () {
+
+            $('#divduplicatetitleerroredit').hide();
+
+
+        });
+
+
+        //To handle Screen hang on backpress 
+
+        $(document).on('keydown', function (e) {
+            var $target = $(e.target || e.srcElement);
+            if (e.keyCode == 8 && !$target.is('input,[contenteditable="true"],textarea')) {
+                e.preventDefault();
+            }
+        })
+
+        $('#EditModalPopUpModal').on('click', function () {
+
+            if ($('#editinputDate').val() == "") {
+                $('#updateannouncement').attr('disabled', 'disabled');
+            }
+
+
+            if ($('#editinputendDate').val() == "") {
+
+                $('#updateannouncement').attr('disabled', 'disabled');
+            }
+
+
+
+
+
+        })
+
+
+    });
+
+
+
+
+
+} ]);
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+

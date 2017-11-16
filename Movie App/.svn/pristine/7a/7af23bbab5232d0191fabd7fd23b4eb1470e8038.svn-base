@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SCAdminDAL;
+using System.Data;
+
+namespace SCAdminBAL
+{
+   public  class CpeCountryAvailibityBAL
+    {
+       private CpeCountryAvailibityDAL objCpeCountryAvailibityDAL = new CpeCountryAvailibityDAL();
+
+        public List<CPECountryAvailability> GetCountryDetails()
+        {
+            DataTable dtAccessDetails = objCpeCountryAvailibityDAL.GetCountryDetails();
+            List<CPECountryAvailability> lstCountryDetails = new List<CPECountryAvailability>();
+            foreach (DataRow dr in dtAccessDetails.Rows)
+            {
+                CPECountryAvailability objCountryDetails = new CPECountryAvailability();
+                //objCountryDetails.CountryId = Convert.ToString(dr["COUNTRY_ID"]);
+                objCountryDetails.CountryName = Convert.ToString(dr["COUNTRY_NAME"]);
+
+                //objCountryDetails.SupplierId = Convert.ToString(dr["SUPPLIER_ID"]);
+                objCountryDetails.SupplierName = Convert.ToString(dr["CHAR_NAME"]);
+
+                objCountryDetails.ProductName = Convert.ToString(dr["PRODUCT_NAME"]);
+                objCountryDetails.AvtivityName = Convert.ToString(dr["ACTIVITY_NAME"]);
+                objCountryDetails.CpeAvailabilityStatus = Convert.ToString(dr["CPE_AVAILABILITY_STATUS"]);
+
+
+                lstCountryDetails.Add(objCountryDetails);
+            }
+            return lstCountryDetails;
+        }
+
+
+        public List<CPEMaintSupplierReport> GetCPEMaintSupplierReport()
+       {
+
+           objCpeCountryAvailibityDAL = new CpeCountryAvailibityDAL();
+
+           DataTable DtCntryAvailDetails = objCpeCountryAvailibityDAL.GetCPEMaintSupplierReport();
+           List<CPEMaintSupplierReport> lstMaintSuppReport = new List<CPEMaintSupplierReport>();
+           try
+           {
+               foreach (DataRow dr in DtCntryAvailDetails.Rows)
+               {
+                   CPEMaintSupplierReport objCPEMaintSupplierReport = new CPEMaintSupplierReport();
+                   objCPEMaintSupplierReport.CountryName = Convert.ToString(dr["country_name"]);
+                   objCPEMaintSupplierReport.ProductName = Convert.ToString(dr["product"]);
+                   objCPEMaintSupplierReport.ManufacturerName = Convert.ToString(dr["manufacturer_name"]);
+                   objCPEMaintSupplierReport.DistributorName = Convert.ToString(dr["distributor_name"]);
+                   objCPEMaintSupplierReport.Maintainer = Convert.ToString(dr["Maintainer"]);
+                   objCPEMaintSupplierReport.Installer = Convert.ToString(dr["Installer"]);
+                   objCPEMaintSupplierReport.InstallerType = Convert.ToString(dr["supp_type"]);
+                   objCPEMaintSupplierReport.PricingType = Convert.ToString(dr["pricing_type"]);
+                   objCPEMaintSupplierReport.SmartAvailability = Convert.ToString(dr["SMART_SERVICE_AVAIL"]);
+
+                   lstMaintSuppReport.Add(objCPEMaintSupplierReport);
+               }
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return lstMaintSuppReport;
+       }
+    }
+}

@@ -1,0 +1,488 @@
+﻿app.factory('AdminCallerAccessSupplierGridFactory', function ($http) {
+
+    var AdminCallerAccessSupplierGridFactory = {};
+
+    AdminCallerAccessSupplierGridFactory.GetAdminCallerAccessSupplierGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminCallerAccessSupplierView', { });
+
+    }
+
+    return AdminCallerAccessSupplierGridFactory;
+});
+
+
+app.factory('AdminCallerAccessDropdownFactory', function ($http) {
+
+    var AdminCallerAccessDropdownFactory = {};
+
+    AdminCallerAccessDropdownFactory.GetAdminCallerAccessSupplierDropdownGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminCallerAccessSupplierDropdown', {  });
+
+    }
+
+    return AdminCallerAccessDropdownFactory;
+});
+
+app.factory('AdminCallerAccessMatrixFactory', function ($http) {
+
+    var AdminCallerAccessMatrixFactory = {};
+
+    AdminCallerAccessMatrixFactory.GetCallerAccessSupplier = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminCallerAccessSupplierMatrix', {  });
+
+    }
+
+    return AdminCallerAccessMatrixFactory;
+});
+
+app.factory('SetDropdownProductsFactory', function ($http) {
+
+    var SetDropdownProductsFactory = {};
+
+    SetDropdownProductsFactory.SetProductsDetails = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/SetDropdownAdminCallerAccessSupplierMatrix', { 'OptionMatrixId': OptionMatrixId });
+
+    }
+
+    return SetDropdownProductsFactory;
+});
+
+app.factory('SetCharIdFactory', function ($http) {
+
+    var SetCharIdFactory = {};
+
+    SetCharIdFactory.SetCharIDDetails = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminCallerAccessSupplierCharids', { 'OptionMatrixId': OptionMatrixId });
+
+    }
+
+    return SetCharIdFactory;
+});
+
+app.factory('CallerSuppMaxVal', function ($http) {
+
+    var CallerSuppMaxVal = {};
+
+    CallerSuppMaxVal.GetCallerSuppMaxval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxCallerSupplierCD', {});
+
+    }
+
+    return CallerSuppMaxVal;
+});
+
+app.factory('CallerSuppValInsert', function ($http) {
+
+    var CallerSuppValInsert = {};
+
+    CallerSuppValInsert.GetInsertval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/InsertAdminCallerSupplier', { 'DepId': DepId, 'DepOptionMatrixID': DepOptionMatrixID,
+                                                                         'DepProductCD': DepProductCD, 'DepSubproductCD': DepSubproductCD,
+                                                                         'DepCharTypeID': DepCharTypeID, 'DepCharID': DepCharID,
+                                                                         'ArrAvailCD': ArrAvailCD, 'ArrOptionMatrixId': ArrOptionMatrixId, 'ProductCD': ProductCD,
+                                                                         'SubProductCD': SubProductCD, 'CharTypeId': CharTypeId, 'ArrCharId': ArrCharId,
+                                                                         'DepValidCD': DepValidCD, 'User_Id': User_Id
+                                                                     });
+
+    }
+
+    return CallerSuppValInsert;
+});
+app.factory('CallerSuppDelete', function ($http) {
+
+    var CallerSuppDelete = {};
+
+    CallerSuppDelete.GetCallerSuppDel = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/DeleteAdminCallerSupplier', { 'DepProductCD': DepProductCD, 'DepSubproductCD': DepSubproductCD, 'DepOptionMatrixID': DepOptionMatrixID });
+
+    }
+
+    return CallerSuppDelete;
+});
+
+app.controller('CallerAccessSupplierCtrl', ['$scope', 'AdminCallerAccessSupplierGridFactory', 'AdminCallerAccessDropdownFactory', 'AdminCallerAccessMatrixFactory', 'NgTableParams', 'SetDropdownProductsFactory', 'SetCharIdFactory', 'CallerSuppMaxVal', 'CallerSuppValInsert', 'CallerSuppDelete', '$timeout', function ($scope, AdminCallerAccessSupplierGridFactory, AdminCallerAccessDropdownFactory, AdminCallerAccessMatrixFactory, NgTableParams, SetDropdownProductsFactory, SetCharIdFactory, CallerSuppMaxVal, CallerSuppValInsert, CallerSuppDelete, $timeout) {
+
+
+
+
+
+
+
+
+
+
+
+
+    AccessLevel = User_id = ""
+    AccessLevel = $scope.AccessLevel;
+    User_id = $scope.User_Id;
+
+
+
+
+    AdminCallerAccessSupplierGridFactory.GetAdminCallerAccessSupplierGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+        $scope.GlossaryGrid = data;
+
+
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+    //$(".pageLoaderOverlay").hide();
+    var Product = ArrAvailCD = ArrOptionMatrixId = ArrCharId = DepId = DepIdNew = "";
+    //CategoryDescription = "", CategoryId = "";
+    $scope.addNewTask = function () {
+
+
+        $scope.GlossaryTerm = "";
+        $scope.GlossaryDesc = "";
+
+        AccessLevel = $scope.AccessLevel;
+        User_id = $scope.User_Id;
+        AdminGlossaryProductsGridFactory.GetAdminGlossaryProductGrid().success(function (data) {
+            $scope.Products = data.d;
+            if (data.d.length == 0) {
+
+
+                $scope.showNodata = true;
+                $('#tblAnnouncements').hide();
+                $scope.Nodata = "There are no Announcement(s).";
+            }
+            else {
+                $scope.showNodata = false;
+                $scope.usersTable1 = new NgTableParams({}, { 'dataset': data.d });
+
+                $(".pageLoaderOverlay").hide();
+
+                //$("div[ng-table-pagination = 'params']").remove();
+            }
+            $(".pageLoaderOverlay").hide();
+        });
+        $scope.Reset = 0;
+    }
+
+
+    $scope.EditRecord = function (category) {
+        ArrCharId = ArrOptionMatrixId = ArrAvailCD = "";
+        OptionMatrixId = category.OptionMatrixId;
+        $scope.Reset = 1;
+
+
+        $scope.CaseAvailability = [];
+        AdminCallerAccessMatrixFactory.GetCallerAccessSupplier().success(function (data) {
+            $(".Select1").select2({});
+
+            $scope.usersTable1 = data.d;
+
+            for (var j = 0; j < data.d.length; j++) {
+                ArrOptionMatrixId += $scope.usersTable1[j].OptionMatrixId + ",";
+            }
+
+
+            SetDropdownProductsFactory.SetProductsDetails().success(function (data) {
+
+                $scope.SetDropdown = data.d;
+               
+                   
+         
+                //$scope.SetDropdown.CharId.join(',');
+                for (var j = 0; j <= $scope.SetDropdown.length - 1; j++) {
+
+                    //ArrAvailCD += $scope.SetDropdown[j].AvailCD + ",";
+                    ArrCharId += $scope.SetDropdown[j].CharId + ",";
+                    DepOptionMatrixID = $scope.SetDropdown[j].DepOptionMatrixId;
+                    //DepProductCD = $scope.SetDropdown[j].DepProductCD;
+                    DepProductCD = $scope.SetDropdown[j].DepProductCD;
+                    DepSubproductCD = $scope.SetDropdown[j].DepSubproductCD;
+                    DepCharTypeID = $scope.SetDropdown[j].DepCharTypeID;
+                    DepCharID = $scope.SetDropdown[j].DepCharID;
+                    ProductCD = $scope.SetDropdown[j].ProductCd;
+                    SubProductCD = $scope.SetDropdown[j].SubProductCd;
+                    CharTypeId = $scope.SetDropdown[j].CharTypeID;
+                    DepValidCD = $scope.SetDropdown[j].DepValidCD;
+                    User_Id = $scope.User_Id;
+                    for (var i = 0; i <= $scope.usersTable1.length - 1; i++) {
+                        if ($scope.usersTable1[j].OptionMatrixId == $scope.SetDropdown[i].OptionMatrixId) {
+                            // $scope.
+                            $scope.CaseAvailability.push($scope.SetDropdown[i].AvailCD);
+                           
+                            // $('table > tbody > tr > td > div > select')[j].selected = $scope.Avalability[i].AvailCD
+                        }
+
+
+
+                    }
+
+                }
+                $timeout(function () {
+                    for (i = 0; i <= $scope.CaseAvailability.length - 1; i++) {
+
+                $("#ddlCaseAvailability" + i).select2({});
+                $('#divAvail' + i + ' .select2-chosen').html($scope.CaseAvailability[i]);
+
+            }
+
+            $(".pageLoaderOverlay").hide();
+
+        }, 1000);
+                if ($scope.SetDropdown.length == 0) {
+                    for (var i = 0; i <= 8; i++) {
+                        $scope.Avalability[j].AvailCD = 16;
+                        $scope.CaseAvailability.push($scope.Avalability[j].AvailCD);
+
+                    }
+                    $timeout(function () {
+                        for (i = 0; i <= $scope.SetDropdown.length - 1; i++) {
+
+                            $("#ddlCaseAvailability" + i).select2({});
+                            $('#divAvail' + i + ' .select2-chosen').html($scope.CaseAvailability[i]);
+
+                        }
+
+                        $(".pageLoaderOverlay").hide();
+
+                    }, 1000);
+                    DepOptionMatrixID = category.OptionMatrixId;
+                    //DepProductCD = $scope.SetDropdown[j].DepProductCD;
+
+                    for (var j = 0; j < $scope.usersTable1.length; j++) {
+                        ArrCharId += $scope.usersTable1[j].DepCharID + ",";
+                        DepProductCD = $scope.usersTable1[j].DepProductCD;
+                        DepSubproductCD = $scope.usersTable1[j].DepSubproductCD;
+                        CharTypeId = $scope.usersTable1[j].DepCharTypeID;
+                        ProductCD = 0;
+                        SubProductCD = 0;
+                        DepValidCD = 1;
+                        User_Id = $scope.User_Id;
+
+
+                    }
+                    SetCharIdFactory.SetCharIDDetails().success(function (data) {
+                        DepCharTypeID = data.d[0].DepCharTypeID;
+                        DepCharID = data.d[0].DepCharID;
+                    });
+
+                }
+               
+            });
+
+        });
+     
+
+
+
+
+
+        AccessLevel = $scope.AccessLevel;
+        User_id = $scope.User_Id;
+
+
+    }
+
+    AdminCallerAccessDropdownFactory.GetAdminCallerAccessSupplierDropdownGrid().success(function (data) {
+
+        $scope.Avalability = data.d;
+
+
+
+    });
+
+
+
+
+
+
+
+    $scope.ResetRecord = function () {
+
+        $scope.CaseAvailability = [];
+
+        for (var j = 0; j <= $scope.SetDropdown.length - 1; j++) {
+            for (var i = 0; i <= $scope.usersTable1.length - 1; i++) {
+                // == $scope.SetDropdown[i].OptionMatrixId
+                if ($scope.usersTable1[j].OptionMatrixId == $scope.SetDropdown[i].OptionMatrixId) {
+                    // $scope.
+                    $scope.CaseAvailability.push($scope.SetDropdown[i].AvailCD);
+                 
+                    // $('table > tbody > tr > td > div > select')[j].selected = $scope.Avalability[i].AvailCD
+                }
+
+
+
+            }
+
+        }
+        $timeout(function () {
+            for (i = 0; i <= $scope.SetDropdown.length - 1; i++) {
+
+                $("#ddlCaseAvailability" + i).select2({});
+                $('#divAvail' + i + ' .select2-chosen').html($scope.CaseAvailability[i]);
+
+            }
+
+            $(".pageLoaderOverlay").hide();
+
+        }, 1000);
+    }
+
+
+
+    $scope.SaveAdminAvail = function () {
+
+        for (var i = 0; i < $scope.CaseAvailability.length; i++) {
+            ArrAvailCD += $scope.CaseAvailability[i] + ","
+        }
+
+        //        productID = productId;
+
+        //        ProductLocLevelCd = $scope.ProductLocLevelCD;
+        //        Title = $scope.Title;
+        //        Description = $scope.Description;
+        //        DocumentURL = $scope.DocumentURL;
+        //        strAvailCd = $scope.DocumentId;
+        //        strAvailAbbr = $scope.AvailabilityAbbr;
+        User_id = $scope.User_Id;
+
+        //        if (productID == 0 || $scope.Title == "" || $scope.DocumentURL == "" || $scope.Description == "") {
+        //        }
+        //        else {
+
+        //            ProductCD =
+        //            SubproductCD =
+        //            OptionmatrixID =
+        CallerSuppDelete.GetCallerSuppDel().success(function (data) {
+
+            // debugger;
+            //                ProductCD = data.d;
+            //                ProductId = productID;
+            CallerSuppMaxVal.GetCallerSuppMaxval().success(function (data) {
+
+
+                DepId = data.d;
+
+                DepId = DepId + 10;
+                CallerSuppValInsert.GetInsertval().success(function (data) {
+
+                    AdminCallerAccessSupplierGridFactory.GetAdminCallerAccessSupplierGrid().success(function (data) {
+
+                        $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                        $(".pageLoaderOverlay").hide();
+                    });
+
+                });
+            });
+        });
+
+
+        //        }
+
+    }
+
+    $scope.change = function (ProductId) {
+        productId = $scope.ProductName;
+        $(".pageLoaderOverlay").hide();
+    }
+
+
+//    $scope.UpdateAdminAvail = function (DocumentId) {
+
+//        //DocumentId = category.DocumentId;
+//        productID = productId;
+
+//        ProductLocLevelCd = ProductLocLevelCD;
+//        Title = $scope.Title;
+//        Description = $scope.Description;
+//        DocumentURL = $scope.DocumentURL;
+//        strAvailCd = $scope.DocumentId;
+//        //        strAvailAbbr = $scope.AvailabilityAbbr;
+//        User_id = $scope.User_Id;
+
+
+//        DocumentUpdateFactory.GetDocUpdate().success(function (data) {
+//            AdminDocumentationGridFactory.GetAdminAddressGrid().success(function (data) {
+
+//                $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+//                $(".pageLoaderOverlay").hide();
+//            });
+//        });
+
+//    }
+
+
+//    $scope.DeleteAdminAvail = function (category) {
+//        strAvailCd = category.DocumentId;
+//        bootbox.confirm({
+//            "className": "my-custom-class",
+//            message: "Are you sure to delete Notes Category? " + category.DocumentDesc,
+//            callback: function (result) {
+//                if (result) {
+//                    $(".pageLoaderOverlay").hide();
+//                    GlossaryDeleteFactory.GetGlossaryDelete(strAvailCd).success(function (data) {
+
+
+
+//                        AdminDocumentationGridFactory.GetAdminAddressGrid().success(function (data) {
+
+//                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+//                            $(".pageLoaderOverlay").hide();
+//                        });
+//                    });
+//                }
+
+//            }
+//        });
+
+
+
+
+//    }
+
+
+
+
+
+
+
+
+
+} ]);
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

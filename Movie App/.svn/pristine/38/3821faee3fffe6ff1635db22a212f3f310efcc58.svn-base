@@ -1,0 +1,487 @@
+﻿app.factory('AdminGlossaryGridFactory', function ($http) {
+
+    var AdminGlossaryGridFactory = {};
+
+    AdminGlossaryGridFactory.GetAdminGlossaryGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminGlossaryView', { 'AccessLevel': AccessLevel, 'User_id': User_id });
+
+    }
+
+    return AdminGlossaryGridFactory;
+});
+
+
+app.factory('AdminGlossaryProductsGridFactory', function ($http) {
+
+    var AdminGlossaryProductsGridFactory = {};
+
+
+    AdminGlossaryProductsGridFactory.GetAdminGlossaryProductGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminGlossaryProductView', { 'AccessLevel': AccessLevel, 'User_id': User_id });
+
+    }
+
+    return AdminGlossaryProductsGridFactory;
+});
+
+app.factory('AdminGlossaryFactory', function ($http) {
+
+    var AdminGlossaryFactory = {};
+
+    AdminGlossaryFactory.GetAdminGlossary = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetAdminGlossaryView', { 'ProductCD': ProductCD, 'lblGlossaryTerm': lblGlossaryTerm });
+
+    }
+
+    return AdminGlossaryFactory;
+});
+
+//check not needed
+app.factory('CategoryProductsFactory', function ($http) {
+
+    var CategoryProductsFactory = {};
+
+    CategoryProductsFactory.GetProductsDetails = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetProductDocumentationView', { 'AccessLevel': AccessLevel, 'User_id': User_id });
+
+    }
+
+    return CategoryProductsFactory;
+});
+
+app.factory('GlossaryInsertFactory', function ($http) {
+
+    var GlossaryInsertFactory = {};
+
+    GlossaryInsertFactory.GetGlossaryInsert = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/InsertUpdateAdminGlossary', { 'ProductCD': ProductCD, 'TermName': TermName, 'TermDesc': TermDesc, 'User_id': User_id });
+
+    }
+
+    return GlossaryInsertFactory;
+});
+
+//check not needed
+app.factory('DocumentUpdateFactory', function ($http) {
+
+    var DocumentUpdateFactory = {};
+
+    DocumentUpdateFactory.GetDocUpdate = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/UpdateAdminDocumentation', { 'productID': productID, 'ProductLocLevelCd': ProductLocLevelCd, 'Title': Title, 'DocumentURL': DocumentURL, 'Description': Description, 'User_id': User_id, 'strAvailCd': strAvailCd });
+
+    }
+
+    return DocumentUpdateFactory;
+});
+
+
+app.factory('GlossaryDeleteFactory', function ($http) {
+
+    var GlossaryDeleteFactory = {};
+
+    GlossaryDeleteFactory.GetGlossaryDelete = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/DeleteAdminGlossary', { 'TermName': TermName, 'ProductCD': ProductCD });
+
+    }
+
+    return GlossaryDeleteFactory;
+});
+
+//check not needed
+app.factory('DocumentationMaxVal', function ($http) {
+
+    var DocumentationMaxVal = {};
+
+    DocumentationMaxVal.GetDocumentMaxval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetMaxDocumentationCD', {});
+
+    }
+
+    return DocumentationMaxVal;
+});
+
+//check not needed
+app.factory('DocumentationLocLevelVal', function ($http) {
+
+    var DocumentationLocLevelVal = {};
+
+    DocumentationLocLevelVal.GetDocumentLocLevelval = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetProductLevelCDDocumentationCD', { "ProductId": ProductId });
+
+    }
+
+    return DocumentationLocLevelVal;
+});
+app.factory('GlossaryPopupGrid', function ($http) {
+
+    var GlossaryPopupGrid = {};
+
+    GlossaryPopupGrid.GetGlossaryPopup = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/PopupGridAdminGlossary', { 'TermId': TermId });
+
+    }
+
+    return GlossaryPopupGrid;
+});
+
+app.controller('GlossaryCtrl', ['$scope', 'AdminGlossaryGridFactory', 'AdminGlossaryProductsGridFactory', 'AdminGlossaryFactory', 'NgTableParams', 'CategoryProductsFactory', 'GlossaryInsertFactory', 'DocumentUpdateFactory', 'GlossaryDeleteFactory', 'GlossaryPopupGrid', function ($scope, AdminGlossaryGridFactory, AdminGlossaryProductsGridFactory, AdminGlossaryFactory, NgTableParams, CategoryProductsFactory, GlossaryInsertFactory, DocumentUpdateFactory, GlossaryDeleteFactory, GlossaryPopupGrid) {
+
+
+
+
+
+    $scope.checkidcall = function () {
+        productCD = ""
+        if (angular.isUndefined($scope.usersTable1) && $scope.Reset == 1) {
+            if ($scope.GlossaryDesc == "" || angular.isUndefined($scope.GlossaryDesc)) {
+                $("#updatebtn").prop('disabled', true);
+            }
+            else {
+                $("#updatebtn").prop('disabled', false);
+            }
+        }
+
+        for (var i = 0; i < $scope.usersTable1.length; i++) {
+            if ($('.chkcls')[i].checked == true) {
+                productCD += $scope.usersTable1[i].ProductCD + ",";
+                //productCD += productCD + ",";
+            }
+
+        }
+        for (var i = 0; i < $scope.usersTable2.length; i++) {
+            if ($('.chkcls1')[i].checked == true) {
+                productCD += $scope.usersTable2[i].ProductCD + ",";
+                //productCD += productCD + ",";
+            }
+        }
+        if ($scope.GlossaryDesc == "" || angular.isUndefined($scope.GlossaryDesc) || angular.isUndefined($scope.GlossaryTerm) || $scope.GlossaryTerm == "" || productCD == "") {
+            $("#submitbtn").prop('disabled', true);
+        }
+        else {
+
+            $("#submitbtn").prop('disabled', false);
+        }
+        if ($scope.Reset == 1) {
+            if ($scope.GlossaryDesc == "" || angular.isUndefined($scope.GlossaryDesc)) {
+                $("#updatebtn").prop('disabled', true);
+            }
+            else {
+                $("#updatebtn").prop('disabled', false);
+            }
+        }
+
+    }
+
+    $scope.checkid1call = function () {
+        productCD = ""
+        for (var i = 0; i < $scope.usersTable1.length; i++) {
+            if ($('.chkcls')[i].checked == true) {
+                productCD += $scope.usersTable1[i].ProductCD + ",";
+                //productCD += productCD + ",";
+            }
+        }
+
+        for (var i = 0; i < $scope.usersTable2.length; i++) {
+            if ($('.chkcls1')[i].checked == true) {
+                productCD += $scope.usersTable2[i].ProductCD + ",";
+                //productCD += productCD + ",";
+            }
+        }
+        if ($scope.GlossaryDesc == "" || angular.isUndefined($scope.GlossaryDesc) || angular.isUndefined($scope.GlossaryTerm) || $scope.GlossaryTerm == "" || productCD == "") {
+            $("#submitbtn").prop('disabled', true);
+        }
+        else {
+
+            $("#submitbtn").prop('disabled', false);
+        }
+
+    }
+
+
+
+
+
+
+    AccessLevel = User_id = ""
+    AccessLevel = $scope.AccessLevel;
+    User_id = $scope.User_Id;
+
+
+
+    AdminGlossaryGridFactory.GetAdminGlossaryGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+        $scope.GlossaryGrid = data;
+
+
+
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+    //$(".pageLoaderOverlay").hide();
+    productCD = TermName = TermDesc = ProductCD = lblGlossaryTerm = GlossaryProduct = GlossaryDesc = TermId = ""
+    //CategoryDescription = "", CategoryId = "";
+    $scope.addNewTask = function () {
+
+
+        $scope.GlossaryTerm = "";
+        $scope.GlossaryDesc = "";
+        $scope.Status = "";
+        AccessLevel = $scope.AccessLevel;
+        User_id = $scope.User_Id;
+        AdminGlossaryProductsGridFactory.GetAdminGlossaryProductGrid().success(function (data) {
+            $scope.Products = data.d;
+            if (data.d.length == 0) {
+
+
+                $scope.showNodata = true;
+                $('#tblAnnouncements').hide();
+                $scope.Nodata = "There are no Announcement(s).";
+            }
+            else {
+                $scope.showNodata = false;
+                $scope.usersTable1 = new NgTableParams({}, { 'dataset': data.d });
+                $scope.usersTable1 = data.d.splice(0, 24);
+                $scope.usersTable2 = data.d;
+                $(".pageLoaderOverlay").hide();
+                //$("div[ng-table-pagination = 'params']").remove();
+            }
+            $(".pageLoaderOverlay").hide();
+        });
+        $scope.Reset = 0;
+    }
+
+
+    $scope.EditRecord = function (category) {
+
+
+        lblGlossaryTerm = category.TermName;
+        ProductCD = category.ProductCD;
+        AdminGlossaryFactory.GetAdminGlossary().success(function (data) {
+            $scope.GlossaryDesc = data;
+
+            $scope.lblGlossaryTerm = category.TermName;
+            $scope.GlossaryProduct = category.ProductName;
+            $scope.TermId = data.d[0].TermId;
+            $scope.GlossaryDesc = data.d[0].TermDesc;
+            lblGlossaryTerm = category.TermName;
+            GlossaryProduct = category.ProductName;
+            GlossaryDesc = $scope.GlossaryDesc;
+            TermId = data.d[0].TermId;
+            $scope.Reset = 1;
+            if ($scope.GlossaryDesc == "" || angular.isUndefined($scope.GlossaryDesc)) {
+                $("#updatebtn").prop('disabled', true);
+            }
+            else {
+                $("#updatebtn").prop('disabled', false);
+            }
+            GlossaryPopupGrid.GetGlossaryPopup(TermId).success(function (data) {
+                $scope.usersTable2 = data.d;
+                $(".pageLoaderOverlay").hide();
+            });
+        });
+
+
+
+
+        AccessLevel = $scope.AccessLevel;
+        User_id = $scope.User_Id;
+
+
+    }
+
+
+
+
+
+
+    $scope.ResetRecord = function () {
+
+
+
+        $scope.GlossaryDesc = GlossaryDesc;
+
+
+    }
+
+
+
+    $scope.SaveAdminAvail = function (DocumentId) {
+        // debugger;
+        for (var i = 0; i < $scope.usersTable1.length; i++) {
+            if ($('.chkcls')[i].checked == true) {
+                ProductCD += $scope.usersTable1[i].ProductCD + ",";
+                //productCD += productCD + ",";
+            }
+        }
+
+        for (var i = 0; i < $scope.usersTable2.length; i++) {
+            if ($('.chkcls1')[i].checked == true) {
+                ProductCD += $scope.usersTable2[i].ProductCD + ",";
+                //productCD += productCD + ",";
+            }
+        }
+
+        //ProductCD = $scope.ProductCD;
+        TermName = $scope.GlossaryTerm;
+        TermDesc = $scope.GlossaryDesc;
+
+        $scope.Status = "Insert";
+        User_id = $scope.User_Id;
+
+        if (ProductCD == 0 || $scope.lblGlossaryTerm == "" || $scope.GlossaryDesc == "") {
+        }
+        else {
+            GlossaryInsertFactory.GetGlossaryInsert().success(function (data) {
+
+
+                AdminGlossaryGridFactory.GetAdminGlossaryGrid().success(function (data) {
+
+                    $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                    $(".pageLoaderOverlay").hide();
+                    //                        });
+
+                    //                    });
+                });
+            });
+
+
+        }
+
+    }
+
+    $scope.change = function (ProductId) {
+        productId = $scope.ProductName;
+        $(".pageLoaderOverlay").hide();
+    }
+
+
+    $scope.UpdateAdminAvail = function (DocumentId) {
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to update Glossary?",
+            callback: function (result) {
+                if (result) {
+                    //DocumentId = category.DocumentId;
+                    ProductCD = ProductCD;
+                    TermName = $scope.lblGlossaryTerm;
+                    TermDesc = $scope.GlossaryDesc;
+
+                    $scope.Status = "Update";
+                    User_id = $scope.User_Id;
+
+
+                    GlossaryInsertFactory.GetGlossaryInsert().success(function (data) {
+                        AdminGlossaryGridFactory.GetAdminGlossaryGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+
+                            bootbox.alert({
+                                "message": "Glossary Updated Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+                    });
+                }
+            }
+        });
+
+    }
+
+
+    $scope.DeleteAdminAvail = function (category) {
+        ProductCD = category.ProductCD;
+        TermName = category.TermName;
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Notes Category? " + category.TermName,
+            callback: function (result) {
+                if (result) {
+                    $(".pageLoaderOverlay").hide();
+                    GlossaryDeleteFactory.GetGlossaryDelete().success(function (data) {
+
+                        $scope.Status = data.d;
+
+                        AdminGlossaryGridFactory.GetAdminGlossaryGrid().success(function (data) {
+
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                        });
+                    });
+                }
+
+            }
+        });
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+} ]);
+
+
+//app.directive('autoComplete', function ($timeout) {
+//    return function (scope, iElement, iAttrs) {
+//        iElement.autocomplete({
+//            source: scope[iAttrs.uiItems],
+//            select: function () {
+//                $timeout(function () {
+//                    iElement.trigger('input');
+//                }, 0);
+//            }
+//        });
+//    };
+//});
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

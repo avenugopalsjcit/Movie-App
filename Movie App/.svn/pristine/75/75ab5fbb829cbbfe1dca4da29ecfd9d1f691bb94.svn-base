@@ -1,0 +1,648 @@
+﻿<style>
+    /* draggable targets */
+    
+    
+    
+    #multiselecttable
+    {
+        width: 100% !important;
+    }
+    input[type='button']
+    {
+        width: 100px !important;
+    }
+    .clsddlProducttype, .editProduct
+    {
+        width: 250px;
+    }
+    
+    
+    #tblEditProduct > tbody > tr > td
+    {
+        padding: 0px 61px 19px 4px !important;
+    }
+    
+    #tblEditProduct > tbody > tr > td > label
+    {
+        margin-bottom: -5px;
+    }
+    
+    #tblEditProduct tbody tr td input[type='text']
+    {
+        width: 250px;
+    }
+    
+    #tblEditProduct tbody tr td select
+    {
+        width: 250px;
+    }
+    
+    .formproduct > tbody > tr > td:nth-child(3n+3)
+    {
+        /*color: #ccc;*/
+        margin-left: 28px !important;
+        position: absolute;
+    }
+    
+    
+    .innertable > tbody > tr > td:nth-child(2n+2)
+    {
+        /*color: #ccc;*/
+        margin-left: 182px !important;
+        position: absolute;
+    }
+    .innertable > tbody > tr > td
+    {
+        padding-bottom: 30px;
+    }
+    
+    .formproduct > tbody > tr > td:nth-child(4n+4)
+    {
+        /*color: #ccc;*/
+        margin-left: 27em !important;
+        position: absolute;
+    }
+    
+    #Mapping_Interfaces > tbody > tr > td > select
+    {
+        width: 40em;
+        margin-bottom: 2px;
+        padding-top: 0px;
+        height: 14em;
+    }
+    #Mapping_Interfaces > tbody > tr > td
+    {
+        vertical-align: top;
+        text-align: center;
+    }
+    
+    
+    table > thead > tr > th
+    {
+        text-align: center;
+        cursor: default;
+    }
+    
+    #addNewProductModal select + span
+    {
+        color: Red;
+    }
+    
+    .innertable:hover
+    {
+        background-color:Red;
+    }
+    
+    
+    
+    /* canvas styles */
+    
+    
+    /* draggable targets */
+</style>
+<div ng-controller="productCtrl" id="divddlCharacteristicType">
+    <div class="form-horizontal col-md-12" style="margin-left: 14px">
+        <div class="container" style="margin-left: 0px; margin-bottom: 10px">
+            <div class="col-md-2" style="margin-left: -27px;">
+                <h3 style="margin-left: 0em;">
+                    <span style="cursor: default">Product</span></h3>
+            </div>
+            <div class="" style="margin-left: 79em;">
+                <a data-target="#addNewProductModal" data-toggle="modal" class="btn btn-primary btn-sm"
+                    ng-click="ResetProducts(ServiceTypes)">Add Product</a>
+            </div>
+        </div>
+        <div class="row col-md-8" style="margin-left: -7px">
+            <div class="col-md-3" style="margin-left: -20px">
+                <label>
+                    Product</label></div>
+            <!--ng-change="GetProductDetailsById(DDL_PL_Product)"-->
+            <div class="col-md-5" style="padding-left: 68px">
+                <select ng-model="DDL_PL_Product" style="width: 250px" ng-options="item.product_id as item.ProductName for item in ProductsList"
+                    id="DDL_PL_Product">
+                    <option value=''>&nbsp&nbsp--&nbsp Please Select &nbsp--</option>
+                </select>
+            </div>
+            <div>
+                <input type="button" class="btn btn-primary" value="GO" ng-click="GetProducts(DDL_PL_Product);IseditProduct=true" />
+            </div>
+        </div>
+        <!--{{EditProduct}}-->
+        <div ng-show="pageLoad">
+            <table style="margin-top: 82px" id="tblEditProduct">
+                <tr>
+                    <td>
+                        <label>
+                            Product Type</label>
+                    </td>
+                    <td>
+                        <!--    track by option.PRODUCT_TYPE-->
+                        <select class="editProduct" ng-model="EditProduct.PRODUCT_TYPE" ng-options="option.PRODUCT_TYPE as option.PRODUCT_DESC for option in ServiceTypes.CSU_PRODUCT_TYPE">
+                        </select>
+                    </td>
+                    <td>
+                        <label>
+                            Country is required for all National Products</label>
+                    </td>
+                    <td>
+                        <!--   <select class="editProduct" ng-model="EditProduct" 
+                        ng-options="item.COUNTRY_NAME for item in ServiceTypes.CSU_COUNTRY track by item.COUNTRY_ID">
+                        </select>-->
+                        <select class="editProduct" ng-model="EditProduct.COUNTRY_ID" ng-options="item.COUNTRY_ID as item.COUNTRY_NAME for item in ServiceTypes.CSU_COUNTRY">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>
+                            Product Level</label>
+                    </td>
+                    <td>
+                        <select class="editProduct" ng-model="EditProduct.PRODUCT_LOC_LEVEL_CD" ng-options="item.PRODUCT_LOC_LEVEL_CD as item.PRODUCT_LOC_LEVEL_DESC for item in ServiceTypes.CSU_REF_PRODUCT_LOC_LEVEL">
+                        </select>
+                    </td>
+                    <td>
+                        <label>
+                            Abbreviation</label>
+                    </td>
+                    <td>
+                        <input type="text" ng-model="EditProduct.PRODUCT_ABBR" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>
+                            Product Name</label>
+                    </td>
+                    <td>
+                        <input type="text" ng-model="EditProduct.PRODUCT_NAME" />
+                    </td>
+                    <td>
+                        <label>
+                            Parent Product</label>
+                    </td>
+                    <td>
+                        <select class="editProduct" ng-model="EditProduct.PARENT_PRODUCT_CD" ng-options="item.PARENT_PRODUCT_CD as item.PRODUCT_NAME for item in ServiceTypes.CSU_PRODUCT">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>
+                            Valid</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.PRODUCT_VALID_CD" ng-true-value="1"
+                            ng-false-value="0" ng-checked="EditProduct.PRODUCT_VALID_CD==1" />
+                    </td>
+                    <td>
+                        <label>
+                            Use CPE for Product</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.USE_CPE_PRODUCT" ng-true-value="1" ng-false-value="0"
+                            ng-checked="EditProduct.USE_CPE_PRODUCT==1" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>
+                            Make Parent Port speeds valid
+                        </label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.VALIDATE_PARENT_PORTSPEED" ng-true-value="1"
+                            ng-false-value="0" ng-checked="EditProduct.VALIDATE_PARENT_PORTSPEED==1" />
+                        <br />
+                        <a data-target="#ValidMappedModal" data-toggle="modal" ng-click="ValidMapped(DDL_PL_Product)">
+                            Valid Mapping </a>
+                        <!-- <a ng-click="NaviagaionValidMapping(DDL_PL_Product)">Valid Mapping</a>-->
+                    </td>
+                    <td>
+                        <label>
+                            Display POP characteristics
+                        </label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="PoPCharcerstic" ng-checked="IsPoP" ng-true-value="1"
+                            ng-false-value="0" />
+                        <br />
+                        <a data-target="#DisplayPoPCharctersticModal" data-toggle="modal" ng-click="DisplayPoPcharacteristic(DDL_PL_Product)">
+                            Display PoP characteristic </a>
+                        <!-- <a data-target="#addNewProductModal" data-toggle="modal" class="btn btn-primary btn-sm"
+                    ng-click="ResetProducts(ServiceTypes)">Add Product</a>-->
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>
+                            Launch the product for End-Users</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.Launchtheproduct" ng-true-value="1"
+                            ng-false-value="0" ng-checked="IsLaunchtheproduct" />
+                    </td>
+                    <td>
+                        <label>
+                            Service Type</label>
+                    </td>
+                    <td>
+                        <select class="editProduct" ng-model="EditProduct.SERVICE_TYPE_CD" ng-options="item.SERVICE_TYPE_CD as item.SERVICE_TYPE_DESC for item in ServiceTypes.CSU_REF_SERVICE_TYPE">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>
+                            Alias Id</label>
+                    </td>
+                    <td>
+                        <select class="editProduct" ng-model="EditProduct.ALIAS_ID" ng-options="item.ALIAS_ID as item.PRODUCT_NAME for item in ServiceTypes.CSU_PRODUCT">
+                        </select>
+                    </td>
+                    <td>
+                        <label>
+                            Display Lead Time</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.DISPLAY_LEAD_TIME" ng-true-value="1"
+                            ng-false-value="0" ng-checked="EditProduct.DISPLAY_LEAD_TIME==1" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>
+                            Access Method Required</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.ACCESS_METHOD_REQUIRED " ng-true-value="1"
+                            ng-false-value="0" ng-checked="EditProduct.ACCESS_METHOD_REQUIRED==1" />
+                    </td>
+                    <td>
+                        <label>
+                            EFM Valid
+                        </label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.EFM_REQUIRED" ng-true-value="1" ng-false-value="0"
+                            ng-checked="EditProduct.EFM_REQUIRED==1" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>
+                            Flexiport Available</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.FLEXIPORT" ng-true-value="1" ng-false-value="0"
+                            ng-checked="EditProduct.FLEXIPORT==1" />
+                        <br />
+                        <a data-target="#FlexPortModal" data-toggle="modal" ng-click="FlexPort(DDL_PL_Product)">
+                            Flexiport Availability </a>
+                    </td>
+                    <td>
+                        <label>
+                            Unbundled NNI</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.FLEXIPORT" ng-true-value="1" ng-false-value="0"
+                            ng-checked="EditProduct.FLEXIPORT==1" />
+                        <br />
+                        <a data-target="#UnbundledNNIModal" data-toggle="modal" ng-click="UnbundledNNI(DDL_PL_Product)">
+                            Unbundled NNI Availability</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>
+                            Make Platform-Resiliency Mapping</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.PLAT_RESIL_MAP" ng-true-value="1" ng-false-value="0"
+                            ng-checked="EditProduct.PLAT_RESIL_MAP==1" />
+                    </td>
+                    <td>
+                        <label>
+                            Enforce Supplier Grouping</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" ng-model="EditProduct.IS_SUPP_GRP_ENFORCED" ng-true-value="1"
+                            ng-false-value="0" ng-checked="EditProduct.IS_SUPP_GRP_ENFORCED==1" />
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <div class="col-md-12">
+                <div class="col-md-4" style="text-align: center">
+                    <label>
+                        Capman Platform</label></div>
+                <div class="col-md-4" style="text-align: center">
+                    <label>
+                        Ethernet Phase Attribute</label></div>
+                <div class="col-md-4" style="text-align: center">
+                    <label>
+                        Supported Country Level Access Type</label></div>
+            </div>
+            <!--Dragable Items-->
+            <div class="col-md-12" style="margin-left: -51px;">
+                <!-- //CAPMAN_PLATFORM_ID-->
+                <div class="col-md-2" style="width: 200px">
+                    <ol data-draggable="target">
+                        <li ng-repeat="item in CapmanUniqueRecords track by item.CAPMAN_PLATFORM_ID" data-draggable="item">
+                            <p style="display: none">
+                                {{item.CAPMAN_PLATFORM_ID}}</p>
+                            {{item.CAPMAN_PLATFORM_NAME}} </li>
+                    </ol>
+                </div>
+                <div class="col-md-2" style="width: 200px">
+                    <ol data-draggable="target" id="CapmanUniqueRecordsID">
+                        <li ng-model="CAPMANPLATFORM" ng-repeat="item in ECapmanPlatforms track by item.CAPMAN_PLATFORM_ID"
+                            data-draggable="item">
+                            <p style="display: none">
+                                {{item.CAPMAN_PLATFORM_ID}}
+                            </p>
+                            {{item.CAPMAN_PLATFORM_NAME}} </li>
+                    </ol>
+                </div>
+                <div class="col-md-2" style="width: 160px">
+                    <ol data-draggable="target">
+                        <li ng-repeat="item in CapmanUniqueRecords track by item.CAPMAN_PLATFORM_ID" data-draggable="item">
+                            <p style="display: none">
+                                <!-- {{item.CAPMAN_PLATFORM_ID}}</p>
+                        {{item.CAPMAN_PLATFORM_NAME}} </li>-->
+                    </ol>
+                </div>
+                <div class="col-md-2" style="width: 160px">
+                    <ol data-draggable="target">
+                        <li ng-model="EditProduct" ng-repeat="item in CapmanUniqueRecords track by item.CAPMAN_PLATFORM_ID"
+                            data-draggable="item">
+                            <p style="display: none">
+                                <!-- {{item.CAPMAN_PLATFORM_ID}}</p>
+                        {{item.CAPMAN_PLATFORM_NAME}} </li>-->
+                    </ol>
+                </div>
+                <div class="col-md-2" style="width: 180px">
+                    <ol data-draggable="target">
+                        <li ng-repeat="item in SupportDuplicateRecords track by item.ID" data-draggable="item">
+                            <p style="display: none">
+                                {{item.ID}}</p>
+                            {{item.NAME}}</li>
+                    </ol>
+                </div>
+                <div class="col-md-1" style="width: 180px">
+                    <ol data-draggable="target" id="SupportDuplicateRecordsID">
+                        <li ng-model="EditProduct.SupportCountry" ng-repeat="item in SupportUniqueRecords track by item.ID"
+                            data-draggable="item">
+                            <p style="display: none">
+                                {{item.ID}}</p>
+                            <p>
+                                {{item.NAME}}</p>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <div>
+                <input type="button" value="Update" class="btn btn-primary" ng-click="UpdateProduct(DDL_PL_Product,EditProduct)" />
+            </div>
+            <div class="col-md-12" style="margin-left: -49px">
+                <div class="col-md-2" style="text-align: center">
+                    <label>
+                        Access Speeds</label></div>
+                <div class="col-md-3" style="text-align: center">
+                    <label>
+                        Available Interfaces</label></div>
+                <div class="col-md-1">
+                </div>
+                <div class="col-md-3" style="text-align: center">
+                    <label>
+                        Preferred Interfaces</label></div>
+                <div class="col-md-3" style="text-align: center">
+                    <label>
+                        Optional Interfaces</label></div>
+            </div>
+            <div class="col-md-12" style="margin-left: -63px">
+                <div class="col-md-1" style="padding-bottom: 3em; margin-left: 34px;">
+                    <select ng-model="Accessitem" id="AccessSpeedsId" style="width: 120px; margin-right: 35px"
+                        size="9" ng-options="Accessitem.Access_CHAR_ID as Accessitem.Access_CHAR_NAME for Accessitem in ServiceTypes.Access_Speed"
+                        multiple>
+                    </select>
+                </div>
+                <div class="col-md-3" style="margin-left: 31px">
+                    <select ng-model="InterfaceItem" id="AccessInterfaceId" ng-options="InterfaceItem.Interface_CHAR_ID as InterfaceItem.Interface_NAME for InterfaceItem  in ServiceTypes.Interfaces"
+                        size="9" multiple>
+                    </select>
+                </div>
+                <div class="col-md-1" style="margin-left: 24px; margin-right: -41px;">
+                    <buttn class="btn btn-primary" ng-click="AssignInterface(InterfaceItem)"><i class="glyphicon glyphicon-forward"></i></buttn>
+                    <button class="btn btn-primary" ng-click="DeAssignInterface(preferredItem)">
+                        <i class="glyphicon glyphicon-backward"></i>
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <select multiple id="PreferredInterfacesId" ng-model="preferredItem" size="9" ng-options="p_interface.INTERFACE_CHAR_ID as p_interface.INTERFACE_CHAR_NAME for p_interface in ServiceTypes.PreferredInterfaces">
+                    </select>
+                </div>
+                <div class="col-md-1" style="margin-left: 24px; margin-right: -41px;">
+                    <button class="btn btn-primary" ng-click="AssignPreInterface(preferredItem)">
+                        <i class="glyphicon glyphicon-forward"></i>
+                    </button>
+                    <button class="btn btn-primary" ng-click="DeAssignPreInterface(Optional_interface_Item)">
+                        <i class="glyphicon glyphicon-backward"></i>
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <select multiple id="OptionalInterfacesId" ng-model="Optional_interface_Item" size="9"
+                        ng-options="p_interface.INTERFACE_CHAR_ID as p_interface.INTERFACE_CHAR_NAME for p_interface in ServiceTypes.OptionalInterfaces">
+                    </select>
+                </div>
+            </div>
+            <div>
+                <input type="button" ng-click="updateMappedInterfaces(DDL_PL_Product,Accessitem,ServiceTypes.PreferredInterfaces,ServiceTypes.OptionalInterfaces,InterfaceItem)"
+                    value="Update" class="btn btn-primary" />
+            </div>
+            <div id="divMappedInterfaces">
+                <table id="tblMappedInterfaces" ng-table="MappedInterfacesTable" class="table table-bordered table-striped">
+                    <tbody>
+                        <tr ng-repeat="item in $data">
+                            <td filter="{ ACCESS_NAME: 'text'}">
+                                <span id="item.ACCESS_CHAR_ID">{{item.ACCESS_NAME}}</span>
+                            </td>
+                            <td>
+                                <select ng-model="p_interface.INTERFACE_CHAR_ID" size="9" ng-options="p_interface.INTERFACE_CHAR_ID as p_interface.INTERFACE_CHAR_NAME for p_interface in item.Final_P_Interface">
+                                </select>
+                            </td>
+                            <td>
+                                <select ng-model="O_interface.INTERFACE_CHAR_ID" size="9" ng-options="O_interface.O_InterfaceId as O_interface.INTERFACE_CHAR_NAME
+                             for O_interface in item.Final_O_Interface">
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay" style="display: none">
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="addNewProductModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add New Product Reference
+                        </h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Product Type&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-5">
+                                    <select class="clsddlProducttype" name="lstProductType" ng-model="Product.PRODUCT_TYPE"
+                                        ng-options="item.PRODUCT_TYPE as item.PRODUCT_DESC for item in ServiceTypes.CSU_PRODUCT_TYPE">
+                                        <span ng-show="pageLoad" ng-if="Product.PRODUCT_TYPE==null||Product.PRODUCT_TYPE==undefined">
+                                            Please Select Product Type</span>
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label  col-md-5">
+                                    Country is only required for National Products&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-5">
+                                    <select class="clsddlProducttype" name="lstCountryId" ng-model="Product.COUNTRY_CD"
+                                        ng-options="item.COUNTRY_ID as item.COUNTRY_NAME for item in ServiceTypes.CSU_COUNTRY">
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Service Type&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-5">
+                                    <select class="clsddlProducttype" name="lstServiceType" ng-model="Product.SERVICE_TYPE_CD"
+                                        ng-options=" item.SERVICE_TYPE_CD as item.SERVICE_TYPE_DESC for item in ServiceTypes.CSU_REF_SERVICE_TYPE">
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Product Level&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-5">
+                                    <select class="clsddlProducttype" ng-model="Product.PRODUCT_LOC_LEVEL_CD" name="lstProductLocLevel"
+                                        ng-options="item.PRODUCT_LOC_LEVEL_CD as item.PRODUCT_LOC_LEVEL_DESC for item in ServiceTypes.CSU_REF_PRODUCT_LOC_LEVEL">
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Abbreviation (Don't use spaces)&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-7">
+                                    <input type="text" class="form-control" ng-model="Product.PRODUCT_ABBR" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Name&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-7">
+                                    <textarea cols="45" name="txtProductName" ng-model="Product.PRODUCT_NAME" style="width: 245px"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Parent Product</label>
+                                <div class="col-md-7">
+                                    <select class="clsddlProducttype" name="lstParentProductId" ng-model="Product.PARENT_PRODUCT_CD"
+                                        ng-options="item.PARENT_PRODUCT_CD as item.PRODUCT_NAME for item in ServiceTypes.CSU_PRODUCT">
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Capman Platform</label>
+                                <div class="col-md-5">
+                                    <select id="lstCapmanPlatformId" ng-model="Product.capman_platform_id" ng-options="item.CAPMAN_PLATFORM_ID as item.CAPMAN_PLATFORM_NAME for item in ServiceTypes.CAPMAN_PLATFORMS"
+                                        multiple size="9" name="lstCapmanPlatformId" style="width: 246px">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Alias Id</label>
+                                <div class="col-md-5">
+                                    <select class="clsddlProducttype" name="lstParentProductId" ng-model="Product.ALIAS_ID"
+                                        ng-options="item.ALIAS_ID as item.PRODUCT_NAME for item in ServiceTypes.CSU_PRODUCT">
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Valid</label>
+                                <div class="col-md-7">
+                                    <input type="checkbox" ng-model="Product.PRODUCT_VALID_CD" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Display Lead Time</label>
+                                <div class="col-md-7">
+                                    <input type="checkbox" ng-model="Product.DISPLAY_LEAD_TIME" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Access Method Required
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="checkbox" ng-model="Product.ACCESS_METHOD_REQUIRED" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    EFM Valid
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="checkbox" ng-model="Product.EFM_REQUIRED" />
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div class="form-horizontal" style="padding-left: 3%">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click="AddProduct(Product,Product.PARENT_PRODUCT_CD,Product.ALIAS_ID,Product.PRODUCT_VALID_CD,Product.DISPLAY_LEAD_TIME,Product.ACCESS_METHOD_REQUIRED,Product.EFM_REQUIRED)" />-->
+                        <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click="AddProduct(Product)"
+                            data-dismiss="modal" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="DisplayPoPCharctersticModal"
+        role="dialog" aria-hidden="true" aria-labelledby="myModalLabel">
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="ValidMappedModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="FlexPortModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="UnbundledNNIModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+    </div>
+</div>
+<script src="../../Scripts/dragdropitems.js" type="text/javascript"></script>

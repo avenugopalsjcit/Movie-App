@@ -1,0 +1,514 @@
+﻿<div ng-controller="AdminDSLCaseDetailsUpdateCtrl">
+    <!--<div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">-->
+         <!--<p class="col-sm-2 control-label" style="text-align: left">-->
+                            <a ng-click="GetCasesCountryAccess()" class="glyphicon glyphicon-backward" style="font-size:20px;"></a>
+             <!--           </p>--><br />
+    <h4>
+        Edit Case Details (Country Level)
+    </h4>
+    <!-- </div>
+    </div>-->
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="panel-body">
+                <div class="form-horizontal" style="width: 100%;">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label cus-text-left">
+                            Country &nbsp;
+                        </label>
+                        <p class="col-sm-2 control-label" style="text-align: left">
+                            {{CountryName}}
+                        </p>                       
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label cus-text-left">
+                            Availability &nbsp;
+                        </label>
+                        <p class="col-sm-2 control-label" style="text-align: left">
+                            {{CaseAvailability}}
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label cus-text-left">
+                            Valid &nbsp;
+                        </label>
+                        <p class="col-sm-2 control-label" style="text-align: left">
+                            [{{Validity}}]
+                        </p>
+                    </div>
+                    <div class="form-group" id="divDLSPackages">
+                        <label for="" class="col-sm-2 control-label cus-text-left">
+                            BT Package &nbsp;
+                        </label>
+                        <p class="col-sm-2 control-label" style="text-align: left">
+                            <!--<select style="width: 120px;" id="Select2" class="form-control">
+                                    <option value="Access Type">Hybrid VPN</option>
+                                </select>-->
+                            <select id="Select1" ng-model="DLSPackagesMod" ng-options="pkg.CharId as pkg.CharName for pkg in DLSPackages"
+                                ng-change="DSLPkgChange()">
+                            </select></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label cus-text-left">
+                            Split Tunneling Availability &nbsp;
+                        </label>
+                        <p class="col-sm-2 control-label" style="text-align: left">
+                            {{TunnelingNote}}
+                        </p>
+                    </div>
+                    <div class="form-group" ng-show="GPOPInterconnect">
+                        <label for="" class="col-sm-2 control-label cus-text-left">
+                            GPOP InterConnect&nbsp;
+                        </label>
+                        <p class="col-sm-3 control-label" style="text-align: left">
+                            <!--<select style="width: 120px;" id="Select2" class="form-control">
+                                    <option value="Access Type">Hybrid VPN</option>
+                                </select>-->
+                            <select id="Select2" ng-model="GPOPInterConnectMod" ng-options="gpop.HubSiteId as gpop.HubSiteName for gpop in GPOPInterconnect"
+                                style="width: 150px;" ng-change="GPOPChange()">
+                            </select></p>
+                    </div>
+                    <div style="text-align: center; color: Blue; text-decoration: underline; font-weight: bold;">
+                        <!--<a style=" color:Blue;text-decoration:underline;" ng-show="PortTypeLevelChars" ng-click="GetData()">View/Edit Port Type Level Characteristics</a>-->
+                        <a data-target="#divPortTypeChars" data-toggle="modal" ng-click="GetData()" ng-show="PortTypeLevelChars">
+                            View/Edit Port Type Level Characteristics</a>
+                    </div>
+                    <div tabindex="-1" class="modal fade in modalalign" id="divPortTypeChars" role="dialog"
+                        aria-hidden="true" aria-labelledby="myModalLabel">
+                        <div class="vertical-alignment-helper">
+                            <div class="modal-dialog vertical-align-center">
+                                <div class="modal-content" style="width: 90%; height: 800px; overflow-y: scroll;
+                                    overflow-x: hidden;">
+                                    <div class="modal-header" style="padding: 0px 0px 0px 0px;">
+                                        <button class="close" type="button" data-dismiss="modal" style="margin: 15px 15px 15px 15px;">
+                                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                                        </button>
+                                        <div class="row text-left Arrow " style="padding-left: 40px">
+                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                <h4>
+                                                    Edit Case Reference(Country Level)
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="container">
+                                        <div id="divDSLAccessSetPortTypes">
+                                            <h5 class="panel-title" ng-show="IsHybrid">
+                                                Hybrid VPN Access Set - Port Types</h5>
+                                            <h5 class="panel-title" ng-show="!IsHybrid">
+                                                DSL Access Set - Port Types</h5>
+                                            <h6 ng-show="IsHybrid">
+                                                Access Type - Supplier - Supplier Product - Access Speed - Interface - Framing -
+                                                Connector</h6>
+                                            <h6 ng-show="!IsHybrid">
+                                                Access Type - Supplier - Supplier Product - GPOP Interconnect - Access Speed - Interface
+                                                - Framing - Connector</h6>
+                                            <select id="Select6" ng-model="AdminDetailsPortDropdownDataMod" ng-change="GetSelectedValue()"
+                                                ng-options="item as item.CharName for item in AdminDetailsPortDropdownData" class="col-sm-8">
+                                            </select>
+                                        </div>
+                                        <br />
+                                        <div ng-show="PortTypeCharacteristics != null && PortTypeCharacteristics.data.length !=0">
+                                            <div class="panel-heading Arrow">
+                                                <h5 class="panel-title" ng-show="IsHybrid">
+                                                    Hybrid VPN Characteristics (Port Type Level)</h5>
+                                                <h5 class="panel-title" ng-show="!IsHybrid">
+                                                    DSL Characteristics (Port Type Level)</h5>
+                                            </div>
+                                            <br />
+                                            <div class="panel-body">
+                                                <table ng-table="PortTypeCharacteristics" class="table table-striped" id="Table3">
+                                                    <tr ng-repeat="popchr in $data">
+                                                        <td data-title="'Characteristic Type'" filter="{ CharacteristicType: 'text'}" sortable="'CharacteristicType'"
+                                                            class="Arrow">
+                                                            {{ popchr.CharacteristicType}}
+                                                        </td>
+                                                        <td data-title="'Characteristic'" filter="{ Characteristic: 'text'}" sortable="'Characteristic'"
+                                                            class="Arrow">
+                                                            {{ popchr.Characteristic}}
+                                                        </td>
+                                                        <td data-title="'Availability'" filter="{ Availability: 'text'}" sortable="'Availability'"
+                                                            class="Arrow">
+                                                            <select id="Select7" ng-model="PortTypeCharacteristicsModal[$index].CharAvailCd"
+                                                                ng-options="case.CaseAvailCd as case.CaseAvailDesc for case in CaseAvailabilitylst"
+                                                                style="width: 200px;">
+                                                                <option value="">Select</option>
+                                                            </select>
+                                                        </td>
+                                                        <td data-title="'value'" filter="{ CharacteristicValue: 'text'}" sortable="'CharacteristicValue'"
+                                                            class="Arrow">
+                                                            <input ng-model="PortTypeCharacteristicsModal[$index].CharacteristicValue" />
+                                                        </td>
+                                                        <td data-title="'Valid'" filter="{ Validity: 'text'}" sortable="'Validity'" class="Arrow">
+                                                            <input type="checkbox" name="chk" ng-model="PortTypeCharacteristicsModal[$index].IsValid" />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div ng-show="PortTypeParentCharacteristics != null && PortTypeParentCharacteristics.data.length !=0">
+                                            <div class="panel-heading Arrow">
+                                                <h5 class="panel-title" ng-show="IsHybrid">
+                                                    Hybrid VPN Parent Characteristics (Port Type Level)</h5>
+                                                <h5 class="panel-title" ng-show="!IsHybrid">
+                                                    DSL Parent Characteristics (Port Type Level)</h5>
+                                            </div>
+                                            <div class="panel-body">
+                                                <table ng-table="PortTypeParentCharacteristics" class="table table-striped" id="Table4">
+                                                    <tr ng-repeat="popchr in $data">
+                                                        <td data-title="'Characteristic Type'" filter="{ CharacteristicType: 'text'}" sortable="'CharacteristicType'"
+                                                            class="Arrow">
+                                                            {{ popchr.CharacteristicType}}
+                                                        </td>
+                                                        <td data-title="'Characteristic'" filter="{ Characteristic: 'text'}" sortable="'Characteristic'"
+                                                            class="Arrow">
+                                                            {{ popchr.Characteristic}}
+                                                        </td>
+                                                        <td data-title="'Availability'" filter="{ Availability: 'text'}" sortable="'Availability'"
+                                                            class="Arrow">
+                                                            {{ popchr.Availability}}
+                                                        </td>
+                                                        <td data-title="'Value'" filter="{ CharacteristicValue: 'text'}" sortable="'CharacteristicValue'"
+                                                            class="Arrow">
+                                                            {{ PortTypeParentCharacteristicsModal[$index].CharacteristicValue}}
+                                                        </td>
+                                                        <td data-title="'Valid'" filter="{ Validity: 'text'}" sortable="'Validity'" class="Arrow">
+                                                            <input type="checkbox" name="chk" ng-model="PortTypeParentCharacteristicsModal[$index].IsValid" />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="modal-footer">
+                                            <table style="width: 100%;">
+                                                <tr>
+                                                    <th>
+                                                        Created By
+                                                    </th>
+                                                    <th>
+                                                        Created Date
+                                                    </th>
+                                                    <th>
+                                                        Updated By
+                                                    </th>
+                                                    <th>
+                                                        Updated Date
+                                                    </th>
+                                                </tr>
+                                                <tr style="text-align: left;">
+                                                    <td style="width: 25%">
+                                                        {{CreatedBy1}}
+                                                    </td>
+                                                    <td style="width: 25%">
+                                                        {{CreatedDate1}}
+                                                    </td>
+                                                    <td style="width: 25%">
+                                                        {{UpdatedBy1}}
+                                                    </td>
+                                                    <td style="width: 25%">
+                                                        {{UpdatedDate1}}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <input type="button" class="btn btn-default btn-sm " ng-click="UpdatePortType()"
+                                                value="Update" />
+                                            <input type="button" class="btn btn-default btn-sm" ng-click="ResetPortTypeChars()"
+                                                value="Reset" />
+                                            <button id="btnCaseUpdate" class="btn btn-default" type="button" data-dismiss="modal">
+                                                Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="">
+                <div ng-show="HVPNProductCharacteristic != null && HVPNProductCharacteristic.data.length !=0">
+                    <div class="panel-heading Arrow">
+                        <h5 class="panel-title" ng-show="IsHybrid">
+                            HVPN Characteristics (Package Level)</h5>
+                        <h5 class="panel-title" ng-show="!IsHybrid">
+                            DSL Characteristics (Package Level)</h5>
+                    </div>
+                    <div class="panel-body">
+                        <table ng-table="HVPNProductCharacteristic" class="table table-striped" id="Table2">
+                            <tr ng-repeat="popchr in $data">
+                                <td data-title="'Characteristic Type'" filter="{ CharacteristicType: 'text'}" sortable="'CharacteristicType'"
+                                    class="Arrow">
+                                    {{ popchr.CharacteristicType}}
+                                </td>
+                                <td data-title="'Characteristic'" filter="{ Characteristic: 'text'}" sortable="'Characteristic'"
+                                    class="Arrow">
+                                    {{ popchr.Characteristic}}
+                                </td>
+                                <td data-title="'Availability'" filter="{ Availability: 'text'}" sortable="'Availability'"
+                                    class="Arrow">
+                                    <select id="Select5" ng-model="HVPNProductCharacteristicModal[$Index].CharAvailCd"
+                                        ng-options="case.CaseAvailCd as case.CaseAvailDesc for case in CaseAvailabilitylst"
+                                        style="width: 200px;">
+                                        <option value="">Select</option>
+                                    </select>
+                                </td>
+                                <td data-title="'Value'" filter="{ CharacteristicValue: 'text'}" sortable="'CharacteristicValue'"
+                                    class="Arrow">
+                                    <input ng-model="HVPNProductCharacteristicModal[$Index].CharacteristicValue" />
+                                </td>
+                                <td data-title="'Valid'" filter="{ Validity: 'text'}" sortable="'Validity'" class="Arrow">
+                                    <input type="checkbox" name="chk" ng-model="HVPNProductCharacteristicModal[$Index].IsValid" />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div ng-show="HVPNProductPortTypes != null && HVPNProductPortTypes.data.length !=0">
+                    <div class="panel-heading Arrow">
+                        <h5 class="panel-title" ng-show="IsHybrid">
+                            Hybrid VPN Port Types</h5>
+                        <h5 class="panel-title" ng-show="!IsHybrid">
+                            DSL Port Types</h5>
+                    </div>
+                   
+                        <table ng-table="HVPNProductPortTypes" class="table table-striped" id="HVPNProductPortTypesTbl">
+                            <tr ng-repeat="popchr in $data">
+                                <td data-title="'Port Speed (Down/Up)'" filter="{ PortSpeed: 'text'}" sortable="'PortSpeed'"
+                                    class="Arrow" ng-show="IsHybrid">
+                                    {{ popchr.PortSpeed}}
+                                </td>
+                                <td data-title="'Port Speed Availability'" filter="{ CityPOPName: 'text'}" sortable="'CityPOPName'"
+                                    class="Arrow" ng-show="IsHybrid">
+                                    <select id="ddlCaseAvailability[$Index]" ng-model="HVPNProductPortTypesModal[$index].PortSpeedAvailabilityId"
+                                        ng-options="case.CaseAvailCd as case.CaseAvailDesc for case in CaseAvailabilitylst"
+                                        style="width: 200px;">
+                                        <option value="">Select</option>
+                                    </select>
+                                </td>
+                                <td data-title="'Characteristic Type'" filter="{ CharacteristicType: 'text'}" sortable="'CharacteristicType'"
+                                    class="Arrow" ng-show="!IsHybrid">
+                                    {{ popchr.CharacteristicType}}
+                                </td>
+                                <td data-title="'Access Availability'" filter="{ CreatedDate: 'text'}" sortable="'CreatedDate'"
+                                    class="Arrow" ng-show="!IsHybrid">
+                                    <select id="Select3" ng-model="HVPNProductPortTypesModal[$index].AccessAvailabilityId"
+                                        id="HVPNProductPortTypesAvai[$Index]" ng-options="case.CaseAvailCd as case.CaseAvailDesc for case in CaseAvailabilitylst"
+                                        style="width: 200px;">
+                                        <option value="">Select</option>
+                                    </select>
+                                </td>
+                                <td data-title="'Access Type'" filter="{ AccessType: 'text'}" sortable="'AccessType'"
+                                    class="Arrow">
+                                    {{ popchr.AccessType}}
+                                </td>
+                                <td data-title="'DSL Technology Type'" filter="{ CreatedDate: 'text'}" sortable="'CreatedDate'"
+                                    class="Arrow" ng-show="!IsHybrid">
+                                    <select id="Select4" ng-model="HVPNProductPortTypesModal[$index].DSLTechnologyTypeId"
+                                        ng-options="case.CaseAvailCd as case.CaseAvailDesc for case in CaseAvailabilitylst"
+                                        style="width: 200px;">
+                                        <option value="">Select</option>
+                                    </select>
+                                </td>
+                                <td data-title="'Supplier'" filter="{ Supplier: 'text'}" sortable="'Supplier'" class="Arrow">
+                                    {{ popchr.Supplier}}
+                                </td>
+                                <td data-title="'Supplier Product'" filter="{ SupplierProduct: 'text'}" sortable="'SupplierProduct'"
+                                    class="Arrow">
+                                    {{ popchr.SupplierProduct}}
+                                </td>
+                                <td data-title="'GPOP Interconnect'" filter="{ GPOPInterconnect: 'text'}" sortable="'GPOPInterconnect'"
+                                    class="Arrow" ng-show="IsHybrid">
+                                    {{ popchr.GPOPInterconnect}}
+                                </td>
+                                <td data-title="'Interconnect Design'" filter="{ InterconnectDesign: 'text'}" sortable="'InterconnectDesign'"
+                                    class="Arrow" ng-show="!IsHybrid">
+                                    {{ popchr.InterconnectDesign}}
+                                </td>
+                                <td data-title="'Access Availability'" filter="{ CreatedDate: 'text'}" sortable="'CreatedDate'"
+                                    class="Arrow" ng-show="IsHybrid">
+                                    <select id="ddlCaseAvailability1" ng-model="HVPNProductPortTypesModal[$index].AccessAvailabilityId"
+                                        ng-options="case.CaseAvailCd as case.CaseAvailDesc for case in CaseAvailabilitylst"
+                                        style="width: 200px;">
+                                        <option value="">Select</option>
+                                    </select>
+                                </td>
+                                <td data-title="'Access Speed(Down/Up)'" filter="{ AccessSpeed: 'text'}" sortable="'AccessSpeed'"
+                                    class="Arrow">
+                                    {{ popchr.AccessSpeed}}
+                                </td>
+                                <td data-title="'Interface'" filter="{ Interface: 'text'}" sortable="'Interface'"
+                                    class="Arrow">
+                                    {{ popchr.Interface}}
+                                </td>
+                                <td data-title="'Framing'" filter="{ Framing: 'text'}" sortable="'Framing'" class="Arrow">
+                                    {{popchr.Framing}}
+                                </td>
+                                <td data-title="'Connector'" filter="{ Connector: 'text'}" sortable="'Connector'"
+                                    class="Arrow">
+                                    {{popchr.Connector}}
+                                </td>
+                                <td data-title="'Valid'" filter="{ Validity: 'text'}" sortable="'Validity'" class="Arrow">
+                                    <input type="checkbox" name="chk" ng-model="HVPNProductPortTypesModal[$index].IsValid" />
+                                </td>
+                            </tr>
+                        </table>
+                  
+                </div>
+                <div ng-show="HVPNProductParentCharacteristic != null && HVPNProductParentCharacteristic.data.length !=0">
+                    <div class="panel-heading Arrow">
+                        <h5 class="panel-title" ng-show="IsHybrid">
+                            Hybrid VPN Parent Characteristics (Package Level)</h5>
+                        <h5 class="panel-title" ng-show="!IsHybrid">
+                            DSL Parent Characteristics (Package Level)</h5>
+                    </div>
+                    <div class="panel-body">
+                        <table ng-table="HVPNProductParentCharacteristic" class="table table-striped" id="Table1">
+                            <tr ng-repeat="popchr in $data">
+                                <td data-title="'Characteristic Type'" filter="{ CharacteristicType: 'text'}" sortable="'CharacteristicType'"
+                                    class="Arrow">
+                                    {{ popchr.CharacteristicType}}
+                                </td>
+                                <td data-title="'Characteristic'" filter="{ Characteristic: 'text'}" sortable="'Characteristic'"
+                                    class="Arrow">
+                                    {{ popchr.Characteristic}}
+                                </td>
+                                <td data-title="'Availability'" filter="{ Availability: 'text'}" sortable="'Availability'"
+                                    class="Arrow">
+                                    {{ popchr.Availability}}
+                                </td>
+                                <td data-title="'Value'" filter="{ CharacteristicValue: 'text'}" sortable="'CharacteristicValue'"
+                                    class="Arrow">
+                                    {{ popchr.CharacteristicValue}}
+                                </td>
+                                <td data-title="'Valid'" filter="{ Validity: 'text'}" sortable="'Validity'" class="Arrow">
+                                    <input type="checkbox" name="chk" ng-model="HVPNProductParentCharacteristicModal[$index].IsValid" />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div ng-show="HVPNProductParentPortTypes != null && HVPNProductParentPortTypes.data.length !=0">
+                    <div class="panel-heading Arrow">
+                        <h5 class="panel-title" ng-show="IsHybrid">
+                            Hybrid VPN Parent Port Types</h5>
+                        <h5 class="panel-title" ng-show="!IsHybrid">
+                            DSL Parent Port Types</h5>
+                    </div>
+                    <div class="panel-body">
+                        <table ng-table="HVPNProductParentPortTypes" class="table table-striped" id="HVPNProductParentPortTypesTbl">
+                            <tr ng-repeat="popchr in $data">
+                                <td data-title="'Port Speed (Down/Up)'" filter="{ PortSpeed: 'text'}" sortable="'PortSpeed'"
+                                    class="Arrow" ng-show="IsHybrid">
+                                    {{ popchr.PortSpeed}}
+                                </td>
+                                <td data-title="'Port Speed Availability'" filter="{ PortSpeedAvailability: 'text'}"
+                                    sortable="'PortSpeedAvailability'" class="Arrow" ng-show="IsHybrid">
+                                    {{ popchr.PortSpeedAvailability}}
+                                </td>
+                                <td data-title="'Characteristic Type'" filter="{ CharacteristicType: 'text'}" sortable="'CharacteristicType'"
+                                    class="Arrow" ng-show="!IsHybrid">
+                                    {{ popchr.CharacteristicType}}
+                                </td>
+                                <td data-title="'Access Availability'" filter="{ AccessAvailability: 'text'}" sortable="'AccessAvailability'"
+                                    class="Arrow" ng-show="!IsHybrid">
+                                    {{ popchr.AccessAvailability}}
+                                </td>
+                                <td data-title="'Access Type'" filter="{ AccessType: 'text'}" sortable="'AccessType'"
+                                    class="Arrow">
+                                    {{ popchr.AccessType}}
+                                </td>
+                                <td data-title="'DSL Technology Type'" filter="{ DSLTechnologyType: 'text'}" sortable="'DSLTechnologyType'"
+                                    class="Arrow" ng-show="!IsHybrid">
+                                    {{ popchr.DSLTechnologyType}}
+                                </td>
+                                <td data-title="'Supplier'" filter="{ Supplier: 'text'}" sortable="'Supplier'" class="Arrow">
+                                    {{ popchr.Supplier}}
+                                </td>
+                                <td data-title="'Supplier Product'" filter="{ SupplierProduct: 'text'}" sortable="'SupplierProduct'"
+                                    class="Arrow">
+                                    {{ popchr.SupplierProduct}}
+                                </td>
+                                <td data-title="'GPOP Interconnect'" filter="{ GPOPInterconnect: 'text'}" sortable="'GPOPInterconnect'"
+                                    class="Arrow" ng-show="IsHybrid">
+                                    {{ popchr.GPOPInterconnect}}
+                                </td>
+                                <td data-title="'Interconnect Design'" filter="{ InterconnectDesign: 'text'}" sortable="'InterconnectDesign'"
+                                    class="Arrow" ng-show="!IsHybrid">
+                                    {{ popchr.InterconnectDesign}}
+                                </td>
+                                <td data-title="'Access Availability'" filter="{ AccessAvailability: 'text'}" sortable="'AccessAvailability'"
+                                    class="Arrow" ng-show="IsHybrid">
+                                    {{ popchr.AccessAvailability}}
+                                </td>
+                                <td data-title="'Access Speed(Down/Up)'" filter="{ AccessSpeed: 'text'}" sortable="'AccessSpeed'"
+                                    class="Arrow">
+                                    {{ popchr.AccessSpeed}}
+                                </td>
+                                <td data-title="'Interface'" filter="{ Interface: 'text'}" sortable="'Interface'"
+                                    class="Arrow">
+                                    {{ popchr.Interface}}
+                                </td>
+                                <td data-title="'Framing'" filter="{ Framing: 'text'}" sortable="'Framing'" class="Arrow">
+                                    {{popchr.Framing}}
+                                </td>
+                                <td data-title="'Connector'" filter="{ Connector: 'text'}" sortable="'Connector'"
+                                    class="Arrow">
+                                    {{popchr.Connector}}
+                                </td>
+                                <td data-title="'Valid'" filter="{ Validity: 'text'}" sortable="'Validity'" class="Arrow">
+                                    <input type="checkbox" name="chk" ng-model="HVPNProductParentPortTypesModal[$index].IsValid"
+                                        id="Checkbox1" />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="panel-body">
+                <div class="modal-footer">
+                    <div>
+                        <table style="width: 100%;">
+                            <tr>
+                                <th>
+                                    Created By
+                                </th>
+                                <th>
+                                    Created Date
+                                </th>
+                                <th>
+                                    Updated By
+                                </th>
+                                <th>
+                                    Updated Date
+                                </th>
+                            </tr>
+                            <tr style="text-align: left;">
+                                <td style="width: 25%">
+                                    {{CreatedBy}}
+                                </td>
+                                <td style="width: 25%">
+                                    {{CreatedDate}}
+                                </td>
+                                <td style="width: 25%">
+                                    {{UpdatedBy}}
+                                </td>
+                                <td style="width: 25%">
+                                    {{UpdatedDate}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <input type="button" class="btn btn-default btn-sm " value="Update" ng-click="Update()" />
+                    <input type="button" class="btn btn-default btn-sm" ng-click="ResetCaseDetails()"
+                        value="Reset" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,167 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Services;
+using SCAdminBAL;
+using System.Data;
+
+namespace SCAdmin
+{
+    public partial class SingleCaseCountryAccess : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        [WebMethod]
+        public static CountryAccessCases UpdateCountryAccessCase(string CaseId, bool CaseValidCD, int CaseAvailCD, string UserId)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.UpdateCountryAccessCase(CaseId, CaseValidCD, CaseAvailCD, UserId);
+        }
+
+        [WebMethod]
+        public static int DeleteCountryAccessCase(int CaseId, int AccessLevel, int UserId)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.DeleteCountryAccessCase(CaseId, AccessLevel, UserId);
+        }
+
+        [WebMethod]
+        public static List<DSLPackages> GetCountryAccessDSLPackages(string CaseId, bool CaseValidCD, string PackageType, string CountryName)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetCountryAccessDSLPackages(CaseId, CaseValidCD, PackageType, CountryName);
+        }       
+
+        [WebMethod]
+        public static string GetTunnelingNote(string CountryName)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetTunnelingNote(CountryName);
+        }
+
+        [WebMethod]
+        public static int GetVSATCharId()
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetVSATCharId();
+        }
+
+        [WebMethod]
+        public static int GetCasePackageId(int CaseId, int PackageId)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetCasePackageId(CaseId, PackageId);
+        }
+
+        [WebMethod]
+        public static List<GPOPInterConnect> GetGPOPInterConnect(int CaseId, int PackageId, int VSATCharId, int CasePackageId, int CountryId, bool IsVSAT)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetGPOPInterConnect(CaseId, PackageId, VSATCharId, CasePackageId, CountryId, IsVSAT);
+        }
+
+        [WebMethod]
+        public static int GetCharLevelcharacteristics(int ProductCD, bool IsHybrid)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetCharLevelcharacteristics(ProductCD, IsHybrid);
+        }
+
+        [WebMethod]
+        public static List<DSLCharacteristics> GetDSLCharacteristics(int CaseId, int CasePackageId, string UserId, string IsHybrid)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetDSLCharacteristics(CaseId, CasePackageId, UserId, IsHybrid);
+        }
+
+        [WebMethod]
+        public static List<HVPNProductPortTypes> GetHVPNProductPortTypes(int CaseId, int CasePackageId, int CountryId, string UserId, int PackageId, int GPOP, string IsHybrid, string IsVsat)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetHVPNProductPortTypes(CaseId, CasePackageId, CountryId, UserId, PackageId, GPOP, IsHybrid, IsVsat);
+        }
+
+        [WebMethod]
+        public static List<DSLCharacteristics> GetDSLParentCharacteristics(int CaseId, int CasePackageId, int CountryId, int childproductcd, string UserId, int PackageId, string IsHybrid)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetDSLParentCharacteristics(CaseId, CasePackageId, CountryId, childproductcd, UserId, PackageId, IsHybrid);
+        }
+
+        [WebMethod]
+        public static List<HVPNProductPortTypes> GetHVPNProductParentPortTypes(int CaseId, int CasePackageId, int CountryId, int childproductcd, string UserId, int PackageId, string IsHybrid)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetHVPNProductParentPortTypes(CaseId, CasePackageId, CountryId, childproductcd, UserId, PackageId, IsHybrid);
+        }       
+
+        [WebMethod]
+        public static List<AdminDetailsPortDropdownData> GetAdminDetailsPortDropdownData(int CaseId, int CasePackageId, int CountryId, int PackageId, string IsHybrid)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetAdminDetailsPortDropdownData(CaseId, CasePackageId, CountryId, PackageId, IsHybrid);
+        }
+
+        [WebMethod]
+        public static List<DSLCharacteristics> GetPortTypeCharacteristics(int CaseId, int PortTypeId, int AccessSetId, string UserId, string IsHybrid)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetPortTypeCharacteristics(CaseId, PortTypeId, AccessSetId, UserId, IsHybrid);
+        }
+
+        [WebMethod]
+        public static List<DSLCharacteristics> GetPortTypeParentCharacteristics(int CaseId, int PortTypeId, int AccessSetId, int ParentId, string UserId, string IsHybrid)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetPortTypeParentCharacteristics(CaseId, PortTypeId, AccessSetId, ParentId, UserId, IsHybrid);
+        }
+
+        [WebMethod]
+        public static int GetPortTypeParentCharacteristicsParentId(int CaseId, int AccessSetId, int PortTypeId)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetPortTypeParentCharacteristicsParentId(CaseId, AccessSetId, PortTypeId);
+        }
+
+        [WebMethod]
+        public static int UpdateDSLCharacteristics(DSLCharacteristicsUpdate DSLCharacteristicsData, bool IsParent)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.UpdateDSLCharacteristics(DSLCharacteristicsData, IsParent);
+        }
+
+        [WebMethod]
+        public static int UpdatePortTypeCharacteristics(DSLCharacteristicsUpdate DSLCharacteristicsData, bool IsParent)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.UpdatePortTypeCharacteristics(DSLCharacteristicsData, IsParent);
+        }
+
+        [WebMethod]
+        public static int UpdateHVPNPortTypes(HVPNProductPortTypesUpdate HVPNProductPortTypesData, bool IsHybrid, bool IsParent)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.UpdateHVPNPortTypes(HVPNProductPortTypesData, IsHybrid, IsParent);
+        }
+
+        [WebMethod]
+        public static CaseUpdateTimeLines GetCaseDetailsUpdatedDates(int CaseId, int CasePkgId)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetCaseDetailsUpdatedDates(CaseId, CasePkgId);
+        }
+
+        [WebMethod]
+        public static CaseUpdateTimeLines GetCaseDetailsPortTypesUpdatedDates(int CaseId, int CasePkgId)
+        {
+            CountryAccessCaseDefBAL bal = new CountryAccessCaseDefBAL();
+            return bal.GetCaseDetailsPortTypesUpdatedDates(CaseId, CasePkgId);
+        }
+    }
+}

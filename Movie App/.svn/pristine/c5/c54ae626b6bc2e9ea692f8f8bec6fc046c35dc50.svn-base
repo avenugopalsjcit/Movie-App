@@ -1,0 +1,1330 @@
+﻿
+
+app.factory('OrgListFactory', function ($http) {
+
+    var OrgListFactory = {};
+
+    OrgListFactory.GetOrg = function (Distributer) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/GetOrganizationLstDetails', { 'Distributer': Distributer });
+
+    }
+
+    return OrgListFactory;
+});
+
+
+
+app.factory('OrgGridFactory', function ($http) {
+
+    var OrgGridFactory = {};
+
+    OrgGridFactory.GetOrgGrid = function (Distributer) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/GetOrganizationGridDetails', { 'Distributer': Distributer });
+
+    }
+
+    return OrgGridFactory;
+});
+
+app.factory('detailsInfoOrg', function ($http) {
+    var detailsInfoOrg = {};
+    detailsInfoOrg.GetValueOrg = function (btnvalue, DistributerValues, CountryValues, SupplierValues) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/SaveAndDelete', { 'btnvalue': btnvalue, 'DistributerValues': DistributerValues, 'CountryValues': CountryValues, 'SupplierValues': SupplierValues })
+    }
+    return detailsInfoOrg;
+});
+
+app.factory('deletedetailsInfoOrg', function ($http) {
+    var deletedetailsInfoOrg = {};
+    deletedetailsInfoOrg.removeRowOrg = function (btnvalue, DistributerValues, CountryValues, SupplierValues) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/SaveAndDelete', { 'btnvalue': btnvalue, 'DistributerValues': DistributerValues, 'CountryValues': CountryValues, 'SupplierValues': SupplierValues })
+    }
+    return deletedetailsInfoOrg;
+});
+
+
+
+
+
+app.factory('BTGFRListFactory', function ($http) {
+
+    var BTGFRListFactory = {};
+
+    BTGFRListFactory.GetBTGFR = function (Distributer) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/GetBTGFRLstDetails', { 'Distributer': Distributer });
+
+    }
+
+    return BTGFRListFactory;
+});
+
+
+
+app.factory('BTGFRGridFactory', function ($http) {
+
+    var BTGFRGridFactory = {};
+
+    BTGFRGridFactory.GetBTGFRGrid = function (Distributer) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/GetBTGFRGridDetails', { 'Distributer': Distributer });
+
+    }
+
+    return BTGFRGridFactory;
+});
+
+
+app.factory('detailsInfoBTGFR', function ($http) {
+    var detailsInfoBTGFR = {};
+    detailsInfoBTGFR.GetValueBTGFR = function (btnvalue, DistributerValues, CountryValues, SupplierValues, tab) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/PostBGFROrg', { 'btnvalue': btnvalue, 'DistributerValues': DistributerValues, 'CountryValues': CountryValues, 'SupplierValues': SupplierValues, 'tab': tab })
+    }
+    return detailsInfoBTGFR;
+});
+
+app.factory('deletedetailsInfoBTGFR', function ($http) {
+    var deletedetailsInfoBTGFR = {};
+    deletedetailsInfoBTGFR.removeRowBTGFR = function (btnvalue, DistributerValues, CountryValues, SupplierValues, tab) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/DeleteBGFROrg', { 'btnvalue': btnvalue, 'DistributerValues': DistributerValues, 'CountryValues': CountryValues, 'SupplierValues': SupplierValues, 'tab': tab })
+    }
+    return deletedetailsInfoBTGFR;
+});
+
+app.factory('CountryListFactory', function ($http) {
+
+    var CountryListFactory = {};
+
+    CountryListFactory.GetCountry = function (Country) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/GetCountryLstDetails', { 'Country': Country });
+
+    }
+
+    return CountryListFactory;
+});
+
+app.factory('SupplierListFactory', function ($http) {
+
+    var SupplierListFactory = {};
+
+    SupplierListFactory.GetSupplier = function (Supplier) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/GetSupplierLstDetails', { 'Supplier': Supplier });
+
+    }
+
+    return SupplierListFactory;
+});
+
+app.factory('DistributorGridFactory', function ($http) {
+
+    var DistributorGridFactory = {};
+
+    DistributorGridFactory.GetDistributorsGrid = function (Distributer) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/GetSupplierGridDetails', { 'Distributer': Distributer });
+
+    }
+
+    return DistributorGridFactory;
+});
+
+
+
+app.factory('detailsInfo', function ($http) {
+    var detailsInfo = {};
+    detailsInfo.GetValue = function (btnvalue, DistributerValues, CountryValues, SupplierValues, tab) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/PostBGFROrg', { 'btnvalue': btnvalue, 'DistributerValues': DistributerValues, 'CountryValues': CountryValues, 'SupplierValues': SupplierValues, 'tab': tab });
+    }
+    return detailsInfo;
+});
+
+app.factory('deletedetailsInfo', function ($http) {
+    var deletedetailsInfo = {};
+
+    deletedetailsInfo.removeRow = function (btnvalue, DistributerValues, CountryValues, SupplierValues, tab) {
+        $(".pageLoaderOverlay").show();
+        return $http.post('SupplierRestriction.aspx/DeleteBGFROrg', { 'btnvalue': btnvalue, 'DistributerValues': DistributerValues, 'CountryValues': CountryValues, 'SupplierValues': SupplierValues, 'tab': tab });
+    }
+    return deletedetailsInfo;
+});
+
+app.controller('mainctrl', function ($scope, $filter, $http, ngTableParams, DistributorListFactory, OrgListFactory, OrgGridFactory, detailsInfoOrg, deletedetailsInfoOrg, BTGFRListFactory, BTGFRGridFactory, detailsInfoBTGFR, deletedetailsInfoBTGFR, CountryListFactory, SupplierListFactory, DistributorGridFactory, detailsInfo, deletedetailsInfo) {
+    $scope.TotalRecordCount1 = 0;
+    $scope.TotalRecordCount2 = 0;
+    $scope.TotalRecordCount3 = 0;
+    $scope.Disttab = function () {
+        $("input:checkbox").prop('checked', false);
+    }
+
+
+
+    $scope.chkall = function () {
+
+        if ($scope.selectedAll) {
+            $scope.selectedAll = true;
+            $("input:checkbox").prop('checked', true);
+        } else {
+            $scope.selectedAll = false;
+        }
+        angular.forEach($scope.usersTable.data, function (item) {
+            item.Selected = $scope.selectedAll;
+
+        });
+
+
+
+    }
+
+    $scope.chk = function () {
+
+        for (var i = 0; i < $scope.usersTable.data.length; i++) {
+            if ($(chekid)[i].checked == true) {
+
+                all = true;
+                notall = false;
+
+
+            }
+            else {
+
+                notall = true;
+                all = false
+
+                break;
+            }
+        }
+        if (notall == false) {
+            $scope.selectedAll = true;
+            return;
+        }
+        if (all == false) {
+            $scope.selectedAll = false;
+            return;
+        }
+
+
+    }
+
+
+    $scope.chkallBTGFR = function () {
+
+        if ($scope.selectedAll) {
+            $scope.selectedAll = true;
+            $("input:checkbox").prop('checked', true);
+        } else {
+            $scope.selectedAll = false;
+        }
+        angular.forEach($scope.usersTable1.data, function (item) {
+            item.Selected = $scope.selectedAll;
+
+        });
+
+
+
+    }
+
+    $scope.chkBTGFR = function () {
+
+        for (var i = 0; i < $scope.usersTable1.data.length; i++) {
+            if ($(Checkbox1)[i].checked == true) {
+
+                all = true;
+                notall = false;
+
+
+            }
+            else {
+
+                notall = true;
+                all = false
+
+                break;
+            }
+        }
+        if (notall == false) {
+            $scope.selectedAll = true;
+            return;
+        }
+        if (all == false) {
+            $scope.selectedAll = false;
+            return;
+        }
+
+
+    }
+
+
+    $scope.chkallOrg = function () {
+
+        if ($scope.selectedAll) {
+            $scope.selectedAll = true;
+            $("input:checkbox").prop('checked', true);
+        } else {
+            $scope.selectedAll = false;
+        }
+        angular.forEach($scope.usersTable2.data, function (item) {
+            item.Selected = $scope.selectedAll;
+
+        });
+
+
+
+    }
+
+    $scope.chkOrg = function () {
+
+        for (var i = 0; i < $scope.usersTable2.data.length; i++) {
+            if ($(Checkbox2)[i].checked == true) {
+
+                all = true;
+                notall = false;
+
+
+            }
+            else {
+
+                notall = true;
+                all = false
+
+                break;
+            }
+        }
+        if (notall == false) {
+            $scope.selectedAll = true;
+            return;
+        }
+        if (all == false) {
+            $scope.selectedAll = false;
+            return;
+        }
+
+
+    }
+
+
+    var btnvalue = "", CountryValues = "", DistributerValues = "", SupplierValues = "", distributorids = "", countryids = "", supplierids = "";
+
+
+
+    $scope.GetValue = function () {
+        tab = "Distributor";
+        count = 0;
+        CountryValues = "";
+        DistributerValues = "";
+        SupplierValues = "";
+        var btnvalue = $('Save').selector;
+        if ($scope.Country == undefined || $scope.Distributer == undefined
+        || $scope.Supplier == undefined || $scope.Country.length == 0 || $scope.Distributer.length == 0 || $scope.Supplier.length == 0) {
+
+            bootbox.alert({
+                "message": "Please Select atleast one item in Distributor,Country,Supplier and click on Save",
+                "className": "my-custom-class",
+                "callback": function () {
+                    console.log("Success callback");
+                }
+            });
+            return false;
+        }
+        CountryValues = $scope.Country.join(',');
+        DistributerValues = $scope.Distributer.join(',');
+        SupplierValues = $scope.Supplier.join(',');
+        arrcountry = CountryValues.split(',');
+        arrDistributer = DistributerValues.split(',');
+        arrSupplier = SupplierValues.split(',');
+        Distributercount = arrDistributer.length;
+        Suppliercount = arrSupplier.length;
+        countrycount = arrcountry.length;
+        count = (Distributercount * Suppliercount * countrycount);
+        $(".pageLoaderOverlay").show();
+
+
+
+
+        detailsInfo.GetValue(btnvalue, DistributerValues, CountryValues, SupplierValues, tab).success(function (data) {
+            if (data.d == 0) {
+                bootbox.alert({
+                    "message": " Restriction(s) already exist",
+                    "className": "my-custom-class",
+                    "callback": function () {
+                        console.log("Success callback");
+                    }
+                });
+            }
+            else if (data.d < count) {
+                bootbox.alert({
+                    "message": data.d + " Restriction(s) have been added, " +
+                    (count - data.d) + " Restriction(s) already exist",
+                    "className": "my-custom-class",
+                    "callback": function () {
+                        console.log("Success callback");
+                    }
+                });
+            }
+            else if (data.d) {
+
+                bootbox.alert({
+                    "message": data.d + " Restriction(s) have been added",
+                    "className": "my-custom-class",
+                    "callback": function () {
+                        console.log("Success callback");
+                    }
+                });
+            }
+
+
+            DistributorGridFactory.GetDistributorsGrid("Distributor").success(function (data) {
+                $(".pageLoaderOverlay").hide();
+                $scope.DistributerGrid = data.d;
+                $scope.TotalRecordCount1 = $scope.DistributerGrid.length;
+                if (angular.isDefined($scope.DistributerList)) {
+                    delete $scope.Distributer;
+                }
+                if (angular.isDefined($scope.CountryList)) {
+                    delete $scope.Country;
+                }
+                if (angular.isDefined($scope.SupplierList)) {
+                    delete $scope.Supplier;
+                }
+
+                $scope.usersTable = new ngTableParams({
+
+                }, { 'dataset': $scope.DistributerGrid
+
+
+                });
+                if (data.d.length == 0) {
+                    $scope.ActiveRestrictions = false;
+                    $("#DeletedivDist").hide();
+                }
+                else {
+                    $scope.ActiveRestrictions = true;
+                    $("#DeletedivDist").show();
+                }
+            })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+        })
+        .error(function (error) {
+            alert("Problem occured while loading States; " + error);
+        });
+
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+    $scope.resetDropDown = function () {
+
+        if (angular.isDefined($scope.DistributerList)) {
+            delete $scope.Distributer;
+        }
+        if (angular.isDefined($scope.CountryList)) {
+            delete $scope.Country;
+        }
+        if (angular.isDefined($scope.SupplierList)) {
+            delete $scope.Supplier;
+        }
+    }
+
+
+    $scope.removeRow = function () {
+        DistributerValues = "";
+        countryids = "";
+        supplierids = "";
+        count = 0;
+        var index = -1;
+        tab = "Distributor"
+        var comArr = eval($scope.DistributerGrid);
+        btnvalue = $(Deletebtn)[0].defaultValue;
+
+        for (var i = 0; i < $scope.usersTable.data.length; i++) {
+            if ($(chekid)[i].checked == true) {
+                DistributerValues += $scope.usersTable.data[i].DistributorId + ",";
+                countryids += $scope.usersTable.data[i].countryid + ",";
+                supplierids += $scope.usersTable.data[i].supplierid + ",";
+                count = count + 1;
+            }
+        }
+        if (DistributerValues == "" || countryids == "" || supplierids == "") {
+            bootbox.alert({
+                "message": "Please select atleast one Restriction",
+                "className": "my-custom-class",
+                "callback": function () {
+                    console.log("Success callback");
+                }
+            });
+            return false;
+        }
+        DistributerValues = DistributerValues.slice(0, -1);
+        CountryValues = countryids.slice(0, -1);
+        SupplierValues = supplierids.slice(0, -1);
+
+
+
+
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Active Restrictions?",
+            callback: function (result) {
+                if (result) {
+                    $(".pageLoaderOverlay").show();
+                    $http.post('SupplierRestriction.aspx/DeleteBGFROrg', { 'btnvalue': btnvalue, 'DistributerValues': DistributerValues, 'CountryValues': CountryValues, 'SupplierValues': SupplierValues, 'tab': tab }).success(function (data) {
+                        $scope.selectedAll = false;
+                        DistributorGridFactory.GetDistributorsGrid("Distributor").success(function (data) {
+                            $(".pageLoaderOverlay").hide();
+                            $scope.DistributerGrid = data.d;
+                            $scope.TotalRecordCount1 = $scope.DistributerGrid.length;
+                            if (angular.isDefined($scope.DistributerList)) {
+                                delete $scope.Distributer;
+                            }
+                            if (angular.isDefined($scope.CountryList)) {
+                                delete $scope.Country;
+                            }
+                            if (angular.isDefined($scope.SupplierList)) {
+                                delete $scope.Supplier;
+                            }
+
+
+                            $scope.usersTable = new ngTableParams({
+
+                            }, {
+                                'dataset': $scope.DistributerGrid
+
+                            });
+                            if (data.d.length == 0) {
+                                $scope.ActiveRestrictions = false;
+                                $("#DeletedivDist").hide();
+                            }
+                            else {
+                                $scope.ActiveRestrictions = true;
+                                $("#DeletedivDist").show();
+                            }
+                            bootbox.alert({
+                                "message": count + " Restriction(s) have been deleted",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+
+                        });
+
+
+                    });
+                }
+            }
+        });
+
+
+    }
+
+
+
+
+    if (angular.isDefined($scope.DistributerList)) {
+        delete $scope.Distributer;
+    }
+    if (angular.isDefined($scope.CountryList)) {
+        delete $scope.Country;
+    }
+    if (angular.isDefined($scope.SupplierList)) {
+        delete $scope.Supplier;
+    }
+
+    $(".pageLoaderOverlay").show();
+    DistributorListFactory.GetDistributors("Distributor").success(function (data) {
+
+        $scope.DistributerList = data.d;
+        if ($scope.DistributerList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.DistributerGrid != undefined) {
+            $(".pageLoaderOverlay").hide();
+        }
+    })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+    CountryListFactory.GetCountry("Country").success(function (data) {
+
+        $scope.CountryList = data.d;
+        if ($scope.DistributerList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.DistributerGrid != undefined) {
+            $(".pageLoaderOverlay").hide();
+        }
+    })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+    SupplierListFactory.GetSupplier("Supplier").success(function (data) {
+
+        $scope.SupplierList = data.d;
+        if ($scope.DistributerList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.DistributerGrid != undefined) {
+            $(".pageLoaderOverlay").hide();
+        }
+    })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+
+
+    DistributorGridFactory.GetDistributorsGrid("Distributor").success(function (data) {
+
+        $scope.DistributerGrid = data.d;
+        $scope.TotalRecordCount1 = $scope.DistributerGrid.length;
+        if ($scope.DistributerList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.DistributerGrid != undefined) {
+            $(".pageLoaderOverlay").hide();
+        }
+
+
+        $scope.usersTable = new ngTableParams({
+
+        }, {
+            'dataset': $scope.DistributerGrid
+
+        });
+
+        if (data.d.length == 0) {
+            $scope.ActiveRestrictions = false;
+            $("#DeletedivDist").hide();
+        }
+        else {
+            $scope.ActiveRestrictions = true;
+            $("#DeletedivDist").show();
+        }
+
+    })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+
+
+
+
+
+
+
+
+
+    //BTGFR
+
+
+
+
+
+
+
+
+
+
+
+
+
+    var btnvalue = "", CountryValues = "", DistributerValues = "", SupplierValues = "", distributorids = "", countryids = "", supplierids = "";
+
+
+    $scope.resetDropDown = function () {
+        if (angular.isDefined($scope.BTGFRList)) {
+            delete $scope.BTGFR;
+        }
+        if (angular.isDefined($scope.CountryList)) {
+            delete $scope.Country;
+        }
+        if (angular.isDefined($scope.SupplierList)) {
+            delete $scope.Supplier;
+        }
+    }
+
+    $scope.GetValueBTGFR = function () {
+
+
+        CountryValues = "";
+        DistributerValues = "";
+        SupplierValues = "";
+        tab = "BTGFR";
+        var btnvalue = $('Save').selector;
+        if ($scope.BTGFR == undefined || $scope.Country == undefined || $scope.Supplier == undefined || $scope.Country.length == 0 || $scope.BTGFR.length == 0 || $scope.Supplier.length == 0) {
+            bootbox.alert({
+                "message": "Please Select atleast one item in BTGFR,Country,Supplier and click on Save",
+                "className": "my-custom-class",
+                "callback": function () {
+                    console.log("Success callback");
+                }
+            });
+            return false;
+        }
+        DistributerValues = $scope.BTGFR.join(',');
+        CountryValues = $scope.Country.join(',');
+        SupplierValues = $scope.Supplier.join(',');
+
+        arrcountry = CountryValues.split(',');
+        arrDistributer = DistributerValues.split(',');
+        arrSupplier = SupplierValues.split(',');
+        Distributercount = arrDistributer.length;
+        Suppliercount = arrSupplier.length;
+        countrycount = arrcountry.length;
+        count = (Distributercount * Suppliercount * countrycount);
+
+
+        $(".pageLoaderOverlay").show();
+
+
+
+
+        detailsInfoBTGFR.GetValueBTGFR(btnvalue, DistributerValues, CountryValues, SupplierValues, tab).success(function (data) {
+            if (data.d == 0) {
+                bootbox.alert({
+                    "message": " Restriction(s) already exist",
+                    "className": "my-custom-class",
+                    "callback": function () {
+                        console.log("Success callback");
+                    }
+                });
+            }
+            else if (data.d < count) {
+                bootbox.alert({
+                    "message": data.d + " Restriction(s) have been added, " +
+                    (count - data.d) + " Restriction(s) already exist",
+                    "className": "my-custom-class",
+                    "callback": function () {
+                        console.log("Success callback");
+                    }
+                });
+            }
+            else if (data.d) {
+
+                bootbox.alert({
+                    "message": data.d + " Restriction(s) have been added",
+                    "className": "my-custom-class",
+                    "callback": function () {
+                        console.log("Success callback");
+                    }
+                });
+            }
+            BTGFRGridFactory.GetBTGFRGrid("BTGFR").success(function (data) {
+
+                $(".pageLoaderOverlay").hide();
+                $scope.BTGFRGrid = data.d;
+                $scope.TotalRecordCount2 = $scope.BTGFRGrid.length;
+                if (angular.isDefined($scope.BTGFRList)) {
+                    delete $scope.BTGFR;
+                }
+                if (angular.isDefined($scope.CountryList)) {
+                    delete $scope.Country;
+                }
+                if (angular.isDefined($scope.SupplierList)) {
+                    delete $scope.Supplier;
+                }
+
+                $scope.usersTable1 = new ngTableParams({
+
+                }, { 'dataset': $scope.BTGFRGrid
+
+                });
+                if (data.d.length == 0) {
+                    $scope.BTGFRData = false;
+                    $("#DeleteBTGFRData").hide();
+                }
+                else {
+                    $scope.BTGFRData = true;
+                    $("#DeleteBTGFRData").show();
+                }
+            })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+        })
+        .error(function (error) {
+
+            alert("Problem occured while loading States; " + error);
+        });
+    };
+
+
+
+
+
+
+
+
+
+    $scope.removeRowBTGFR = function () {
+        DistributerValues = "";
+        CountryValues = "";
+        SupplierValues = "";
+        var index = -1;
+        tab = "BTGFR";
+        var comArr = eval($scope.BTGFRGrid);
+        btnvalue = $(Deletebtn)[0].defaultValue;
+        for (var i = 0; i < $scope.usersTable1.data.length; i++) {
+            if ($(Checkbox1)[i].checked == true) {
+                DistributerValues += $scope.usersTable1.data[i].BTGFR + ",";
+                CountryValues += $scope.usersTable1.data[i].countryid + ",";
+                SupplierValues += $scope.usersTable1.data[i].supplierid + ",";
+            }
+        }
+        if (DistributerValues == "" || CountryValues == "" || SupplierValues == "") {
+            bootbox.alert({
+                "message": "Please select atleast one Restriction",
+                "className": "my-custom-class",
+                "callback": function () {
+                    console.log("Success callback");
+                }
+            });
+            return false;
+        }
+        DistributerValues = DistributerValues.slice(0, -1);
+        CountryValues = CountryValues.slice(0, -1);
+        SupplierValues = SupplierValues.slice(0, -1);
+
+
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Active Restrictions?",
+            callback: function (result) {
+                if (result) {
+                    deletedetailsInfoBTGFR.removeRowBTGFR(btnvalue, DistributerValues, CountryValues, SupplierValues, tab).success(function (data) {
+                        $(".pageLoaderOverlay").show();
+                        $scope.selectedAll = false;
+                        bootbox.alert({
+                            "message": data.d + " Restriction(s) have been deleted",
+                            "className": "my-custom-class",
+                            "callback": function () {
+                                console.log("Success callback");
+                            }
+                        });
+
+                        //detailsInfoBTGFR.GetValueBTGFR(btnvalue, DistributerValues, CountryValues, SupplierValues, tab).success(function (data) {
+                        // $http.post('SupplierRestriction.aspx/GetBTGFRGridDetails', { 'Distributer': Distributer });
+
+                        BTGFRGridFactory.GetBTGFRGrid("BTGFR").success(function (data) {
+                            $(".pageLoaderOverlay").hide();
+                            $scope.BTGFRGrid = data.d;
+                            $scope.TotalRecordCount2 = $scope.BTGFRGrid.length;
+                            if (angular.isDefined($scope.BTGFRList)) {
+                                delete $scope.BTGFR;
+                            }
+                            if (angular.isDefined($scope.CountryList)) {
+                                delete $scope.Country;
+                            }
+                            if (angular.isDefined($scope.SupplierList)) {
+                                delete $scope.Supplier;
+                            }
+
+                            $scope.usersTable1 = new ngTableParams({
+
+                            }, { 'dataset': $scope.BTGFRGrid
+
+                            });
+                            if (data.d.length == 0) {
+                                $scope.BTGFRData = false;
+                                $("#DeleteBTGFRData").hide();
+                            }
+                            else {
+                                $scope.BTGFRData = true;
+                                $("#DeleteBTGFRData").show();
+                            }
+                        })
+        .error(function (error) {
+            alert(error);
+
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+
+                    });
+                };
+            }
+        });
+
+    };
+
+    $scope.BTGFRtab = function () {
+
+
+        $("input:checkbox").prop('checked', false);
+
+
+        if (angular.isDefined($scope.BTGFRList)) {
+            delete $scope.BTGFR;
+        }
+        if (angular.isDefined($scope.CountryList)) {
+            delete $scope.Country;
+        }
+        if (angular.isDefined($scope.SupplierList)) {
+            delete $scope.Supplier;
+        }
+
+        if (angular.isUndefined($scope.showBTGR) || $scope.showBTGR == '') {
+            $(".pageLoaderOverlay").show();
+            BTGFRListFactory.GetBTGFR("BTGFR").success(function (data) {
+
+                $scope.BTGFRList = data.d;
+                if ($scope.BTGFRList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.BTGFRGrid != undefined) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+
+            CountryListFactory.GetCountry("Country").success(function (data) {
+
+                $scope.CountryList = data.d;
+                if ($scope.BTGFRList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.BTGFRGrid != undefined) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+
+            SupplierListFactory.GetSupplier("Supplier").success(function (data) {
+
+                $scope.SupplierList = data.d;
+                if ($scope.BTGFRList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.BTGFRGrid != undefined) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+
+            BTGFRGridFactory.GetBTGFRGrid("BTGFR").success(function (data) {
+
+                if (data.d.length == 0) {
+
+                }
+                else {
+
+                }
+                $scope.BTGFRGrid = data.d;
+                $scope.TotalRecordCount2 = $scope.BTGFRGrid.length;
+                if ($scope.BTGFRList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.BTGFRGrid != undefined) {
+                    $(".pageLoaderOverlay").hide();
+                }
+
+                $scope.usersTable1 = new ngTableParams({
+
+                }, { 'dataset': $scope.BTGFRGrid
+
+                });
+                if (data.d.length == 0) {
+                    $scope.BTGFRData = false;
+                    $("#DeleteBTGFRData").hide();
+                }
+                else {
+                    $scope.BTGFRData = true;
+                    $("#DeleteBTGFRData").show();
+                }
+            })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+
+
+            $scope.showBTGR = 1;
+
+        }
+    }
+
+
+    //Organization
+
+
+
+
+
+
+    var btnvalue = "", CountryValues = "", DistributerValues = "", SupplierValues = "", distributorids = "", countryids = "", supplierids = "";
+
+
+
+    $scope.GetValueOrg = function () {
+
+
+        CountryValues = "";
+        tab = "Organization";
+        DistributerValues = "";
+        SupplierValues = "";
+        var btnvalue = $('Save').selector;
+        if ($scope.Organization == undefined || $scope.Country == undefined || $scope.Supplier == undefined || $scope.Country.length == 0 || $scope.Organization.length == 0 || $scope.Supplier.length == 0) {
+            bootbox.alert({
+                "message": "Please Select atleast one item in Organization,Country,Supplier and click on Save",
+                "className": "my-custom-class",
+                "callback": function () {
+                    console.log("Success callback");
+                }
+            });
+            return false;
+        }
+        CountryValues = $scope.Country.join(',');
+        DistributerValues = $scope.Organization.join(',');
+        SupplierValues = $scope.Supplier.join(',');
+        arrcountry = CountryValues.split(',');
+        arrDistributer = DistributerValues.split(',');
+        arrSupplier = SupplierValues.split(',');
+        Distributercount = arrDistributer.length;
+        Suppliercount = arrSupplier.length;
+        countrycount = arrcountry.length;
+        count = (Distributercount * Suppliercount * countrycount);
+        $(".pageLoaderOverlay").show();
+        detailsInfoOrg.GetValueOrg(btnvalue, DistributerValues, CountryValues, SupplierValues).success(function (data) {
+            if (data.d == 0) {
+                bootbox.alert({
+                    "message": " Restriction(s) already exist",
+                    "className": "my-custom-class",
+                    "callback": function () {
+                        console.log("Success callback");
+                    }
+                });
+            }
+            else if (data.d < count) {
+                bootbox.alert({
+                    "message": data.d + " Restriction(s) have been added, " +
+                    (count - data.d) + " Restriction(s) already exist",
+                    "className": "my-custom-class",
+                    "callback": function () {
+                        console.log("Success callback");
+                    }
+                });
+            }
+            else if (data.d) {
+
+                bootbox.alert({
+                    "message": data.d + " Restriction(s) have been added",
+                    "className": "my-custom-class",
+                    "callback": function () {
+                        console.log("Success callback");
+                    }
+                });
+            }
+            OrgGridFactory.GetOrgGrid("ORGANIZATION").success(function (data) {
+
+                $(".pageLoaderOverlay").hide();
+                $scope.OrgGrid = data.d;
+                $scope.TotalRecordCount3 = $scope.OrgGrid.length;
+                if (angular.isDefined($scope.OrgList)) {
+                    delete $scope.Organization;
+                }
+                if (angular.isDefined($scope.CountryList)) {
+                    delete $scope.Country;
+                }
+                if (angular.isDefined($scope.SupplierList)) {
+                    delete $scope.Supplier;
+                }
+
+                $scope.usersTable2 = new ngTableParams({
+
+                }, { 'dataset': $scope.OrgGrid
+
+                });
+                if (data.d.length == 0) {
+                    $scope.ORGData = false;
+                    $("#deleteOrgdiv").hide();
+                }
+                else {
+                    $scope.ORGData = true;
+                    $("#deleteOrgdiv").show();
+                }
+            })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+        });
+
+    };
+
+
+
+
+    $scope.resetDropDown = function () {
+        if (angular.isDefined($scope.BTGFRList)) {
+            delete $scope.BTGFR;
+        }
+        if (angular.isDefined($scope.DistributerList)) {
+            delete $scope.Distributer;
+        }
+        if (angular.isDefined($scope.OrgList)) {
+            delete $scope.Organization;
+        }
+        if (angular.isDefined($scope.CountryList)) {
+            delete $scope.Country;
+        }
+        if (angular.isDefined($scope.SupplierList)) {
+            delete $scope.Supplier;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    $scope.removeRowOrg = function () {
+
+        DistributerValues = "";
+        CountryValues = "";
+        SupplierValues = "";
+        var index = -1;
+        tab = "Organization"
+        var comArr = eval($scope.OrgGrid);
+        btnvalue = $(Deletebtn)[0].defaultValue;
+        for (var i = 0; i < $scope.usersTable2.data.length; i++) {
+            if ($(Checkbox2)[i].checked == true) {
+                DistributerValues += $scope.usersTable2.data[i].BTGFR + ",";
+                CountryValues += $scope.usersTable2.data[i].countryid + ",";
+                SupplierValues += $scope.usersTable2.data[i].supplierid + ",";
+            }
+        }
+        if (DistributerValues == "" || CountryValues == "" || SupplierValues == "") {
+
+            bootbox.alert({
+                "message": "Please select atleast one Restriction",
+                "className": "my-custom-class",
+                "callback": function () {
+                    console.log("Success callback");
+                }
+            });
+            return false;
+        }
+        DistributerValues = DistributerValues.slice(0, -1);
+        CountryValues = CountryValues.slice(0, -1);
+        SupplierValues = SupplierValues.slice(0, -1);
+
+
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete Active Restrictions?",
+            callback: function (result) {
+                if (result) {
+                    deletedetailsInfoOrg.removeRowOrg(btnvalue, DistributerValues, CountryValues, SupplierValues).success(function (data) {
+                        $(".pageLoaderOverlay").show();
+                        $scope.selectedAll = false;
+                        bootbox.alert({
+                            "message": data.d + " Restriction(s) have been deleted",
+                            "className": "my-custom-class",
+                            "callback": function () {
+                                console.log("Success callback");
+                            }
+                        });
+
+
+                        OrgGridFactory.GetOrgGrid("ORGANIZATION").success(function (data) {
+                            $(".pageLoaderOverlay").hide();
+                            $scope.OrgGrid = data.d;
+                            $scope.TotalRecordCount3 = $scope.OrgGrid.length;
+                            if (angular.isDefined($scope.OrgList)) {
+                                delete $scope.Organization;
+                            }
+                            if (angular.isDefined($scope.CountryList)) {
+                                delete $scope.Country;
+                            }
+                            if (angular.isDefined($scope.SupplierList)) {
+                                delete $scope.Supplier;
+                            }
+
+                            $scope.usersTable2 = new ngTableParams({
+
+                            }, { 'dataset': $scope.OrgGrid
+
+                            });
+                            if (data.d.length == 0) {
+                                $scope.ORGData = false;
+                                $("#deleteOrgdiv").hide();
+                            }
+                            else {
+                                $scope.ORGData = true;
+                                $("#deleteOrgdiv").show();
+                            }
+                        })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+
+                    });
+                };
+            }
+
+
+        });
+    }
+
+
+
+
+    $scope.Orgtab = function () {
+
+        $("input:checkbox").prop('checked', false);
+        if (angular.isDefined($scope.OrgList)) {
+            delete $scope.Organization;
+        }
+        if (angular.isDefined($scope.CountryList)) {
+            delete $scope.Country;
+        }
+        if (angular.isDefined($scope.SupplierList)) {
+            delete $scope.Supplier;
+        }
+        if (angular.isUndefined($scope.showOrg) || $scope.showOrg == '') {
+            $(".pageLoaderOverlay").show();
+            OrgListFactory.GetOrg("ORGANIZATION").success(function (data) {
+
+                $scope.OrgList = data.d;
+                if ($scope.OrgList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.OrgGrid != undefined) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+            CountryListFactory.GetCountry("Country").success(function (data) {
+
+                $scope.CountryList = data.d;
+                if ($scope.OrgList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.OrgGrid != undefined) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+            SupplierListFactory.GetSupplier("Supplier").success(function (data) {
+
+                $scope.SupplierList = data.d;
+                if ($scope.OrgList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.OrgGrid != undefined) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            })
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+            OrgGridFactory.GetOrgGrid("ORGANIZATION").success(function (data) {
+
+                $scope.OrgGrid = data.d;
+                $scope.TotalRecordCount3 = $scope.OrgGrid.length;
+                if ($scope.OrgList != undefined && $scope.CountryList != undefined && $scope.SupplierList != undefined && $scope.OrgGrid != undefined) {
+                    $(".pageLoaderOverlay").hide();
+                }
+
+
+
+
+
+
+                $scope.usersTable2 = new ngTableParams({
+
+                }, { 'dataset': $scope.OrgGrid
+
+                });
+                if (data.d.length == 0) {
+                    $scope.ORGData = false;
+                    $("#deleteOrgdiv").hide();
+                }
+                else {
+                    $scope.ORGData = true;
+                    $("#deleteOrgdiv").show();
+                }
+
+            })
+
+
+
+
+        .error(function (error) {
+            alert(error);
+            alert("Problem occured while loading Speed Info; " + JSON.stringify(error));
+        });
+
+
+
+            $scope.showOrg = 1;
+
+        }
+
+
+    }
+
+
+});
+
+   

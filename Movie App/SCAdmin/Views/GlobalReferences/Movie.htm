@@ -1,0 +1,58 @@
+﻿<div>
+
+    <div id="divAnnouncements" ng-controller="MovieCtrl">
+        <div>
+            <p>Search:</p>
+            <input type="text" id="searchtxt" ng-model="post.search" name="searchtxt" /> <button type="submit" class="btn btn-primary" id="btnsearch" ng-click='getItems(post.search)' name="btnsearch">Submit</button>
+        </div>
+
+        <table ng-table="usersTable" id="tblMovie" class="table table-striped Arrow">
+            <tr ng-repeat="film in $data">
+              
+                <td data-title="' display title'" sortable="'display_title'" filter="{ 'display_title': 'text' }" class="Arrow">
+
+                    <a href="{{film.link.url}}">    {{film.display_title}}   </a>
+                </td>
+                <td data-title="' Multimedia'"  sortable="'film.multimedia.src'" filter="{ 'film.multimedia.src': 'text' }"
+                    class="Arrow">
+                    <div>
+                        <img src=" {{film.multimedia.src}}" alt=" {{film.multimedia.src}}">  <br />
+
+                    </div>
+
+                </td>
+                <td data-title="' headline'"    sortable="'headline'" filter="{ 'headline': 'text' }"
+                    class="Arrow">
+                    <div>
+                        {{film.headline}}<br />
+
+                    </div>
+
+                </td>
+                <td data-title="'summary_short'"  sortable="'summary_short'" filter="{ 'summary_short': 'text' } " style=" width:600px;"
+                    class="Arrow">
+                    <div>
+                        {{film.summary_short}}
+                        <br />
+                        {{film.publications_date}}
+                    </div>
+
+                </td>
+
+            </tr>
+        </table>
+    </div>
+    <div>
+    </div>
+    <script type="text/javascript">
+        $("#btnsearch").click(function () {
+
+            var search = $('#searchtxt').val();
+
+        });
+
+
+    </script>
+
+
+</div>

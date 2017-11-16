@@ -1,0 +1,200 @@
+﻿
+<div class="container">
+  <ul class="nav nav-tabs">
+            <li  class="active"><a data-toggle="tab" 
+                data-target="#divMonthlyUR">Monthly Usage Report</a> </li>
+            <li  ><a data-toggle="tab"
+                 class="Show_HVPN clickable1" data-target="#divWeeklyUR">Weekly Usage Report</a>
+               
+            </li>           
+        </ul>
+         <div class="tab-content clearfix ">
+            <div id="divMonthlyUR" class="tab-pane active">
+            <div ng-controller="Controllers.MonthlyUsaseReportCtrl">
+
+    <div class="row" style="padding-left: 10px">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            
+                <div class="panel-body">
+                 <div>
+    <!--<h4 style="text-align:center">Monthly Usage Report</h4>-->
+    </div>
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label cus-text-left" for="">
+                                Selection Criteria
+                            </label>
+                            <div class="col-sm-3">
+                                <select id="Select1" style="width: 250px" ng-change="GetUsageReport(modReport)" ng-model="modReport"
+                                    ng-options="item.reportTypeId as item.reportType for item in reportTypeList"
+                                    class="cus-text-left">
+                                    <!--<option value="">Select</option>-->
+                                </select>
+                            </div>
+                            <div class="col-sm-2" ng-show="isExportAvailable">
+                                <input type="button" class=" btn btn-primary" ng-click="ExportMonthlyReport()" value="Download To Excel" />
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-show="NoReportData" class="alert alert-danger Arrow" role="alert">
+                        No records found
+                    </div>
+                    <div ng-show="NoDropdownSelection" class="alert alert-danger Arrow" role="alert">
+                        Please select some value from dropdown
+                    </div>
+                    <div ng-show="TotalSessionReportData">
+                        <table ng-table="UsageReportTable" class="table table-striped no-pager" show-filter="true">
+                            <tr ng-repeat="report in $data">
+                                <td title="'Month-Year'" filter="{ Month: 'text'}" sortable="'Month'">
+                                    {{report.Month}}
+                                </td>
+                                <td title="'Count'" filter="{ Count: 'text'}" sortable="'Count'">
+                                    {{report.Count}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div ng-show="DistributorReportData">
+                        <table ng-table="UsageReportTable" class="table table-striped" show-filter="true">
+                            <tr ng-repeat="report in $data">
+                                <td title="'Month-Year'" filter="{ Month: 'text'}" sortable="'Month'">
+                                    {{report.Month}}
+                                </td>
+                                <td title="'Distributor'" filter="{ Description: 'text'}" sortable="'Description'">
+                                    {{report.Description}}
+                                </td>
+                                <td title="'Product'" filter="{ Product: 'text'}" sortable="'Product'">
+                                    {{report.Product}}
+                                </td>
+                                <td title="'Count'" filter="{ Count: 'text'}" sortable="'Count'">
+                                    {{report.Count}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div ng-show="GFRReportData">
+                        <table ng-table="UsageReportTable" class="table table-striped no-pager" show-filter="true">
+                            <tr ng-repeat="report in $data">
+                                <td title="'Month-Year'" filter="{ Month: 'text'}" sortable="'Month'">
+                                    {{report.Month}}
+                                </td>
+                                <td title="'GFR'" filter="{ Description: 'text'}" sortable="'Description'">
+                                    {{report.Description}}
+                                </td>
+                                <td title="'Product'" filter="{ Product: 'text'}" sortable="'Product'">
+                                    {{report.Product}}
+                                </td>
+                                <td title="'Count'" filter="{ Count: 'text'}" sortable="'Count'">
+                                    {{report.Count}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div ng-show="ORGReportData">
+                        <table ng-table="UsageReportTable" class="table table-striped" show-filter="true">
+                            <tr ng-repeat="report in $data">
+                                <td title="'Month-Year'" filter="{ Month: 'text'}" sortable="'Month'">
+                                    {{report.Month}}
+                                </td>
+                                <td title="'Organisation'" filter="{ Description: 'text'}" sortable="'Description'">
+                                    {{report.Description}}
+                                </td>
+                                <td title="'Product'" filter="{ Product: 'text'}" sortable="'Product'">
+                                    {{report.Product}}
+                                </td>
+                                <td title="'Count'" filter="{ Count: 'text'}" sortable="'Count'">
+                                    {{report.Count}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div ng-show="AllReportData">
+                        <table ng-table="UsageReportTable" class="table table-striped" show-filter="true">
+                            <tr ng-repeat="report in $data">
+                                <td title="'Month-Year'" filter="{ Month: 'text'}" sortable="'Month'">
+                                    {{report.Month}}
+                                </td>
+                                <td title="'Dist / GFR / ORG'" filter="{ Description: 'text'}" sortable="'Description'">
+                                    {{report.Description}}
+                                </td>
+                                <td title="'Product'" filter="{ Product: 'text'}" sortable="'Product'">
+                                    {{report.Product}}
+                                </td>
+                                <td title="'Count'" filter="{ Count: 'text'}" sortable="'Count'">
+                                    {{report.Count}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+
+                </div>
+            
+        </div>
+    </div>
+</div>
+            </div>
+            <div id="divWeeklyUR" class="tab-pane">
+            <div ng-controller="Controllers.WeeklyUsageReportCtrl">
+    <div class="row" style="padding-left: 10px">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">            
+                <div class="panel-body">
+                <!--<h4 style="text-align:center">Weekly Usage Report</h4>-->
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <!--<label class="col-sm-2 control-label" for="" style="font-size:11px;"style="margin:auto;">-->
+                            <label class="col-sm-2 control-label cus-text-left" for="">
+                                Start Date - End Date (s)
+                            </label>
+                            <div class="col-sm-3">
+                                <select id="Select2" ng-model="modWeeklyReport" ng-options="item as item for item in reportTypeWeeklyList"
+                                    class="form-control" multiple style="height:100px;">
+                                    <!--<option value="">Select</option>-->
+                                </select>
+                                <br />
+                             <span style="color: Red;" ng-show="NoReportData" class="Arrow">Please select Start Date - End Date</span>
+                                </div>
+                            <div class="col-sm-3" style="padding-left:0px;">
+                            <br /><br />
+                                <input type="button" value="Go" ng-click="GetWeeklyUsageReport()" ng-show="modWeeklyReport.length>0" class="btn btn-primary" />
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div ng-show="NoReportData" class="alert alert-danger Arrow" role="alert">
+                        Please select some value from dropdown
+                    </div>-->                     
+                    <div ng-show="WeeklyReportData">
+                        <table ng-table="WeeklyUsageReportTable" class="table table-striped no-pager">
+                            <tr ng-repeat="report in $data">
+                                <td title="'Date'">
+                                    {{report.date}}
+                                </td>
+                                <td title="'Count'">
+                                    {{report.count}}
+                                </td>
+                            </tr>
+                           <!-- <tr>
+                            <td></td>
+                            <td><b>Total&nbsp;:&nbsp;</b> {{totalCount}}</td>
+                            </tr>-->
+                        </table>
+
+                       <!-- <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p style="font-size:14px; text-align:left" class="Arrow">
+                            <span style="color:Black;">Total: {{totalCount}}</span>
+                        </p> 
+                        </div>-->
+                        
+
+                    </div>
+                </div>            
+        </div>
+    </div>
+</div>
+            </div>            
+            </div>
+            </div>
+            <iframe id="csvDownloadFrame" style="display:none;"></iframe>
+            <div class="pageLoaderOverlay">
+</div>
+

@@ -1,0 +1,619 @@
+﻿(function (ng, app) {
+    app.controller('Controllers.StandardReportsNewCtrl', function ($scope, $http, NgTableParams, $rootScope, GetReportfactory, AddNewStandardReport, UpdateStandardReport, DeleteStandardReport) {
+        var self = this;
+
+        $(".pageLoaderOverlay").show();
+
+        // $rootScope.ServiceType = 2;
+        GetReportfactory.GetStandardProductDetails($rootScope.User_Id, $rootScope.AccessLevel).success(function (data) {
+
+            if (data.d.length != 0) {
+                $scope.ProductReportData = true;
+                $('#DivReports').show();
+                $('#divReportemptyMsg').hide();
+
+            }
+            else {
+                $('#DivReports').hide();
+                $('#divReportemptyMsg').show();
+                $scope.ProductReportData = false;
+            }
+            $scope.ProductReportTable = new NgTableParams({}, { 'dataset': data.d });
+            $scope.tableParams = new NgTableParams({
+                sorting: {
+                    ReportCD: 'dsc'
+                }
+            }, {
+                getData: function ($defer, params) {
+                    $defer.resolve($filter('orderBy')($scope.ProductReportTable, params.orderBy()));
+                }
+            });
+            $('.pageLoaderOverlay').hide();
+        }).error(function (error) {
+
+            // alert("Problem occured while Loading Supplier Types" + error);
+            $(".pageLoaderOverlay").hide();
+        });
+        GetReportfactory.GetProductList($rootScope.User_Id, $rootScope.AccessLevel).success(function (data) {
+
+            var result = [];
+            $scope.lstProductReportsDetails = data.d;
+            $scope.masterdata = angular.copy($scope.lstProductReportsDetails);
+
+            $("#modProduct").select2({});
+            $("#modSubProduct").select2({});
+            // $(".pageLoaderOverlay").hide();
+        }).error(function (error) {
+
+            // alert("Problem occured while Loading Supplier Types" + error);
+            $(".pageLoaderOverlay").hide();
+        });
+
+        $scope.GetProductDetails = function (modProduct) {
+            $("#btn_save").attr('disabled', 'disabled');
+            if (($scope.ProdDescription != "" && $scope.ProdDescription != undefined) && $('#select2-chosen-1').text() != "-- Select Product--") {
+                $("#btn_save").removeAttr('disabled');
+                //  $("#DivDescError").show();
+            }
+            //  $("#divAddButton").hide();
+            if (modProduct != "" && modProduct != undefined && modProduct != null) {
+                // $("#divAddButton").show();
+
+
+                $(".pageLoaderOverlay").show();
+                if (modProduct != undefined) {
+                    $('#DivReports').show();
+                    $('#DivSubReports').show();
+                    $scope.ProductName = $("#modProduct option:selected").text();
+                    $('#select2-chosen-2').text('-- Select Sub Product--');
+                    GetReportfactory.GetSubProductList(modProduct, $rootScope.AccessLevel, $rootScope.User_Id).success(function (data) {
+                        $scope.lstsubProductlist = data.d;
+                        $('.pageLoaderOverlay').hide();
+
+                    }).error(function (error) {
+
+                        // alert("Problem occured while Loading Supplier Types" + error);
+                        $(".pageLoaderOverlay").hide();
+                    });
+                }
+            }
+        }
+
+        $scope.CancelRecord = function (Id, desc, abbr, validcode) {
+
+            $('#' + Id).find('td:eq(2)').html(desc);
+            $('#' + Id).find('td:eq(3)').html(abbr);
+
+            if ($scope.Default_checkedValue == true) {
+               
+                $('#' + Id).find('td:eq(4)').find('input[type=checkbox]').attr('checked', true);
+            }
+            else {
+                $('#' + Id).find('td:eq(4)').find('input[type=checkbox]').attr('checked', false);
+            }
+
+            $('#' + Id).find('td:eq(4)').find('input[type=checkbox]').attr('disabled', 'disabled');
+            $('#' + Id).find('.editReportclass').show();
+            $('#' + Id).find('.editbuttonclass').hide();
+            $('#' + Id).find('.cancelbuttonclass').hide();
+            $('#' + Id).find('.deletebuttonclass').show();
+        }
+
+        $scope.AddNewReport = function (modProduct, modSubProduct) {
+            $("#DivProductError").hide();
+            $("#DivDescriptionError").hide();
+            if (modProduct == "" || modProduct == undefined || $('#select2-chosen-1').text() == "-- Select Product--") {
+                $("#DivProductError").show();
+                if ($scope.ProdDescription == "" || $scope.ProdDescription == undefined) {
+                    $("#DivDescriptionError").show();
+                }
+
+                return;
+            }
+            if ($("#modProduct option:selected").text() == "" || $('#select2-chosen-1').text() == "-- Select Product--") {
+                $("#DivProductError").show();
+                return;
+            }
+
+
+            $scope.ProductID = '';
+            if (modProduct != undefined) {
+                $scope.ProductID = modProduct;
+            }
+            $scope.SubProductID = '';
+            if (modSubProduct != undefined) {
+                $scope.SubProductID = modSubProduct
+            }
+
+            if ($('#select2-chosen-2').text() == "-- Select Sub Product--") {
+                $scope.SubProductID = '';
+            }
+            //$("#DivDescError").hide();
+            // $("#DivDescriptionError").hide();
+
+            if ($scope.ProdDescription != "") {
+                var selProdID = $scope.ProductID;
+                $(".pageLoaderOverlay").show();
+                AddNewStandardReport.addNewReport($scope.ProductID, $scope.ProdDescription, $scope.Abbreviation, $scope.ValidCheck, $rootScope.User_Id, $scope.SubProductID).success(function (data) {
+                    GetReportfactory.GetStandardProductDetails($rootScope.User_Id, $rootScope.AccessLevel).success(function (data) {
+
+                        if (data.d.length != 0) {
+                            $scope.ProductReportData = true;
+                            $('#DivReports').show();
+                            $('#divReportemptyMsg').hide();
+
+                        }
+                        else {
+                            $('#DivReports').hide();
+                            $('#divReportemptyMsg').show();
+                            $scope.ProductReportData = false;
+                        }
+                        $scope.ProductReportTable = new NgTableParams({}, { 'dataset': data.d });
+                        $scope.tableParams = new NgTableParams({
+                            sorting: {
+                                ReportCD: 'dsc'
+                            }
+                        }, {
+                            getData: function ($defer, params) {
+                                $defer.resolve($filter('orderBy')($scope.ProductReportTable, params.orderBy()));
+                            }
+                        });
+                        $scope.ReportDesc = "";
+                        $scope.reportAbbr = "";
+                        $scope.Abbreviation = "";
+                        $scope.ProdDescription = "";
+                        $scope.ValidCheck = false;
+                        $scope.reportValidCD = false;
+
+                        $('#select2-chosen-1').text('-- Select Product--');
+                        $('#select2-chosen-2').text('-- Select Sub Product--');
+                        $("#DivProductError").hide();
+                        $("#DivDescriptionError").hide();
+                        $("#btn_save").attr('disabled', 'disabled');
+                        $('.pageLoaderOverlay').hide();
+                        bootbox.alert({ "className": "my-custom-class", message: "Record added successfully" });
+                    }).error(function (error) {
+
+                        // alert("Problem occured while Loading Supplier Types" + error);
+                        $(".pageLoaderOverlay").hide();
+                    });
+                    var tableData = [];
+                    if (data.d != undefined) {
+
+                        // var ddlDefaultSelect = { 'ReportCD': data.d.ReportCD, 'ProductId': data.d.ProductId, 'ProductName': data.d.ProductName, 'SubProductId': data.d.SubProductId, 'SubProductName': data.d.SubProductName, 'reportLocLevelCD': data.d.reportLocLevelCD, 'reportDescription': data.d.reportDescription, 'reportPathDesc': data.d.reportPathDesc, 'reportValidCD': data.d.reportValidCD, 'reportAbbr': data.d.reportAbbr };
+                        // $scope.ProductReportTable.splice(0, '0', ddlDefaultSelect);
+
+                        // tableData.push(data.d);
+                        //  $scope.ProductReportTable = tableData;
+
+                    }
+                    $('#addNewReportModal').modal('hide');
+                }).error(function (error) {
+
+                    // alert("Problem occured while Loading Supplier Types" + error);
+                    $(".pageLoaderOverlay").hide();
+                });
+            }
+            else {
+                $("#DivDescriptionError").show();
+            }
+        }
+
+
+        $scope.ResetReport = function (modProduct, modSubProduct) {
+            $scope.ReportDesc = "";
+            $scope.reportAbbr = "";
+            $scope.Abbreviation = "";
+            $scope.ProdDescription = "";
+            $scope.ValidCheck = false;
+            $scope.reportValidCD = false;
+            var selProdID = $scope.ProductID
+            var ReportIds = $scope.ReportId;
+            $('#select2-chosen-1').text('-- Select Product--');
+            $('#select2-chosen-2').text('-- Select Sub Product--');
+            $("#DivProductError").hide();
+            $("#DivDescriptionError").hide();
+            $("#btn_save").attr('disabled', 'disabled');
+        }
+        $scope.DeleteReport = function (Id, reportID, ReportDesc) {
+
+            var reportDescription = ReportDesc;
+            var ReportIds = reportID;
+            bootbox.confirm("Are you sure to delete report  <b>" + reportDescription + "</b>?", function (result) {
+
+                if (result) {
+
+                    DeleteStandardReport.deleteReport(ReportIds).success(function (data) {
+
+                        if (data.d > 0) {
+                            // $('#' + Id).remove();
+                            GetReportfactory.GetStandardProductDetails($rootScope.User_Id, $rootScope.AccessLevel).success(function (data) {
+
+                                if (data.d.length != 0) {
+                                    $scope.ProductReportData = true;
+                                    $('#DivReports').show();
+                                    $('#divReportemptyMsg').hide();
+
+                                }
+                                else {
+                                    $('#DivReports').hide();
+                                    $('#divReportemptyMsg').show();
+                                    $scope.ProductReportData = false;
+                                }
+                                $scope.ProductReportTable = new NgTableParams({}, { 'dataset': data.d });
+
+                                $('.pageLoaderOverlay').hide();
+                                bootbox.alert({ "className": "my-custom-class", message: "Report deleted successfully" });
+                            }).error(function (error) {
+
+                                // alert("Problem occured while Loading Supplier Types" + error);
+                                $(".pageLoaderOverlay").hide();
+                            });
+                        }
+                    }).error(function (error) {
+
+                        // alert("Problem occured while Loading Supplier Types" + error);
+                        $(".pageLoaderOverlay").hide();
+                    });
+                }
+            }).error(function (error) {
+
+                // alert("Problem occured while Loading Supplier Types" + error);
+                $(".pageLoaderOverlay").hide();
+            });
+
+        }
+        $scope.DeleteReportData = function (id, reportID, reportDesc, modProduct) {
+
+            var reportDescription = reportDesc;
+            var ReportIds = reportID;
+            bootbox.confirm("Are you sure to delete report " + reportDescription + "?", function (result) {
+
+                if (result) {
+                    $(".pageLoaderOverlay").show();
+                    DeleteStandardReport.deleteReport(ReportIds).success(function (data) {
+
+                        if (data.d == 1) {
+                            if ($scope.SubProductID == "") {
+                                GetReportfactory.GetProductReportList(modProduct).success(function (data) {
+                                    if (data.d.length != 0) {
+                                        $scope.ProductReportData = true;
+                                        $('#DivReports').show();
+                                        $('#divReportemptyMsg').hide();
+
+                                    }
+                                    else {
+                                        $('#DivReports').hide();
+                                        $('#divReportemptyMsg').show();
+                                        $scope.ProductReportData = false;
+                                    }
+
+                                    $scope.ProductReportTable = new NgTableParams({}, { 'dataset': data.d });
+                                    $('.pageLoaderOverlay').hide();
+                                    $('#editReportModal').modal('hide');
+                                    bootbox.alert({ "className": "my-custom-class", message: "Report deleted successfully" });
+                                }).error(function (error) {
+
+                                    // alert("Problem occured while Loading Supplier Types" + error);
+                                    $(".pageLoaderOverlay").hide();
+                                });
+                            }
+                            else {
+                                GetReportfactory.GetSubProductList(modProduct, $rootScope.AccessLevel, $rootScope.User_Id).success(function (data) {
+                                    if (data.d.length != 0) {
+                                        $scope.SubProductReportData = true;
+                                        $('#DivSubReports').show();
+                                        $('#divSubReportemptyMsg').hide();
+                                    }
+                                    else {
+                                        $('#DivSubReports').hide();
+                                        $('#divSubReportemptyMsg').show();
+                                        $scope.SubProductReportData = false;
+                                    }
+
+                                    $scope.SubProductReportTable = new NgTableParams({}, { 'dataset': data.d });
+                                    $('.pageLoaderOverlay').hide();
+                                    $('#editReportModal').modal('hide');
+                                    bootbox.alert({ "className": "my-custom-class", message: "Report deleted successfully" });
+                                }).error(function (error) {
+
+                                    // alert("Problem occured while Loading Supplier Types" + error);
+                                    $(".pageLoaderOverlay").hide();
+                                });
+                            }
+                            // $('#editReportModal').modal('hide');
+                        }
+                    }).error(function (error) {
+
+                        // alert("Problem occured while Loading Supplier Types" + error);
+                        $(".pageLoaderOverlay").hide();
+                    });
+                }
+            }).error(function (error) {
+
+                // alert("Problem occured while Loading Supplier Types" + error);
+                $(".pageLoaderOverlay").hide();
+            });
+
+        }
+        $scope.updateReport = function () {
+            $scope.ProductName = $("#modProduct option:selected").text();
+            $scope.ProductID = modProduct;
+            $("#DivDescError1").hide();
+            $("#DivDescriptionError1").hide();
+            if ($scope.ReportDesc != "") {
+                if ($scope.Default_desc != $scope.ReportDesc || $scope.Default_abbr != $scope.reportAbbr || $scope.Default_checkedValue != $scope.reportValidCD) {
+                    var selProdID = $scope.ProductID
+                    var ReportIds = $scope.ReportId;
+                    UpdateStandardReport.updateReport(ReportIds, $scope.ProductID, $scope.ReportDesc, $scope.reportAbbr, $scope.reportValidCD, $rootScope.User_Id, $scope.SubProductID).success(function (data) {
+                        if (data.d == 1) {
+                            if ($scope.SubProductID == "") {
+                                GetReportfactory.GetProductReportList(modProduct).success(function (data) {
+                                    if (data.d.length != 0) {
+                                        $scope.ProductReportData = true;
+                                        $('#DivReports').show();
+                                        $('#divReportemptyMsg').hide();
+
+                                    }
+                                    else {
+                                        $('#DivReports').hide();
+                                        $('#divReportemptyMsg').show();
+                                        $scope.ProductReportData = false;
+                                    }
+                                    bootbox.alert({ "className": "my-custom-class", message: "Report updated successfully" });
+                                    $scope.ProductReportTable = new NgTableParams({}, { 'dataset': data.d });
+                                    $('.pageLoaderOverlay').hide();
+                                    $('#editReportModal').modal('hide');
+                                }).error(function (error) {
+
+                                    // alert("Problem occured while Loading Supplier Types" + error);
+                                    $(".pageLoaderOverlay").hide();
+                                });
+                            }
+                            else {
+                                GetReportfactory.GetSubProductList(modProduct, $rootScope.AccessLevel, $rootScope.User_Id).success(function (data) {
+                                    if (data.d.length != 0) {
+                                        $scope.SubProductReportData = true;
+                                        $('#DivSubReports').show();
+                                        $('#divSubReportemptyMsg').hide();
+                                    }
+                                    else {
+                                        $('#DivSubReports').hide();
+                                        $('#divSubReportemptyMsg').show();
+                                        $scope.SubProductReportData = false;
+                                    }
+
+                                    $scope.SubProductReportTable = new NgTableParams({}, { 'dataset': data.d });
+                                    $('.pageLoaderOverlay').hide();
+                                    $('#editReportModal').modal('hide');
+                                    bootbox.alert({ "className": "my-custom-class", message: "Report updated successfully" });
+                                }).error(function (error) {
+
+                                    // alert("Problem occured while Loading Supplier Types" + error);
+                                    $(".pageLoaderOverlay").hide();
+                                });
+                            }
+                        }
+                    }).error(function (error) {
+
+                        // alert("Problem occured while Loading Supplier Types" + error);
+                        $(".pageLoaderOverlay").hide();
+                    });
+                }
+                else {
+                    bootbox.alert({ "className": "my-custom-class", message: "Data remains the  same and hence there is no update" });
+                }
+            }
+            else {
+                $("#DivDescriptionError1").show();
+            }
+
+        }
+
+
+        $scope.OpenAddNewSubReportpopup = function (Id, subProductId, subproductName, modProduct) {
+            $scope.userForm1.$setPristine();
+            $scope.Abbreviation = "";
+            $scope.ProdDescription = "";
+            $scope.ValidCheck = false;
+            $scope.ProductName = $("#modProduct option:selected").text();
+            $scope.ProductID = modProduct;
+            $scope.SubProductID = subProductId;
+            $scope.SubProductname = subproductName;
+            // $('#divFeatureID1').show();
+            $('#addNewReportModal').modal('show');
+        }
+        $scope.OpenAddNewReportpopup = function () {
+            $("#btn_save").attr('disabled', 'disabled');
+            $('#select2-chosen-1').text('-- Select Product--');
+            $('#select2-chosen-2').text('-- Select Sub Product--');
+            $scope.userForm1.$setPristine();
+            $scope.SubProductID = "";
+            $scope.SubProductname = "";
+
+            $scope.Abbreviation = "";
+            $scope.ProdDescription = "";
+            $scope.ValidCheck = false;
+            $("#DivProductError").hide();
+            $("#DivDescriptionError").hide();
+
+            $('#addNewReportModal').modal('show');
+        }
+
+        $scope.keyupevt = function () {
+            $("#DivDescriptionError").hide();
+            $("#DivDescriptionError1").hide();
+            $("#btn_save").attr('disabled', 'disabled');
+            if (($scope.ProdDescription != "" && $scope.ProdDescription != undefined) && $('#select2-chosen-1').text() != "-- Select Product--") {
+                $("#btn_save").removeAttr('disabled');
+                //  $("#DivDescError").show();
+            }
+            if ($scope.ProdDescription == "") {
+                $("#DivDescError1").show();
+                //  $("#DivDescError").show(); ;
+            }
+        };
+        $scope.EditReport = function (Id, reportDesc, reportAbbr, validselect) {
+            $scope.Default_desc = reportDesc;
+            $scope.Default_abbr = reportAbbr;
+            $scope.Default_checkedValue = validselect
+            if ($.trim($('#' + Id).find('td:eq(2)').text()) != '') {
+
+                $('#' + Id).find('td:eq(2)').html("<input class='form-control' type='text' maxlength='200' value='" + $.trim($('#' + Id).find('td:eq(2)').text()) + "'></input>  <div id='DivDescriptionErrormsg' style='display:none;'> <p  class='help-block' style='color: Red'>Enter Description</p> </div>");
+                $('#' + Id).find('td:eq(3)').html("<input class='form-control' type='text' maxlength='9' value='" + $.trim($('#' + Id).find('td:eq(3)').text()) + "'></input>");
+                $('#' + Id).find('td:eq(4)').find('input[type=checkbox]').removeAttr('disabled');
+                $('#' + Id).find('.editReportclass').hide();
+                $('#' + Id).find('.editbuttonclass').show();
+                $('#' + Id).find('.deletebuttonclass').hide();
+                $('#' + Id).find('.cancelbuttonclass').show();
+
+                // $('#' + Id).find('span').first().next().show();
+
+            }
+        }
+
+        $scope.OpenEditReportPopUp = function (Id, prodId, Productname, ReportId, ReportDesc, reportLocLevelCD, reportPathDesc, reportValidCD, reportAbbr, subProdID, SubProdName) {
+            $scope.userForm.$setPristine();
+
+            ReportDesc = $.trim($('#' + Id).find('td:eq(2)').find('input').val());
+            reportAbbr = $.trim($('#' + Id).find('td:eq(3)').find('input').val());
+            if (ReportDesc == "" || ReportDesc == undefined) {
+                $('#DivDescriptionErrormsg').show();
+                return;
+            }
+            else {
+                $('#DivDescriptionErrormsg').hide();
+            }
+            if ($('#' + Id).find('td:eq(4)').find('input[type=checkbox]').is(':checked')) {
+                reportValidCD = true;
+            }
+
+            else {
+                reportValidCD = false;
+            }
+            $scope.ProductName = Productname;
+            $scope.ProductID = prodId;
+            $scope.ReportDesc = ReportDesc;
+            $scope.ReportId = ReportId;
+            $scope.reportLocLevelCD = reportLocLevelCD;
+            $scope.reportPathDesc = reportPathDesc;
+            $scope.reportValidCD = reportValidCD;
+            $scope.reportAbbr = reportAbbr;
+            $scope.SubProductID = subProdID;
+            $scope.SubProductname = SubProdName;
+            if ($scope.SubProductID != "" && $scope.SubProductID != undefined && $scope.SubProductID != 0) {
+                $('#divFeatureID').show();
+            }
+            else {
+                $('#divFeatureID').hide();
+            }
+            UpdateStandardReport.updateReport(ReportId, prodId, ReportDesc, reportAbbr, $scope.reportValidCD, $rootScope.User_Id, $scope.SubProductID).success(function (data) {
+                if (data.d == 1) {
+                    //                    $scope.ProductReportTable.forEach(function (item) {
+                    //                        if (item.ReportCD == ReportId) {
+                    //                            item.reportDescription = ReportDesc;
+                    //                            item.reportAbbr = reportAbbr;
+                    //                            item.reportValidCD = $scope.reportValidCD;
+                    //                        }
+                    //                    });
+                    $('#' + Id).find('td:eq(4)').find('input[type=checkbox]').attr('disabled', 'disabled');
+                    $('#' + Id).find('.editReportclass').show();
+                    $('#' + Id).find('.editbuttonclass').hide();
+                    $('#' + Id).find('.cancelbuttonclass').hide();
+                    $('#' + Id).find('.deletebuttonclass').show();
+                    bootbox.alert({ "className": "my-custom-class", message: "Record updated successfully" });
+                }
+            }).error(function (error) {
+
+                // alert("Problem occured while Loading Supplier Types" + error);
+                $(".pageLoaderOverlay").hide();
+            });
+            $('#' + Id).find('td:eq(2)').html($.trim($('#' + Id).find('td:eq(2)').find('input').val()));
+            $('#' + Id).find('td:eq(3)').html($.trim($('#' + Id).find('td:eq(3)').find('input').val()));
+
+            //            if ($scope.reportValidCD == true) {
+            //                $('#' + Id).find('td:eq(4)').find('input[type=checkbox]').prop("checked", true);
+            //            }
+
+            //            else {
+            //                $('#' + Id).find('td:eq(4)').find('input[type=checkbox]').prop("checked", true);
+            //            }
+
+
+            // $('#editReportModal').modal('show');
+        }
+
+        $scope.OpenPopup = function (user) {
+            var selTabText = $('.nav-tabs .active').text();
+
+            var HeaderText = 'Edit ' + selTabText;
+            $scope.prodOwner = 0;
+            $scope.UserName = user.UserName;
+            $scope.UserCategory = user.UserCategoryCD;
+            $scope.UserStatus = user.UserStatusId;
+            $scope.EmpID = user.EmpID;
+            $scope.UserEmailID = "";
+            $scope.HeaderText = HeaderText;
+            if (selTabText == 'End User') {
+                $scope.UserEmailID = user.UserEmailID;
+            }
+            if (user.UserEmail == 0) {
+                $scope.email = false;
+            }
+            else {
+                $scope.email = true;
+            }
+        }
+
+    });
+
+    app.factory('GetReportfactory', function ($http) {
+        var GetReportfactory = {};
+
+        GetReportfactory.GetStandardProductDetails = function (userid, issuperuser) {
+            return $http.post('StandardReports_New.aspx/GetStandardReportsDetails', { 'userid': userid, 'issuperuser': issuperuser });
+        }
+        GetReportfactory.GetProductList = function (userid, issuperuser) {
+            return $http.post('StandardReports_New.aspx/GetProductList', { 'userid': userid, 'issuperuser': issuperuser });
+        }
+        GetReportfactory.GetProductReportList = function (ProductID) {
+
+            return $http.post("StandardReports_New.aspx/GetProductReportList", { 'ProductID': ProductID });
+        }
+        GetReportfactory.GetSubProductList = function (ProductID, userType, userid) {
+
+            return $http.post("StandardReports_New.aspx/GetSubProductList", { 'ProductID': ProductID, 'userType': userType, 'userid': userid });
+        }
+        return GetReportfactory;
+    });
+
+    app.factory('AddNewStandardReport', function ($http) {
+
+        var AddNewStandardReport = {};
+        AddNewStandardReport.addNewReport = function (ProdID, ProdDescription, Abbreviation, ValidCheck, userID, subProductID) {
+
+            return $http.post("StandardReports_New.aspx/AddNewReport", { 'ProdID': ProdID, 'ProdDescription': ProdDescription, 'Abbreviation': Abbreviation, 'ValidCheck': ValidCheck, 'userID': userID, 'subProductID': subProductID });
+        }
+        return AddNewStandardReport;
+    });
+
+    app.factory('UpdateStandardReport', function ($http) {
+
+        var UpdateStandardReport = {};
+        UpdateStandardReport.updateReport = function (ReportID, ProdID, ProdDescription, Abbreviation, ValidCheck, userID, subProductID) {
+
+            return $http.post("StandardReports_New.aspx/UpdateReport", { 'ReportID': ReportID, 'ProdID': ProdID, 'ProdDescription': ProdDescription, 'Abbreviation': Abbreviation, 'ValidCheck': ValidCheck, 'userID': userID, 'subProductID': subProductID });
+        }
+        return UpdateStandardReport;
+    });
+    app.factory('DeleteStandardReport', function ($http) {
+
+        var DeleteStandardReport = {};
+        DeleteStandardReport.deleteReport = function (ReportID) {
+
+            return $http.post("StandardReports_New.aspx/DeleteReport", { 'ReportID': ReportID });
+        }
+        return DeleteStandardReport;
+    });
+
+} (angular, app));

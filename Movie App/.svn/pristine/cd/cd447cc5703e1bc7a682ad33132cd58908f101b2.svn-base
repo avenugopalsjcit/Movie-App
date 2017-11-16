@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SCAdminDAL;
+using PCDataAccess;
+using Newtonsoft.Json;
+using SCAdminBAL.MCU;
+using PCDataAccess_V;
+using System.Data;
+
+namespace SCAdminBAL.Mass_case_update
+{
+    public class getAccessSpeed
+    {
+        public string GetAccessSpeed(int[] Caselist, int[] PopList, int[] PortSpeedList,
+           int ProductCd, int SubProductCd, string accessSuppID, string SuppProd, string AccType, string type)
+        {
+            DataSet dsAccessSupp = null;
+
+            if (type == "HVPN")
+                dsAccessSupp = GetAccessSuppDatahvpn(Caselist, PopList, PortSpeedList, ProductCd, SubProductCd, accessSuppID, SuppProd, AccType);
+            else
+                dsAccessSupp = GetAccessSuppData(Caselist, PopList, PortSpeedList, ProductCd, SubProductCd, accessSuppID, SuppProd, AccType);
+            DataSet dsAS = new DataSet();
+            dsAS = dsAccessSupp.Copy();
+            dsAccessSupp.Dispose();
+            DataView dvAS = new DataView();
+            dvAS = dsAS.Tables[0].DefaultView;
+            dvAS.Sort = "accessnumval ASC";
+
+            DataTable dtAccessSpeed = dvAS.ToTable();
+            return "[" + JsonConvert.SerializeObject(dvAS.ToTable()) + "," + JsonConvert.SerializeObject(dsAccessSupp.Tables[1]) + "]";
+            //return JsonConvert.SerializeObject(dtAccessSpeed);
+
+        }
+
+        private DataSet GetAccessSuppDatahvpn(int[] SelectedCases, int[] SelectedPops, int[] SelectedPortSpeeds, int ProdCd, int SubProdCd, string AS, string AP, string AT)
+        {
+            DataRetrieval_V oDataAccess = new DataRetrieval_V(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            try
+            {
+                dsData = oDataAccess.GetAccessSuppInfohvpn(SelectedCases, SelectedPops, SelectedPortSpeeds, ProdCd, SubProdCd, AS, AP, AT);
+            }
+            catch
+            {
+                throw;
+            }
+            return dsData;
+
+        }
+
+        public DataSet GetAccessSuppData(int[] SelectedCases, int[] SelectedPops, int[] SelectedPortSpeeds, int ProdCd, int SubProdCd, string AS, string AP, string AT)
+        {
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            try
+            {
+                //dsData = oDataAccess.GetAccessSuppInfo(SelectedCases, SelectedPops, SelectedPortSpeeds, ProdCd, SubProdCd, PSS, PSAT, PSSP);
+                dsData = oDataAccess.GetAccessSuppInfo(SelectedCases, SelectedPops, SelectedPortSpeeds, ProdCd, SubProdCd, AS, AP, AT);
+            }
+            catch
+            {
+                throw;
+            }
+            return dsData;
+
+
+        }
+    }
+
+
+
+}

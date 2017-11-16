@@ -1,0 +1,171 @@
+﻿
+    <div >
+     
+            <div id="divAnnouncements"  ng-controller="AdminUnitofMeasureCtrl" >
+             
+               <div >
+                       
+                        <div id="Div6">
+                       
+                          <div class="row text-left Arrow ">
+                           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                                Unit of Measure
+                            </h3>
+                        </div>
+                    </div>  
+                        <div class="col-md-12"  >
+                        <button class="btn btn-default btn-sm pull-right" id="Addbtn" data-toggle="modal" data-target="#basicModal" ng-click="addNewTask()" >Add Unit Of Measure</button>
+                         </div>
+                        
+                            
+
+                              <table ng-table="usersTable" id="tblAvailability"  class="table table-striped Arrow">
+                                <tr ng-repeat="category in $data">
+                                       <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                                        <td data-title="' Unit Of Measure'"  sortable="'UOMName'" class="Arrow">
+                                            {{category.UOMName}}
+                                        </td>
+                                        <td data-title="' Edit'">
+                                        <button class="btn btn-default btn-sm" id="Editbtn" data-toggle="modal" ng-click="EditRecord(category)" data-target="#basicModal" ><span class="glyphicon glyphicon-pencil"></span></button>
+                                        </td>
+                                        <td data-title="' Delete'">
+                                        <button value="Delete" class="btn btn-sm btn-danger" id="AnnouncementId" class="chkAnnounmence" data-ng-click="DeleteAdminAvail(category)" > <span class="glyphicon glyphicon-trash"></span></button></span>
+                                    </td>
+                                        
+                                    </tr>
+                                   
+                                </table>
+                            
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+
+               
+
+              
+               
+           
+              <div class="modal fade" id="basicModal" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" >
+                <div class="modal-content">
+                    <div class="modal-header" ng-show="Reset==0">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add Unit of Measure</h4>
+                    </div>
+                      <div class="modal-header" ng-show="Reset==1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Edit  Unit of Measure</h4>
+                    </div>
+                    <div class="modal-body">
+                         <form class="form-horizontal" name="Availabilityform" novalidate>
+                        
+                        
+                        <div class="control-group" >
+                            <label class="control-label" for="inputtitle" >
+                                Unit of Measure <span style="color:Red">*</span></label>
+                            <div class="controls" >
+                                <input type="text" style="font-weight:normal" id="inputAbbr" ng-model="UnitofMeasure" ng-minlength="1" placeholder="Unit of Measure" required >
+                            </div>
+                            <div>
+                                        <p style="margin-left: 132px; color: Red" ng-show="Availabilityform.inputAbbr.$invalid && !Availabilityform.inputAbbr.$pristine"
+                                            class="help-block">
+                                            Please Enter Unit of Measure.</p>
+                                    </div>
+                        </div>
+                       
+                        </form>
+                    </div>
+                    <div>
+                    
+                    
+                              <table ng-show="Reset==1" id="Table1"  class="table table-striped Arrow">
+                              <tbody >
+                              <thead>
+                              <tr>
+                              <th style="background-color:transparent;color:Black">
+                              Created by
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Created Date
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Updated by
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Date Last Updated
+                              </th>
+                              </tr>
+                              </thead>
+                                <tr ng-repeat="category2 in usersTable2">
+                                
+                                       
+                                        <td    class="Arrow">
+                                            {{category2.CREATED_EMP_ID}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.CREATED_DT}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.UPDATED_EMP_ID}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.UPDATED_DT}}
+                                        </td>
+                                    </tr>
+                                   </tbody>
+                                </table>
+                    </div>
+                    <div class="modal-footer" style="background-color:none">
+                   
+                        <button type="button" id="Resetbtn" ng-show="Reset==1" class="btn btn-default"  ng-click="ResetRecord()">
+                            Reset</button>
+                        
+                           <button type="button" id="closebtn" data-dismiss="modal"  class="btn btn-default"  >
+                            Close </button>
+                        <button type="button" class="btn btn-primary" ng-show="Reset==0" data-dismiss="modal"   ng-disabled="Availabilityform.$invalid"  ng-click="SaveAdminAvail()">
+                            Submit</button>
+                             <button type="button" class="btn btn-primary" ng-show="Reset==1"  data-dismiss="modal"   ng-disabled="Availabilityform.$invalid"  ng-click="UpdateAdminAvail(AvailValidCd)">
+                            Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+               
+
+               </div>
+               
+            </div>
+            
+       
+        
+        
+        
+    </div>
+    
+  
+    
+   
+    <div>
+        
+    
+   
+       
+
+       
+   <div class="pageLoaderOverlay">
+    </div>
+
+    </div>
+

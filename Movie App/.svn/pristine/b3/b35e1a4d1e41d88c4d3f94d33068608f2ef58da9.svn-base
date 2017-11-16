@@ -1,0 +1,750 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SCAdminDAL;
+using System.Data;
+using PCDataAccess;
+using Newtonsoft.Json;
+
+namespace SCAdminBAL
+{
+    public class CPEBundlesBAL
+    {
+        private CPEBundlesDAL objCpeBundlesDAL = new CPEBundlesDAL();
+
+
+        public List<CPEBundles> GetCPEProducts()
+        {
+            DataTable dtproducts = objCpeBundlesDAL.GetCPEProducts();
+
+            List<CPEBundles> lstproducts = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtproducts.Rows)
+                {
+                    CPEBundles objCpeProducts = new CPEBundles();
+
+                    objCpeProducts.ProductID = Convert.ToString(dr["Product_CD"]);
+
+                    objCpeProducts.ProductName = Convert.ToString(dr["Product_Name"]);
+                    lstproducts.Add(objCpeProducts);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstproducts;
+        }
+
+        public List<CPEBundles> GetCPERegion()
+        {
+            DataTable dtregion = objCpeBundlesDAL.GetCPERegion();
+
+            List<CPEBundles> lstregion = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtregion.Rows)
+                {
+                    CPEBundles objCpeRegion = new CPEBundles();
+
+                    objCpeRegion.RegionName = Convert.ToString(dr["REGION_NAME"]);
+                    objCpeRegion.RegionID = Convert.ToString(dr["REGION_ID"]);
+
+                    lstregion.Add(objCpeRegion);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstregion;
+        }
+
+        public List<CPEBundles> GetCPECountry(int RegionID)
+        {
+            DataTable dtcountry = objCpeBundlesDAL.GetCPECountry(RegionID);
+
+            List<CPEBundles> lstcountry = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtcountry.Rows)
+                {
+                    CPEBundles objCpeCountry = new CPEBundles();
+
+                    objCpeCountry.CountryName = Convert.ToString(dr["COUNTRY_NAME"]);
+                    objCpeCountry.CountryID = Convert.ToString(dr["COUNTRY_ID"]);
+
+                    lstcountry.Add(objCpeCountry);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstcountry;
+        }
+
+        public List<CPEBundles> FetchUpdatedByuserName(string Userid)
+        {
+            DataTable dtcountry = objCpeBundlesDAL.FetchUpdatedByuserName(Userid);
+
+            List<CPEBundles> lstcountry = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtcountry.Rows)
+                {
+                    CPEBundles obj = new CPEBundles();
+
+                    obj.UpdatedByUserName = Convert.ToString(dr["USER_NAME"]);
+
+
+                    lstcountry.Add(obj);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstcountry;
+        }
+
+        public List<CPEBundles> GetCPERouter(int ProductID, int RegionID, int CountryID)
+        {
+            DataTable dtrouter = objCpeBundlesDAL.GetCPERouter(ProductID, RegionID, CountryID);
+
+            List<CPEBundles> lstrouter = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtrouter.Rows)
+                {
+                    CPEBundles objCpeRouter = new CPEBundles();
+
+                    objCpeRouter.RouterNamedd = Convert.ToString(dr["ROUTER_NAME"]);
+
+
+                    lstrouter.Add(objCpeRouter);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstrouter;
+        }
+
+        public List<CPEBundles> GetCPEBundle(int ProductID, int RegionID, int CountryID, List<string> RouterNamedd)
+        {
+            DataTable dtbundle = objCpeBundlesDAL.GetCPEBundle(ProductID, RegionID, CountryID, RouterNamedd);
+
+            List<CPEBundles> lstbundle = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtbundle.Rows)
+                {
+                    CPEBundles objCpeBundle = new CPEBundles();
+
+                    objCpeBundle.BundleNamedd = Convert.ToString(dr["Bundle_NAME"]);
+
+
+                    lstbundle.Add(objCpeBundle);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstbundle;
+        }
+
+        public List<CPEBundles> ShowAssignedCountries(string BundleName, string AccessType)
+        {
+            DataTable dtbundle = objCpeBundlesDAL.ShowAssignedCountries(BundleName, AccessType);
+
+            List<CPEBundles> lstassignedcountry = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtbundle.Rows)
+                {
+                    CPEBundles objCpeBundle = new CPEBundles();
+
+                    objCpeBundle.AssignedCountry = Convert.ToString(dr["COUNTRY_NAME"]);
+
+
+                    lstassignedcountry.Add(objCpeBundle);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstassignedcountry;
+        }
+
+
+        public List<CPEBundles> ShowUnAssignedCountries(string BundleName, string AccessType)
+        {
+            DataTable dtbundle = objCpeBundlesDAL.ShowUnAssignedCountries(BundleName, AccessType);
+
+            List<CPEBundles> lstassignedcountry = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtbundle.Rows)
+                {
+                    CPEBundles objCpeBundle = new CPEBundles();
+
+                    objCpeBundle.UnAssignedCountry = Convert.ToString(dr["COUNTRY_NAME"]);
+
+
+                    lstassignedcountry.Add(objCpeBundle);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstassignedcountry;
+        }
+        public List<CPEBundles1> GetCPEBundleTableDetails(int ProductID, int RegionID, int CountryID, List<string> RouterNamedd, List<string> BundleNamedd)
+        {
+            List<CPEBundles1> obj;
+            List<CPEBundles> lstsupplier = new List<CPEBundles>();
+            try
+            {
+                DataTable dtsupplier = objCpeBundlesDAL.GetCPEBundleTableDetails(ProductID, RegionID, CountryID, RouterNamedd, BundleNamedd);
+
+                List<Part> optPart = new List<Part>();
+                List<Part> iosPart = new List<Part>();
+
+                string prevBundleName = string.Empty;
+
+                var grouped = from table in dtsupplier.AsEnumerable()
+                              group table by new { placeCol = table["Bundle_Name"] } into groupby
+                              select new
+                              {
+                                  Value = groupby.Key,
+                                  ColumnValues = groupby
+                              };
+
+
+                foreach (var key in grouped)
+                {
+                    CPEBundles objOnetoManyMap = new CPEBundles();
+
+                    objOnetoManyMap.Bundle = key.Value.placeCol.ToString();
+                   
+                    objOnetoManyMap.optPart = new List<Part>();
+                    objOnetoManyMap.iosPart = new List<Part>();
+                    objOnetoManyMap.varParts = new List<string>();
+                    foreach (var columnValue in key.ColumnValues)
+                    {
+                        objOnetoManyMap.Router = Convert.ToString(columnValue["ROUTER_NAME"]);
+ 
+
+                        if (Convert.ToString(columnValue["PART_TYPE"]) == "Opt")
+                        {
+
+                            Part p = new Part();
+                            p.AceesTypeOpt = Convert.ToString(columnValue["CHAR_NAME"]);
+
+
+                            if (objOnetoManyMap.optPart.Where(t => t.AceesTypeOpt == p.AceesTypeOpt).ToList().Count == 0)
+                            {
+
+                               // p.PartName = Environment.NewLine + "\r\n"  + p.AceesTypeOpt + ":" + Environment.NewLine  + "\r\n" + Convert.ToString(columnValue["NAME"]);
+                                p.PartName = "<br/>" + p.AceesTypeOpt + " :" + "<br/>" + Convert.ToString(columnValue["NAME"]);
+                            }
+                            else
+                            {
+                                p.PartName = Convert.ToString(columnValue["NAME"]);
+                            }
+
+                          //  p.PartName = Convert.ToString(columnValue["NAME"]);
+
+
+                            //p.PartName = p.AceesTypeOpt + ":" + Convert.ToString(columnValue["NAME"]);
+
+                           
+                            
+                         //   p.PartName = Convert.ToString(p.PartName.OrderBy(x => x).ToArray());
+                            objOnetoManyMap.optPart.Add(p);
+                           // var matches = objOnetoManyMap.optPart.Where(q => q.AceesTypeOpt == p.AceesTypeOpt).ToList();
+                           
+                        }
+
+                        if (Convert.ToString(columnValue["PART_TYPE"]) == "IOS")
+                        {
+                            Part p = new Part();
+                            p.AceesType = Convert.ToString(columnValue["CHAR_NAME"]);
+                            if (objOnetoManyMap.iosPart.Where(t => t.AceesType == p.AceesType).ToList().Count == 0)
+                            {
+
+                                // p.PartName = Environment.NewLine + "\r\n"  + p.AceesTypeOpt + ":" + Environment.NewLine  + "\r\n" + Convert.ToString(columnValue["NAME"]);
+                                p.PartNameIOS = "<br/>" + p.AceesType + " :" + "<br/>" + Convert.ToString(columnValue["NAME"]);
+                            }
+                            else
+                            {
+                                p.PartNameIOS = Convert.ToString(columnValue["NAME"]);
+                            }
+                           
+                            objOnetoManyMap.iosPart.Add(p);
+                        }
+
+                        if (Convert.ToString(columnValue["PART_TYPE"]) == "Var")
+                        {    
+                            objOnetoManyMap.varParts.Add(Convert.ToString(columnValue["NAME"]));
+                        }
+
+                        objOnetoManyMap.ValidBundle = Convert.ToString(columnValue["Valid_Bundle"]);
+                        objOnetoManyMap.RouterEndofQuoteDate = Convert.ToString(columnValue["ROUTER_EOQ_DATE"]).Replace("00:00:00", "");
+                        objOnetoManyMap.RouterEndofSupportDate = Convert.ToString(columnValue["ROUTER_EOL_DATE"]).Replace("00:00:00", "");
+                        objOnetoManyMap.BundleEndofQuoteDate = Convert.ToString(columnValue["BUNDLE_EOQ_DATE"]).Replace("00:00:00", "");
+                        objOnetoManyMap.BundleEndofSupportDate = Convert.ToString(columnValue["BUNDLE_EOS_DATE"]).Replace("00:00:00", "");
+                        objOnetoManyMap.ExpectedDate = Convert.ToString(columnValue["EXPECTED_DATE"]).Replace("00:00:00", "");
+                        objOnetoManyMap.QuotableStartDate = Convert.ToString(columnValue["QUOTABLE_START_DATE"]).Replace("00:00:00", "");
+                        objOnetoManyMap.CreatedBy = Convert.ToString(columnValue["CREATED_BY_USER"]);
+                        objOnetoManyMap.CreatedDate = Convert.ToString(columnValue["BUNDLE_CREATED_DATE"]).Substring(0, 12);
+                        objOnetoManyMap.UpdatedBy = Convert.ToString(columnValue["UPDATED_BY_USER"]);
+                        if (Convert.ToString(columnValue["DATE_LAST_UPDATED"]) != "")
+                        {
+                            objOnetoManyMap.DateLastUpdated = Convert.ToString(columnValue["DATE_LAST_UPDATED"]).Substring(0, 12);
+                        }
+                        if (Convert.ToString(columnValue["DATE_LAST_UPDATED"]) == "")
+                        {
+                            objOnetoManyMap.DateLastUpdated = Convert.ToString(columnValue["DATE_LAST_UPDATED"]);
+                        }
+                    }
+
+                    lstsupplier.Add(objOnetoManyMap);
+                    
+                }
+
+
+
+                obj = new List<CPEBundles1>();
+
+                foreach (CPEBundles o in lstsupplier)
+                {
+                    CPEBundles1 abc = new CPEBundles1();
+                    
+                    foreach (var a in o.optPart)
+                    {
+                        abc.Accesstype = a.AceesTypeOpt + "," + abc.Accesstype;
+                        abc.OptionalParts = a.PartName + "," + abc.OptionalParts;
+                        //abc.PartName = Environment.NewLine+abc.PartName != "" ? abc.PartName + Environment.NewLine + a.PartName : a.PartName+Environment.NewLine;
+                        abc.PartName = abc.PartName != "" ? abc.PartName + "<br/>"+ a.PartName : a.PartName ;
+
+                    }
+                  
+
+                 
+                    foreach (var a in o.iosPart)
+                    {
+                        abc.Accesstype = a.AceesType + "," + abc.Accesstype;
+                        abc.Iosparts = a.PartName + "," + abc.Iosparts;
+                        abc.PartNameIOS = abc.PartNameIOS != "" ? abc.PartNameIOS +"<br/>"+  a.PartNameIOS : a.PartName;
+
+                    }
+
+               
+                    foreach (var a in o.varParts)
+                    {
+                        abc.VariableParts = a+","+abc.VariableParts;
+                    }
+
+                    List<string> Accesstypelist = abc.Accesstype.Split(',').ToList();
+                    var DistinctAccesstypelist = Accesstypelist.SelectMany(x => x.Split(',')).Distinct().ToList();
+                    string.Join(",", DistinctAccesstypelist);
+                    abc.Accesstype = string.Join(",", DistinctAccesstypelist);
+
+
+                    abc.Accesstype = abc.Accesstype.Replace(",", "." + Environment.NewLine + " ");
+                   
+
+                    if (abc.OptionalParts != null)
+                    {
+                        List<string> OptionalPartslist = abc.OptionalParts.Split(',').ToList();
+                         var DistinctOptionalPartslist = OptionalPartslist.SelectMany(x => x.Split(',')).Distinct().ToList();
+                      //  var DistinctOptionalPartslist = OptionalPartslist.SelectMany(x => x.Split(',')).ToList();
+                        string.Join(",", DistinctOptionalPartslist);
+                        abc.OptionalParts = string.Join(",", DistinctOptionalPartslist);
+                        abc.OptionalParts = abc.OptionalParts.Replace(",", "." + Environment.NewLine + " ");
+                    }
+
+                    if (abc.Iosparts!=null)
+                    {
+                        List<string> IospartsPartslist = abc.Iosparts.Split(',').ToList();
+                      //  var DistinctIospartsPartslist = IospartsPartslist.SelectMany(x => x.Split(',')).Distinct().ToList();
+                        var DistinctIospartsPartslist = IospartsPartslist.SelectMany(x => x.Split(',')).ToList();
+
+
+                        string.Join(",", DistinctIospartsPartslist);
+                        abc.Iosparts = string.Join(",", DistinctIospartsPartslist);
+                        abc.Iosparts = abc.Iosparts.Replace(",", "." +  " ");
+                       
+                    }
+
+                    if (abc.VariableParts != null)
+                    {
+                        List<string> VariablePartslist = abc.VariableParts.Split(',').ToList();
+                       // var DistinctVariablePartslist = VariablePartslist.SelectMany(x => x.Split(',')).Distinct().ToList();
+                        var DistinctVariablePartslist = VariablePartslist.SelectMany(x => x.Split(',')).ToList();
+
+
+                        string.Join(",", DistinctVariablePartslist);
+                        abc.VariableParts = string.Join(",", DistinctVariablePartslist);
+                        abc.VariableParts = abc.VariableParts.Replace(",", "." + Environment.NewLine + " ");
+                    }
+
+                 
+                    abc.Router = o.Router;
+                    abc.Bundle = o.Bundle;
+                    abc.ValidBundle = o.ValidBundle;
+                   
+                    abc.RouterEndofQuoteDate = o.RouterEndofQuoteDate;
+                    abc.RouterEndofSupportDate = o.RouterEndofSupportDate;
+                    abc.BundleEndofQuoteDate = o.BundleEndofQuoteDate ;
+                    abc.BundleEndofSupportDate = o.BundleEndofSupportDate;
+                    abc.ExpectedDate = o.ExpectedDate;
+                    abc.QuotableStartDate = o.QuotableStartDate ;
+                    abc.CreatedBy = o.CreatedBy ;
+                    abc.CreatedDate =o.CreatedDate ;
+                    abc.UpdatedBy =o.UpdatedBy;
+                    abc.DateLastUpdated =o.DateLastUpdated;
+
+                   
+                    obj.Add(abc);
+                }
+
+
+                //foreach (DataRow dr in dtsupplier.Rows)
+                //{
+                //    if ( Convert.ToString(dr["PART_TYPE"]) == "Opt")
+                //    {
+                //        Part oPart = new Part();
+                //        oPart.AceesType = Convert.ToString(dr["CHAR_NAME"]);
+                //        oPart.PartName = Convert.ToString(dr["NAME"]);
+                //        oPart.bundleId = Convert.ToString(dr["Bundle_Name"]);
+                //        optPart.Add(oPart);
+
+                //    }
+
+                //    if ( Convert.ToString(dr["PART_TYPE"]) == "IOS")
+                //    {
+                //        Part oPart = new Part();
+                //        oPart.AceesType = Convert.ToString(dr["CHAR_NAME"]);
+                //        oPart.PartName = Convert.ToString(dr["NAME"]);
+                //        oPart.bundleId = Convert.ToString(dr["Bundle_Name"]);
+                //        iosPart.Add(oPart);
+                //    }
+                //}
+
+
+                //string optpart = "";
+
+                //foreach (DataRow dr in dtsupplier.Rows)
+                //{
+
+                //    if (prevBundleName != Convert.ToString(dr["Bundle_Name"]))
+                //    {
+                //        CPEBundles objCpeSuppliers = new CPEBundles();
+                //        //objCpeSuppliers.Router = Convert.ToString(dr["Router_Name"]);
+
+                //        //objCpeSuppliers.Bundle = Convert.ToString(dr["Bundle_Name"]);
+                //        objCpeSuppliers.ValidBundle = Convert.ToString(dr["Valid_Bundle"]);
+                //        objCpeSuppliers.AccessType = Convert.ToString(dr["CHAR_NAME"]);
+                //        // objCpeSuppliers.Iosparts = Convert.ToString(dr["PART_NAME"]);
+                //        objCpeSuppliers.PartType = Convert.ToString(dr["PART_TYPE"]);
+                //        if (objCpeSuppliers.PartType == "Opt")
+                //        {
+
+                //            //   objCpeSuppliers.OptionalParts = Convert.ToString(dr["NAME"]);
+                //            objCpeSuppliers.AccessType = Convert.ToString(dr["CHAR_NAME"]);
+
+                //            objCpeSuppliers.OptionalParts += optpart;
+                //            optpart = "";
+
+
+                //            Part oPart = new Part();
+                //            oPart.AceesType = Convert.ToString(dr["CHAR_NAME"]);
+                //            oPart.PartName = Convert.ToString(dr["NAME"]);
+                //            oPart.bundleId = Convert.ToString(dr["Bundle_Name"]);
+                //            optPart.Add(oPart);
+
+
+                //            optpart += Convert.ToString(dr["NAME"]);
+
+                //        }
+                //        if (objCpeSuppliers.PartType == "Var")
+                //        {
+                //            objCpeSuppliers.VariableParts = Convert.ToString(dr["NAME"]);
+                //            objCpeSuppliers.AccessType = Convert.ToString(dr["CHAR_NAME"]);
+
+
+                //        }
+                //        if (objCpeSuppliers.PartType == "IOS")
+                //        {
+                //            objCpeSuppliers.Iosparts = Convert.ToString(dr["NAME"]);
+                //            objCpeSuppliers.AccessType = Convert.ToString(dr["CHAR_NAME"]);
+
+
+                //            Part oPart = new Part();
+                //            oPart.AceesType = Convert.ToString(dr["CHAR_NAME"]);
+                //            oPart.PartName = Convert.ToString(dr["NAME"]);
+                //            oPart.bundleId = Convert.ToString(dr["Bundle_Name"]);
+                //            iosPart.Add(oPart);
+                //        }
+
+                //        objCpeSuppliers.RouterEndofQuoteDate = Convert.ToString(dr["ROUTER_EOQ_DATE"]).Replace("00:00:00", "");
+                //        objCpeSuppliers.RouterEndofSupportDate = Convert.ToString(dr["ROUTER_EOL_DATE"]).Replace("00:00:00", "");
+                //        objCpeSuppliers.BundleEndofQuoteDate = Convert.ToString(dr["BUNDLE_EOQ_DATE"]).Replace("00:00:00", "");
+                //        objCpeSuppliers.BundleEndofSupportDate = Convert.ToString(dr["BUNDLE_EOS_DATE"]).Replace("00:00:00", "");
+                //        objCpeSuppliers.ExpectedDate = Convert.ToString(dr["EXPECTED_DATE"]).Replace("00:00:00", "");
+                //        objCpeSuppliers.QuotableStartDate = Convert.ToString(dr["QUOTABLE_START_DATE"]).Replace("00:00:00", "");
+                //        objCpeSuppliers.CreatedBy = Convert.ToString(dr["CREATED_BY"]);
+                //        objCpeSuppliers.CreatedDate = Convert.ToString(dr["BUNDLE_CREATED_DATE"]).Substring(0, 17);
+                //        // objCpeSuppliers.UpdatedBy = Convert.ToString(dr["UPDATED_EMP_ID"]);
+                //        objCpeSuppliers.DateLastUpdated = Convert.ToString(dr["DATE_LAST_UPDATED"]);
+
+                //        //lstsupplier.Add(objCpeSuppliers);
+                //    }
+                //    else
+                //    {
+                //        optpart += Convert.ToString(dr["NAME"]);
+                //    }
+
+                //}
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+          //  lstsupplier = lstsupplier.Distinct().ToList();
+            return obj;
+        }
+
+        public List<CPEBundles> GetCPEBundleTableDetails_UpdateBundleValidity(int ProductID, int RegionID, int CountryID, List<string> RouterNamedd, List<string> BundleNamedd)
+        {
+
+            List<CPEBundles> lstsupplier = new List<CPEBundles>();
+            try
+            {
+                DataTable dtsupplier = objCpeBundlesDAL.GetCPEBundleTableDetails_UpdateBundleValidity(ProductID, RegionID, CountryID, RouterNamedd, BundleNamedd);
+                foreach (DataRow dr in dtsupplier.Rows)
+                {
+                    CPEBundles objCpeSuppliers = new CPEBundles();
+
+
+                    objCpeSuppliers.Bundle = Convert.ToString(dr["Bundle_Name"]);
+                    objCpeSuppliers.ValidBundle = Convert.ToString(dr["Valid_Bundle"]);
+
+
+                    lstsupplier.Add(objCpeSuppliers);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            lstsupplier = lstsupplier.Distinct().ToList();
+            return lstsupplier;
+        }
+
+        public int UpdateCPEBundleValidity(string BundleNameValues, string Userid)
+        {
+            int BundleValidity = objCpeBundlesDAL.UpdateCPEBundleValidity(BundleNameValues, Userid);
+
+            return BundleValidity;
+
+        }
+        public int UpdateCPEBundleValidity1(string BundleNameValuesUnchecked, string Userid)
+        {
+            int BundleValidity = objCpeBundlesDAL.UpdateCPEBundleValidity1(BundleNameValuesUnchecked,Userid);
+
+            return BundleValidity;
+
+        }
+
+        public List<CPEBundles> GetCPEBundleTableDetails2(int ProductID)
+        {
+            DataTable dtsupplier2 = objCpeBundlesDAL.GetCPEBundleTableDetails2(ProductID);
+
+            List<CPEBundles> lstsupplier2 = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtsupplier2.Rows)
+                {
+                    CPEBundles objCpeSuppliers2 = new CPEBundles();
+
+                    objCpeSuppliers2.Bundle = Convert.ToString(dr["BUNDLE_NAME"]);
+                    objCpeSuppliers2.VariableParts = Convert.ToString(dr["VARIABLE_PARTS"]);
+
+                    lstsupplier2.Add(objCpeSuppliers2);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstsupplier2;
+        }
+
+
+        public List<CPEBundles> GetCPEBundleTableDetails3(int ProductID)
+        {
+            DataTable dtsupplier3 = objCpeBundlesDAL.GetCPEBundleTableDetails3(ProductID);
+
+            List<CPEBundles> lstsupplier3 = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtsupplier3.Rows)
+                {
+                    CPEBundles objCpeSuppliers3 = new CPEBundles();
+
+
+                    objCpeSuppliers3.OptionalParts = Convert.ToString(dr["OPTIONAL_PART"]);
+                    objCpeSuppliers3.AccessType = Convert.ToString(dr["ACCESS_TYPE_NAME"]);
+
+                    lstsupplier3.Add(objCpeSuppliers3);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstsupplier3;
+        }
+
+        public List<CPEBundles> GetCPEBundleTableDetails4(int ProductID)
+        {
+            DataTable dtsupplier4 = objCpeBundlesDAL.GetCPEBundleTableDetails4(ProductID);
+
+            List<CPEBundles> lstsupplier4 = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtsupplier4.Rows)
+                {
+                    CPEBundles objCpeSuppliers4 = new CPEBundles();
+
+                    objCpeSuppliers4.RouterEndofQuoteDate = Convert.ToString(dr["ROUTER_EOQ_DATE"]).Replace("00:00:00", "");
+                    objCpeSuppliers4.RouterEndofSupportDate = Convert.ToString(dr["ROUTER_EOL_DATE"]).Replace("00:00:00", "");
+                    objCpeSuppliers4.BundleEndofQuoteDate = Convert.ToString(dr["BUNDLE_EOQ_DATE"]).Replace("00:00:00", "");
+                    objCpeSuppliers4.BundleEndofSupportDate = Convert.ToString(dr["BUNDLE_EOS_DATE"]).Replace("00:00:00", "");
+                    objCpeSuppliers4.ExpectedDate = Convert.ToString(dr["EXPECTED_DATE"]).Replace("00:00:00", "");
+                    objCpeSuppliers4.QuotableStartDate = Convert.ToString(dr["QUOTABLE_START_DATE"]).Replace("00:00:00", "");
+                    objCpeSuppliers4.CreatedBy = Convert.ToString(dr["CREATED_EMP_ID"]);
+                    objCpeSuppliers4.CreatedDate = Convert.ToString(dr["BUNDLE_CREATED_DT"]);
+                    objCpeSuppliers4.UpdatedBy = Convert.ToString(dr["UPDATED_EMP_ID"]);
+                    objCpeSuppliers4.DateLastUpdated = Convert.ToString(dr["BUNDLE_UPDATED_DT"]);
+
+                    lstsupplier4.Add(objCpeSuppliers4);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstsupplier4;
+        }
+
+        public List<CPEBundles> GetCPEBundleTableDetails5(int ProductID)
+        {
+            DataTable dtsupplier5 = objCpeBundlesDAL.GetCPEBundleTableDetails5(ProductID);
+
+            List<CPEBundles> lstsupplier5 = new List<CPEBundles>();
+            try
+            {
+                foreach (DataRow dr in dtsupplier5.Rows)
+                {
+                    CPEBundles objCpeSuppliers5 = new CPEBundles();
+
+                    objCpeSuppliers5.Router = Convert.ToString(dr["ROUTER_NAME"]);
+                    objCpeSuppliers5.Bundle = Convert.ToString(dr["BUNDLE_NAME"]);
+                    objCpeSuppliers5.PartType = Convert.ToString(dr["PART_TYPE"]);
+                    if (objCpeSuppliers5.PartType == "Opt")
+                    {
+                        objCpeSuppliers5.OptionalParts = Convert.ToString(dr["NAME"]);
+                        objCpeSuppliers5.AccessType = Convert.ToString(dr["CHAR_NAME"]);
+                    }
+                    if (objCpeSuppliers5.PartType == "Var")
+                    {
+                        objCpeSuppliers5.VariableParts = Convert.ToString(dr["NAME"]);
+                        objCpeSuppliers5.AccessType = Convert.ToString(dr["CHAR_NAME"]);
+                    }
+                    if (objCpeSuppliers5.PartType == "IOS")
+                    {
+                        objCpeSuppliers5.Iosparts = Convert.ToString(dr["NAME"]);
+                        objCpeSuppliers5.AccessType = Convert.ToString(dr["CHAR_NAME"]);
+                    }
+                    lstsupplier5.Add(objCpeSuppliers5);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lstsupplier5;
+        }
+
+        //public List<CPEBundles> GetBundleIDArray()
+        //{
+        //    DataTable dtsupplier = objCpeBundlesDAL.GetBundleIDArray("75");
+
+        //    List<CPEBundles> lstsupplier = new List<CPEBundles>();
+        //    try
+        //    {
+        //        foreach (DataRow dr in dtsupplier.Rows)
+        //        {
+        //            CPEBundles objCpeSuppliers = new CPEBundles();
+
+        //            objCpeSuppliers.ProductID = Convert.ToString(dr["Product_CD"]);
+        //            objCpeSuppliers.ProductName = Convert.ToString(dr["Product_Name"]);
+        //            lstsupplier.Add(objCpeSuppliers);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+
+        //    return lstsupplier;
+        //}
+
+        //public List<CPEBundles> GetAllAccessIDArray()
+        //{
+        //    DataTable dtsupplier = objCpeBundlesDAL.GetAllAccessIDArray();
+
+        //    List<CPEBundles> lstsupplier = new List<CPEBundles>();
+        //    try
+        //    {
+        //        foreach (DataRow dr in dtsupplier.Rows)
+        //        {
+        //            CPEBundles objCpeSuppliers = new CPEBundles();
+
+        //            objCpeSuppliers.ProductID = Convert.ToString(dr["Product_CD"]);
+        //            objCpeSuppliers.ProductName = Convert.ToString(dr["Product_Name"]);
+        //            lstsupplier.Add(objCpeSuppliers);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+
+        //    return lstsupplier;
+        //}
+    }
+}

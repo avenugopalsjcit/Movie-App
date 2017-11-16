@@ -1,0 +1,136 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+  public  class AdminAvailabilityViewBAL
+    {
+      private GlobalReferenceDAL objSRD = new GlobalReferenceDAL();
+
+      public List<AvailabilityGrid> GetGridAvailabilityDetails()
+      {
+
+
+          List<AvailabilityGrid> lstOrg = new List<AvailabilityGrid>();  
+          DataTable dtGridDistributor = objSRD.GetGridAvailabilityDetails();
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              AvailabilityGrid objOrg = new AvailabilityGrid();
+              
+              objOrg.AvailabilityDesc = Convert.ToString(dr["AVAIL_DESC"]);
+              objOrg.AvailabilityAbbr = Convert.ToString(dr["AVAIL_ABBR"]);
+              objOrg.AvailabilityValid = Convert.ToBoolean(dr["AVAIL_VALID_CD"]);
+              objOrg.AvailValidCd = Convert.ToInt32(dr["AVAIL_CD"]);
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+      public int GetMaxAvailCD()
+      {
+          //AvailabilityGrid objOrg = new AvailabilityGrid();
+          return objSRD.MaxAvailCD();
+          
+      }
+      public int DeleteAdminAvail(string strAvailCd)
+      {
+
+          int count = objSRD.AdminAvailDelete(strAvailCd);
+
+
+
+          return count;
+      }
+      public List<AvailabilityGrid> PopupGridAdminAvail(string strAvailCd)
+              {
+
+                  List<AvailabilityGrid> lstOrg = new List<AvailabilityGrid>();
+                  DataTable dtGridDistributor = objSRD.AdminAvailPopupGrid(strAvailCd);
+
+
+
+
+
+
+
+                  foreach (DataRow dr in dtGridDistributor.Rows)
+                  {
+                      AvailabilityGrid objOrg = new AvailabilityGrid();
+                      //var options = { timeZone: 'UTC', timeZoneName: 'short' };
+                      //  console.log(date.toLocaleTimeString('en-US', options));
+                      DateTime currentDate = Convert.ToDateTime(dr["CREATED_DT"]);
+                      DateTime updatedDate = Convert.ToDateTime(dr["UPDATED_DT"]);
+                     
+                      objOrg.Created_Emp_Id = Convert.ToString(dr["CREATED_EMP_ID"]);
+                      objOrg.Created_Dt = currentDate.ToString("dd-MMM-yyyy HH:mm");
+                      objOrg.Updated_Emp_Id = Convert.ToString(dr["UPDATED_EMP_ID"]);
+                      objOrg.Updated_Dt = updatedDate.ToString("dd-MMM-yyyy HH:mm");
+                      lstOrg.Add(objOrg);
+                  }
+
+
+                  return lstOrg;
+              }
+      public int InsertAdminAvail(string strAvailCd, string strAvailDesc, string strAvailAbbr, string strAvailValidCd, string User_id)
+      {
+
+          int count = objSRD.AdminAvailInsert( strAvailCd,  strAvailDesc,  strAvailAbbr,  strAvailValidCd,  User_id);
+
+
+
+          return count;
+      }
+
+      public int UpdateAdminAvail(string strAvailDesc, string strAvailAbbr, string strAvailvalidCd, string User_id, string strAvailCd)
+      {
+
+          int count = objSRD.AdminAvailUpdate( strAvailDesc,  strAvailAbbr,  strAvailvalidCd,  User_id,  strAvailCd);
+
+
+
+          return count;
+      }
+
+
+      public List<AdminBtgfrGrid> GetGridAdminBtgfrView()
+      {
+
+
+          List<AdminBtgfrGrid> lstOrg = new List<AdminBtgfrGrid>();
+          DataTable dtGridDistributor = objSRD.GetGridAdminBtgfr();
+
+
+
+
+
+
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              AdminBtgfrGrid objOrg = new AdminBtgfrGrid();
+
+              objOrg.btgfr = Convert.ToString(dr["btgfr"]);
+              objOrg.description = Convert.ToString(dr["description"]);
+              
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+    }
+}

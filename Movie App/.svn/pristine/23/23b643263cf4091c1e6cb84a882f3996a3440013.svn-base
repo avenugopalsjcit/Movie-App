@@ -1,0 +1,311 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using PCDataAccess;
+using Newtonsoft.Json;
+
+namespace SCAdminBAL.MCU
+{
+    public class Charecteristics
+    {
+
+        private String _CHAR_NAME = String.Empty;
+        private Int32 _CHAR_ID = -1;
+        private Int32 _CHAR_TYPE_ID = -1;
+        private String _CHAR_DESC = String.Empty;
+        private String _CHAR_UNIT_OF_MEASURE = String.Empty;
+        private String _CREATED_EMP_ID = String.Empty;
+        private DateTime _CREATED_DT = DateTime.Now;
+        private String _UPDATED_EMP_ID = String.Empty;
+        private DateTime _UPDATED_DT = DateTime.Now;
+        private String _CHAR_ACTUAL_VALUE = String.Empty;
+        private String _CHAR_VALUE_2 = String.Empty;
+        //1.1 Modify Begins
+        //private String _CHAR_VALUE = "N";
+        private String _CHAR_VALUE = String.Empty;
+        //1.1 Modify Ends
+        private Int32 _CHAR_UPPER_RANGE = -1;
+        private Int32 _CHAR_LOWER_RANGE = -1;
+        private Int32 _CHAR_VALID_CD = -1;
+        private Int32 _CHAR_NUM_VALUE = -1;
+        private Int32 _CHAR_TYPE_VALUE_COUNT = -1;
+        private Int32 _PopSiteId = -1;
+        private Int32 _CHAR_AVAIL_CD = -1;
+        private String _AVAIL_TEXT = String.Empty;
+
+        #region Public Property
+
+        public String CharValue
+        {
+            get
+            {
+                return _CHAR_VALUE;
+            }
+            set
+            {
+                _CHAR_VALUE = value;
+            }
+        }
+
+        public String CharValue2
+        {
+            get
+            {
+                return _CHAR_VALUE_2;
+            }
+            set
+            {
+                _CHAR_VALUE_2 = value;
+            }
+        }
+        public String CharAvailText
+        {
+            get
+            {
+                return _AVAIL_TEXT;
+            }
+            set
+            {
+                _AVAIL_TEXT = value;
+            }
+        }
+        public Int32 CharAvailCd
+        {
+            get
+            {
+                return _CHAR_AVAIL_CD;
+            }
+            set
+            {
+                _CHAR_AVAIL_CD = value;
+            }
+        }
+        public Int32 PopSiteId
+        {
+            get
+            {
+                return _PopSiteId;
+            }
+            set
+            {
+                _PopSiteId = value;
+            }
+        }
+        public Int32 CharTypeValueCount
+        {
+            get
+            {
+                return _CHAR_TYPE_VALUE_COUNT;
+            }
+            set
+            {
+                _CHAR_TYPE_VALUE_COUNT = value;
+            }
+        }
+        public Int32 NumValue
+        {
+            get
+            {
+                return _CHAR_NUM_VALUE;
+            }
+            set
+            {
+                _CHAR_NUM_VALUE = value;
+            }
+        }
+        public Int32 ValidCd
+        {
+            get
+            {
+                return _CHAR_VALID_CD;
+            }
+            set
+            {
+                _CHAR_VALID_CD = value;
+            }
+        }
+        public Int32 LowerRange
+        {
+            get
+            {
+                return _CHAR_LOWER_RANGE;
+            }
+            set
+            {
+                _CHAR_LOWER_RANGE = value;
+            }
+        }
+        public Int32 UpperRange
+        {
+            get
+            {
+                return _CHAR_UPPER_RANGE;
+            }
+            set
+            {
+                _CHAR_UPPER_RANGE = value;
+            }
+        }
+        public String ActualValue
+        {
+            get
+            {
+                return _CHAR_ACTUAL_VALUE;
+            }
+            set
+            {
+                _CHAR_ACTUAL_VALUE = value;
+            }
+        }
+        public DateTime UpdatedDt
+        {
+            get
+            {
+                return _UPDATED_DT;
+            }
+            set
+            {
+                _UPDATED_DT = value;
+            }
+        }
+        public DateTime CreatedDt
+        {
+            get
+            {
+                return _CREATED_DT;
+            }
+            set
+            {
+                _CREATED_DT = value;
+            }
+        }
+        public String UpdatedEmpId
+        {
+            get
+            {
+                return _UPDATED_EMP_ID;
+            }
+            set
+            {
+                _UPDATED_EMP_ID = value;
+            }
+        }
+        public String CreatedEmpId
+        {
+            get
+            {
+                return _CREATED_EMP_ID;
+            }
+            set
+            {
+                _CREATED_EMP_ID = value;
+            }
+        }
+        public String UnitOfMeasure
+        {
+            get
+            {
+                return _CHAR_UNIT_OF_MEASURE;
+            }
+            set
+            {
+                _CHAR_UNIT_OF_MEASURE = value;
+            }
+        }
+        public String CharDesc
+        {
+            get
+            {
+                return _CHAR_DESC;
+            }
+            set
+            {
+                _CHAR_DESC = value;
+            }
+        }
+        public Int32 CharTypeId
+        {
+            get
+            {
+                return _CHAR_TYPE_ID;
+            }
+            set
+            {
+                _CHAR_TYPE_ID = value;
+            }
+        }
+        public String CharName
+        {
+            get
+            {
+                return _CHAR_NAME;
+            }
+            set
+            {
+                _CHAR_NAME = value;
+            }
+        }
+        public Int32 CharId
+        {
+            get
+            {
+                return _CHAR_ID;
+            }
+            set
+            {
+                _CHAR_ID = value;
+            }
+        }
+
+        public List<PortSpeedCharacteristics> GetParentPortDetails(Int32[] aiPopSelected, Int32[] aiPlatforms, int iProductCd, int subProductId)
+        {
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            List<PortSpeedCharacteristics> lstPortSpeedChar = new List<PortSpeedCharacteristics>();
+            try
+            {
+                dsData = oDataAccess.GetPortDetails(aiPopSelected, aiPlatforms, iProductCd);
+                PortSpeedCharacteristics oPorts;
+                Int32 iCount = 0;
+                //child case is yet to implement
+                foreach (DataRow dr in dsData.Tables[0].Rows)
+                {
+                    oPorts = new PortSpeedCharacteristics();
+                    oPorts.CharId = iCount;
+                    oPorts.CharDesc = dr["PortSpeedId"].ToString() + "/" + dr["accessid"].ToString() + "/" + dr["supplierid"].ToString() + "/" + dr["typeid"].ToString() + "/" + dr["nameid"].ToString();
+                    oPorts.CharName = dr["PortSpeedName"].ToString() + "/" + dr["AccessName"].ToString() + "/" + dr["SupplierName"].ToString() + "/" + dr["TypeName"].ToString() + "/" + dr["NameName"].ToString();
+                    oPorts.IsValidMapping=IsValidMapping(iProductCd,subProductId,int.Parse(dr["PortSpeedId"].ToString()),int.Parse(dr["accessid"].ToString()),int.Parse(dr["typeid"].ToString()));
+                    lstPortSpeedChar.Add(oPorts);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return lstPortSpeedChar;
+           // return JsonConvert.SerializeObject(dsData.Tables[0]);
+        }
+
+
+        public Int32 IsValidMapping(int iProductCd, int iSubproductCd, int iportspeedid, int iaccessspeedid, int iaccesstypeid)
+        {
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            int iValidMapping = 0;
+
+            try
+            {
+                // iValidMapping = Convert.ToInt32(oDataAccess.GetValidParentmappings(iProductCd, iSubproductCd, iportspeedid, iaccessspeedid, iaccesstypeid));
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return iValidMapping;
+
+        }
+    }
+
+}
+        #endregion

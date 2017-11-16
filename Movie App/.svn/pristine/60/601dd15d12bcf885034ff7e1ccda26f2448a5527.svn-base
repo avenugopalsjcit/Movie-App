@@ -1,0 +1,91 @@
+﻿
+<div ng-controller="PoPTypeMappingCtrl" class="container">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                Pop Type Mappings
+            </h3>
+        </div>
+    </div>
+    <div class="row text-left Arrow">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <p class="red">
+                <span class="color-black">Note : </span>Administrators can select multiple values
+                from the Pop Type Box and assign it to either APoP, GPoP or LLPoP using Drag and
+                Drop.<br />
+            </p>
+        </div>
+    </div>
+    <div class="row text-left Arrow">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <p class="red" style="margin-left: 37px">
+                Administrators can select multiple values either from APoP,GPoP or LLPoP to unassign
+                a Pop Type using Drag and Drop.
+            </p>
+        </div>
+    </div>
+    <input type="text" id="dragvalues" style="visibility: hidden" />
+    <div class="row" id="divddlCharacteristicType">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xs-12">
+            <div class="form-horizontal col-sm-6">
+                <div class="form-group">
+                    <label class="col-sm-3" for="PoPType">
+                        PoP Type</label>
+                    <div class="col-sm-6 " title="Drag and Drop Units to map or Unmap">
+                        <ol data-draggable="target" id="poptype">
+                            <li ng-repeat="poptype in PoPtypeData track by $index" data-draggable="item" title="Drag and Drop Units to map or Unmap"
+                                id="poptype{{$index}}">
+                                <p style="display: none;">
+                                    {{poptype.CharId}}</p>
+                                {{poptype.CharName}} </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="form-horizontal col-sm-6">
+                <div class="form-group">
+                    <label class="col-sm-2" for="GPOPType">
+                        GPoP</label>
+                    <div class="col-sm-6">
+                        <ol data-draggable="target" id="GPoP">
+                            <li ng-repeat="GPoP in GPOPsData track by $index" data-draggable="item" title="Drag and Drop Units to map or Unmap"
+                                id="GPoP{{$index}}">
+                                <p style="display: none;">
+                                    {{GPoP.CharId}}</p>
+                                {{GPoP.CharName}} </li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2" for="APOPType">
+                        APoP</label>
+                    <div class="col-sm-6">
+                        <ol data-draggable="target" id="APoP">
+                            <li ng-repeat="APoP in APoPsData track by $index" data-draggable="item" title="Drag and Drop Units to map or Unmap"
+                                id="APOP{{$index}}">
+                                <p style="display: none;">
+                                    {{APoP.CharId}}</p>
+                                {{APoP.CharName}} </li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2" for="LLPOPType">
+                        LLPoP</label>
+                    <div class="col-sm-6">
+                        <ol data-draggable="target" id="LLPoP">
+                            <li ng-repeat="LLPoP in LLPoPsData track by $index" data-draggable="item" title="Drag and Drop Units to map or Unmap"
+                                id="LLOP{{$index}}">
+                                <p style="display: none;">
+                                    {{LLPoP.CharId}}</p>
+                                {{LLPoP.CharName}} </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pageLoaderOverlay">
+</div>
+<script src="Scripts/dragdropitems.js" type="text/javascript"></script>

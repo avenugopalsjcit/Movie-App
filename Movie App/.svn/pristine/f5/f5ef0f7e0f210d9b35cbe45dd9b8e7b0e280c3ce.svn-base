@@ -1,0 +1,188 @@
+﻿<div ng-controller="CPEBundlesCtrl" class="container">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-left: 27px; padding-bottom: 6px">
+            <h3>
+                CPE Bundles
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        <label for="cpeproduct" class="col-sm-3">
+                            Product<span style="color: red"> *</span></label>
+                        <div class="col-sm-2">
+                            <select name="CPEProduct" style="width: 20em;" ng-model="CPEProductitem" ng-options="supp.ProductID as supp.ProductName for supp in cpeproduct"
+                             ng-change="showregion()"   id="ddlProduct">
+                              <option value="">--Select--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" id="idregiondd" style="Visibility:hidden">
+                        <label for="cperegion" class="col-sm-3">
+                            Region<span style="color: red"> *</span></label>
+                        <div class="col-sm-2">
+                            <select name="CPERegion" style="width: 20em;" ng-model="CPERegionitem" ng-options="supp.RegionID as supp.RegionName for supp in cperegion"
+                                id="ddlRegion" ng-change=" DisplayCountryDropDown(CPERegionitem)">
+                                 <option value="">--Select--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" id="ddlCountrylist" style="visibility: hidden">
+                        <label for="cpecountry" class="col-sm-3">
+                            Country<span style="color: red"> *</span></label>
+                        <div class="col-sm-2">
+                            <select name="CPECountry" style="width: 20em;" ng-model="CPECountryitem" ng-options="supp.CountryID as supp.CountryName for supp in cpecountry"
+                                id="ddlCountry" ng-change="DisplayBundleTable(CPEProductitem,CPERegionitem,CPECountryitem)">
+                                 <option value="">--Select--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" id="Div1" style="visibility: hidden; padding-top: 15px">
+                        <label for="cperouter" class="col-sm-3">
+                            Router<span style="color: red"> *</span></label>
+                        <div class="col-sm-3">
+                            <select name="CPERouter" multiple size="8" style="width: 25em;" ng-model="CPERouteritem"
+                                ng-options="supp as supp for supp in cperouter" id="rouetrmultidd" ng-change="showbuttonenablerouter()">
+                                
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4" id="Div2" style="visibility: hidden; padding-top: 15px">
+                        <label for="cpebundle" class="col-sm-3">
+                            Bundle<span style="color: red"> *</span></label>
+                        <div class="col-sm-2">
+                            <select name="CPEBundle" multiple size="8" style="width: 25em;" ng-model="CPEBundleitem"
+                                ng-options="supp as supp for supp in cpebundle" id="bundlemultidd" ng-change="showbuttonenable()">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-3" id="idbtnshow" style="padding-top: 14px; padding-bottom: 0px;visibility:hidden">
+                        <input class="btn btn-primary " id="Button2"  style="margin-bottom: 10px; margin-left: 10px;"
+                            type="button" value="Show" disabled="disabled" ng-click="DisplayBundleTableFinal(CPEProductitem,CPERegionitem,CPECountryitem,CPERouteritem,CPEBundleitem)">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <table ng-table="usersTable" id="tblbundles" class="table table-bordered table-striped"
+                       style="visibility:hidden" show-filter="true">
+                        <tbody>
+                            <tr ng-repeat="user in $data">
+                                <td data-title="'Router'" filter="{ Router : 'text'}" sortable="'Router'">
+                                    {{user.Router}}
+                                </td>
+                                <td data-title="'Bundle'" filter="{ Bundle : 'text'}" sortable="'Bundle'">
+                                    {{user.Bundle}}
+                                </td>
+                               <!-- <td data-title="'ValidBundle'" filter="{ ValidBundle : 'text'}" sortable="'ValidBundle'">
+                                    {{user.ValidBundle}}
+                                </td>-->
+                                <td id="updatebtn" data-title="'Valid Bundle'">
+                                <input type="checkbox" id="chekid" ng-model="validbundle[$index]" class="form-control" style="margin-top: 0px" />
+                                </td>
+                                <td data-title="'Standard Parts(Access Type)'" filter="{ Accesstype : 'text'}" sortable="'Accesstype'">
+                                    {{user.Accesstype}}
+                                </td>
+                                <td data-title="'Standard Parts(IOS Parts)'" filter="{ Iosparts : 'text'}" sortable="'Iosparts'">
+                                    {{user.Iosparts}}
+                                </td>
+                                <td data-title="'Variable Parts'" filter="{ VariableParts : 'text'}" sortable="'VariableParts'">
+                                    {{user.VariableParts}}
+                                </td>
+                                <td data-title="'Access Type'" filter="{ Accesstype : 'text'}" sortable="'Accesstype'">
+                                    {{user.Accesstype}}
+                                </td>
+                                <td data-title="'Optional Parts'" filter="{ OptionalParts : 'text'}" sortable="'OptionalParts'">
+                                    {{user.OptionalParts}}
+                                </td>
+                                <td data-title="'To Show Country Assignment'">
+                                    <input type="checkbox" ng-model="showcountryassignment" class="form-control" style="margin-top: 0px" />
+                                </td>
+                                <td data-title="'Router End of Quote Date'" filter="{ RouterEndofQuoteDate : 'text'}"
+                                    sortable="'RouterEndofQuoteDate'">
+                                    {{user.RouterEndofQuoteDate}}
+                                </td>
+                                <td data-title="'Router End of Support Date'" filter="{ RouterEndofSupportDate : 'text'}"
+                                    sortable="'RouterEndofSupportDate'">
+                                    {{user.RouterEndofSupportDate}}
+                                </td>
+                                <td data-title="'Bundle End of Quote Date'" filter="{ BundleEndofQuoteDate : 'text'}"
+                                    sortable="'BundleEndofQuoteDate'">
+                                    {{user.BundleEndofQuoteDate}}
+                                </td>
+                                <td data-title="'Bundle End of Support Date'" filter="{ BundleEndofSupportDate : 'text'}"
+                                    sortable="'BundleEndofSupportDate'">
+                                    {{user.BundleEndofSupportDate}}
+                                </td>
+                                <td data-title="'Expected Date'" filter="{ ExpectedDate : 'text'}" sortable="'ExpectedDate'">
+                                    {{user.ExpectedDate}}
+                                </td>
+                                <td data-title="'Quotable Start Date'" filter="{ QuotableStartDate : 'text'}" sortable="'QuotableStartDate'">
+                                    {{user.QuotableStartDate}}
+                                </td>
+                                <td data-title="'Created By'" filter="{ CreatedBy : 'text'}" sortable="'CreatedBy'">
+                                    {{user.CreatedBy}}
+                                </td>
+                                <td data-title="'Created Date'" filter="{ CreatedDate : 'text'}" sortable="'CreatedDate'">
+                                    {{user.CreatedDate}}
+                                </td>
+                                  <td data-title="'UpdatedBy'" filter="{ UpdatedBy : 'text'}" sortable="'UpdatedBy'">
+                                    {{user.UpdatedBy}}
+                                </td>
+                                <td data-title="'Date Last Updated'" filter="{ DateLastUpdated : 'text'}" sortable="'DateLastUpdated'">
+                                    {{user.DateLastUpdated}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="updatebutton1" style="Visibility:hidden">
+                        <input class="btn btn-primary" id="Button1" style="margin-bottom: 10px; margin-left: 10px;"
+                            type="button" value="Update" ng-click="UpdateBundleValidity111()">
+                    </div>
+                    <!-- <button type="button"  id="btnshowbundlevalidity1" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" ng-click="DisplayBundleValidityStatus()">Open Modal</button>-->
+                    <!-- Modal -->
+                    <div class="modal fade" id="myModal" role="dialog">
+                        <div class="modal-dialog">
+                            <!-- Modal content-->
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        &times;</button>
+                                    <h4 class="modal-title">
+                                        Modal Header</h4>
+                                </div>
+                                <div class="modal-body">
+                                   <table ng-table="usersTable2"  class="table table-bordered table-striped" show-filter="true">
+                        <tbody>
+                            <tr ng-repeat="user in $data">
+                                <td data-title="'Bundle Name'" filter="{ Bundle : 'text'}" sortable="'Bundle'">
+                                    {{user.Bundle}}
+                                </td>
+                                 <td id="Td1" data-title="'Valid Bundle'">
+                               <input type="checkbox" id="Checkbox1" ng-model="validbundle[$index-1]" class="form-control" style="margin-top: 0px" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                                </div>
+                                
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                        Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="showNodata">
+                    <div class="alert alert-danger Arrow ng-binding ng-scope col-sm-12" role="alert">
+                        {{Nodata}}
+                    </div>
+                </div>
+            </div>
+        </div>
+</div> </div>
+<div class="pageLoaderOverlay">
+</div>

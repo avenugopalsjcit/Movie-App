@@ -1,0 +1,234 @@
+﻿<div>
+    <div id="divAnnouncements" ng-controller="AdminAccessSupplierCtrl">
+        <div class="panel panel-primary col-md-12">
+            <div id="Div6">
+                  <div class="row text-left Arrow ">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                                 Access Supplier View</h3>
+                        
+                    </div>
+                </div>
+              <!--  <div class="col-md-12">
+                    <button class="btn btn-default btn-sm pull-right" id="Addbtn" data-toggle="modal"
+                        data-target="#basicModal" ng-click="addNewTask()">
+                        Add Address Reference</button>
+                </div>-->
+
+                 <div class="col-md-12 Arrow pull-left" id="divAddButton"  style="padding-bottom:20px">
+                      <button  class="btn btn-primary" id="Addbtn" data-toggle="modal" data-target="#basicModal" ng-click="addNewTask()">
+                            <span class="glyphicon glyphicon-plus" title="Add Address"></span>
+                        </button>
+                   </div>
+                <table ng-table="usersTable" id="tblAvailability" class="table table-striped Arrow">
+                    <tr ng-repeat="category in $data">
+                        <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                        <td data-title="' Address Name'" sortable="'AddressDescription'" filter="{ 'AddressDescription': 'text' }" class="Arrow">
+                            {{category.suppliername}}
+                        </td>
+                        <td data-title="' Created By / Created Date (GMT)'" filter="{ 'Created_Emp_Id': 'text' }"
+                            class="Arrow"  >
+                            <div>
+                                {{category.CreatedBy}}<br />
+                                {{category.CreatedDate}}
+                            </div>
+                            <!--<input type="text" value = "{{category.AvailabilityAbbr}}" ng-show="Reset==1"/>-->
+                        </td>
+                        <td data-title="' Updated By / Updated Date (GMT)'" filter="{ 'Updated_Emp_Id': 'text' } "
+                            class="Arrow" >
+                            <div>
+                                {{category.UpdatedBy}}
+                                <br />
+                                {{category.UpdatedDate}}
+                            </div>
+                            <!--<input type="text" value = "{{category.AvailabilityAbbr}}" ng-show="Reset==1"/>-->
+                        </td>
+                        <td data-title="' Actions'">
+                           
+                           <button class="btn btn-default btn-sm" id="Editbtn" data-toggle="modal" data-target="#basicModal"  ng-click="EditRecord(category)" ><span class="glyphicon glyphicon-pencil" ></span></button>
+                                        
+                                        <button value="Delete" class="btn btn-sm btn-danger" id="Deletebtn" class="chkAnnounmence" data-ng-click="DeleteRecord(category)" > <span class="glyphicon glyphicon-trash"></span></button>
+                                   
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+            </div>
+        </div>
+
+
+
+        <div class="modal fade" id="basicModal" role="dialog"  style="margin-top:-150px">
+            <div class="modal-dialog" >
+                <div class="vertical-alignment-helper">
+                    <div class="modal-dialog vertical-align-center">
+                        <div class="modal-content" style=" width: 900px">
+                          
+                            <div class="modal-header" >
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="H1">
+                            Edit  Access Supplier</h4>
+                    </div>
+                            <div class="modal-body">
+                              <form  name="Documentationform" novalidate>
+                                <div class="form-horizontal">
+                                    
+                                    
+                                        
+
+                                        
+
+                                        
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                              <span style="color: Red">*</span>    Supplier Name</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" id="inputhours"   ng-change="prodchange()" ng-model="Hours" placeholder="" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                                Supplier Address</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" id="inputlanguages1"  ng-change="prodchange()" ng-model="Languages1" placeholder="" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                                Supplier Operating Hours</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" id="inputlanguages2"  ng-change="prodchange()" ng-model="Languages2" placeholder="" required>
+                                            </div>
+                                        </div>
+                                       <!-- <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                                Language 7/24</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" id="inputlanguages3" ng-model="Languages3" placeholder="">
+                                            </div>
+                                        </div>-->
+                                        <!--<div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="width:auto">
+                                                (Max 255 characters are allowed in Address)</label>
+                                        </div>-->
+                                     <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                                Supplier Notes</label>
+                                            <div class="col-sm-2">
+                                                <input type="text" id="inputAddress"  ng-change="prodchange()" ng-model="Address" placeholder="" required/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="inputDescription" style="text-align:left">
+                                                CPR Flag</label>
+                                            <div class="col-sm-2">
+                                                <input type="checkbox" id="Text2"  ng-change="prodchange()" ng-model="Address" placeholder="" required/>
+                                            </div>
+                                        </div>
+                                         <div class="row" style="height: 30px;">
+                                        <div class="col-sm-6">
+                                           Distributor List</div>
+                                        <div class="col-sm-6">
+                                         <span style="color: Red">*</span>   Assigned Distributors</div>
+                                    </div>
+                                         <div id="divddlCharacteristicType" title="Drag and Drop Units to map or Unmap" class="row">
+                                          <div id="div1" title="Drag and Drop Units to map or Unmap" class="row" style="margin-left:0px;margin-right:0px">
+                                        <!-- <select id="ddlCharacteristicType" ng-click="CharacteristicChange(Avail)"  ng-model="UOMName" ng-options="Avail.UOMId as Avail.UOMName for Avail in DropdownData"  
+                                    style="width:15em" required>
+                                    <option value="">--- Select ---</option>
+                                </select>-->
+                                        <div class="col-sm-6">
+                                            <input type="text" class="control-label " style="display: none;" ng-model="CharacterTypeID"
+                                                id="CharacterTypeID" />
+                                            <ol data-draggable="target" >
+                                                <li ng-repeat="dist in distributorlist track by dist.id  " data-draggable="item"
+                                                    title="Drag and Drop Units to map or Unmap">
+                                                    <p style="display: none">
+                                                        {{dist.id}}</p>
+                                                    {{dist.name}} </li>
+                                            </ol>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <ol data-draggable="target" id="mapBlock">
+                                                <li ng-repeat="dist in Assdistributorlist track by dist.id " data-draggable="item"
+                                                    title="Drag and Drop to map or Unmap">{{dist.name}}
+                                                    <p style="display: none">
+                                                        {{dist.id}}</p>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
+
+
+
+
+                                      <div class="row" style="height: 30px;margin-left:10px">
+                                        <div class="col-sm-6">
+                                           Country List</div>
+                                        <div class="col-sm-6">
+                                        <span style="color: Red">*</span>   Assigned Countries</div>
+                                    </div>
+
+                                     <div id="divCharacterType" title="Drag and Drop Units to map or Unmap" class="row" style="margin-left:0px;margin-right:0px">
+                                        <!-- <select id="ddlCharacteristicType" ng-click="CharacteristicChange(Avail)"  ng-model="UOMName" ng-options="Avail.UOMId as Avail.UOMName for Avail in DropdownData"  
+                                    style="width:15em" required>
+                                    <option value="">--- Select ---</option>
+                                </select>-->
+                                        <div class="col-sm-6" >
+                                            <input type="text" class="control-label " style="display: none;" ng-model="CharacterType"
+                                                id="CharacterType" />
+                                            <ol data-draggable="target"  id ="countrylstid">
+                                                <li ng-repeat="countr in countrylist track by countr.countryid " data-draggable="item"
+                                                    title="Drag and Drop Units to map or Unmap">
+                                                    <p style="display: none">
+                                                        {{countr.countryid}}</p>
+                                                    {{countr.countryname}} </li>
+                                            </ol>
+                                        </div>
+                                        <div class="col-sm-6" >
+                                            <ol data-draggable="target" id="Asscountryid" >
+                                                <li ng-repeat="countr in Asscountrylist track by countr.countryid " data-draggable="item" 
+                                                    title="Drag and Drop to map or Unmap">{{countr.countryname}}
+                                                    <p style="display: none">
+                                                        {{countr.countryid}}</p>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                    </div>
+                                       <div>
+                                       <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="closemodal()">
+                                        Modify Priorities</button>
+                                       </div> 
+                                </div>
+                                </form>
+                                <div class="modal-footer" style="background-color: none">
+                                  
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="closemodal()">
+                                        Close</button>
+                                          <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="closemodal()">
+                                        Reset</button>
+                                     <button type="button" id="updatebtn" class="btn btn-primary"  disabled="disabled" data-dismiss="modal" ng-click="UpdateRecord()">
+                                        Update</button>
+                                </div>
+                            </div>
+                            <div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+
+
+        </div>
+        <div class="pageLoaderOverlay">
+</div>
+        </div>
+      
+<script src="../../Scripts/dragdropitems.js" type="text/javascript"></script>

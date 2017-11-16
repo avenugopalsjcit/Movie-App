@@ -1,0 +1,57 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+   public class OrderAccessSpeedDAL
+    {
+
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        public DataTable GetGridAdminBtgfr()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"Select CHAR_ID, char_name, char_actual_value, char_num_value FROM CSU_REF_VALID_CHAR WHERE CHAR_TYPE_ID = 27 ORDER BY CHAR_NUM_VALUE ";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+              
+        }
+
+        public int UpdateGridAdminOrderAccessSpeed(string User_Id, string charid, string charNumValue)
+        {
+            int status=0;
+            //GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string[] charids = charid.Split(',');
+            string[] charNumValues = charNumValue.Split(',');
+            oConn.Open();
+            string str = string.Empty;
+            DateTime date = DateTime.ParseExact(DateTime.Now.Date.ToShortDateString(), "dd/MM/yyyy", null);
+            string end_date = String.Format("{0:dd-MMM-yyyy}", date);
+            for (int i = 0; i < charNumValues.Length-1; i++)
+            {
+                int id = Convert.ToInt32(charids[i]);
+                str = @"update csu_ref_valid_char  set char_num_value = '" + charNumValues[i] + "', 	  updated_emp_id = '" + User_Id + "', updated_dt = '" + end_date + "'   where char_id =" + id;
+                OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+                 status = cmd.ExecuteNonQuery();
+            }
+           
+            oConn.Close();
+            return status;
+
+        }
+    }
+}

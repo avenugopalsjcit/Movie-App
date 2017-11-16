@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="app">
+<head>
+    <title></title>
+  
+    <style type="text/css">
+        .navbar-brand
+        {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            text-align: center;
+            margin: auto;
+        }   
+    </style>
+</head>
+<body>
+    <div >
+        
+            <div id="divAnnouncements"  ng-controller="AdminNotesPriorityCtrl" >
+         
+               <div >
+                       
+                        <div id="Div6">
+                         <div class="row text-left Arrow ">
+                           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                                Notes Priority
+                            </h3>
+                        </div>
+                    </div>
+                        <div class="col-md-12"  >
+                        <button class="btn btn-default btn-sm pull-right" id="Addbtn" data-toggle="modal" data-target="#basicModal" ng-click="addNewTask()" >Add Notes Priority  </button>
+                         </div>
+                        
+                            
+
+                              <table ng-table="usersTable" id="tblAvailability"  class="table table-striped Arrow">
+                                <tr ng-repeat="category in $data">
+                                       <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                                        <td data-title="' Notes Priority'"  sortable="'NotesPriorityDesc'" class="Arrow">
+                                            {{category.NotesPriorityDesc}}
+                                        </td>
+                                         <td data-title="' CreatedBy/CreatedDate'"    class="Arrow">
+                                         
+                                            {{category.CREATED_EMP_ID}}<br /> {{category.CREATED_DT}}
+                                           
+                                             <!--<input type="text" value = "{{category.AvailabilityAbbr}}" ng-show="Reset==1"/>-->
+                                        </td>
+                                           <td data-title="' UpdatedBy/UpdatedDate'"    class="Arrow">
+                                      
+                                            {{category.UPDATED_EMP_ID}} <br /> {{category.UPDATED_DT}}
+                                           
+                                             <!--<input type="text" value = "{{category.AvailabilityAbbr}}" ng-show="Reset==1"/>-->
+                                        </td>
+                                        <td data-title="' Edit'">
+                                        <button class="btn btn-default btn-sm" id="Editbtn" data-toggle="modal" ng-click="EditRecord(category)" data-target="#basicModal" ><span class="glyphicon glyphicon-pencil"></span></button>
+                                        </td>
+                                        <td data-title="' Delete'">
+                                        <button value="Delete" class="btn btn-sm btn-danger" id="AnnouncementId" class="chkAnnounmence" data-ng-click="DeleteAdminAvail(category)" > <span class="glyphicon glyphicon-trash"></span></button></span>
+                                    </td>
+                                        
+                                    </tr>
+                                   
+                                </table>
+                            
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+
+               
+
+      
+            <!--   <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true" style="background: transparent; box-shadow: none;   border-style: none;  display: block; width: 900px;  margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;" >-->
+              <div class="modal fade" id="basicModal" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" >
+                <div class="modal-content">
+                    <div class="modal-header" ng-show="Reset==0">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                          Add Notes Priority Reference  </h4>
+                    </div>
+                     <div class="modal-header" ng-show="Reset==1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                          Edit Notes Priority Reference  </h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" name="Availabilityform" novalidate>
+                        
+                        
+                        <div class="control-group" >
+                            <label class="control-label" for="inputtitle" >
+                                Description <span style="color:Red">*</span></label>
+                            <div class="controls" >
+                                <input type="text" style="font-weight:normal" id="inputDesc" ng-model="PriorityDesc" placeholder="Description"  required>
+                            </div>
+                              <div>
+                                        <p style="margin-left: 132px; color: Red" ng-show="Availabilityform.inputDesc.$invalid && !Availabilityform.inputDesc.$pristine"
+                                            class="help-block">
+                                            Please Enter Description.</p>
+                                    </div>
+                        </div>
+                       
+                       
+                        </form>
+                    </div>
+                    <div>
+                    
+                    
+                        <div>
+                    
+                    
+                              <table ng-show="Reset==1" id="Table1"  class="table table-striped Arrow">
+                              <tbody >
+                              <thead>
+                              <tr>
+                              <th style="background-color:transparent;color:Black">
+                              Created by
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Created Date
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Updated by
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Date Last Updated
+                              </th>
+                              </tr>
+                              </thead>
+                                <tr ng-repeat="category2 in usersTable2">
+                                
+                                       
+                                      <td    class="Arrow">
+                                            {{category2.CREATED_EMP_ID}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.CREATED_DT}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.UPDATED_EMP_ID}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.UPDATED_DT}}
+                                        </td>
+                                    </tr>
+                                   </tbody>
+                                </table>
+                    </div>
+                    </div>
+                   <div class="modal-footer" style="background-color:none">
+                   
+                        <button type="button" id="Resetbtn" ng-show="Reset==1" class="btn btn-default"  ng-click="ResetRecord()">
+                            Reset</button>
+                        
+                           <button type="button" id="closebtn" data-dismiss="modal"  class="btn btn-default"  >
+                            Close </button>
+                        <button type="button" class="btn btn-primary" ng-show="Reset==0" data-dismiss="modal"   ng-disabled="Availabilityform.$invalid"  ng-click="SaveAdminAvail()">
+                            Add</button>
+                             <button type="button" class="btn btn-primary" ng-show="Reset==1"  data-dismiss="modal"   ng-disabled="Availabilityform.$invalid"  ng-click="UpdateAdminAvail(AvailValidCd)">
+                            Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+               
+
+               </div>
+               
+            </div>
+            
+       
+        
+        
+        
+    </div>
+    
+  
+    
+    <div class="pageLoaderOverlay">
+    </div>
+    
+    <div>
+        
+    
+
+        
+  
+
+    </div>
+
+   
+</body>
+</html>
+

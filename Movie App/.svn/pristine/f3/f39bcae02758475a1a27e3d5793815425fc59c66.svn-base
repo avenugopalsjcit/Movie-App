@@ -1,0 +1,11 @@
+﻿
+
+app.controller("Controller.Citylevel", function ($scope, $compile, $ngBootbox, MCUParam, MCUHelper) {
+    $('.pageLoaderOverlay').hide();
+
+    $("#lstRegionlist").select2();
+    $("#CaseAvailDDL").select2();
+    $("#ValidCaseDDL").select2();
+
+
+});

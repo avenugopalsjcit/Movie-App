@@ -1,0 +1,780 @@
+﻿app.controller("Controllers.SLAMasterCtrl", function ($scope, SLA, $cacheFactory, $compile, $http) {
+    $("#Go1").show();
+
+    $("#Add1").show();
+    $scope.Countries1 = false;
+    $scope.products = false;
+    $scope.Resilencys = false;
+    $scope.partners = false;
+
+    $scope.goDisable = true;
+    $scope.AddDisable = true;
+    $scope.disbaleSavebtn = true;
+
+    $scope.IsAddClick = true;
+
+    $scope.Edit = true;
+    $scope.Save = true;
+
+
+
+
+
+
+    SLA.sendPageLoadData().success(
+        function (data) {
+            $("#Go1").hide();
+            $scope.Countries = JSON.parse(data.d).getCountry;
+            $scope.Suppliers = JSON.parse(data.d).getPartner;
+            $scope.Primaries = JSON.parse(data.d).getPrimary;
+            $scope.Products = JSON.parse(data.d).getProducts;
+            $scope.Resiliencies = JSON.parse(data.d).getResiliency;
+            $scope.Secondaries = JSON.parse(data.d).getSecondary;
+            $("#productId").select2(
+            {
+            });
+            $("#PartnerId").select2(
+            {
+            });
+            $("#PrimaryAccessId").select2(
+            {
+            });
+            $("#SecondaryAccessId").select2(
+            {
+            });
+            $("#ResiliencyId").select2(
+            {
+            });
+
+        })
+        .error(function (data) {
+            console.log(data)
+        });
+
+
+
+
+    $scope.goClick = function () {
+
+        $scope.InsertTable = false;
+        $scope.UpdateTable = true;
+
+        if ($scope.Countryitem == undefined) {
+            $scope.Countries1 = true;
+            return;
+        }
+
+        if ($("#SLAMasterDatatable tbody tr").length == 0) {
+            $scope.permission = true;
+        }
+
+        $scope.IsAddClick = true;
+
+        $scope.disbaleSavebtn = true;
+        $("#SaveMaster").removeClass("btn btn-primary").addClass("btn btn-default");
+        $("#Go1").show();
+        SLA.getSLAMasterDetailsData($scope.productitem, $scope.Countryitem.join(","), $("#PartnerId :selected").text(),
+            $scope.Resiliencyitem, "", "").success(function (data) {
+
+                //vimp concept here...
+                //$('#tblShow tbody tr:not(:first)').remove();
+
+                //                $('#tblShow tbody tr:first').remove();
+                //                $('#tblShow tbody').append('<tr></tr>');
+
+
+
+                $("#Go1").hide();
+                $scope.IsGo = true;
+                // $scope.IsAddEnable = false;
+                $scope.Save = false;
+                $scope.Edit = true;
+                $scope.Norecords = true;
+                $scope.slaMasterData = JSON.parse(data.d).getSLAMaster;
+
+                //                if ($scope.slaMasterData.length == 0) {
+                //                    $("#tblShow tbody").html("<tr><td colspan='13'><label>No Records Found</label></td></tr>");
+                //                    $scope.Norecords = false;
+                //                }
+
+                $scope.bandslacategory = JSON.parse(data.d).BandSLACategory;
+
+                $scope.Slacategory = [];
+                $scope.band1 = [];
+                for (var i = 0; i < $scope.bandslacategory.length; i++) {
+                    if ($scope.bandslacategory[i].CHAR_TYPE_ID == 3842) {
+                        $scope.Slacategory.push($scope.bandslacategory[i]);
+                    }
+                    if ($scope.bandslacategory[i].CHAR_TYPE_ID == 3846) {
+                        $scope.band1.push($scope.bandslacategory[i]);
+                    }
+                }
+            }).error(function () { alert("failed") });
+    }
+
+
+    var count2 = 0;
+
+    $scope.EditMaster = function (id, event, item) {
+
+        count2++;
+
+        var CountryName = [];
+        $('#CountryId :selected').each(function (i, selected) {
+            CountryName[i] = $(selected).text();
+        });
+        var Country = CountryName.join(",");
+
+
+        $scope.EProductName = $("#productId :selected").text(),
+                 $scope.EPartnerName = $("#PartnerId :selected").text().trim(),
+                 $scope.EResiliencyName = $("#ResiliencyId :selected").text().trim(),
+                 $scope.ECountryName = CountryName.join(","),
+
+                 $scope.EPrimaryAccessName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(1)").html().trim(),
+                 $scope.EPrimaryServiceVariant = $(event.currentTarget).parent().parent().parent().find("td:nth-child(2)").html().trim(),
+                 $scope.EPrimaryDeleviryName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(3)").html().trim(),
+
+                 $scope.ESecondaryAccessName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(4)").html().trim(),
+                 $scope.ESecondaryServiceVariant = $(event.currentTarget).parent().parent().parent().find("td:nth-child(5)").html().trim(),
+                 $scope.ESecondaryDeleviryName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(6)").html().trim(),
+
+                 $scope.EDescription = $(event.currentTarget).parent().parent().parent().find("td:nth-child(7)").html().trim(),
+                 $scope.ESLACategory = $(event.currentTarget).parent().parent().parent().find("td:nth-child(8)").html().trim(),
+                 $scope.ESiteAvailabilityTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(9)").html().trim(),
+
+                 $scope.ESeverity1RepairTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(10)").html().trim(),
+                 $scope.EResiliencyRepairTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(11)").html().trim(),
+                 $scope.EBandName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(12)").html().trim()
+        $scope.CurrentItem = [];
+        $scope.CurrentItem.push(
+                        {
+                            ProductitemName: $scope.EProductName,
+                            CountryName: $scope.ECountryName,
+                            PartnerName: $scope.EPartnerName,
+                            ResiliencyName: $scope.EResiliencyName,
+
+                            PrimaryAccessaName: $scope.EPrimaryAccessName,
+                            SecondaryAccessName: $scope.ESecondaryAccessName,
+
+                            PrimaryDeleveryModeName: $scope.EPrimaryDeleviryName,
+                            SecondaryDeleveryModeName: $scope.ESecondaryDeleviryName,
+
+                            PrimaryServiceVariantName: $scope.EPrimaryServiceVariant,
+                            SecondaryServiceVariantName: $scope.ESecondaryServiceVariant,
+
+                            DescriptionName: $scope.EDescription,
+                            SLACategoryName: $scope.ESLACategory,
+                            SiteAvailabilityTargetName: $scope.ESiteAvailabilityTarget,
+
+                            Service1RepairTargetName: $scope.ESeverity1RepairTarget,
+                            ResiliencyRepairTargetName: $scope.EResiliencyRepairTarget,
+                            BandName: $scope.EBandName,
+                            SBRName: ""
+                        });
+
+        if (item.SITE_AVAILABILITY_TARGET == null) {
+            item.SITE_AVAILABILITY_TARGET = "";
+        }
+        if (item.DESCRIPTION == null) {
+            item.DESCRIPTION = "";
+        }
+        if (item.SEVERITY_1_REPAIR_TARGET == null) {
+            item.SEVERITY_1_REPAIR_TARGET = "";
+        }
+
+        if (item.RESILIENCY_REPAIR_TARGET == null) {
+            item.RESILIENCY_REPAIR_TARGET = "";
+        }
+
+
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(7)").html("<input  type='text' id='desc" + id + "' value='" + item.DESCRIPTION + "'>");
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(9)").html("<input  type='text' id='site" + id + "' value='" + item.SITE_AVAILABILITY_TARGET + "'>");
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(10)").html("<input  type='text' id='repair" + id + "' value='" + item.SEVERITY_1_REPAIR_TARGET + "'>");
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(11)").html("<input  type='text' id='res" + id + "' value='" + item.RESILIENCY_REPAIR_TARGET + "'>");
+
+        $scope.dyn_html = "";
+        $scope.dyn_html += "<select style=\"width:250px\" id=\"slacategoryId\" ng-model=\"item.SLA_CATEGORY\" ng-options=\"item1.CHAR_ID as item1.CHAR_NAME for item1 in Slacategory\"><option value=''>--- Please select ---</option></select>";
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(8)")
+        .html($compile($scope.dyn_html)($scope));
+
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(8)").find("select").select2({});
+
+        //var xyz = $scope.ESLACategory
+        if ($scope.ESLACategory != '') {
+            $(event.currentTarget).parent().parent().parent().find("td:nth-child(8) div").children("a")
+        .children("span:first").html($scope.ESLACategory);
+        }
+        $("#slacategoryId").val($scope.ESLACategory);
+
+        $scope.dyn_html1 = "";
+        $scope.dyn_html1 += "<select style=\"width:250px\" id=\"BandId\" ng-model=\"item.BAND\" ng-options=\"item2.CHAR_ID as item2.CHAR_NAME for item2 in band1\"><option value=''>--- Please select ---</option></select>";
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(12)")
+        .html($compile($scope.dyn_html1)($scope));
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(12)").find("select").select2({});
+        if ($scope.EBandName != '') {
+            $(event.currentTarget).parent().parent().parent().find("td:nth-child(12) div").children("a")
+        .children("span:first").html($scope.EBandName)
+        }
+
+
+        $("#slacategoryId").val(item.BAND);
+
+
+
+
+    };
+
+
+    $scope.UpdateRecord = function (id, event, item) {
+        $("#Go1").show();
+
+
+
+        var CountryName = [];
+        $('#CountryId :selected').each(function (i, selected) {
+            CountryName[i] = $(selected).text();
+        });
+        var Country = CountryName.join(",");
+
+
+        $scope.UProductName = $("#productId :selected").text(),
+                 $scope.UPartnerName = $("#PartnerId :selected").text().trim(),
+                 $scope.UResiliencyName = $("#ResiliencyId :selected").text().trim(),
+                 $scope.UCountryName = CountryName.join(","),
+
+                 $scope.UPrimaryAccessName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(1)").html().trim(),
+                 $scope.UPrimaryServiceVariant = $(event.currentTarget).parent().parent().parent().find("td:nth-child(2)").html().trim(),
+                 $scope.UPrimaryDeleviryName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(3)").html().trim(),
+
+                 $scope.USecondaryAccessName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(4)").html().trim(),
+                 $scope.USecondaryServiceVariant = $(event.currentTarget).parent().parent().parent().find("td:nth-child(5)").html().trim(),
+                 $scope.USecondaryDeleviryName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(6)").html().trim(),
+
+                 $scope.UDescription = $(event.currentTarget).parent().parent().parent().find("td:nth-child(7) input[type='text']").val().trim(),
+
+                $scope.USLACategory = $(event.currentTarget).parent().parent().parent().find("td:nth-child(8)").find("#slacategoryId option:selected").text().trim(),
+                $scope.USiteAvailabilityTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(9) input[type='text']").val().trim(),
+
+                 $scope.USeverity1RepairTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(10) input[type='text']").val().trim(),
+                  $scope.UResiliencyRepairTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(11) input[type='text']").val().trim(),
+                  $scope.UBandName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(12)").find("#BandId option:selected").text().trim()
+        $scope.UpdateItem = [];
+
+        if ($scope.USLACategory == '--- Please select ---') {
+            $scope.USLACategory = '';
+        }
+        if ($scope.UBandName == '--- Please select ---') {
+            $scope.UBandName = '';
+        }
+        $scope.UpdateItem.push(
+                        {
+                            ProductitemName: $scope.UProductName,
+                            CountryName: $scope.UCountryName,
+                            PartnerName: $scope.UPartnerName,
+                            ResiliencyName: $scope.UResiliencyName,
+
+                            PrimaryAccessaName: $scope.UPrimaryAccessName,
+                            SecondaryAccessName: $scope.USecondaryAccessName,
+
+                            PrimaryDeleveryModeName: $scope.UPrimaryDeleviryName,
+                            SecondaryDeleveryModeName: $scope.USecondaryDeleviryName,
+
+                            PrimaryServiceVariantName: $scope.UPrimaryServiceVariant,
+                            SecondaryServiceVariantName: $scope.USecondaryServiceVariant,
+
+                            DescriptionName: $scope.UDescription,
+                            SLACategoryName: $scope.USLACategory,
+                            SiteAvailabilityTargetName: $scope.USiteAvailabilityTarget,
+
+                            Service1RepairTargetName: $scope.USeverity1RepairTarget,
+                            ResiliencyRepairTargetName: $scope.UResiliencyRepairTarget,
+                            BandName: $scope.UBandName,
+                            SBRName: ""
+                        });
+
+        $http.post("SLAMaster.aspx/UpdateMasterdetails",
+                                          {
+                                              'CurrentItem': JSON.stringify($scope.CurrentItem),
+                                              'UpdateItem': JSON.stringify($scope.UpdateItem)
+                                          }).
+                            success(function (data) {
+                                $("#Go1").hide();
+                                $(event.currentTarget).parent().parent().parent().find("td:nth-child(7)").html("<span id='desc" + id + "'>" + $scope.UDescription + "</span>");
+                                $(event.currentTarget).parent().parent().parent().find("td:nth-child(9)").html("<span id='site" + id + "'>" + $scope.USiteAvailabilityTarget + "</span>");
+                                $(event.currentTarget).parent().parent().parent().find("td:nth-child(10)").html("<span id='repair" + id + "'>" + $scope.USeverity1RepairTarget + "</span>");
+                                $(event.currentTarget).parent().parent().parent().find("td:nth-child(11)").html("<span id='res" + id + "'>" + $scope.UResiliencyRepairTarget + "</span>");
+                                $(event.currentTarget).parent().parent().parent().find("td:nth-child(8)").html("<span id='sla" + id + "'>" + $scope.USLACategory + "</span>");
+                                $(event.currentTarget).parent().parent().parent().find("td:nth-child(12)").html("<span id='band" + id + "'>" + $scope.UBandName + "</span>");
+                            }).error(function (data) { console.log('error') });
+    };
+
+
+
+    $scope.SLAMasterDetails = [];
+    SLA.getSLAMasterDetailsData1().success(function (data) {
+        $("#Add1").hide();
+        $scope.PrimaryAccessTechnology = JSON.parse(data.d).primaryAccessTechnology;
+        $scope.PrimaryServiceVariant = JSON.parse(data.d).primaryServiceVariant;
+        $scope.PrimaryDeleveryMode = JSON.parse(data.d).PrimaryDeliveryMode;
+        $scope.getBandSLACategery = JSON.parse(data.d).getBandSLACategery;
+        $scope.SLACategory = [];
+        $scope.Band1 = [];
+        for (var i = 0; i < $scope.getBandSLACategery.length; i++) {
+            if ($scope.getBandSLACategery[i].CHAR_TYPE_ID == 3842) {
+                $scope.SLACategory.push($scope.getBandSLACategery[i]);
+            }
+            if ($scope.getBandSLACategery[i].CHAR_TYPE_ID == 3846) {
+                $scope.Band1.push($scope.getBandSLACategery[i]);
+            }
+        }
+    });
+
+
+
+    $scope.TempAccessTech = [
+    {
+        Name: "Ethernet",
+        TValue: 1
+    }, {
+        Name: "Leased Line",
+        TValue: 2
+    }, {
+        Name: "hVPN",
+        TValue: 3
+    },
+     {
+         Name: "VSAT",
+         TValue: 4
+     }, {
+         Name: "DSL",
+         TValue: 5
+     },
+    {
+        Name: "N/A",
+        TValue: 6
+    }
+    ];
+
+
+    $scope.CheckRecord = function (item, value) {
+        if (value == null) {
+            switch (item) {
+                case "product":
+                    $scope.products = true;
+                    break;
+                case "partner":
+                    $scope.partners = true;
+                    break;
+                case "resilency":
+                    $scope.Resilencys = true;
+                    break;
+                case "Countries":
+                    $scope.Resilencys = true;
+                    break;
+            }
+        }
+        if (value != null) {
+            switch (item) {
+                case "product":
+                    $scope.products = false;
+                    break;
+                case "partner":
+                    $scope.partners = false;
+                    break;
+                case "resilency":
+                    $scope.Resilencys = false;
+                    break;
+                case "Countries":
+                    $scope.Resilencys = false;
+                    break;
+            }
+        }
+
+        if (item == 'product') {
+            $scope.Countryitem = null;
+            $scope.Supplieritem = null;
+            $scope.Resiliencyitem = null;
+            //            $scope.primaryitem = null;
+            //            $scope.secondaryitem = null;
+            $("#PartnerId").parent().find('span').first().html('&nbsp;&nbsp--&nbsp;Select&nbsp--');
+            $("#ResiliencyId").parent().find('span').first().html('&nbsp;&nbsp--&nbsp;Select&nbsp--');
+            //  $("#PrimaryAccessId").parent().find('span').first().html('&nbsp;&nbsp--&nbsp;Select&nbsp--');
+            // $("#SecondaryAccessId").parent().find('span').first().html('&nbsp;&nbsp--&nbsp;Select&nbsp--');
+
+        }
+    }
+
+
+    var GloabalCheck = true;
+
+
+    $scope.checkRec1 = function (id, item, index) {
+        if (item == null) {
+            $('#' + id).next().next().show();
+            GloabalCheck = false;
+        }
+        if (item != null) {
+            $('#' + id).next().next().hide();
+            GloabalCheck = true;
+
+            if ($('#' + id + ' :selected').text().trim() != "Ethernet") {
+                $('#' + id).parent().next().next().children('div').children('a').children("span:first").html("&nbsp;&nbsp;--Select--  ")
+            }
+        }
+    }
+
+    $scope.checkRec2 = function (id) {
+        if ($('#' + id + ' :selected').text().trim() != "Ethernet") {
+            $('#' + id).parent().next().next().children('div').children('a').children("span:first").html("&nbsp;&nbsp;--Select--  ")
+        }
+    }
+
+    var count = 0;
+    $scope.PrevSelection = [];
+    $scope.ADDMasterDetails = function () {
+        count++;
+
+        $scope.PrevSelection.push({ count: [$scope.productitem,
+        $scope.Countryitem,
+        $scope.Supplieritem,
+        $scope.Resiliencyitem]
+        });
+        var Isame = false;
+        if (count > 1) {
+            Isame = angular.equals($scope.PrevSelection[$scope.PrevSelection.length - 1], $scope.PrevSelection[$scope.PrevSelection.length - 2]);
+        }
+
+        if (Isame == false) {
+            $("#SLAMasterDatatable tbody tr").remove();
+           // Isame = true;
+        }
+
+
+        $scope.disbaleSavebtn = false;
+        $scope.goDisable = false;
+        $scope.IsAddClick = false;
+        $("#accessdis1").select2(
+            {
+            });
+        $("#accessdis2").select2(
+            {
+            });
+
+        $scope.InsertTable = true; $scope.IsGo = true; $scope.Edit = true; $scope.UpdateTable = false;
+        $("#SaveMaster").removeClass("btn btn-default").addClass("btn btn-primary");
+
+
+
+
+        var IsLastRowValid = true;
+        $("#SLAMasterDatatable tbody tr:last td").each(function (index, element) {
+            if (index < 2) {
+                var access = $(element).find('select :selected').val();
+                var service = $(element).find('select :selected').val();
+                if (access == "" || access == null || access == "?") {
+                    $(element).find("select").next().next().show();
+                    IsLastRowValid = false;
+                }
+                if (service == "" || access == null || access == "?") {
+                    $(element).find("select").next().next().show();
+                    IsLastRowValid = false;
+                }
+            }
+        });
+
+
+        if (IsLastRowValid == true && GloabalCheck == true) {
+
+            $scope.dyn_cnt = "";
+            $scope.dyn_cnt += "<tr id=\"dyntr\"><td><select  class=\"dynSelect\" ng-change=\"checkRec1('PrimaryTechId_" + count + "',primaryTech_" + count + ")\" id=\"PrimaryTechId_" + count + "\" ng-model=\"primaryTech_" + count + "\" ng-options=\"item1.TValue as item1.Name for item1 in TempAccessTech\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><br/><span style=\"display:none;color:red\">Select Primary Access Technology</span></td>";
+            $scope.dyn_cnt += "<td><select class=\"dynSelect\" id=\"primarySeveriantId_" + count + "\" ng-model=\"primaryvariantid_" + count + "\" ng-options=\"item3.SERVICE_VARIANT_ID  as item3.SERVICE_VARIANT_NAME for item3 in PrimaryServiceVariant\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><br/><span style=\"display:none;color:red\">Select Primary Service Variant</span></td>";
+            $scope.dyn_cnt += "<td><select class=\"dynSelect\" ng-disabled=\"primaryTech_" + count + " != 1\" id=\"primaryDeliveryModeId\" ng-model=\"primarydeliveryid_" + count + "\" ng-options=\"item2.DELIVERY_MODE_ID  as item2.DELIVERY_MODE_NAME for item2 in PrimaryDeleveryMode\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select></td>";
+
+            $scope.dyn_cnt += "<td><select class=\"dynSelect\" ng-change=\"checkRec2('SecondaryTechId_" + count + "')\" id=\"SecondaryTechId_" + count + "\" ng-model=\"secondarytechId_" + count + "\" ng-options=\"item1.TValue as item1.Name for item1 in TempAccessTech\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select></td>";
+            $scope.dyn_cnt += "<td><select class=\"dynSelect\" id=\"SecondaryseveriantId\" ng-model=\"secondaryvariantid_" + count + "\" ng-options=\"item5.SERVICE_VARIANT_ID  as item5.SERVICE_VARIANT_NAME for item5 in PrimaryServiceVariant\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select></td>";
+            $scope.dyn_cnt += "<td><select class=\"dynSelect\" ng-disabled=\"secondarytechId_" + count + " != 1\" id=\"SecondaryDeliveryModeId\" ng-model=\"secondarydeliveryid_" + count + "\" ng-options=\"item6.DELIVERY_MODE_ID  as item6.DELIVERY_MODE_NAME for item6 in PrimaryDeleveryMode\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select></td>";
+
+            $scope.dyn_cnt += "<td><input id='txtDesc' type='text' ng-model=\"txtdesc_" + count + "\"/></td>";
+
+            $scope.dyn_cnt += "<td><select class=\"dynSelect\" id=\"SLACategoryId\" ng-model=\"slacategory_" + count + "\" ng-options=\"item7.CHAR_ID as item7.CHAR_NAME for item7 in SLACategory\" ><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select></td>";
+            $scope.dyn_cnt += "<td><input id=\"siteAvailabilityID\" type=\"text\" ng-model=\"txtSiteAvailabilityTarget_" + count + "\" /></td>";
+            $scope.dyn_cnt += "<td><input id=\"Severiaty1repairTargetId\" type=\"text\" ng-model=\"txtSeveriaty1repairTarget_" + count + "\" /></td>";
+            $scope.dyn_cnt += "<td><input id=\"resilancyrepairTargetId\" type=\"text\" ng-model=\"txtresilancyrepairTarget_" + count + "\" /></td>";
+            $scope.dyn_cnt += "<td><select class=\"dynSelect\" id=\"BandId\" ng-model=\"band_" + count + "\" ng-options=\"item8.CHAR_ID as item8.CHAR_NAME for item8 in Band1\" ><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select></td>";
+            $scope.dyn_cnt += "<td><select class=\"dynSelect\" id=\"SBRId\" ng-model=\"sbrID_" + count + "\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option><option>Non-assignable</option><option>Standard</option><option>N/A</option></select></td>";
+            //$scope.dyn_cnt += "<td><button type=\"button\" onClick=\"$(this).closest('tr').remove();\" class=\"btn btn-default btn-sm\" \><span class=\"glyphicon glyphicon-remove\"></span></td></tr>"
+            $scope.dyn_cnt += "<td><button id='cancelButton" + count + "' type=\"button\" ng-click='CancelInsert(" + count + ")' class=\"btn btn-default btn-sm\" \><span class=\"glyphicon glyphicon-remove\"></span></td></tr>"
+            $("#SLAMasterDatatable tbody").append($compile($scope.dyn_cnt)($scope));
+        }
+
+        $("#SLAMasterDatatable tr td select").select2({});
+        $("#dyntr td div").attr("style", "width:200px");
+    };
+
+
+    $scope.CancelInsert = function (Id) {
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to cancel?",
+            callback: function (result) {
+                if (result) {
+                    $("#cancelButton" + Id).closest('tr').remove();
+                }
+            }
+        });
+    }
+
+
+    $scope.SaveMasterDetails = function () {
+        $scope.IsAddEnable = true;
+        $scope.IsGo = false;
+        $scope.MasterDetailsData = [];
+
+        var IsLastRowValid = true;
+        $("#SLAMasterDatatable tbody tr:last td").each(function (index, element) {
+            if (index < 2) {
+                var access = $(element).find('select :selected').val();
+                var service = $(element).find('select :selected').val();
+                if (access == "" || access == null || access == "?") {
+                    $(element).find("select").next().next().show();
+                    IsLastRowValid = false;
+                }
+                if (service == "" || access == null || access == "?") {
+                    $(element).find("select").next().next().show();
+                    IsLastRowValid = false;
+                }
+            }
+        });
+
+
+        if (IsLastRowValid == true && GloabalCheck == true) {
+            $("#Go1").show();
+            var ProductName = $("#productId :selected").text();
+            var PartnerName = $("#PartnerId :selected").text().trim();
+            var ResiliencyName = $("#ResiliencyId :selected").text().trim();
+            var CountryName = $("#CountryId :selected").text().trim();
+
+
+            var CountryName = [];
+            $('#CountryId :selected').each(function (i, selected) {
+                CountryName[i] = $(selected).text();
+            });
+            var Country = CountryName.join(",");
+
+
+            $('#SLAMasterDatatable tbody tr').each(function (index, element) {
+                //$(element).find("td:nth-child(2) select :selected")
+                $scope.PrimaryAccessTechName = $(element).find("td:nth-child(1) select :selected").text();
+                $scope.primaryServicevariantName = $(element).find("td:nth-child(2) select :selected").text();
+
+                if ($(element).find("#primaryDeliveryModeId :selected").val() == "") {
+                    $scope.primaryDeliveryModeName = "N/A";
+                }
+                else {
+                    $scope.primaryDeliveryModeName = $(element).find("#primaryDeliveryModeId :selected").text();
+                }
+
+                $scope.SecondaryTechName = $(element).find("td:nth-child(4) :selected").val();
+                if ($scope.SecondaryTechName == "") {
+                    $scope.SecondaryTechName = "N/A";
+                }
+                else {
+                    $scope.SecondaryTechName = $(element).find("td:nth-child(4) :selected").text();
+                }
+
+                $scope.SecondarServiceVaraintName = $(element).find("#SecondaryseveriantId :selected").val();
+                if ($scope.SecondarServiceVaraintName == "") {
+                    $scope.SecondarServiceVaraintName = "N/A";
+                }
+                else {
+                    $scope.SecondarServiceVaraintName = $(element).find("#SecondaryseveriantId :selected").text();
+                }
+
+                $scope.SecondaryDeliveryModeName = $(element).find("#SecondaryDeliveryModeId :selected").val()
+                if ($scope.SecondaryDeliveryModeName == "") {
+                    $scope.SecondaryDeliveryModeName = "N/A";
+                }
+                else {
+                    $scope.SecondaryDeliveryModeName = $(element).find("#SecondaryDeliveryModeId :selected").text();
+                }
+
+
+                $scope.SLACategoryName = $(element).find("#SLACategoryId :selected").val();
+                if ($scope.SLACategoryName.trim() == "") {
+                    $scope.SLACategoryName = "N/A";
+                }
+                else {
+                    $scope.SLACategoryName = $(element).find("#SLACategoryId :selected").text();
+                }
+
+                $scope.txtDesc = $(element).find("#txtDesc").val();
+                if ($scope.txtDesc == "") {
+                    $scope.txtDesc = "";
+                }
+                $scope.siteAvailabilityName = $(element).find("#siteAvailabilityID").val();
+                $scope.Severiaty1repairTargetName = $(element).find("#Severiaty1repairTargetId").val();
+                $scope.resilancyrepairTargetName = $(element).find("#resilancyrepairTargetId").val();
+
+                $scope.BandName = $(element).find("#BandId :selected").val();
+                if ($scope.BandName.trim() == "") {
+                    $scope.BandName = "";
+                }
+                else {
+                    $scope.BandName = $(element).find("#BandId :selected").text();
+                }
+
+                $scope.SBRName = $(element).find("#SBRId :selected").val();
+                if ($scope.SBRName.trim() == "") {
+                    $scope.SBRName = "";
+                }
+                else {
+                    $scope.SBRName = $(element).find("#SBRId :selected").text();
+                }
+                $scope.MasterDetailsData.push(
+                        {
+                            ProductitemName: ProductName,
+                            CountryName: CountryName.join(","),
+                            PartnerName: PartnerName,
+                            ResiliencyName: ResiliencyName,
+                            PrimaryAccessaName: $scope.PrimaryAccessTechName,
+                            SecondaryAccessName: $scope.SecondaryTechName,
+                            PrimaryDeleveryModeName: $scope.primaryDeliveryModeName,
+                            SecondaryDeleveryModeName: $scope.SecondaryDeliveryModeName,
+                            PrimaryServiceVariantName: $scope.primaryServicevariantName,
+                            SecondaryServiceVariantName: $scope.SecondarServiceVaraintName,
+                            DescriptionName: $scope.txtDesc,
+                            SLACategoryName: $scope.SLACategoryName,
+                            SiteAvailabilityTargetName: $scope.siteAvailabilityName,
+                            Service1RepairTargetName: $scope.Severiaty1repairTargetName,
+                            ResiliencyRepairTargetName: $scope.resilancyrepairTargetName,
+                            BandName: $scope.BandName,
+                            SBRName: $scope.SBRName
+                            //   SBPName 
+                        });
+            });
+
+            $http.post("SLAMaster.aspx/InsertMasterdetails",
+                                          {
+                                              'CountryName': CountryName.join(","),
+                                              'SaveMasterDetailsJSON': JSON.stringify($scope.MasterDetailsData)
+                                          }).
+                            success(function (data) {
+                                $("#Go1").hide();
+                                console.log("success");
+                                console.log(data);
+
+                            }).error(function (data) { console.log('error') });
+
+        }
+
+
+    }
+
+
+
+    $scope.CancelRecord = function (index, event, item) {
+        $scope.CDescription = $(event.currentTarget).parent().parent().parent().find("td:nth-child(7) input[type='text']").val().trim(),
+        $scope.CSLACategory = $(event.currentTarget).parent().parent().parent().find("td:nth-child(8)").find("#slacategoryId option:selected").text().trim(),
+        $scope.CSiteAvailabilityTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(9) input[type='text']").val().trim(),
+        $scope.CSeverity1RepairTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(10) input[type='text']").val().trim(),
+        $scope.CResiliencyRepairTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(11) input[type='text']").val().trim(),
+        $scope.CBandName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(12)").find("#BandId option:selected").text().trim()
+
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(7)").html("<span id='desc" + index + "'>" + $scope.CDescription + "</span>");
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(9)").html("<span id='site" + index + "'>" + $scope.CSiteAvailabilityTarget + "</span>");
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(10)").html("<span id='repair" + index + "'>" + $scope.CSeverity1RepairTarget + "</span>");
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(11)").html("<span id='res" + index + "'>" + $scope.CResiliencyRepairTarget + "</span>");
+        if ($scope.CSLACategory == '--- Please select ---') {
+            $scope.CSLACategory = '';
+        }
+        if ($scope.CBandName == '--- Please select ---') {
+            $scope.CBandName = '';
+        }
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(8)").html("<span id='sla" + index + "'>" + $scope.CSLACategory + "</span>");
+        $(event.currentTarget).parent().parent().parent().find("td:nth-child(12)").html("<span id='band" + index + "'>" + $scope.CBandName + "</span>");
+
+    }
+
+
+
+
+
+
+    $scope.DeleteRecord = function (index, event, item) {
+
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete record?",
+            callback: function (result) {
+                if (result) {
+                    $("#Go1").show();
+                    var CountryName = [];
+                    $('#CountryId :selected').each(function (i, selected) {
+                        CountryName[i] = $(selected).text();
+                    });
+                    $scope.DProductName = $("#productId :selected").text(),
+                 $scope.DPartnerName = $("#PartnerId :selected").text().trim(),
+                 $scope.DResiliencyName = $("#ResiliencyId :selected").text().trim(),
+                 $scope.DCountryName = CountryName.join(","),
+
+                 $scope.DPrimaryAccessName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(1)").html().trim(),
+                 $scope.DPrimaryServiceVariant = $(event.currentTarget).parent().parent().parent().find("td:nth-child(2)").html().trim(),
+                 $scope.DPrimaryDeleviryName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(3)").html().trim(),
+
+                 $scope.DSecondaryAccessName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(4)").html().trim(),
+                 $scope.DSecondaryServiceVariant = $(event.currentTarget).parent().parent().parent().find("td:nth-child(5)").html().trim(),
+                 $scope.DSecondaryDeleviryName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(6)").html().trim(),
+
+                 $scope.DDescription = $(event.currentTarget).parent().parent().parent().find("td:nth-child(7)").html().trim(),
+                 $scope.DSLACategory = $(event.currentTarget).parent().parent().parent().find("td:nth-child(8)").html().trim(),
+                 $scope.DSiteAvailabilityTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(9)").html().trim(),
+
+                 $scope.DSeverity1RepairTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(10)").html().trim(),
+                 $scope.DResiliencyRepairTarget = $(event.currentTarget).parent().parent().parent().find("td:nth-child(11)").html().trim(),
+                 $scope.DBandName = $(event.currentTarget).parent().parent().parent().find("td:nth-child(12)").html().trim()
+                    $scope.DeleteItemJSON = [];
+
+                    $scope.DeleteItemJSON.push(
+                        {
+                            ProductitemName: $scope.DProductName,
+                            CountryName: $scope.DCountryName,
+                            PartnerName: $scope.DPartnerName,
+                            ResiliencyName: $scope.DResiliencyName,
+
+                            PrimaryAccessaName: $scope.DPrimaryAccessName,
+                            SecondaryAccessName: $scope.DSecondaryAccessName,
+
+                            PrimaryDeleveryModeName: $scope.DPrimaryDeleviryName,
+                            SecondaryDeleveryModeName: $scope.DSecondaryDeleviryName,
+
+                            PrimaryServiceVariantName: $scope.DPrimaryServiceVariant,
+                            SecondaryServiceVariantName: $scope.DSecondaryServiceVariant,
+
+                            DescriptionName: $scope.DDescription,
+                            SLACategoryName: $scope.DSLACategory,
+                            SiteAvailabilityTargetName: $scope.DSiteAvailabilityTarget,
+
+                            Service1RepairTargetName: $scope.DSeverity1RepairTarget,
+                            ResiliencyRepairTargetName: $scope.DResiliencyRepairTarget,
+                            BandName: $scope.DBandName,
+                            SBRName: ""
+                        });
+
+
+                    $http.post("SLAMaster.aspx/DeleteMasterdetails",
+                                          {
+                                              'DeleteItemJSON': JSON.stringify($scope.DeleteItemJSON)
+                                          }).
+                            success(function (data) {
+
+                                $scope.slaMasterData.splice(index, 1);
+                                $("#Go1").hide();
+                            }).
+                            error(function (data) { console.log('error') });
+                }
+            }
+        });
+    }
+
+});

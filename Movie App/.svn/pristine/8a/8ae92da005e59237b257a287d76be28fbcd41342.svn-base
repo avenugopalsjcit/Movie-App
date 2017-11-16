@@ -1,0 +1,9 @@
+﻿app.controller("productCtrl", function ($scope) {
+
+
+     $(".clsddlProducttype").select2();
+   // $("#selectsingle").select2();
+
+    
+
+});

@@ -1,0 +1,130 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+
+namespace SCAdminBAL.MCU
+{
+    /// <summary>
+    /// Summary description for Country
+    /// </summary>
+    [Serializable]
+    public class Country
+    {
+        #region Private Variables
+        private String _COUNTRY_NAME = String.Empty;
+        private Int32 _COUNTRY_ID = -1;
+        private Int32 _REGION_ID = -1;
+        private String _REGION_NAME = String.Empty;
+        private Int32 _COUNTRY_VALID_CD = -1;
+        private String _CREATED_EMP_ID = String.Empty;
+        private DateTime _CREATED_DT = DateTime.Now;
+        private String _UPDATED_EMP_ID = String.Empty;
+        private DateTime _UPDATED_DT = DateTime.Now;
+        #endregion
+
+        #region Public Properties
+        public String CountryName
+        {
+            get
+            {
+                return _COUNTRY_NAME;
+            }
+            set
+            {
+                _COUNTRY_NAME = value;
+            }
+        }
+        public String RegionName
+        {
+            get
+            {
+                return _REGION_NAME;
+            }
+            set
+            {
+                _REGION_NAME = value;
+            }
+        }
+
+        public DateTime UpdatedDt
+        {
+            get
+            {
+                return _UPDATED_DT;
+            }
+            set
+            {
+                _UPDATED_DT = value;
+            }
+        }
+        public DateTime CreatedDt
+        {
+            get
+            {
+                return _CREATED_DT;
+            }
+            set
+            {
+                _CREATED_DT = value;
+            }
+        }
+        public String UpdatedEmpId
+        {
+            get
+            {
+                return _UPDATED_EMP_ID;
+            }
+            set
+            {
+                _UPDATED_EMP_ID = value;
+            }
+        }
+        public String CreatedEmpId
+        {
+            get
+            {
+                return _CREATED_EMP_ID;
+            }
+            set
+            {
+                _CREATED_EMP_ID = value;
+            }
+        }
+        public Int32 CountryValidCd
+        {
+            get
+            {
+                return _COUNTRY_VALID_CD;
+            }
+            set
+            {
+                _COUNTRY_VALID_CD = value;
+            }
+        }
+        public Int32 RegionId
+        {
+            get
+            {
+                return _REGION_ID;
+            }
+            set
+            {
+                _REGION_ID = value;
+            }
+        }
+
+        public Int32 CountryId
+        {
+            get
+            {
+                return _COUNTRY_ID;
+            }
+            set
+            {
+                _COUNTRY_ID = value;
+            }
+        }
+        #endregion
+    }
+}

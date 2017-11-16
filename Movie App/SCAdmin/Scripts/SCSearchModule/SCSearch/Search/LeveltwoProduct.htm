@@ -1,0 +1,642 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="../BootStrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../BootStrap/css/styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body ng-app="appModule">
+   
+        <div ng-controller='LeveltowProductCntrl'>
+            
+            
+                 <div class="row">
+                     <div class="col-md-12 col-lg-12 text-center marTop10 red">
+                         <p class="Arrow">
+                             Features not entered into Sales Catalogue should be considered Not Available.</p>
+                     </div>
+                 </div>
+
+            <div id="documents" ng-hide="ShowLevelTwoProductDocLinks==0">
+                <div class="panel panel-primary">
+                    <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#levtwoProductDoc">
+                        <h3 class="panel-title">
+                            Product Documents</h3>
+                        <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i>
+                        </span>
+                    </div>
+                    <div id="levtwoProductDoc" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div ng-controller="DocumentLinkscntrl" id="ProductDocLinks">
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6 text-left">
+                                    <table>
+                                        <tr ng-repeat="dc in DocumentslinksData">
+                                            <td>
+                                                <a href="{{dc.DocumentUrl}}" target="_blank">{{dc.DocumentTitle}}</a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+
+                 <div class="panel panel-primary">
+                     <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#levtwoProductDetails">
+                         <h3 class="panel-title">
+                             Product Details</h3>
+                        <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i>
+                        </span>
+                     </div>
+                      <div id="levtwoProductDetails" class="panel-collapse collapse">
+                     <div class="panel-body">
+                         <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                             <tr>
+                                 <td width="40%" class="Arrow">
+                                     Service Available
+                                 </td>
+                                 <td width="60%" class="Arrow">
+                                     {{ServiceAvail}}
+                                 </td>
+                             </tr>
+
+                              <tr id ="showTargetAvailDate">
+                                 <td width="40%" class="Arrow">
+                                     Target Availability Date
+                                 </td>
+                                 <td width="60%" class="Arrow">
+                                     {{targetAvailDate}}
+                                 </td>
+                             </tr>
+                             <tr style="display: none" ng-if="showpopcode">
+                                 <td width="40%" class="Arrow">
+                                     POP Code :
+                                 </td>
+                                 <td width="60%" class="Arrow">
+                                     {{POPCode}}
+                                 </td>
+                             </tr>
+                             <tr style="display: none" ng-if="showpopcol">
+                                 <td class="Arrow">
+                                     POP Color:
+                                 </td>
+                                 <td class="Arrow">
+                                     {{POPColor}}
+                                 </td>
+                             </tr>
+                             <tr style="display: none" ng-if="showNwName">
+                                 <td width="40%" class="Arrow">
+                                     Network Name :
+                                 </td>
+                                 <td width="60%" class="Arrow">
+                                     {{NetworkName}}
+                                 </td>
+                             </tr>
+                             <tr style="display: none" ng-if="showres">
+                                 <td width="40%" class="Arrow">
+                                     Support Resilient Only POP:
+                                 </td>
+                                 <td width="60%">
+                                     {{SupportRes}}
+                                 </td>
+                             </tr>
+                         </table>
+                     </div>
+                     </div>
+                 </div>
+                  
+                    <div class="panel panel-primary" id="tblPopCharacteristics" style="display: none";>
+                        <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#levtwopop">
+                            <h3 class="panel-title">
+                                Pop Characteristics</h3>
+                                <span class="pull-right "><i class="glyphicon glyphicon-chevron-down"></i>
+                        </span>
+                        </div>
+                        <div id="levtwopop" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                                <tr ng-repeat="pc in PopCharData">
+                                    <td width="40%" class="Arrow">
+                                        {{pc.CharName}}
+                                    </td>
+                                    <td width="60%" class="Arrow">
+                                        {{pc.CharValue}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        </div>
+                    </div>
+               
+
+            <div class="panel panel-primary prodChar" ng-repeat='item in tblcharslist'>
+                <div class="panel-heading upDownIconToggle collapsed  clickable1" data-toggle="collapse"
+                    data-target="#levtwochar{{$index}}">
+                    <h3 class="panel-title">
+                        {{item.CharTypeAlias}}</h3>
+                    <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i>
+                    </span>
+                </div>
+                <div id="levtwochar{{$index}}" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                            <tr ng-repeat="subitem in item.chars | orderBy:'CharName'">
+                                <td width="40%" class="Arrow">
+                                    {{subitem.CharName}}
+                                </td>
+                                <td width="60%" class="Arrow">
+                                    {{subitem.CharValue}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+                        
+                 <div class="panel panel-primary bg1" style="display: none">
+                     <div class="panel-body">
+                         <div id="trParent" class="form-horizontal" style="display: none">
+                             <div class="form-group">
+                                 <label for="" class="col-sm-2 control-label">
+                                     Access Supplier(s)</label>
+                                 <div class="col-sm-2">
+                                     <select class="form-control" ng-model="PSubProdAccessSupplier" id="AccessSupplier"
+                                         ng-options="suppData.AccessSupplierID as suppData.AccessSupplierName for suppData in SubprodAccessSupp">
+                                         <option value="">ALL</option>
+                                     </select>
+                                 </div>
+                                 <label for="" class="col-sm-2 control-label">
+                                     Port Speed(s)</label>
+                                 <div class="col-sm-2">
+                                     <select class="form-control" multiple size="7" ng-model="subProdParentPort" id="PortSpeed">
+                                         <option ng-repeat='pSpeed in SubprodPortSpeed' value="{{pSpeed.PortSpeedID}}">{{pSpeed.PortSpeedName}}</option>
+                                     </select>
+                                 </div>
+                                 <div class="col-sm-2">
+                                     <input type="button" value="GO" ng-click="GetsubProdParentPort()" class="btn btn-success" />
+                                 </div>
+                             </div>
+                         </div>
+                         <div id='trChild' class="form-horizontal" style="display: block">
+                             <div class="form-group">
+                                 <label for="" class="col-sm-2 control-label">
+                                     Parent Access Supplier(s)</label>
+                                 <div class="col-sm-2">
+                                     <select class="form-control" id="" ng-model="subChildAccessSupp" ng-options="CAccesssupp.AccessSupplierID as CAccesssupp.AccessSupplierName for CAccesssupp in SubChildAccSuppdata">
+                                         <option value="">ALL</option>
+                                     </select>
+                                 </div>
+                                 <label for="" class="col-sm-2 control-label">
+                                     Parent Port Speed(s)</label>
+                                 <div class="col-sm-2 control-label">
+                                     <select id="Select1" multiple size="7" ng-model="subChildPortSpeed" class="form-control">
+                                         <option ng-repeat='cSpeed in subChildPortSpeedData' value="{{cSpeed.PortSpeedID}}">{{cSpeed.PortSpeedName}}</option>
+                                     </select>
+                                 </div>
+                             </div>
+                             <div class="form-group">
+                                 <label for="" class="col-sm-2 control-label">
+                                     CPE Supplier(s)</label>
+                                 <div class="col-sm-2 control-label">
+                                     <select class="form-control" id="cpesuppliers" ng-init="CPESuppliers = options[0]"
+                                         ng-model="CPESuppliers">
+                                         <option ng-repeat='objsupp in CpeSupplierData' value="{{objsupp.supplierID}}">{{objsupp.SupplierName}}</option>
+                                     </select>
+                                 </div>
+                                 <div class="col-sm-2 control-label">
+                                     <input type="button" value="GO" class="btn btn-success" ng-click="GetCPortSpeeds()" />
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+           
+                 <div id="tblParentSpeeds" class="table-responsive" style="display: none">
+                     <table cellpadding="0" cellspacing="0" class="table table-bordered tblnowrap">
+                         <tr>
+                             <th class="Arrow">
+                                 Port Speed
+                             </th>
+                             <th class="Arrow">
+                                 Port Speed Availability
+                             </th>
+                             <th class="Arrow">
+                                 Access Speed
+                             </th>
+                             <th class="Arrow">
+                                 Access Technology
+                             </th>
+                             <th class="Arrow">
+                                 Access Supplier Name
+                                 <br>
+                                 Supplier Product Name<br>
+                                 / BT Internal SLA Information
+                             </th>
+                             <th class="Arrow">
+                                 Service Type
+                             </th>
+                             <th class="Arrow">
+                                 Access Speed Availability
+                             </th>
+                             <th class="Arrow">
+                                 Ordering Status
+                             </th>
+                             <th class="Arrow">
+                                 Interface
+                             </th>
+                             <th class="Arrow">
+                                 Framing
+                             </th>
+                             <th class="Arrow">
+                                 Connector
+                             </th>
+                             <th class="Arrow">
+                                 with CPE
+                                 <br />
+                                 calendar days
+                                 <br />
+                                 + Status
+                             </th>
+                             <th class="Arrow">
+                                 without CPE
+                                 <br />
+                                 calendar days
+                                 <br />
+                                 + Status
+                             </th>
+                             <th class="Arrow">
+                                 with CPE
+                                 <br />
+                                 calendar days
+                                 <br />
+                                 + Status
+                             </th>
+                             <th class="Arrow">
+                                 without CPE
+                                 <br />
+                                 calendar days
+                                 <br />
+                                 + Status
+                             </th>
+                         </tr>
+                         <tbody>
+                             <tr ng-repeat='psData in subProdParentPortSpeedGridData'>
+                                 <td class="Arrow">
+                                     {{psData.PortSpeeds}}
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.PortSpeedAvailability}}
+                                 </td>
+                                 <td class="Arrow"> 
+                                     {{psData.AccessSpeed}}
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.AccessTechnology}}
+                                 </td>
+                                 <td>
+                                     {{psData.SupplierProductName}}<br />
+                                     <a href='SLAInformation.asp?slaproduct={{psData.AccessSupplierNameID}}&speed={{psData.AccessSpeedCharID}}&speeduom={{psData.ASpeedUOM}}&sSupplier={{psData.AccessSupplierCharID}}&AccTypename={{psData.AccessProductTypeID}}'>
+                                         {{psData.SupplierProductName1}}</a>
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.ServiceType}}
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.AccessSpeedAvailability}}
+                                 </td>
+                                 <td>
+                                     <a href='product/dispACCESSdetails.asp?Product=25&Region={{psData.RegionID}}&Country={{psData.CountryID}}&Site=0&ChosenSupplier={{psData.AccessSupplierCharID}}'>
+                                         {{psData.OrderingStatus}}</a>
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.Interface}}
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.Framing}}
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.Connecter}}
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.offnetwithCPEStatus[0]}} &nbsp;&nbsp;&nbsp;{{psData.offnetwithCPEStatus[1]}}
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.offnetWithOutCPEStatus[0]}} &nbsp;&nbsp;&nbsp;{{psData.offnetWithOutCPEStatus[1]}}
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.onnetWithCPEStatus[0]}} &nbsp;&nbsp;&nbsp;{{psData.onnetWithCPEStatus[1]}}
+                                 </td>
+                                 <td class="Arrow">
+                                     {{psData.onnetWithoutCPEStatus[0]}} &nbsp;&nbsp;&nbsp;{{psData.onnetWithoutCPEStatus[1]}}
+                                 </td>
+                             </tr>
+                         </tbody>
+                     </table>
+                 </div>
+
+
+                 <!--cpe Information-->
+                 <div id="CPEPanel">
+                     <div class="panel panel-primary" id="CPELaunchStatus" style="margin-top: 10px;">
+                         <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                             data-target="#LeveltwoCPELaunch">
+                             <h3 class="panel-title">
+                                 CPE Launch Status</h3>
+                             <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                         </div>
+                         <div id="LeveltwoCPELaunch" class="panel-collapse collapse">
+                             <div class="panel-body">
+                                 <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                                     <tr>
+                                         <td width="40%" class="Arrow">
+                                             BT Managed CPE Availability
+                                         </td>
+                                         <td width="60%" class="Arrow">
+                                             {{CPELaunchAvailability}}
+                                         </td>
+                                     </tr>
+                                 </table>
+                             </div>
+                         </div>
+                     </div>
+
+                     <div class="panel panel-primary" style=" margin-top: 10px; width: auto"
+                         id="tblBundle">
+                         <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                             data-target="#LeveltwoCPEBundle">
+                             <h3 class="panel-title">
+                                 CPE Bundle Details</h3>
+                             <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                         </div>
+                         <div id="LeveltwoCPEBundle" class="panel-collapse collapse">
+                             <div class="panel-body">
+                                 <table cellpadding="0" cellspacing="0" class="table table-bordered">
+                                     <tr>
+                                         <th class="Arrow">
+                                             Router
+                                         </th>
+                                         <th class="Arrow">
+                                             Access Technology
+                                         </th>
+                                         <th class="Arrow">
+                                             Bundle
+                                         </th>
+                                         <th class="Arrow">
+                                             Expected Date for ORDER
+                                         </th>
+                                         <th class="Arrow">
+                                             Quotable Start Date
+                                         </th>
+                                         <th class="Arrow">
+                                             EOQ
+                                         </th>
+                                         <th class="Arrow">
+                                             EOS
+                                         </th>
+                                         <th class="Arrow">
+                                             EOL
+                                         </th>
+                                         <th class="Arrow">
+                                             Smart Service Availability
+                                         </th>
+                                     </tr>
+                                     <tr ng-repeat="x in bundleDet | orderBy:'RouterName'">
+                                         <td class="Arrow">
+                                             {{ x.RouterName }}
+                                         </td>
+                                         <td class="Arrow">
+                                             {{ x.AccessTechnology }}
+                                         </td>
+                                         <td>
+                                             <span ng-class="partialbundle">{{ x.BundleName }}</span>&nbsp;&nbsp; <a class="btn-link"
+                                                 ng-click="openPartPopup(x.BundleID,x.BundleName)">Parts</a>
+                                         </td>
+                                         <td class="Arrow">
+                                             {{ x.ExpectedDateforOrder }}
+                                         </td>
+                                         <td class="Arrow">
+                                             {{ x.QoutableStartDate }}
+                                         </td>
+                                         <td class="Arrow">
+                                             {{ x.EOQ }}
+                                         </td>
+                                         <td class="Arrow">
+                                             {{ x.EOS }}
+                                         </td>
+                                         <td class="Arrow">
+                                             {{ x.EOL }}
+                                         </td>
+                                         <td class="Arrow">
+                                             {{ x.SmartServiceAvailability }}
+                                         </td>
+                                     </tr>
+                                 </table>
+                             </div>
+                         </div>
+                     </div>
+                            <div class="panel panel-primary" id="maintOption">
+                                <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                                    data-target="#LeveltwoCPEMaintOption">
+                                    <h3 class="panel-title">
+                                        CPE Maintenance Options
+                                    </h3>
+                                    <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                                </div>
+                                <div id="LeveltwoCPEMaintOption" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <div class="panel panel-primary bg1">
+                                            <div class="panel-body">
+                                                <div class="form-group">
+                                                    <label for="" class="col-sm-2 control-label">
+                                                        CPE Suppliers:</label>
+                                                    <div class="col-sm-2">
+                                                       <select class="form-control" ng-change="getCityInfo()" ng-model="cpesuppliers" ng-options="item.supplierID as item.supplierName for item in CpeSupplierData" id="ddlSupplier">
+                                                        </select>
+                                                    </div>
+                                                    <label for="" class="col-sm-2 control-label">
+                                                        Please select city of customer's site:</label>
+                                                      
+                                                       <!-- {{CpeCityList}}-->
+                                                    <div class="col-sm-3">
+                                                        <select class="form-control"
+                                                         ng-change="getMaintainanceDetails()" ng-model="suppliercity" id="ddlSuppCity"
+                                                            ng-options="item.Item1 as item.Item2 for item in CpeCityList">
+                                                            <%--<option ng-repeat='objsupp in CpeCityList' value="{{objsupp.Item1}}">{{objsupp.Item2}}</option>--%>
+                                                            <!--<option ng-value="item.Item1" ng-selected="item.Item2=='All Cities'">{{item.Item2}}</option>-->
+                                                            
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <table cellpadding="0" cellspacing="0" class="table table-bordered tblnowrap" id="mainrow">
+                                            <tr>
+                                                <th class="Arrow">
+                                                    Supplier
+                                                </th>
+                                                <th class="Arrow">
+                                                    Service Name
+                                                </th>
+                                                <th class="Arrow">
+                                                    Service Availability
+                                                </th>
+                                                <th class="Arrow">
+                                                    Service Restrictions
+                                                </th>
+                                                <th class="Arrow">
+                                                    Smart Service Availibility
+                                                </th>
+                                                <th ng-show="{{isAMD}}" class="Arrow">
+                                                    Manufacturer Name
+                                                </th>
+                                                <th ng-show="{{isAMD}}" class="Arrow">
+                                                    Maintainer Name
+                                                </th>
+                                            </tr>
+                                            <tr ng-repeat="x in mainOptList">
+                                                <td class="Arrow">
+                                                    {{ x.SupplierName }}
+                                                </td>
+                                                <td class="Arrow">
+                                                    {{ x.ServiceName }}
+                                                </td>
+                                                <td class="Arrow">
+                                                    {{ x.ServiceAvailabilityDesc }}
+                                                </td>
+                                                <td class="Arrow">
+                                                    {{ x.ServiceRestriction }}
+                                                </td>
+                                                <td class="Arrow">
+                                                    {{x.smartServiceAvailability}}
+                                                </td>
+                                                <td ng-show="{{isAMD}}" class="Arrow">
+                                                    {{ x.ManufacturerName }}
+                                                </td>
+                                                <td ng-show="{{isAMD}}" class="Arrow">
+                                                    {{ x.MaintainerName }}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <div id="noSuppAlert" class="Arrow">
+                                            Note : <font color="Red">This country does not have a valid CPE Preferred supplier</font>
+                                        </div>
+
+                                        <div id="maintenanceoptionMsg">
+                                            <p class="red">
+                                                <b>No maintenance option available for this supplier and city combination </b>
+                                            </p>
+                                        </div>
+
+                                        <div class="Arrow">
+                                           <p class="red"><span style="color: Black">Note:</span>&nbsp;In case of CPE All Cities
+                                                indicates that Nationwide Coverage is supported for the selected country and supplier.</p></div>
+                                        <div id="note">
+                                          <p class="red"> Please select city of customer site to check availability, if no match then please
+                                            use CPE+ to check closest city and make bid requests.</p> 
+                                       
+                                        </div>
+
+                                        
+
+
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                                <div class="panel panel-primary" style=" margin-top: 10px;" id="panelCPELeadTime">  
+                                    <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                                        data-target="#LeveltwoCPELeadTime">
+                                        <h2 class="panel-title">
+                                            CPE Lead Time & Status</h2>
+                                            <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i>
+                                    </span>
+                                    </div>
+                                    <div id="LeveltwoCPELeadTime" class="panel-collapse collapse">
+                                        <div class="panel-body">
+                                            <table id="TableLead" cellpadding="0" cellspacing="0" class="table table-bordered tblnowrap">
+                                                <tr>
+                                                    <th class="Arrow">
+                                                        Transaction Type
+                                                    </th>
+                                                    <th class="Arrow">
+                                                        CPE Lead Time
+                                                    </th>
+                                                    <th class="Arrow">
+                                                        CPE Lead Time Status
+                                                    </th>
+                                                </tr>
+                                                <tr ng-repeat="x in CPELeadtimelist">
+                                                    <td class="Arrow">
+                                                        {{ x.transactionType }}
+                                                    </td>
+                                                    <td class="Arrow">
+                                                        {{ x.CPELeadTime }}
+                                                    </td>
+                                                    <td class="Arrow">
+                                                        {{ x.CPELeadTimeStatus }}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                 <!--cpe information-->
+                 </div>
+            <!--<ng-include src="openCpeInformationpopup()"></ng-include>-->
+
+             <div id="divUserInfo">
+            <table style="height:10px">
+            <tr>
+            <td>&nbsp;</td>
+            </tr>
+            </table>
+                <table cellpadding="0" cellspacing="0" class="table table-bordered table-striped">
+                    <tr>
+                        <td class="Arrow">
+                            Created By
+                        </td>
+                        <td class="Arrow">
+                            Created Date
+                        </td>
+                        <td class="Arrow">
+                            Updated By
+                        </td>
+                        <td class="Arrow">
+                            Date Last Updated
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="Arrow">
+                            {{CreatedBy}}
+                        </td>
+                        <td class="Arrow">
+                            {{CreatedDate}}
+                        </td>
+                        <td class="Arrow">
+                            {{UpdatedBy}}
+                        </td>
+                        <td class="Arrow">
+                            {{UpdatedDate}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+        </div>
+        <div class="pageLoaderOverlay">
+    </div>
+       
+   
+    
+  
+</body>
+</html>
+
+

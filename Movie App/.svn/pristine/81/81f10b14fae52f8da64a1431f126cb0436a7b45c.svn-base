@@ -1,0 +1,303 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Services;
+using SCAdminBAL;
+
+namespace SCAdmin
+{
+    public partial class ProductMapping : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        [WebMethod]
+        public static lstProductMappingData ProductMappingDetails(string TabName, string ProductID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchProductMappingDetails(TabName, ProductID);
+
+
+        }
+        [WebMethod]
+        public static lstProductMappingData Productbasedonbtgfr(string TabName, string BTGFRID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchProductMappingBasedOnBTGFR(TabName, BTGFRID);
+
+
+        }
+
+        [WebMethod]
+        public static lstProductMappingData UnassignProductbasedonbtgfr(string TabName, string BTGFRID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchUnassignProductbasedonbtgfr(TabName, BTGFRID);
+
+
+        }
+
+           [WebMethod]
+        public static lstProductMappingData UnassignProductbasedonorg(string TabName, string ORGID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchUnassignProductbasedonorg(TabName, ORGID);
+
+
+        }
+        
+             [WebMethod]
+           public static lstProductMappingData AssignProductbasedonorg(string TabName, string ORGID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchAssignProductbasedonorg(TabName, ORGID);
+
+
+        }
+        
+
+
+        [WebMethod]
+        public static lstProductMappingData AssignProductbasedonbtgfr(string TabName, string BTGFRID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchassignProductbasedonbtgfr(TabName, BTGFRID);
+
+
+        }
+
+        [WebMethod]
+        public static lstProductMappingData Unassigndistributorbasedonproduct(string TabName, string ProductID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchUnassigndistributorbasedonproduct(TabName, ProductID);
+
+
+        }
+
+        [WebMethod]
+        public static lstProductMappingData Assigndistributorbasedonproduct(string TabName, string ProductID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchAssigndistributorbasedonproduct(TabName, ProductID);
+
+
+        }
+
+
+        [WebMethod]
+        public static lstProductMappingData Unassignbtfgrbasedonproduct(string TabName, string ProductID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchUnassignbtfgrbasedonproduct(TabName, ProductID);
+
+
+        }
+
+             [WebMethod]
+        public static lstProductMappingData Unassignorgbasedonproduct(string TabName, string ProductID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchUnassignorgbasedonproduct(TabName, ProductID);
+
+
+        }
+        
+                [WebMethod]
+             public static lstProductMappingData Assignorgbasedonproduct(string TabName, string ProductID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchAssignorgbasedonproduct(TabName, ProductID);
+
+
+        }
+
+        
+
+        [WebMethod]
+        public static lstProductMappingData Assignbtfgrbasedonproduct(string TabName, string ProductID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchAssignbtfgrbasedonproduct(TabName, ProductID);
+
+
+        }
+
+        [WebMethod]
+        public static lstProductMappingData UnassignProductbasedondistributor(string TabName, string DistributorID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchUnassignProductbasedondistributor(TabName, DistributorID);
+
+
+        }
+
+        [WebMethod]
+        public static lstProductMappingData AssignProductbasedondistributor(string TabName, string DistributorID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchAssignProductbasedondistributor(TabName, DistributorID);
+
+
+        }
+
+        [WebMethod]
+        public static lstProductMappingData ProductNamesdd(string TabName)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.ProductNamesdd(TabName);
+
+
+        }
+
+        [WebMethod]
+        public static lstProductMappingData DistributorsNamesdd(string TabName)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.DistributorsNamesdd(TabName);
+
+
+        }
+            [WebMethod]
+        public static lstProductMappingData OrganisationNamesdd(string TabName)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.OrganisationNamesdd(TabName);
+
+
+        }
+        
+
+        [WebMethod]
+        public static lstProductMappingData BTGFRNamesdd(string TabName)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.BTGFRNamesdd(TabName);
+
+
+        }
+
+
+        [WebMethod]
+        public static List<MapUnitofMeasure> GetDropdownMapBTGFRDetails(string CharTypeID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+            return objusersbal.GetDropdownMapUOMDetails(CharTypeID);
+        }
+
+
+        [WebMethod]
+        public static int SaveBTGFRMapping(int ProductID, string list, string User_id)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+            return objusersbal.SaveBTGFRMapping(ProductID, list, User_id);
+        }
+
+        [WebMethod]
+        public static int SaveBTGFRMapping_ProductBasedOnBTGFR(int BTGFRID, string list, string User_id)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+            return objusersbal.SaveBTGFRMapping_ProductBasedOnBTGFR(BTGFRID, list, User_id);
+        }
+
+
+        [WebMethod]
+        public static lstProductMappingData DistributorsBasedOnProductdd(string TabName, string ProductID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchDistributorsBasedOnProductdd(TabName, ProductID);
+
+
+        }
+            [WebMethod]
+        public static lstProductMappingData OrgBasedOnProductdd(string TabName, string ProductID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchOrgBasedOnProductdd(TabName, ProductID);
+
+
+        }
+        
+
+        [WebMethod]
+        public static lstProductMappingData ProductsBasedOnDistributordd(string TabName, string DistributorID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchProductsBasedOnDistributordd(TabName, DistributorID);
+
+
+        }
+              [WebMethod]
+        public static lstProductMappingData ProductsBasedOnORGdd(string TabName, string ORGID)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+
+            return objusersbal.FetchProductsBasedOnORGdd(TabName, ORGID);
+
+
+        }
+
+
+        
+
+        [WebMethod]
+        public static int SaveDistributorProductMapping(int ProductID, string list, string User_id)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+            return objusersbal.SaveDistributorProductMapping(ProductID, list, User_id);
+        }
+
+       
+
+        [WebMethod]
+        public static int SaveDistributorProductMapping_ProductBasedOnDistributor(int DistributorID, string list, string User_id)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+            return objusersbal.SaveDistributorProductMapping_ProductBasedOnDistributor(DistributorID, list, User_id);
+        }
+
+         [WebMethod]
+        public static int SaveORGMapping(int ProductID, string list, string User_id)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+            return objusersbal.SaveORGMapping(ProductID, list, User_id);
+        }
+
+
+           [WebMethod]
+        public static int SaveORGMapping_ProductBasedOnORG(int ORGID, string list, string User_id)
+        {
+            ProductMappingBAL objusersbal = new ProductMappingBAL();
+            return objusersbal.SaveORGMapping_ProductBasedOnORG(ORGID, list, User_id);
+        }
+
+        
+        
+    }
+}

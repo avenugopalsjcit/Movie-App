@@ -1,0 +1,3094 @@
+// -----------------------------------------------------------------------------------------------------------------
+// Version     Date            Modified by            Comments
+//             DD/MM/YY        Infosys ID
+// -----------------------------------------------------------------------------------------------------------------
+// 2.6         04/12/08        sowjanya_kayasri         HVPN CR - Aggregator Case
+// 2.5         30/6/08         akshita_saxena           CR 3 - Location selection display changed
+// 2.4         03/06/08        PawanNarayan_Rudgi       Defect ID : 32831 In PC MCU screen for product: BT BV VoicePort, not able to select cases when POP's are selected individually.
+// 2.3         17/02/08        madhav_shenoy            Performance fix for bandwidth
+// 2.2         12/02/08        madhav_shenoy            Modified function for fixing cpe-supplier defect
+// 2.1         07/02/08        madhav_shenoy            Modified function for fixing cpe-supplier defect
+// 2.0         26/11/07        madhav_shenoy            Modified function for improving performance of access
+// 1.9         31/10/07        madhav_shenoy            Modified function for improving performance
+// 1.8         17/08/07        madhav_shenoy            Added new function for bandwidth pops
+// 1.7         03/08/07        madhav_shenoy            Modified function for update
+// 1.6         09/08/07        akshita_saxena           Added a new function to create the cases for Access
+//                                                       and to update the cases
+// 1.5         03/08/07        akshita_saxena           Addition to get the case data for Access    
+// 1.4         27/07/07        akshita_saxena           Added a function to get the Access region info
+// 1.3         18/7/07         akshita_saxena           Made changes to cater to the bandwidth services
+// 1.2         24/06/07        madhav_shenoy            Added function for update
+// 1.1         07/06/07        madhav_shenoy            Modified function signature
+// 1.0         07/06/07        madhav_shenoy            Created
+// -----------------------------------------------------------------------------------------------------------------
+
+#region Imported Namespaces
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+
+using PCDataAccess;
+using PCDataAccess_V;
+using System.Collections;
+
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+using Oracle.DataAccess.Client;
+
+#endregion
+namespace SCAdminBAL.MCU
+{
+    public class Cases
+    {
+        #region Private Variables
+        private CaseDataCollection _Case = new CaseDataCollection();
+        //1.5 starts
+        private Int32 _AccessValidCase;
+        //1.5 ends
+        #endregion
+
+        #region Public Properties
+
+        public CaseDataCollection CaseArray
+        {
+            get
+            {
+                return _Case;
+            }
+            set
+            {
+                _Case = value;
+            }
+        }
+        //1.5 starts
+        public Int32 AccessValidCase
+        {
+            get
+            {
+                return _AccessValidCase;
+            }
+            set
+            {
+                _AccessValidCase = value;
+            }
+        }
+        //1.5 ends
+        #endregion
+
+
+        //public DataSet GetCountryRegionData(int iProductCd, int iSubProductCd)
+        //{
+        //    DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //    DataSet dsData = new DataSet();
+        //    try
+        //    {
+        //        dsData = oDataAccess.GetCountryRegionInfo(iProductCd, iSubProductCd);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //    return dsData;
+
+        //}
+        //public DataSet GetCityRegionData(int iProductCd, int iSubProductCd,int iValid)
+        //{
+        //    DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //    DataSet dsData = new DataSet();
+        //    try
+        //    {
+        //        dsData = oDataAccess.GetCityRegionInfo(iProductCd, iSubProductCd, iValid);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //    return dsData;
+
+        //}
+
+
+        public DataSet GetRegionData(int iProductCd, int iSubProductCd, int iValid)
+        {
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            try
+            {
+                dsData = oDataAccess.GetRegionInfo(iProductCd, iSubProductCd, iValid);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            //string country = JsonConvert.SerializeObject(dsData.Tables[1]);
+            //string pop = JsonConvert.SerializeObject(dsData.Tables[2]);
+            //string capmanpl = JsonConvert.SerializeObject(dsData.Tables[3]);
+            //string state = JsonConvert.SerializeObject(dsData.Tables[4]);
+            //string city = JsonConvert.SerializeObject(dsData.Tables[5]);
+
+
+            return dsData;
+
+        }
+
+        //public string[] UpdateCases(
+        //      int LocLevel,
+        //      int ProductCd,
+        //      int SubProductCd,
+        //   string UserId,
+        //    int[] iPopId,
+        //    int[] iCaseId,
+        //    int[] pavailcd,
+        //    int[] pcasevalidcd, 
+        //    int[] pcharid,
+        //    int[] pcharavailcd,
+        //    int[] pchartypeid,
+        //    int[] pcharvalue,
+        //    int[] pcharvalue2,
+        //    int[] pportspeedcharid,
+        //    int[] pportavailability,
+        //    int[] pportvalidity,
+        // string[] poffnetleadtime,
+        //    int[] paccesssupplierid,
+        //    int[] paccesssuppliervalid,
+        //    int[] pparentportspeeds,
+        //    int[] pparentportspeedvalid,
+        //    int[] pparentaccessproducttypeid,
+        //    int[] pparentaccesssuppliernameid,
+        //    int[] pparentaccesssuppliercharid,
+        //    int[] pparentaccessspeedcharid,
+        //    int[] pportspeedcharcount,
+        //    int[] paccessspeedcharcount,
+        //    int[] pchardetailvalidcd,
+        //    int[] paccessspeedcharid,
+        //    int[] psuppliercharid, 
+        //    int[] ptypecharid,
+        //    int[] pnamecharid,
+        //    int[] pCharCount,
+        //    int[] pAccessSupplierCount,
+        //    int[] pParentportSpeedCount,
+        //    int[] pCarrier,
+        //    int[] pCPESupplier
+        //    ) 
+        //{
+
+        //    DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //    string[] strOutput = oDataAccess.UpdateSelections(LocLevel, ProductCd, SubProductCd,
+        //        UserId,
+        //        iPopId,
+        //        iCaseId,
+        //        pavailcd,
+        //        pcasevalidcd,
+        //        pcharid,
+        //        pcharavailcd,
+        //        pchartypeid,
+        //        pcharvalue,
+        //        pcharvalue2,
+        //        pportspeedcharid,
+        //        paccessspeedcharid,
+        //        psuppliercharid,
+        //        ptypecharid,
+        //        pnamecharid,
+        //        pportavailability,
+        //        pportvalidity,
+        //        pportspeedcharcount,
+        //        paccessspeedcharcount,
+        //        pchardetailvalidcd,
+        //        poffnetleadtime,
+        //        paccesssupplierid,
+        //        paccesssuppliervalid,
+        //        pparentportspeeds,
+        //        pparentportspeedvalid,
+        //        pparentaccessproducttypeid,
+        //        pparentaccesssuppliernameid,
+        //        pparentaccesssuppliercharid,
+        //        pparentaccessspeedcharid,
+        //        pCharCount,
+        //        pAccessSupplierCount,
+        //        pParentportSpeedCount,
+        //        pCarrier,
+        //        pCPESupplier);
+        //    return strOutput;
+        //}
+
+
+        //   //1.4 starts
+        //   public DataSet GetRegionDataAccess(int iProductCd)
+        //   {
+        //       DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //       DataSet dsData = new DataSet();
+        //       try
+        //       {
+        //           dsData = oDataAccess.GetRegionInfoAccess(iProductCd);
+        //       }
+        //       catch (Exception ex)
+        //       {
+        //           throw;
+        //       }
+        //       return dsData;
+        //   }
+
+        public string GetGpophvpn(MCUSession oMCUSession, int key, int seletedState)
+        {
+            string result = string.Empty;
+            if (oMCUSession.dtPoPs == null)
+            {
+                oMCUSession.dtPoPs = new DataTable();
+                DataRetrieval_V oDataGpop = new DataRetrieval_V(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+                DataSet dsgpop = oDataGpop.GetGpophvpn(oMCUSession.ProductCd, oMCUSession.SubProductCd, key, seletedState);
+                result = JsonConvert.SerializeObject(dsgpop.Tables[0]);
+                oMCUSession.dtPoPs.Merge(dsgpop.Tables[0]);
+            }
+            else if (oMCUSession.dtPoPs.Select("PARENTID=" + key).Length != 0)
+            {
+                DataRow[] dr = oMCUSession.dtPoPs.Select("PARENTID=" + key);
+                result = JsonConvert.SerializeObject(dr.CopyToDataTable<DataRow>());
+            }
+            else 
+            {
+                DataRetrieval_V oDataGpop = new DataRetrieval_V(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+                DataSet dsgpop = oDataGpop.GetGpophvpn(oMCUSession.ProductCd, oMCUSession.SubProductCd, key, seletedState);
+                result = JsonConvert.SerializeObject(dsgpop.Tables[0]);
+                oMCUSession.dtPoPs.Merge(dsgpop.Tables[0]);
+            }
+            //else
+            //{
+            //    DataRow[] dr = oMCUSession.dtPoPs.Select("PARENTID=" + key);
+            //    result = JsonConvert.SerializeObject(dr);
+            //}
+            return result;
+        }
+
+
+        public DataSet GetRegionDatahvpn1(int iProductCd, int iSubProdCd, int iValid)
+        {
+            DataRetrieval_V oDataAccess = new DataRetrieval_V(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            try
+            {
+                dsData = oDataAccess.GetRegionInfohvpn(iProductCd, iSubProdCd, iValid);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return dsData;
+        }
+
+        public string GetRegionDatahvpn(MCUSession oMCUSession, int iValid)
+        {
+            DataRetrieval_V oDataAccess = new DataRetrieval_V(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            DataSet dsData = new DataSet();
+            try
+            {
+                //if (oMCUSession.dtRegion == null || oMCUSession.dtCountry == null)
+                {
+                    dsData = oDataAccess.GetRegionInfohvpn(oMCUSession.ProductCd, oMCUSession.SubProductCd, iValid);
+                    //oMCUSession.dtRegion = dsData.Tables[0];
+                    //oMCUSession.dtCountry = dsData.Tables[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            string regionCountryJson = "[" + JsonConvert.SerializeObject(dsData.Tables[0]) + "," + JsonConvert.SerializeObject(dsData.Tables[1]) + "]";
+            return regionCountryJson;
+        }
+        //   //1.4 ends
+        //   public DataSet GetRegionDataBandwidth(int iProductCd, int iSubProductCd,int iValid)
+        //   {
+        //       DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //       DataSet dsData = new DataSet();
+        //       try
+        //       {
+        //           dsData = oDataAccess.GetRegionInfoBandwidth(iProductCd, iSubProductCd, iValid);
+        //       }
+        //       catch (Exception ex)
+        //       {
+        //           throw;
+        //       }
+        //       return dsData;
+
+        //   }
+        //   //1.6 starts
+        //   //public void AddCasesAccess(String[] VPSSPopid, String[] VPSSCaseid, String[] VPSSSupid, String[] VPSSSupTypeid, String[] VPSSSupNameid, String[] VPSSSpeedid, Cases oCase, int[] Poplist, Int32 CaseAvail, Int32 CaseValidity, AccessSupp tempAccess)
+        //   //{
+        //   //    CaseData oNewCD;
+        //   //    //purna AccessSuppChar oTempSpeedSup;
+        //   //    //required to associate the access speed with the case
+
+
+        //   //    //CaseDataCollection oCaseCol = new CaseDataCollection();
+        //   //    //  Check how many cases need to be created for each of the hubsites
+        //   //    int count = 0;
+        //   //    for (int i = 0; i < Poplist.Length; i++)
+        //   //    {
+        //   //        //find the number of cases in all to be created and start creating casedata objects
+        //   //        for (int j = 0; j < VPSSPopid.Length; j++)
+        //   //        {
+        //   //            if (Poplist[i] == Convert.ToInt32(VPSSPopid[j]))
+        //   //            {
+
+        //   //                //find the appropriate data from the oCase object and put into the new object
+        //   //                foreach (CaseData oCD in oCase.CaseArray)
+        //   //                {
+        //   //                    if (Poplist[i] == oCD.Pop.PopSiteId)
+        //   //                    {
+        //   //                        count = count + 1;
+        //   //                        oNewCD = new CaseData();
+        //   //                        oNewCD.Pop.PopSiteId = oCD.Pop.PopSiteId;
+        //   //                        oNewCD.Pop.PopSiteName = oCD.Pop.PopSiteName;
+        //   //                        oNewCD.Pop.PopSiteValidCd = oCD.Pop.PopSiteValidCd;
+        //   //                        oNewCD.Pop.PopType = oCD.Pop.PopType;
+        //   //                        oNewCD.Pop.RegionId = oCD.Pop.RegionId;
+        //   //                        oNewCD.Pop.RegionName = oCD.Pop.RegionName;
+        //   //                        oNewCD.HasCase = oCD.HasCase;
+        //   //                        oNewCD.ProductCd = oCD.ProductCd;
+        //   //                        oNewCD.StateProvinceId = oCD.StateProvinceId;
+        //   //                        oNewCD.AccessSpeedCharId = Convert.ToInt32(VPSSSpeedid[j].ToString());
+        //   //                        oNewCD.CaseId = Convert.ToInt32(VPSSCaseid[j].ToString());
+        //   //                        oNewCD.AccessSupplierCharId = Convert.ToInt32(VPSSSupid[j].ToString());
+        //   //                        oNewCD.AccessProductTyprId = Convert.ToInt32(VPSSSupTypeid[j].ToString());
+        //   //                        oNewCD.ACCESS_SUPPLIER_NAME_ID = (String)VPSSSupNameid[j].ToString().Clone();
+        //   //                        oNewCD.CaseAvailCd = CaseAvail;
+        //   //                        oNewCD.CaseValidCd = CaseValidity;
+        //   //                        //required for the sake of display :I
+        //   //                        foreach (AccessSuppChar oAS in tempAccess.AccessSuppColl)
+        //   //                        {
+        //   //                            if (oAS.AccessId == oNewCD.AccessSpeedCharId && oAS.AccessTypeId == oNewCD.AccessProductTyprId && oAS.SupplierId == oNewCD.AccessSupplierCharId && oAS.SupplierNameId.ToString() == oNewCD.ACCESS_SUPPLIER_NAME_ID)
+        //   //                            {
+        //   //                                oNewCD.SpeedSupp.AccessId = oAS.AccessId;
+        //   //                                oNewCD.SpeedSupp.AccessName = oAS.AccessName;
+        //   //                                oNewCD.SpeedSupp.AccessTypeId = oAS.AccessTypeId;
+        //   //                                oNewCD.SpeedSupp.AccessTypeName = oAS.AccessTypeName;
+        //   //                                oNewCD.SpeedSupp.AccessValue = oAS.AccessValue;
+        //   //                                oNewCD.SpeedSupp.SupplierId = oAS.SupplierId;
+        //   //                                oNewCD.SpeedSupp.SupplierName = oAS.SupplierName;
+        //   //                                oNewCD.SpeedSupp.SupplierNameId = oAS.SupplierNameId;
+        //   //                                oNewCD.SpeedSupp.SupplierNameName = oAS.SupplierNameName;
+        //   //                                oNewCD.SpeedSupp.UOM = oAS.UOM;
+
+        //   //                            }
+        //   //                        }
+        //   //                        //here we finish the waste of effort  
+        //   //                        CaseArray.Add((CaseData)oNewCD.Clone());
+        //   //                    }
+        //   //                }
+
+
+        //   //            }
+        //   //        }
+
+
+        //   //    }
+
+        //   //}
+
+        //   //1.6 ends
+        //   //1.8 Add Begins
+        //   //2.5 starts
+        //   //public void AddBandwidthPops(DataSet dsRegionInfo, Int32 iAction, String strSelection, String strType, Int32 iProductCd, Int32 iSubProductCd)
+        //   public void AddBandwidthPops(DataSet dsRegionInfo, Int32 iAction, String strSelection, String strType, Int32 iProductCd, Int32 iSubProductCd, string parent)
+        //   //2.5 ends 
+        //   {
+        //       DataView dvSelect = new DataView();
+        //       DataView dvCapman = new DataView();
+        //       DataView dvRegionInfo = new DataView();
+        //       DataView dvCountryInfo = new DataView();
+
+        //       //2.5 starts
+        //       DataView dvState = new DataView();
+        //       DataView dvCity = new DataView();
+        //       dvState = dsRegionInfo.Tables[3].DefaultView;
+        //       dvCity = dsRegionInfo.Tables[4].DefaultView;
+        //       //2.5 ends
+
+        //       dvRegionInfo = dsRegionInfo.Tables[0].DefaultView;
+        //       dvCountryInfo = dsRegionInfo.Tables[1].DefaultView;
+        //       dvSelect = dsRegionInfo.Tables[2].DefaultView;
+
+
+        //       switch (strType)
+        //       {
+        //           case "Co":
+        //               dvSelect.RowFilter = "Region_id =" + strSelection;
+        //               break;
+        //           //2.5 starts
+        //           case "St":
+        //               dvSelect.RowFilter = "country_id=" + strSelection;
+        //               break;
+        //           case "Ci":
+        //               if (parent == "State")
+        //               {
+        //                   dvSelect.RowFilter = "state_province_id=" + strSelection;
+        //               }
+        //               else
+        //               {
+        //                   dvSelect.RowFilter = "country_id=" + strSelection;
+        //               }
+        //               break;
+
+        //           //2.5 ends
+        //           case "Hu":
+        //               dvSelect.RowFilter = "Parentid =" + strSelection;
+        //               break;
+        //           case "":
+        //               dvSelect.RowFilter = "Hub_Site_id =" + strSelection;
+        //               break;
+        //       }
+
+        //       if (iAction == 1)
+        //       {
+        //           dvRegionInfo.RowFilter = "Region_Id=" + dvSelect[0]["Region_Id"].ToString();
+        //           CaseData oCase;
+        //           for (int i = 0; i < dvSelect.Count; i++)
+        //           {
+        //               //2.5 starts
+        //               //dvCountryInfo.RowFilter = "Country_Id=" + dvSelect[i]["ParentId"].ToString();
+        //               dvCountryInfo.RowFilter = "Country_Id=" + dvSelect[i]["country_id"].ToString();
+        //               dvState.RowFilter = "State_province_id=" + dvSelect[i]["state_province_id"].ToString();
+        //               dvCity.RowFilter = "city_id=" + dvSelect[i]["parentid"].ToString();
+        //               //2.5 ends
+        //               if (dvCountryInfo.Count == 0)
+        //               {
+        //                   continue;
+        //               }
+        //               oCase = new CaseData();
+        //               //2.3 Delete begins
+        //               //oCase.CaseId = Convert.ToInt32(dvSelect[i]["CaseId"].ToString());
+        //               //oCase.CaseValidCd = Convert.ToInt32(dvSelect[i]["CaseValidCd"].ToString());
+        //               //oCase.CaseAvailCd = Convert.ToInt32(dvSelect[i]["AVAILABILITY"].ToString());
+        //               //oCase.Pop.PopSiteValidCd = Convert.ToInt32(dvSelect[i]["casevalidcd"].ToString());
+        //               //oCase.AccessSpeedCharId = Convert.ToInt32(dvSelect[i]["access_speed_char_id"].ToString());
+        //               //2.3 Delete ends
+        //               //2.3 Add begins
+        //               oCase.CaseId = 0;
+        //               //2.3 Add ends
+        //               oCase.HasCase = Convert.ToInt32(dvSelect[i]["HasCase"].ToString());
+        //               oCase.Pop.CountryId = Convert.ToInt32(dvSelect[i]["Country_Id"].ToString());
+        //               oCase.Pop.CountryName = dvCountryInfo[0]["Country_Name"].ToString();
+        //               oCase.ProductCd = iProductCd;
+        //               oCase.SubProductCd = iSubProductCd;
+        //               oCase.Pop.RegionId = Convert.ToInt32(dvSelect[i]["Region_Id"].ToString());
+        //               oCase.Pop.RegionName = dvRegionInfo[0]["Region_Name"].ToString();
+        //               oCase.Pop.PopSiteId = Convert.ToInt32(dvSelect[i]["Hub_Site_Id"].ToString());
+        //               oCase.Pop.PopSiteName = dvSelect[i]["Hub_Site_Name"].ToString();
+        //               //2.5 starts
+        //               oCase.Pop.CityId = Convert.ToInt32(dvCity[0]["city_id"]);
+        //               oCase.Pop.CityName = dvCity[0]["city_name"].ToString();
+        //               if (dvState.Count != 0)
+        //               {
+        //                   oCase.Pop.StateID = Convert.ToInt32(dvState[0]["state_province_id"]);
+        //                   oCase.Pop.Statename = dvState[0]["state_province_name"].ToString();
+        //               }
+        //               //2.5 ends
+        //               //2.3 Delete begins
+        //               //oCase.Pop.PopType = dvSelect[i]["pop_type"].ToString();
+        //               //2.3 Delete ends
+        //               CaseArray.AddMultiPointCase(oCase);
+
+        //           }
+
+        //       }
+        //       else
+        //       {
+        //           CaseData oCase;
+        //           for (int i = 0; i < dvSelect.Count; i++)
+        //           {
+        //               oCase = new CaseData();
+        //               //2.3 Modify begins
+        //               ////Infosys - kiruthika - Drop 3.8 - Begins - update - 11/12/2007
+        //               //oCase = CaseArray.GetCaseBandwidth(Convert.ToInt32(dvSelect[i]["access_speed_char_id"].ToString()), Convert.ToInt32(dvSelect[i]["CaseId"].ToString()), Convert.ToInt32(dvSelect[i]["Hub_Site_Id"].ToString()), iProductCd, iSubProductCd);
+        //               ////Infosys - kiruthika - Drop 3.8 - End - update - 11/12/2007
+        //               oCase = CaseArray.GetCase(Convert.ToInt32(dvSelect[i]["Hub_Site_Id"].ToString()), -1, iProductCd, iSubProductCd);
+        //               //2.3 Modify ends
+        //               if (oCase != null)
+        //               {
+        //                   CaseArray.RemoveMultiPointCase(oCase);
+        //               }
+
+
+        //           }
+
+        //       }
+
+
+
+        //   }
+        //   //1.8 Add Ends
+        //   //2.5 starts
+        //   //public void AddPops(DataSet dsRegionInfo, Int32 iAction, String strSelection, String strType, Int32 iCapmanPlatformId, Int32 iProductCd, Int32 iSubProductCd)
+        //   public void AddPops(DataSet dsRegionInfo, Int32 iAction, String strSelection, String strType, Int32 iCapmanPlatformId, Int32 iProductCd, Int32 iSubProductCd,String parent,Int32 pValid)
+        //   //2.5 ends
+        //   {
+        //       DataView dvSelect = new DataView();
+        //       DataView dvCapman = new DataView();
+        //       DataView dvRegionInfo = new DataView();
+        //       DataView dvCountryInfo = new DataView();
+        //       DataView dvSelect1 = new DataView();
+        //       dvRegionInfo = dsRegionInfo.Tables[0].DefaultView;
+        //       dvCountryInfo = dsRegionInfo.Tables[1].DefaultView;
+        //       //2.5 ends
+        //       DataView dvState = new DataView();
+        //       DataView dvCity = new DataView();
+        //       //2.5 ends
+        //       if (iProductCd == 25)
+        //       {
+        //           dvState = dsRegionInfo.Tables[3].DefaultView;
+        //           dvCity = dsRegionInfo.Tables[4].DefaultView;
+        //       }
+        //       else
+        //       {
+        //           dvState = dsRegionInfo.Tables[4].DefaultView;
+        //           dvCity = dsRegionInfo.Tables[5].DefaultView;
+        //       }
+
+
+        //       dvSelect = dsRegionInfo.Tables[2].DefaultView;
+
+        //       string vars;
+        //       if (iProductCd == 25)
+        //       {
+        //           if (pValid != -1)
+        //           {
+        //               vars = " and case_valid_cd=" + pValid;
+        //           }
+        //           else
+        //           {
+        //               vars = " and 1=1";
+        //           }
+        //       }
+        //       else
+        //       {
+        //           vars = " and 1=1";
+        //       }
+
+
+
+        //       //Infosys-kiruthika-Drop 3.8-Begin Update-20-Nov-2007
+        //       if (iProductCd != 58 && iProductCd != 25 && iProductCd != 72)
+        //       //int prodMultipoint = GetMultipointproduct(iProductCd);
+
+        //       //if (prodMultipoint != 1 && iProductCd != 25)
+        //       //Infosys-kiruthika-Drop 3.8-End Update-20-Nov-2007
+        //       {
+        //           dvCapman = dsRegionInfo.Tables[3].DefaultView;
+        //           //dvCountryInfo.Sort = "country_name ASC";
+        //           if (iCapmanPlatformId > -1)
+        //           {
+        //               dvCapman.RowFilter = "Capman_Platform_id=" + iCapmanPlatformId;
+
+        //           }
+
+        //       }
+
+
+        //       switch (strType)
+        //       {
+        //           case "Co":
+        //               dvSelect.RowFilter = "Region_id =" + strSelection + vars;
+        //               break;
+        //           //2.5 starts
+        //           case "St":
+        //               dvSelect.RowFilter = "country_id=" + strSelection + vars ;
+        //               break;
+        //           case "Ci":
+        //                if(parent=="State")
+        //                {
+        //                    dvSelect.RowFilter = "state_province_id=" + strSelection + vars;
+        //                }
+        //                else
+        //                {
+        //                  //dvSelect.RowFilter="State_province_flag=0 and country_id=" + strSelection;
+        //                    dvSelect.RowFilter = "country_id=" + strSelection + vars;
+        //                }
+        //                break;
+
+        //           //2.5 ends
+        //           case "Hu":
+        //               dvSelect.RowFilter = "Parentid =" + strSelection + vars;
+        //               break;
+        //           case "":
+        //               //Added on 25/8/07 for issue 18492
+        //               if (iCapmanPlatformId > -1)
+        //               {
+        //                   dvSelect.RowFilter = "Hub_Site_id =" + strSelection + "and PLATFORM=" + iCapmanPlatformId + vars;
+        //               }
+        //               else
+        //               {
+        //                   dvSelect.RowFilter = "Hub_Site_id =" + strSelection + vars;
+
+        //               }
+        //               //addition ends
+        //               break;
+        //       }
+
+        //       if (iAction == 1)
+        //       {
+        //           dvRegionInfo.RowFilter = "Region_Id=" + dvSelect[0]["Region_Id"].ToString();
+        //           CaseData oCase;
+        //           for (int i = 0; i < dvSelect.Count; i++)
+        //           {   //2.5 starts
+        //               //dvCountryInfo.RowFilter = "Country_Id=" + dvSelect[i]["ParentId"].ToString();
+        //               dvCountryInfo.RowFilter = "Country_Id=" + dvSelect[i]["country_id"].ToString();
+        //               dvState.RowFilter = "State_province_id=" + dvSelect[i]["state_province_id"].ToString();
+        //               dvCity.RowFilter = "city_id=" + dvSelect[i]["city_id"].ToString();
+        //               //2.5 ends
+        //               if (dvCountryInfo.Count == 0)
+        //               {
+        //                   continue;
+        //               }
+        //               oCase = new CaseData();
+
+        //               if (iProductCd != 25)
+        //               {
+        //                   oCase.CaseId = Convert.ToInt32(dvSelect[i]["CaseId"].ToString());
+        //                   oCase.CaseValidCd = Convert.ToInt32(dvSelect[i]["CaseValidCd"].ToString());
+        //                   oCase.CaseAvailCd = Convert.ToInt32(dvSelect[i]["AVAILABILITY"].ToString());
+        //                   oCase.Pop.PopSiteValidCd = Convert.ToInt32(dvSelect[i]["casevalidcd"].ToString());
+        //                   oCase.HasCase = Convert.ToInt32(dvSelect[i]["HasCase"].ToString());
+
+        //               }
+        //               if (iProductCd == 25)
+        //               {
+        //                   oCase.CaseId = 0;
+        //                   oCase.HasCase = 1;
+        //               }
+
+        //               //oCase.Pop.CountryId = Convert.ToInt32(dvSelect[i]["parentId"].ToString());
+        //               oCase.Pop.CountryId = Convert.ToInt32(dvSelect[i]["country_id"].ToString());
+        //               oCase.Pop.CountryName = dvCountryInfo[0]["Country_Name"].ToString();
+        //               oCase.ProductCd = iProductCd;
+        //               oCase.SubProductCd = iSubProductCd;
+        //               oCase.Pop.RegionId = Convert.ToInt32(dvSelect[i]["Region_Id"].ToString());
+        //               oCase.Pop.RegionName = dvRegionInfo[0]["Region_Name"].ToString();
+        //               oCase.Pop.PopSiteId = Convert.ToInt32(dvSelect[i]["Hub_Site_Id"].ToString());
+        //               oCase.Pop.PopSiteName = dvSelect[i]["Hub_Site_Name"].ToString();
+        //               oCase.Pop.PopType = dvSelect[i]["pop_type"].ToString();
+        //               //2.5 starts
+        //               oCase.Pop.CityId = Convert.ToInt32(dvCity[0]["city_id"]);
+        //               oCase.Pop.CityName = dvCity[0]["city_name"].ToString();
+        //               if (dvState.Count != 0)
+        //               {
+        //                   oCase.Pop.StateID = Convert.ToInt32(dvState[0]["state_province_id"]);
+        //                   oCase.Pop.Statename = dvState[0]["state_province_name"].ToString();
+        //               }
+        //               //2.5 ends
+        //                //Begin 2.4
+        //               //if (iCapmanPlatformId > -1 && iProductCd != 58 && iProductCd != 72 && iProductCd != 25)
+        //               if (iCapmanPlatformId > -1 && iProductCd != 58 && iProductCd != 72 && iProductCd != 25 && dvCapman.Count > 0)
+        //               //End 2.4
+        //               //if (iCapmanPlatformId > -1 && prodMultipoint != 1 && iProductCd != 25)
+        //               //Infosys-kiruthika-Drop 3.8-End Update-20-Nov-2007
+        //              {
+        //                   oCase.Pop.oCapmanPlatform.CapmanPlatformId = Convert.ToInt32(dvCapman[0]["Capman_Platform_Id"].ToString());
+        //                   oCase.Pop.oCapmanPlatform.CapmanPlatformName = dvCapman[0]["Capman_Platform_Name"].ToString();
+        //                   if (CaseArray.Add(oCase) > -1)
+        //                   {
+        //                       break;
+        //                   }
+        //               }
+        //               else
+        //               {
+        //                   if (iProductCd != 25)
+        //                   {
+        //                       dvCapman.RowFilter = "Case_Id=" + dvSelect[i]["CaseId"].ToString();
+
+        //                   }
+        //                   //Infosys-kiruthika-Drop 3.8-Begin Update-20-Nov-2007
+        //                   if (dvCapman.Count > 0 && iProductCd != 58 && iProductCd != 72 && iProductCd != 25)
+        //                   //if (dvCapman.Count > 0 && prodMultipoint != 1 && iProductCd != 25)
+        //                   //Infosys-kiruthika-Drop 3.8-End Update-20-Nov-2007
+        //                   {
+        //                       Int32 iReturn;
+        //                       oCase.Pop.oCapmanPlatform.CapmanPlatformId = Convert.ToInt32(dvCapman[0]["Capman_Platform_Id"].ToString());
+        //                       oCase.Pop.oCapmanPlatform.CapmanPlatformName = dvCapman[0]["Capman_Platform_Name"].ToString();
+        //                       iReturn = CaseArray.Add(oCase);
+        //                       if ((dvCapman.Count > 1) && (iReturn == -1))
+        //                       {
+        //                           oCase.Pop.oCapmanPlatform.CapmanPlatformId = Convert.ToInt32(dvCapman[1]["Capman_Platform_Id"].ToString());
+        //                           oCase.Pop.oCapmanPlatform.CapmanPlatformName = dvCapman[1]["Capman_Platform_Name"].ToString();
+        //                           iReturn = CaseArray.Add(oCase);
+        //                       }
+
+        //                   }
+        //                   else
+        //                   {
+        //                       CaseArray.Add(oCase);
+        //                   }
+
+        //               }
+        //           }
+
+        //       }
+        //       else
+        //       {
+        //           CaseData oCase;
+        //           for (int i = 0; i < dvSelect.Count; i++)
+        //           {
+        //               oCase = new CaseData();
+        //               if (iCapmanPlatformId > -1)
+        //               {
+        //                   oCase = CaseArray.GetCase(Convert.ToInt32(dvSelect[i]["Hub_Site_Id"].ToString()), iCapmanPlatformId, iProductCd, iSubProductCd);
+        //                   if (oCase != null)
+        //                   {
+        //                       CaseArray.Remove(oCase);
+        //                   }
+        //                   break;
+        //               }
+        //               else
+        //               {   //Added for enabling the deselection of pops - 3 sep -akshita
+        //                   if (iProductCd != 25)
+        //                   {
+        //                       dvCapman.RowFilter = "Case_Id=" + dvSelect[i]["caseid"].ToString();
+        //                   }
+        //                   //addition ends
+        //                   if (dvCapman.Count > 0)
+        //                   {
+        //                       for (int j = 0; j < dvCapman.Count; j++)
+        //                       {
+        //                           oCase = CaseArray.GetCase(Convert.ToInt32(dvSelect[i]["Hub_Site_Id"].ToString()), Convert.ToInt32(dvCapman[j]["Capman_Platform_Id"].ToString()), iProductCd, iSubProductCd);
+        //                           if (oCase != null)
+        //                           {
+        //                               CaseArray.Remove(oCase);
+        //                           }
+        //                       }
+        //                   }
+        //                   else
+        //                   {
+        //                       if (iProductCd != 25)
+        //                       {
+        //                           oCase = CaseArray.GetCase(Convert.ToInt32(dvSelect[i]["Hub_Site_Id"].ToString()), -1, iProductCd, iSubProductCd);
+        //                       }
+        //                       else
+        //                       {
+        //                           oCase = CaseArray.GetCase(Convert.ToInt32(dvSelect[i]["Hub_Site_Id"].ToString()), iProductCd);
+        //                       }
+        //                       if (oCase != null)
+        //                       {
+        //                           CaseArray.Remove(oCase);
+        //                       }
+        //                   }
+
+        //               }
+
+        //           }
+
+        //       }
+
+
+
+        //   }
+        //   //2.5 starts
+        //   //public void AddCity(DataSet dsRegionInfo, Int32 iAction, String strSelection, String strType, Int32 iCapmanPlatformId, Int32 iProductCd, Int32 iSubProductCd)
+        //   public void AddCity(DataSet dsRegionInfo, Int32 iAction, String strSelection, String strType, Int32 iCapmanPlatformId, Int32 iProductCd, Int32 iSubProductCd, String parent, String pValid)
+        //   //2.5 ends
+        //   {
+        //       DataView dvSelect = new DataView();
+        //       //2.1 Add begins
+        //       DataRow[] dvSupplier = null;
+        //       //2.1 Add ends
+        //       //2.2 Add begins
+        //       DataRow[] dvSelectSupp = null;
+        //       //2.2 Add ends
+        //       DataView dvRegionInfo = new DataView();
+        //       DataView dvCountryInfo = new DataView();
+        //       dvRegionInfo = dsRegionInfo.Tables[0].DefaultView;
+        //       dvCountryInfo = dsRegionInfo.Tables[1].DefaultView;
+        //       dvSelect = dsRegionInfo.Tables[2].DefaultView;
+        //       //2.5 starts
+        //       DataView dvStateInfo = new DataView();
+        //       dvStateInfo = dsRegionInfo.Tables[4].DefaultView;
+        //       //2.5 ends
+
+        //       //dvCountryInfo.Sort = "country_name ASC";
+        //       //2.1 delete begins
+        //       //if (iCapmanPlatformId != 0)
+        //       //{
+        //       //    dvCapman.RowFilter = "Capman_Platform_id=" + iCapmanPlatformId;
+
+        //       //}
+        //       //2.1 delete ends
+        //       String Vars;
+        //       if (pValid != "-1")
+        //       {
+        //           Vars = " and casevalidcd = " + pValid;
+        //       }
+        //       else
+        //       {
+        //           Vars = " and 1=1";
+        //       }
+
+        //       switch (strType)
+        //       {
+        //           case "Co":
+        //               dvSelect.RowFilter = "Region_id =" + strSelection  + Vars;
+        //               break;
+        //           //2.5 starts
+        //           case "St":
+        //               dvSelect.RowFilter = "Country_id=" + strSelection  + Vars;
+        //               break;
+        //            //2.5 ends
+        //           case "Hu":
+        //               //2.5 starts
+        //               if (parent == "State")
+        //               {                    
+        //                       dvSelect.RowFilter = "State_province_flag=1 and Parentid=" + strSelection + Vars;
+        //               }
+        //               else
+        //               {
+        //                   dvSelect.RowFilter = "State_province_flag=0 and Parentid=" + strSelection + Vars;
+        //              }
+
+        //               //dvSelect.RowFilter = "Parentid =" + strSelection;
+        //               //2.5 ends
+        //               break;
+        //           case "":
+        //               //2.2 Modify begins
+        //               //dvSelect.RowFilter = "city_id =" + strSelection;
+        //               if (iCapmanPlatformId <= 0)
+        //               {
+        //                   dvSelect.RowFilter = "city_id =" + strSelection + Vars;
+        //               }
+        //               else
+        //               {
+        //                   dvSelectSupp = dsRegionInfo.Tables[3].Select("city_id =" + strSelection + " and Char_id=" + iCapmanPlatformId);
+        //                   //2.6 begin
+        //                   dvSelect.RowFilter = "city_id =" + strSelection + " and Caseid =" + dvSelectSupp[dvSelectSupp.Length-1][0].ToString();
+        //                   //2.6 end
+        //               }
+        //               //2.2 Modify ends
+        //               break;
+        //       }
+
+        //       if (iAction == 1)
+        //       {
+        //           dvRegionInfo.RowFilter = "Region_Id=" + dvSelect[0]["Region_Id"].ToString();
+        //           CaseData oCase;
+        //           for (int i = 0; i < dvSelect.Count; i++)
+        //           {
+        //               //2.5 starts
+        //               //dvCountryInfo.RowFilter = "Country_Id=" + dvSelect[i]["ParentId"].ToString();
+        //               dvCountryInfo.RowFilter = "Country_Id=" + dvSelect[i]["Country_id"].ToString();
+        //               //2.5 ends
+        //               if (dvSelect[i]["state_province_flag"].ToString() == "1" && dvSelect[i]["state_province_id"].ToString()!="")
+        //               {
+        //                   dvStateInfo.RowFilter = " state_province_id=" + dvSelect[i]["state_province_id"].ToString();
+        //               }
+
+        //               //2.5 starts
+        //               if (dvCountryInfo.Count == 0)
+        //               {
+        //                   continue;
+        //               }
+        //               //2.5 ends
+        //               oCase = new CaseData();
+        //               oCase.CaseId = Convert.ToInt32(dvSelect[i]["CaseId"].ToString());
+        //               oCase.CaseValidCd = Convert.ToInt32(dvSelect[i]["CaseValidCd"].ToString());
+        //               oCase.CaseAvailCd = Convert.ToInt32(dvSelect[i]["AVAILABILITY"].ToString());
+        //               oCase.HasCase = Convert.ToInt32(dvSelect[i]["HasCase"].ToString());
+        //               //2.5 starts
+        //               //oCase.CitySite.CountryId = Convert.ToInt32(dvSelect[i]["ParentId"].ToString());
+        //               oCase.CitySite.CountryId = Convert.ToInt32(dvSelect[i]["country_id"].ToString());
+        //               //2.5 ends
+        //               oCase.CitySite.CountryName = dvCountryInfo[0]["Country_Name"].ToString();
+        //               oCase.ProductCd = iProductCd;
+        //               oCase.SubProductCd = iSubProductCd;
+        //               oCase.CitySite.RegionId = Convert.ToInt32(dvSelect[i]["Region_Id"].ToString());
+        //               oCase.CitySite.RegionName = dvRegionInfo[0]["Region_Name"].ToString();
+        //               oCase.CitySite.CityId = Convert.ToInt32(dvSelect[i]["City_Id"].ToString());
+        //               oCase.CitySite.CityName = dvSelect[i]["City_Name"].ToString();
+        //               oCase.CitySite.CityValidCd = Convert.ToInt32(dvSelect[i]["casevalidcd"].ToString());
+        //               dvSupplier = dsRegionInfo.Tables[3].Select("Case_Id = " + oCase.CaseId);
+        //               //2.1 Add begins
+        //               if (dvSupplier.Length > 0)
+        //               {
+        //                   oCase.CitySite.AccessSupplierCharId = Convert.ToInt32(dvSupplier[0][2]);
+        //                   oCase.CitySite.AccessSupplierCharName = dvSupplier[0][1].ToString();
+        //               }
+        //               //2.5 starts
+        //               else
+        //               {
+        //                   oCase.CitySite.AccessSupplierCharId = 0;
+        //               }
+        //               //2.1 Add ends
+
+        //               if (dvSelect[i]["state_province_flag"].ToString() == "1" && dvSelect[i]["parentid"].ToString()!="")
+        //               {
+        //                   oCase.StateProvinceId = Convert.ToInt32(dvSelect[i]["parentid"]);
+        //                   oCase.Statename = dvStateInfo[0]["state_province_name"].ToString ();
+        //               }
+        //               //2.5 ends
+        //               CaseArray.AddCity(oCase);
+        //           }
+
+        //       }
+        //       else
+        //       {
+        //           CaseData oCase;
+        //           for (int i = 0; i < dvSelect.Count; i++)
+        //           {
+        //               oCase = CaseArray.GetCityCase(Convert.ToInt32(dvSelect[i]["City_ID"].ToString()), Convert.ToInt32(dvSelect[i]["CaseId"].ToString()), iProductCd, iSubProductCd);
+        //               CaseArray.RemoveCity(oCase);
+        //           }
+
+        //       }
+
+        //   }
+        //   //for country level products
+        //   public void AddCountry(DataSet dsRegionInfo, Int32 iAction, String strSelection, String strType, Int32 iCapmanPlatformId, Int32 iProductCd, Int32 iSubProductCd, Int32 pValid)
+        //   {
+        //       DataView dvRegionInfo = new DataView();
+        //       DataView dvCountryInfo = new DataView();
+        //       DataView dvCityInfo = new DataView();
+        //       dvRegionInfo = dsRegionInfo.Tables[0].DefaultView;
+        //       dvCountryInfo = dsRegionInfo.Tables[1].DefaultView;
+
+        //       String Vars;
+        //       if (pValid != -1)
+        //       {
+        //           Vars = " and casevalidcd = " + pValid;
+        //       }
+        //       else
+        //       {
+        //           Vars = " and 1=1";
+        //       }
+
+        //       switch (strType)
+        //       {
+        //           case "Co":
+        //               dvCountryInfo.RowFilter = "ParentId =" + strSelection + Vars;
+        //               break;
+
+        //           case "":
+        //               dvCountryInfo.RowFilter = "Country_id =" + strSelection + Vars;
+        //               break;
+
+        //       }
+
+        //       if (iAction == 1)
+        //       {
+        //           dvRegionInfo.RowFilter = "Region_Id=" + dvCountryInfo[0]["ParentId"].ToString();
+        //           CaseData oCase;
+        //           for (int i = 0; i < dvCountryInfo.Count; i++)
+        //           {
+        //               oCase = new CaseData();
+        //               oCase.CaseId = Convert.ToInt32(dvCountryInfo[i]["CaseId"].ToString());
+        //               oCase.CaseValidCd = Convert.ToInt32(dvCountryInfo[i]["CaseValidCd"].ToString());
+        //               oCase.CaseAvailCd = Convert.ToInt32(dvCountryInfo[i]["AVAILABILITY"].ToString());
+        //               oCase.HasCase = Convert.ToInt32(dvCountryInfo[i]["HasCase"].ToString());
+        //               oCase.CountrySite.CountryId = Convert.ToInt32(dvCountryInfo[i]["Country_Id"].ToString());
+        //               oCase.CountrySite.CountryName = dvCountryInfo[i]["Country_Name"].ToString();
+        //               oCase.ProductCd = iProductCd;
+        //               oCase.SubProductCd = iSubProductCd;
+        //               oCase.CountrySite.RegionId = Convert.ToInt32(dvCountryInfo[i]["ParentId"].ToString());
+        //               oCase.CountrySite.RegionName = dvRegionInfo[0]["Region_Name"].ToString();
+        //               oCase.CountrySite.CountryValidCd = Convert.ToInt32(dvCountryInfo[i]["casevalidcd"].ToString());
+        //               CaseArray.AddCountry(oCase);
+        //           }
+
+        //       }
+        //       else
+        //       {
+        //           CaseData oCase;
+        //           for (int i = 0; i < dvCountryInfo.Count; i++)
+        //           {
+        //               oCase = CaseArray.GetCountryCase(Convert.ToInt32(dvCountryInfo[i]["Country_ID"].ToString()), iProductCd, iSubProductCd);
+        //               CaseArray.RemoveCountry(oCase);
+        //           }
+
+        //       }
+
+        //   }
+
+
+
+
+        //   //country level addition ends
+        //   // 1.9 modify begins
+        //   //public String[] UpdateCases(MCUSession oMcuSessionData)
+        //   //{
+        //   //    ArrayList iPopId = new ArrayList();
+        //   //    ArrayList iCaseId = new ArrayList();
+        //   //    ArrayList pavailcd = new ArrayList();
+        //   //    ArrayList pcasevalidcd = new ArrayList();
+        //   //    ArrayList pcharid = new ArrayList();
+        //   //    ArrayList pcharavailcd = new ArrayList();
+        //   //    ArrayList pchartypeid = new ArrayList();
+        //   //    ArrayList pcharvalue = new ArrayList();
+        //   //    ArrayList pchardetailvalidcd = new ArrayList();
+        //   //    ArrayList poffnetleadtime = new ArrayList();
+        //   //    ArrayList pportspeedcharid = new ArrayList();
+        //   //    ArrayList paccessspeedcharid = new ArrayList();
+        //   //    ArrayList psuppliercharid = new ArrayList();
+        //   //    ArrayList ptypecharid = new ArrayList();
+        //   //    ArrayList pnamecharid = new ArrayList();
+        //   //    ArrayList pportavailability = new ArrayList();        
+        //   //    ArrayList pportvalidity = new ArrayList();
+        //   //    ArrayList pparentportspeeds = new ArrayList();
+        //   //    ArrayList pparentportspeedvalid = new ArrayList();
+        //   //    ArrayList pparentaccessproducttypeid = new ArrayList();
+        //   //    ArrayList pparentaccesssuppliernameid = new ArrayList();
+        //   //    ArrayList pparentaccesssuppliercharid = new ArrayList();
+        //   //    ArrayList pparentaccessspeedcharid = new ArrayList();
+        //   //    ArrayList paccesssupplierid = new ArrayList();
+        //   //    ArrayList paccesssuppliervalid = new ArrayList();
+        //   //    ArrayList pCharCount = new ArrayList();
+        //   //    ArrayList pAccessSupplierCount = new ArrayList();
+        //   //    ArrayList pParentportSpeedCount = new ArrayList();
+        //   //    ArrayList pcharvalue2 = new ArrayList();
+        //   //    ArrayList pCarrier = new ArrayList();
+        //   //    ArrayList pCPESupplier = new ArrayList();
+        //   //    ArrayList pportspeedcharcount = new ArrayList();
+        //   //    ArrayList paccessspeedcharcount = new ArrayList();
+
+        //   //    Int32 iInnerCount = 0;
+        //   //    Int32 iInnerAccessCount = 0;
+        //   //    Int32 iCharCount = 0;
+        //   //    Int32 iAccessSuppCount = 0;
+        //   //    Int32 iParentPortCount = 0;
+        //   //    String strTemporary = String.Empty;
+
+        //   //    foreach (CaseData oCase in CaseArray)
+        //   //    {
+        //   //        switch (oMcuSessionData.LocLevel)
+        //   //        {
+        //   //            case 2:
+        //   //                iPopId.Add(oCase.CountrySite.CountryId);
+        //   //                break;
+        //   //            case 3:
+        //   //                iPopId.Add(oCase.CitySite.CityId);
+        //   //                pCPESupplier.Add(oCase.CitySite.AccessSupplierCharId);
+        //   //                break;
+        //   //            case 4:
+        //   //                iPopId.Add(oCase.Pop.PopSiteId);
+        //   //                break;
+        //   //        }
+        //   //        iCaseId.Add(oCase.CaseId);
+        //   //        pavailcd.Add(oCase.CaseAvailCd);
+        //   //        pcasevalidcd.Add(oCase.CaseValidCd);
+        //   //        pCarrier.Add(oCase.AccessSupplierCharId);
+
+
+        //   //        foreach (PortSpeedChar oPortSpeed in oCase.PortSpeeds.PortSpeedColl)
+        //   //        {
+        //   //            pportspeedcharid.Add(oPortSpeed.CharId);
+        //   //            pportavailability.Add(oPortSpeed.CharAvailCd);
+        //   //            pportvalidity.Add(oPortSpeed.ValidCd);
+        //   //            poffnetleadtime.Add(oCase.LeadTime);
+
+        //   //            foreach (AccessSuppChar oAccess in oPortSpeed.AccessSupps.AccessSuppColl)
+        //   //            {
+        //   //                paccessspeedcharid.Add(oAccess.AccessId);
+        //   //                psuppliercharid.Add(oAccess.SupplierId);
+        //   //                ptypecharid.Add(oAccess.AccessTypeId);
+        //   //                pnamecharid.Add(oAccess.SupplierNameId);
+        //   //                iInnerAccessCount = iInnerAccessCount + 1;
+        //   //            }
+        //   //            paccessspeedcharcount.Add(iInnerAccessCount);
+        //   //            iInnerCount = iInnerCount + 1;
+
+        //   //        }
+        //   //        pportspeedcharcount.Add(iInnerCount);
+
+        //   //        foreach (Characteristic oChar in oCase.Charecteristics.CharColl)
+        //   //        {
+        //   //            pcharid.Add(oChar.CharId);
+        //   //            pcharavailcd.Add(oChar.CharAvailCd);
+        //   //            pchartypeid.Add(oChar.CharTypeId);
+        //   //            pcharvalue.Add(oChar.CharValue);
+        //   //            pcharvalue2.Add(oChar.CharValue2);
+        //   //            pchardetailvalidcd.Add(oChar.ValidCd);
+
+        //   //            iCharCount = iCharCount + 1;
+
+        //   //        }
+        //   //        if (iCharCount <= 0)
+        //   //        {
+        //   //            pCharCount.Add(1);
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            pCharCount.Add(iCharCount);
+        //   //        }
+
+        //   //        if (oCase.Charecteristics.AccessSuppliers.Count > 0)
+        //   //        {
+        //   //            foreach (AccessSuppChar oAccessSupp in oCase.Charecteristics.AccessSuppliers)
+        //   //            {
+        //   //                paccesssupplierid.Add(oAccessSupp.SupplierId);
+        //   //                paccesssuppliervalid.Add(oAccessSupp.SupplierValidCd);
+        //   //                iAccessSuppCount = iAccessSuppCount + 1;
+
+        //   //            }
+        //   //        }
+        //   //        if (iAccessSuppCount <= 0)
+        //   //        {
+        //   //            pAccessSupplierCount.Add(1);
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            pAccessSupplierCount.Add(iAccessSuppCount);
+        //   //        }
+
+
+        //   //        if (oCase.Charecteristics.ParentPortSpeed.Count > 0)
+        //   //        {
+        //   //            String[] strTemp = new String[5];
+        //   //            foreach (PortSpeedChar oPortSpeed in oCase.Charecteristics.ParentPortSpeed)
+        //   //            {
+        //   //                strTemp = oPortSpeed.CharDesc.Split('/');
+        //   //                pparentportspeeds.Add(Convert.ToInt32(strTemp[0]));
+        //   //                pparentportspeedvalid.Add(oPortSpeed.ValidCd);
+        //   //                pparentaccessproducttypeid.Add(Convert.ToInt32(strTemp[3]));
+        //   //                pparentaccesssuppliernameid.Add(Convert.ToInt32(strTemp[4]));
+        //   //                pparentaccesssuppliercharid.Add(Convert.ToInt32(strTemp[2]));
+        //   //                pparentaccessspeedcharid.Add(Convert.ToInt32(strTemp[1]));
+        //   //                iParentPortCount = iParentPortCount + 1;
+        //   //            }
+        //   //        }
+        //   //        if (iParentPortCount <= 0)
+        //   //        {
+        //   //            pParentportSpeedCount.Add(1);
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            pParentportSpeedCount.Add(iParentPortCount);
+        //   //        }
+        //   //    }
+
+        //   //    DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //   //    String[] strOutput = new String[1];
+
+        //   //    strOutput = oDataAccess.UpdateSelections(oMcuSessionData.LocLevel, oMcuSessionData.ProductCd, oMcuSessionData.SubProductCd, oMcuSessionData.UserId, iPopId.ToArray(iInnerAccessCount.GetType()), iCaseId.ToArray(iInnerAccessCount.GetType()), pavailcd.ToArray(iInnerAccessCount.GetType()),pcasevalidcd.ToArray(iInnerAccessCount.GetType()), pcharid.ToArray(iInnerAccessCount.GetType()), pcharavailcd.ToArray(iInnerAccessCount.GetType()), pchartypeid.ToArray(iInnerAccessCount.GetType()), pcharvalue.ToArray(strTemporary.GetType()), pcharvalue2.ToArray(strTemporary.GetType()), pportspeedcharid.ToArray(iInnerAccessCount.GetType()), paccessspeedcharid.ToArray(iInnerAccessCount.GetType()), psuppliercharid.ToArray(iInnerAccessCount.GetType()), ptypecharid.ToArray(iInnerAccessCount.GetType()), pnamecharid.ToArray(iInnerAccessCount.GetType()), pportavailability.ToArray(iInnerAccessCount.GetType()), pportvalidity.ToArray(iInnerAccessCount.GetType()), pportspeedcharcount.ToArray(iInnerAccessCount.GetType()), paccessspeedcharcount.ToArray(iInnerAccessCount.GetType()), pchardetailvalidcd.ToArray(iInnerAccessCount.GetType()), poffnetleadtime.ToArray(strTemporary.GetType()), paccesssupplierid.ToArray(iInnerAccessCount.GetType()), paccesssuppliervalid.ToArray(iInnerAccessCount.GetType()), pparentportspeeds.ToArray(iInnerAccessCount.GetType()), pparentportspeedvalid.ToArray(iInnerAccessCount.GetType()), pparentaccessproducttypeid.ToArray(iInnerAccessCount.GetType()), pparentaccesssuppliernameid.ToArray(iInnerAccessCount.GetType()), pparentaccesssuppliercharid.ToArray(iInnerAccessCount.GetType()), pparentaccessspeedcharid.ToArray(iInnerAccessCount.GetType()), pAccessSupplierCount.ToArray(iInnerAccessCount.GetType()), pParentportSpeedCount.ToArray(iInnerAccessCount.GetType()), pCarrier.ToArray(iInnerAccessCount.GetType()), pCPESupplier.ToArray(iInnerAccessCount.GetType()));
+
+        //   //    return strOutput;
+
+
+
+        //   //}
+        //public String[] UpdateCases(MCUSession oMcuSessionData, string strInsertCaseIds, string strRemoveCaseIds,int[] cases,int[] pops,
+        //    int[] portSpeed, int[] charecteristicsID, int AccessSupplierID, int AccessProductID, int AccessTypeID, string PhaseAttr)
+        //{
+        //    Int32[] iPopId = new Int32[CaseArray.Count];
+        //    Int32[] iCaseId = new Int32[CaseArray.Count];
+        //    Int32[] pavailcd = new Int32[CaseArray.Count];
+        //    Int32[] pcasevalidcd = new Int32[CaseArray.Count];
+        //    Int32[] pcharid = new Int32[0];
+        //    Int32[] pcharavailcd = new Int32[0];
+        //    Int32[] pchartypeid = new Int32[0];
+        //    String[] pcharvalue = new String[0];
+        //    Int32[] pchardetailvalidcd = new Int32[0];
+        //    String[] poffnetleadtime = new String[0];
+        //    Int32[] pportspeedcharid = new Int32[0];
+        //    Int32[] paccessspeedcharid = new Int32[0];
+        //    Int32[] psuppliercharid = new Int32[0];
+        //    Int32[] ptypecharid = new Int32[0];
+        //    Int32[] pnamecharid = new Int32[0];
+        //    Int32[] pportavailability = new Int32[0];
+        //    Int32[] pportvalidity = new Int32[0];
+        //    Int32[] pparentportspeeds = new Int32[0];
+        //    Int32[] pparentportspeedvalid = new Int32[0];
+        //    Int32[] pparentaccessproducttypeid = new Int32[0];
+        //    Int32[] pparentaccesssuppliernameid = new Int32[0];
+        //    Int32[] pparentaccesssuppliercharid = new Int32[0];
+        //    Int32[] pparentaccessspeedcharid = new Int32[0];
+        //    Int32[] paccesssupplierid = new Int32[0];
+        //    Int32[] paccesssuppliervalid = new Int32[0];
+        //    Int32[] pCharCount = new Int32[CaseArray.Count];
+        //    Int32[] pAccessSupplierCount = new Int32[CaseArray.Count];
+        //    Int32[] pParentportSpeedCount = new Int32[CaseArray.Count];
+        //    Int32[] iportavailability = new Int32[0];
+        //    String[] ioffnetleadtime = new String[0];
+        //    Int32[] iportvalidity = new Int32[0];
+        //    Int32[] iportspeedcharid = new Int32[0];
+        //    Int32[] iaccessspeedcharid = new Int32[0];
+        //    Int32[] isuppliercharid = new Int32[0];
+        //    Int32[] itypecharid = new Int32[0];
+        //    Int32[] inamecharid = new Int32[0];
+        //    Int32[] icharid = new Int32[0];
+        //    Int32[] icharavailcd = new Int32[0];
+        //    Int32[] ichartypeid = new Int32[0];
+        //    String[] icharvalue = new String[0];
+        //    Int32[] ichardetailvalidcd = new Int32[0];
+        //    Int32[] pportspeedcharcount = new Int32[CaseArray.Count];
+        //    Int32[] pTemp = new Int32[0];
+        //    Int32[] pTemplong = new Int32[0];
+        //    Int32[] paccessspeedcharcount = new Int32[0];
+        //    Int32[] iaccessspeedcharcount = new Int32[0];
+        //    Int32[] iaccesssupplierid = new Int32[0];
+        //    Int32[] iaccesssuppliervalid = new Int32[0];
+        //    Int32[] iparentportspeeds = new Int32[0];
+        //    Int32[] iparentportspeedvalid = new Int32[0];
+        //    Int32[] iparentaccessproducttypeid = new Int32[0];
+        //    Int32[] iparentaccesssuppliernameid = new Int32[0];
+        //    Int32[] iparentaccesssuppliercharid = new Int32[0];
+        //    Int32[] iparentaccessspeedcharid = new Int32[0];
+        //    String[] strTemplong = new String[0];
+        //    Int32 iInnerCount = 0;
+        //    Int32 iInnerAccessCount = 0;
+        //    Int32 iCount = 0;
+        //    Int32 iPCount;
+        //    Int32 iACount;
+        //    Int32 iTemp;
+        //    Int32 iCharCount = 0;
+        //    Int32 iAccessSuppCount = 0;
+        //    Int32 iParentPortCount = 0;
+        //    String[] pcharvalue2 = new String[0];
+        //    String[] icharvalue2 = new String[0];
+        //    //1.8 Add begins
+        //    Int32[] pCarrier = new Int32[CaseArray.Count];
+        //    Int32[] pCPESupplier = new Int32[CaseArray.Count];
+        //    //1.8 Add ends
+
+        //    Int32[] pPlatformcharid = new Int32[0];
+        //    Int32[] pCountryID = new Int32[0];
+
+        //    pPlatformcharid = new Int32[CaseArray.Count];
+        //    pCountryID = new Int32[CaseArray.Count];
+
+        //    foreach (CaseData oCase in CaseArray)
+        //    {
+        //        switch (oMcuSessionData.LocLevel)
+        //        {
+        //            case 2:
+        //                iPopId[iCount] = Convert.ToInt32(oCase.CountrySite.CountryId);
+        //                break;
+        //            case 3:
+        //                iPopId[iCount] = Convert.ToInt32(oCase.CitySite.CityId);
+        //                pCPESupplier[iCount] = oCase.CitySite.AccessSupplierCharId;
+        //                break;
+        //            case 4:
+        //                iPopId[iCount] = Convert.ToInt32(oCase.Pop.PopSiteId);
+        //                break;
+        //        }
+        //        iCaseId[iCount] = Convert.ToInt32(oCase.CaseId);
+        //        pavailcd[iCount] = oCase.CaseAvailCd;
+        //        pcasevalidcd[iCount] = oCase.CaseValidCd;
+        //       // iportspeedcharid = new Int32[oCase.PortSpeeds.PortSpeedColl.Count];
+
+        //        iportspeedcharid = new Int32[portSpeed.Length];
+
+        //        pPlatformcharid[iCount] = oCase.Pop.oCapmanPlatform.CapmanPlatformId;
+        //        pCountryID[iCount] = oCase.Pop.CountryId;
+
+        //        //iportavailability = new Int32[oCase.PortSpeeds.PortSpeedColl.Count];
+        //        //iportvalidity = new Int32[oCase.PortSpeeds.PortSpeedColl.Count];
+        //        //ioffnetleadtime = new String[oCase.PortSpeeds.PortSpeedColl.Count];
+        //        //icharid = new Int32[oCase.Charecteristics.CharColl.Count];
+        //        //icharavailcd = new Int32[oCase.Charecteristics.CharColl.Count];
+        //        //ichartypeid = new Int32[oCase.Charecteristics.CharColl.Count];
+        //        //icharvalue = new String[oCase.Charecteristics.CharColl.Count];
+        //        //icharvalue2 = new String[oCase.Charecteristics.CharColl.Count];
+        //        //ichardetailvalidcd = new Int32[oCase.Charecteristics.CharColl.Count];
+
+        //        iportavailability = new Int32[portSpeed.Length];
+        //        iportvalidity = new Int32[portSpeed.Length];
+        //        ioffnetleadtime = new String[portSpeed.Length];
+        //        icharid = new Int32[charecteristicsID.Length];
+        //        icharavailcd = new Int32[charecteristicsID.Length];
+        //        ichartypeid = new Int32[charecteristicsID.Length];
+        //        icharvalue = new String[charecteristicsID.Length];
+        //        icharvalue2 = new String[charecteristicsID.Length];
+        //        ichardetailvalidcd = new Int32[charecteristicsID.Length];
+
+        //        //1.8 add begins
+        //        pCarrier[iCount] = 0;// oCase.AccessSupplierCharId;
+        //        iPCount = 0;
+
+        //        iaccessspeedcharcount = new Int32[portSpeed.Length];
+        //        foreach (PortSpeedChar oPortSpeed in oCase.PortSpeeds.PortSpeedColl)
+        //        {
+        //            iACount = 0;
+        //            iportspeedcharid[iPCount] = Convert.ToInt32(oPortSpeed.CharId);
+        //            iportavailability[iPCount] = oPortSpeed.CharAvailCd;
+        //            iportvalidity[iPCount] = oPortSpeed.ValidCd;
+        //            //R32 : Below Value mapped correctly as we can have diff lead times for diff port speeds
+        //            //ioffnetleadtime[iPCount] = oCase.LeadTime;
+        //            ioffnetleadtime[iPCount] = oPortSpeed.LeadTime;
+        //            iaccessspeedcharid = new Int32[oPortSpeed.AccessSupps.AccessSuppColl.Count];
+        //            isuppliercharid = new Int32[oPortSpeed.AccessSupps.AccessSuppColl.Count];
+        //            itypecharid = new Int32[oPortSpeed.AccessSupps.AccessSuppColl.Count];
+        //            inamecharid = new Int32[oPortSpeed.AccessSupps.AccessSuppColl.Count];
+
+        //            foreach (AccessSuppChar oAccess in oPortSpeed.AccessSupps.AccessSuppColl)
+        //            {
+        //                iaccessspeedcharid[iACount] = Convert.ToInt32(oAccess.AccessId);
+        //                isuppliercharid[iACount] = Convert.ToInt32(oAccess.SupplierId);
+        //                itypecharid[iACount] = Convert.ToInt32(oAccess.AccessTypeId);
+        //                inamecharid[iACount] = Convert.ToInt32(oAccess.SupplierNameId);
+        //                iACount = iACount + 1;
+        //                iInnerAccessCount = iInnerAccessCount + 1;
+        //            }
+        //            iaccessspeedcharcount[iPCount] = iInnerAccessCount;
+        //            if (paccessspeedcharid.Length != 0)
+        //            {
+        //                iTemp = paccessspeedcharid.Length + iaccessspeedcharid.Length;
+        //                pTemp = new Int32[paccessspeedcharid.Length];
+        //                pTemp = paccessspeedcharid;
+        //                paccessspeedcharid = new Int32[iTemp];
+        //                for (int i = 0; i < pTemp.Length; i++)
+        //                {
+        //                    paccessspeedcharid[i] = Convert.ToInt32(pTemp[i]);
+        //                }
+        //                for (int j = 0; j < iaccessspeedcharid.Length; j++)
+        //                {
+        //                    paccessspeedcharid[pTemp.Length + j] = iaccessspeedcharid[j];
+        //                }
+
+        //            }
+        //            else
+        //            {
+        //                paccessspeedcharid = new Int32[iaccessspeedcharid.Length];
+        //                paccessspeedcharid = iaccessspeedcharid;
+        //            }
+        //            if (psuppliercharid.Length != 0)
+        //            {
+        //                iTemp = psuppliercharid.Length + isuppliercharid.Length;
+        //                pTemp = new Int32[psuppliercharid.Length];
+        //                pTemp = psuppliercharid;
+        //                psuppliercharid = new Int32[iTemp];
+        //                for (int i = 0; i < pTemp.Length; i++)
+        //                {
+        //                    psuppliercharid[i] = Convert.ToInt32(pTemp[i]);
+        //                }
+        //                for (int j = 0; j < isuppliercharid.Length; j++)
+        //                {
+        //                    psuppliercharid[pTemp.Length + j] = isuppliercharid[j];
+        //                }
+
+        //            }
+        //            else
+        //            {
+        //                psuppliercharid = new Int32[isuppliercharid.Length];
+        //                psuppliercharid = isuppliercharid;
+        //            }
+        //            if (ptypecharid.Length != 0)
+        //            {
+        //                iTemp = ptypecharid.Length + itypecharid.Length;
+        //                pTemp = new Int32[ptypecharid.Length];
+        //                pTemp = ptypecharid;
+        //                ptypecharid = new Int32[iTemp];
+        //                for (int i = 0; i < pTemp.Length; i++)
+        //                {
+        //                    ptypecharid[i] = Convert.ToInt32(pTemp[i]);
+        //                }
+        //                for (int j = 0; j < itypecharid.Length; j++)
+        //                {
+        //                    ptypecharid[pTemp.Length + j] = itypecharid[j];
+        //                }
+
+        //            }
+        //            else
+        //            {
+        //                ptypecharid = new Int32[itypecharid.Length];
+        //                ptypecharid = itypecharid;
+        //            }
+        //            if (pnamecharid.Length != 0)
+        //            {
+        //                iTemp = pnamecharid.Length + inamecharid.Length;
+        //                pTemp = new Int32[pnamecharid.Length];
+        //                pTemp = pnamecharid;
+        //                pnamecharid = new Int32[iTemp];
+        //                for (int i = 0; i < pTemp.Length; i++)
+        //                {
+        //                    pnamecharid[i] = Convert.ToInt32(pTemp[i]);
+        //                }
+        //                for (int j = 0; j < inamecharid.Length; j++)
+        //                {
+        //                    pnamecharid[pTemp.Length + j] = inamecharid[j];
+        //                }
+
+        //            }
+        //            else
+        //            {
+        //                pnamecharid = new Int32[inamecharid.Length];
+        //                pnamecharid = inamecharid;
+        //            }
+        //            iInnerCount = iInnerCount + 1;
+        //            iPCount = iPCount + 1;
+        //        }
+        //        if (poffnetleadtime.Length != 0)
+        //        {
+        //            iTemp = poffnetleadtime.Length + ioffnetleadtime.Length;
+        //            strTemplong = new String[poffnetleadtime.Length];
+        //            strTemplong = poffnetleadtime;
+        //            poffnetleadtime = new String[iTemp];
+        //            for (int i = 0; i < strTemplong.Length; i++)
+        //            {
+        //                poffnetleadtime[i] = strTemplong[i];
+        //            }
+        //            for (int j = 0; j < ioffnetleadtime.Length; j++)
+        //            {
+        //                poffnetleadtime[strTemplong.Length + j] = ioffnetleadtime[j];
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            poffnetleadtime = new String[ioffnetleadtime.Length];
+        //            poffnetleadtime = ioffnetleadtime;
+        //        }
+        //        if (paccessspeedcharcount.Length != 0)
+        //        {
+        //            iTemp = paccessspeedcharcount.Length + iaccessspeedcharcount.Length;
+        //            pTemplong = new Int32[paccessspeedcharcount.Length];
+        //            pTemplong = paccessspeedcharcount;
+        //            paccessspeedcharcount = new Int32[iTemp];
+        //            for (int i = 0; i < pTemplong.Length; i++)
+        //            {
+        //                paccessspeedcharcount[i] = pTemplong[i];
+        //            }
+        //            for (int j = 0; j < iaccessspeedcharcount.Length; j++)
+        //            {
+        //                paccessspeedcharcount[pTemplong.Length + j] = iaccessspeedcharcount[j];
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            paccessspeedcharcount = new Int32[iaccessspeedcharcount.Length];
+        //            paccessspeedcharcount = iaccessspeedcharcount;
+        //        }
+        //        if (pportspeedcharid.Length != 0)
+        //        {
+        //            iTemp = pportspeedcharid.Length + iportspeedcharid.Length;
+        //            pTemp = new Int32[pportspeedcharid.Length];
+        //            pTemp = pportspeedcharid;
+        //            pportspeedcharid = new Int32[iTemp];
+        //            for (int i = 0; i < pTemp.Length; i++)
+        //            {
+        //                pportspeedcharid[i] = pTemp[i];
+        //            }
+        //            for (int j = 0; j < iportspeedcharid.Length; j++)
+        //            {
+        //                pportspeedcharid[pTemp.Length + j] = iportspeedcharid[j];
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            pportspeedcharid = new Int32[iportspeedcharid.Length];
+        //            pportspeedcharid = iportspeedcharid;
+        //        }
+        //        if (pportavailability.Length != 0)
+        //        {
+        //            iTemp = pportavailability.Length + iportavailability.Length;
+        //            pTemp = new Int32[pportavailability.Length];
+        //            pTemp = pportavailability;
+        //            pportavailability = new Int32[iTemp];
+        //            for (int i = 0; i < pTemp.Length; i++)
+        //            {
+        //                pportavailability[i] = pTemp[i];
+        //            }
+        //            for (int j = 0; j < iportavailability.Length; j++)
+        //            {
+        //                pportavailability[pTemp.Length + j] = iportavailability[j];
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            pportavailability = new Int32[iportavailability.Length];
+        //            pportavailability = iportavailability;
+        //        }
+        //        if (pportvalidity.Length != 0)
+        //        {
+        //            iTemp = pportvalidity.Length + iportvalidity.Length;
+        //            pTemp = new Int32[pportvalidity.Length];
+        //            pTemp = pportvalidity;
+        //            pportvalidity = new Int32[iTemp];
+        //            for (int i = 0; i < pTemp.Length; i++)
+        //            {
+        //                pportvalidity[i] = pTemp[i];
+        //            }
+        //            for (int j = 0; j < iportvalidity.Length; j++)
+        //            {
+        //                pportvalidity[pTemp.Length + j] = iportvalidity[j];
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            pportvalidity = new Int32[iportvalidity.Length];
+        //            pportvalidity = iportvalidity;
+        //        }
+        //        pportspeedcharcount[iCount] = iInnerCount;
+        //        iACount = 0;
+        //        foreach (Characteristic oChar in oCase.Charecteristics.CharColl)
+        //        {
+        //            icharid[iACount] = Convert.ToInt32(oChar.CharId);
+        //            icharavailcd[iACount] = Convert.ToInt32(oChar.CharAvailCd);
+        //            ichartypeid[iACount] = Convert.ToInt32(oChar.CharTypeId);
+        //            //R32 : Below Values mapped correctly, charValue = charValue && charValue2 = charValue2
+        //            icharvalue[iACount] = oChar.CharValue;
+        //            icharvalue2[iACount] = oChar.CharValue2;
+        //            ichardetailvalidcd[iACount] = Convert.ToInt32(oChar.ValidCd);
+        //            iACount = iACount + 1;
+        //            iCharCount = iCharCount + 1;
+
+        //        }
+        //        if (iCharCount <= 0)
+        //        {
+        //            pCharCount[iCount] = 1;
+        //        }
+        //        else
+        //        {
+        //            pCharCount[iCount] = iCharCount;
+        //        }
+        //        if (pchardetailvalidcd.Length != 0)
+        //        {
+        //            iTemp = pchardetailvalidcd.Length + ichardetailvalidcd.Length;
+        //            pTemp = new Int32[pchardetailvalidcd.Length];
+        //            pTemp = pchardetailvalidcd;
+        //            pchardetailvalidcd = new Int32[iTemp];
+        //            for (int i = 0; i < pTemp.Length; i++)
+        //            {
+        //                pchardetailvalidcd[i] = pTemp[i];
+        //            }
+        //            for (int j = 0; j < ichardetailvalidcd.Length; j++)
+        //            {
+        //                pchardetailvalidcd[pTemp.Length + j] = ichardetailvalidcd[j];
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            pchardetailvalidcd = new Int32[ichardetailvalidcd.Length];
+        //            pchardetailvalidcd = ichardetailvalidcd;
+        //        }
+        //        if (pcharvalue.Length != 0)
+        //        {
+        //            iTemp = pcharvalue.Length + icharvalue.Length;
+        //            strTemplong = new String[pcharvalue.Length];
+        //            strTemplong = pcharvalue;
+        //            pcharvalue = new String[iTemp];
+        //            for (int i = 0; i < strTemplong.Length; i++)
+        //            {
+        //                pcharvalue[i] = strTemplong[i];
+        //            }
+        //            for (int j = 0; j < icharvalue.Length; j++)
+        //            {
+        //                pcharvalue[strTemplong.Length + j] = icharvalue[j];
+        //            }
+        //        }
+        //        else
+        //        {
+        //            pcharvalue = new String[icharvalue.Length];
+        //            pcharvalue = icharvalue;
+        //        }
+        //        if (pcharvalue2.Length != 0)
+        //        {
+        //            iTemp = pcharvalue2.Length + icharvalue2.Length;
+        //            strTemplong = new String[pcharvalue2.Length];
+        //            strTemplong = pcharvalue2;
+        //            pcharvalue2 = new String[iTemp];
+        //            for (int i = 0; i < strTemplong.Length; i++)
+        //            {
+        //                pcharvalue2[i] = strTemplong[i];
+        //            }
+        //            for (int j = 0; j < icharvalue2.Length; j++)
+        //            {
+        //                pcharvalue2[strTemplong.Length + j] = icharvalue2[j];
+        //            }
+        //        }
+        //        else
+        //        {
+        //            pcharvalue2 = new String[icharvalue2.Length];
+        //            pcharvalue2 = icharvalue2;
+        //        }
+
+
+        //        if (pchartypeid.Length != 0)
+        //        {
+        //            iTemp = pchartypeid.Length + ichartypeid.Length;
+        //            pTemp = new Int32[pchartypeid.Length];
+        //            pTemp = pchartypeid;
+        //            pchartypeid = new Int32[iTemp];
+        //            for (int i = 0; i < pTemp.Length; i++)
+        //            {
+        //                pchartypeid[i] = pTemp[i];
+        //            }
+        //            for (int j = 0; j < ichartypeid.Length; j++)
+        //            {
+        //                pchartypeid[pTemp.Length + j] = ichartypeid[j];
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            pchartypeid = new Int32[ichartypeid.Length];
+        //            pchartypeid = ichartypeid;
+        //        }
+
+        //        if (pcharavailcd.Length != 0)
+        //        {
+        //            iTemp = pcharavailcd.Length + icharavailcd.Length;
+        //            pTemp = new Int32[pcharavailcd.Length];
+        //            pTemp = pcharavailcd;
+        //            pcharavailcd = new Int32[iTemp];
+        //            for (int i = 0; i < pTemp.Length; i++)
+        //            {
+        //                pcharavailcd[i] = pTemp[i];
+        //            }
+        //            for (int j = 0; j < icharavailcd.Length; j++)
+        //            {
+        //                pcharavailcd[pTemp.Length + j] = icharavailcd[j];
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            pcharavailcd = new Int32[icharavailcd.Length];
+        //            pcharavailcd = icharavailcd;
+        //        }
+
+        //        if (pcharid.Length != 0)
+        //        {
+        //            iTemp = pcharid.Length + icharid.Length;
+        //            pTemp = new Int32[pcharid.Length];
+        //            pTemp = pcharid;
+        //            pcharid = new Int32[iTemp];
+        //            for (int i = 0; i < pTemp.Length; i++)
+        //            {
+        //                pcharid[i] = pTemp[i];
+        //            }
+        //            for (int j = 0; j < icharid.Length; j++)
+        //            {
+        //                pcharid[pTemp.Length + j] = icharid[j];
+        //            }
+        //        }
+        //        else
+        //        {
+        //            pcharid = new Int32[icharid.Length];
+        //            pcharid = icharid;
+        //        }
+
+        //        #region charecteristics
+        //        //if (oCase.Charecteristics.AccessSuppliers.Count > 0)
+        //        //{
+        //        //    iaccesssupplierid = new Int32[oCase.Charecteristics.AccessSuppliers.Count];
+        //        //    iaccesssuppliervalid = new Int32[oCase.Charecteristics.AccessSuppliers.Count];
+        //        //    iACount = 0;
+        //        //    foreach (AccessSuppChar oAccessSupp in oCase.Charecteristics.AccessSuppliers)
+        //        //    {
+        //        //        iaccesssupplierid[iACount] = oAccessSupp.SupplierId;
+        //        //        iaccesssuppliervalid[iACount] = Convert.ToInt32(oAccessSupp.SupplierValidCd);
+        //        //        iAccessSuppCount = iAccessSuppCount + 1;
+        //        //        iACount = iACount + 1;
+        //        //    }
+        //        //    if (paccesssuppliervalid.Length != 0)
+        //        //    {
+        //        //        iTemp = paccesssuppliervalid.Length + iaccesssuppliervalid.Length;
+        //        //        pTemp = new Int32[iaccesssuppliervalid.Length];
+        //        //        pTemp = paccesssuppliervalid;
+        //        //        paccesssuppliervalid = new Int32[iTemp];
+        //        //        for (int i = 0; i < pTemp.Length; i++)
+        //        //        {
+        //        //            paccesssuppliervalid[i] = pTemp[i];
+        //        //        }
+        //        //        for (int j = 0; j < iaccesssuppliervalid.Length; j++)
+        //        //        {
+        //        //            paccesssuppliervalid[pTemp.Length + j] = iaccesssuppliervalid[j];
+        //        //        }
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        paccesssuppliervalid = new Int32[iaccesssuppliervalid.Length];
+        //        //        paccesssuppliervalid = iaccesssuppliervalid;
+        //        //    }
+        //        //    if (paccesssupplierid.Length != 0)
+        //        //    {
+        //        //        iTemp = paccesssupplierid.Length + iaccesssupplierid.Length;
+        //        //        pTemp = new Int32[iaccesssupplierid.Length];
+        //        //        pTemp = paccesssupplierid;
+        //        //        paccesssupplierid = new Int32[iTemp];
+        //        //        for (int i = 0; i < pTemp.Length; i++)
+        //        //        {
+        //        //            paccesssupplierid[i] = pTemp[i];
+        //        //        }
+        //        //        for (int j = 0; j < iaccesssupplierid.Length; j++)
+        //        //        {
+        //        //            paccesssupplierid[pTemp.Length + j] = iaccesssupplierid[j];
+        //        //        }
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        paccesssupplierid = new Int32[iaccesssupplierid.Length];
+        //        //        paccesssupplierid = iaccesssupplierid;
+        //        //    }
+        //        //}
+        //        //else
+        //        //{
+        //        //    if (iAccessSuppCount <= 0)
+        //        //    {
+        //        //        pAccessSupplierCount[iCount] = 1;
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        pAccessSupplierCount[iCount] = iAccessSuppCount;
+        //        //    }
+
+        //        //}
+
+
+        //        //if (oCase.Charecteristics.ParentPortSpeed.Count > 0)
+        //        //{
+        //        //    iparentportspeeds = new Int32[oCase.Charecteristics.ParentPortSpeed.Count];
+        //        //    iparentportspeedvalid = new Int32[oCase.Charecteristics.ParentPortSpeed.Count];
+        //        //    iparentaccessproducttypeid = new Int32[oCase.Charecteristics.ParentPortSpeed.Count];
+        //        //    iparentaccesssuppliernameid = new Int32[oCase.Charecteristics.ParentPortSpeed.Count];
+        //        //    iparentaccesssuppliercharid = new Int32[oCase.Charecteristics.ParentPortSpeed.Count];
+        //        //    iparentaccessspeedcharid = new Int32[oCase.Charecteristics.ParentPortSpeed.Count];
+        //        //    String[] strTemp = new String[5];
+        //        //    iACount = 0;
+        //        //    foreach (PortSpeedChar oPortSpeed in oCase.Charecteristics.ParentPortSpeed)
+        //        //    {
+        //        //        strTemp = oPortSpeed.CharDesc.Split('/');
+        //        //        iparentportspeeds[iACount] = Convert.ToInt32(strTemp[0]);
+        //        //        iparentportspeedvalid[iACount] = Convert.ToInt32(oPortSpeed.ValidCd);
+        //        //        iparentaccessproducttypeid[iACount] = Convert.ToInt32(strTemp[3]);
+        //        //        iparentaccesssuppliernameid[iACount] = Convert.ToInt32(strTemp[4]);
+        //        //        iparentaccesssuppliercharid[iACount] = Convert.ToInt32(strTemp[2]);
+        //        //        iparentaccessspeedcharid[iACount] = Convert.ToInt32(strTemp[1]);
+        //        //        iACount = iACount + 1;
+        //        //        iParentPortCount = iParentPortCount + 1;
+        //        //    }
+
+        //        //    if (pparentportspeeds.Length != 0)
+        //        //    {
+        //        //        iTemp = pparentportspeeds.Length + iparentportspeeds.Length;
+        //        //        pTemp = new Int32[iparentportspeeds.Length];
+        //        //        pTemp = pparentportspeeds;
+        //        //        pparentportspeeds = new Int32[iTemp];
+        //        //        for (int i = 0; i < pTemp.Length; i++)
+        //        //        {
+        //        //            pparentportspeeds[i] = pTemp[i];
+        //        //        }
+        //        //        for (int j = 0; j < iparentportspeeds.Length; j++)
+        //        //        {
+        //        //            pparentportspeeds[pTemp.Length + j] = iparentportspeeds[j];
+        //        //        }
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        pparentportspeeds = new Int32[iparentportspeeds.Length];
+        //        //        pparentportspeeds = iparentportspeeds;
+        //        //    }
+
+        //        //    if (pparentportspeedvalid.Length != 0)
+        //        //    {
+        //        //        iTemp = pparentportspeedvalid.Length + iparentportspeedvalid.Length;
+        //        //        pTemp = new Int32[iparentportspeedvalid.Length];
+        //        //        pTemp = pparentportspeedvalid;
+        //        //        pparentportspeedvalid = new Int32[iTemp];
+        //        //        for (int i = 0; i < pTemp.Length; i++)
+        //        //        {
+        //        //            pparentportspeedvalid[i] = pTemp[i];
+        //        //        }
+        //        //        for (int j = 0; j < iparentportspeedvalid.Length; j++)
+        //        //        {
+        //        //            pparentportspeedvalid[pTemp.Length + j] = iparentportspeedvalid[j];
+        //        //        }
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        pparentportspeedvalid = new Int32[iparentportspeedvalid.Length];
+        //        //        pparentportspeedvalid = iparentportspeedvalid;
+        //        //    }
+
+        //        //    if (pparentaccessproducttypeid.Length != 0)
+        //        //    {
+        //        //        iTemp = pparentaccessproducttypeid.Length + iparentaccessproducttypeid.Length;
+        //        //        pTemp = new Int32[iparentaccessproducttypeid.Length];
+        //        //        pTemp = pparentaccessproducttypeid;
+        //        //        pparentaccessproducttypeid = new Int32[iTemp];
+        //        //        for (int i = 0; i < pTemp.Length; i++)
+        //        //        {
+        //        //            pparentaccessproducttypeid[i] = pTemp[i];
+        //        //        }
+        //        //        for (int j = 0; j < iparentaccessproducttypeid.Length; j++)
+        //        //        {
+        //        //            pparentaccessproducttypeid[pTemp.Length + j] = iparentaccessproducttypeid[j];
+        //        //        }
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        pparentaccessproducttypeid = new Int32[iparentaccessproducttypeid.Length];
+        //        //        pparentaccessproducttypeid = iparentaccessproducttypeid;
+        //        //    }
+
+        //        //    if (pparentaccesssuppliernameid.Length != 0)
+        //        //    {
+        //        //        iTemp = pparentaccesssuppliernameid.Length + iparentaccesssuppliernameid.Length;
+        //        //        pTemp = new Int32[iparentaccesssuppliernameid.Length];
+        //        //        pTemp = pparentaccesssuppliernameid;
+        //        //        pparentaccesssuppliernameid = new Int32[iTemp];
+        //        //        for (int i = 0; i < pTemp.Length; i++)
+        //        //        {
+        //        //            pparentaccesssuppliernameid[i] = pTemp[i];
+        //        //        }
+        //        //        for (int j = 0; j < iparentaccesssuppliernameid.Length; j++)
+        //        //        {
+        //        //            pparentaccesssuppliernameid[pTemp.Length + j] = iparentaccesssuppliernameid[j];
+        //        //        }
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        pparentaccesssuppliernameid = new Int32[iparentaccesssuppliernameid.Length];
+        //        //        pparentaccesssuppliernameid = iparentaccesssuppliernameid;
+        //        //    }
+
+        //        //    if (pparentaccesssuppliercharid.Length != 0)
+        //        //    {
+        //        //        iTemp = pparentaccesssuppliercharid.Length + iparentaccesssuppliercharid.Length;
+        //        //        pTemp = new Int32[iparentaccesssuppliercharid.Length];
+        //        //        pTemp = pparentaccesssuppliercharid;
+        //        //        pparentaccesssuppliercharid = new Int32[iTemp];
+        //        //        for (int i = 0; i < pTemp.Length; i++)
+        //        //        {
+        //        //            pparentaccesssuppliercharid[i] = pTemp[i];
+        //        //        }
+        //        //        for (int j = 0; j < iparentaccesssuppliercharid.Length; j++)
+        //        //        {
+        //        //            pparentaccesssuppliercharid[pTemp.Length + j] = iparentaccesssuppliercharid[j];
+        //        //        }
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        pparentaccesssuppliercharid = new Int32[iparentaccesssuppliercharid.Length];
+        //        //        pparentaccesssuppliercharid = iparentaccesssuppliercharid;
+        //        //    }
+
+        //        //    if (pparentaccessspeedcharid.Length != 0)
+        //        //    {
+        //        //        iTemp = pparentaccessspeedcharid.Length + iparentaccessspeedcharid.Length;
+        //        //        pTemp = new Int32[iparentaccessspeedcharid.Length];
+        //        //        pTemp = pparentaccessspeedcharid;
+        //        //        pparentaccessspeedcharid = new Int32[iTemp];
+        //        //        for (int i = 0; i < pTemp.Length; i++)
+        //        //        {
+        //        //            pparentaccessspeedcharid[i] = pTemp[i];
+        //        //        }
+        //        //        for (int j = 0; j < iparentaccessspeedcharid.Length; j++)
+        //        //        {
+        //        //            pparentaccessspeedcharid[pTemp.Length + j] = iparentaccessspeedcharid[j];
+        //        //        }
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        pparentaccessspeedcharid = new Int32[iparentaccessspeedcharid.Length];
+        //        //        pparentaccessspeedcharid = iparentaccessspeedcharid;
+        //        //    }
+        //        //}
+        //        #endregion
+        //        if (iParentPortCount <= 0)
+        //        {
+        //            pParentportSpeedCount[iCount] = 1;
+        //        }
+        //        else
+        //        {
+        //            pParentportSpeedCount[iCount] = iParentPortCount;
+        //        }
+
+
+        //        iCount = iCount + 1;
+        //    }
+        //    DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //    String[] strOutput = new String[1];
+
+        //    if (HttpContext.Current.Session["AccessSupplierID"] == null)
+        //        HttpContext.Current.Session["AccessSupplierID"] = "0";
+
+        //    if (HttpContext.Current.Session["AccessProductID"] == null)
+        //        HttpContext.Current.Session["AccessProductID"] = "0";
+
+        //    if (HttpContext.Current.Session["AccessTypeID"] == null)
+        //        HttpContext.Current.Session["AccessTypeID"] = "0";
+
+        //    if (HttpContext.Current.Session["PhaseAttr"] == null)
+        //        HttpContext.Current.Session["PhaseAttr"] = "0";
+
+        //    InsertAccessFilters(Convert.ToInt32(HttpContext.Current.Session["AccessSupplierID"].ToString()), Convert.ToInt32(HttpContext.Current.Session["AccessProductID"].ToString()), Convert.ToInt32(HttpContext.Current.Session["AccessTypeID"].ToString()), HttpContext.Current.Session["PhaseAttr"].ToString());
+
+        //    //1.7 Modify begins
+        //    //strOutput = oDataAccess.UpdateSelections(oMcuSessionData.LocLevel,oMcuSessionData.ProductCd, oMcuSessionData.SubProductCd, oMcuSessionData.UserId, iPopId, iCaseId, pavailcd, pcasevalidcd, pcharid, pcharavailcd, pchartypeid, pcharvalue, pportspeedcharid, paccessspeedcharid, psuppliercharid, ptypecharid, pnamecharid, pportavailability, pportvalidity, pportspeedcharcount, paccessspeedcharcount, pchardetailvalidcd, poffnetleadtime, paccesssupplierid, paccesssuppliervalid, pparentportspeeds, pparentportspeedvalid, pparentaccessproducttypeid, pparentaccesssuppliernameid, pparentaccesssuppliercharid, pparentaccessspeedcharid,pCharCount,pAccessSupplierCount,pParentportSpeedCount);
+        //    strOutput = oDataAccess.UpdateSelections(oMcuSessionData.LocLevel, oMcuSessionData.ProductCd, oMcuSessionData.SubProductCd,
+        //        oMcuSessionData.UserId, 
+        //        iPopId, 
+        //        iCaseId,
+        //        pavailcd,
+        //        pcasevalidcd, 
+        //        pcharid, 
+        //        pcharavailcd,
+        //        pchartypeid, 
+        //        pcharvalue,
+        //        pcharvalue2,
+        //        pportspeedcharid,
+        //        paccessspeedcharid,
+        //        psuppliercharid,
+        //        ptypecharid, 
+        //        pnamecharid, 
+        //        pportavailability,
+        //        pportvalidity,
+        //        pportspeedcharcount,
+        //        paccessspeedcharcount, 
+        //        pchardetailvalidcd,
+        //        poffnetleadtime,
+        //        paccesssupplierid,
+        //        paccesssuppliervalid,
+        //        pparentportspeeds, 
+        //        pparentportspeedvalid,
+        //        pparentaccessproducttypeid,
+        //        pparentaccesssuppliernameid, 
+        //        pparentaccesssuppliercharid,
+        //        pparentaccessspeedcharid,
+        //        pCharCount, 
+        //        pAccessSupplierCount,
+        //        pParentportSpeedCount,
+        //        pCarrier, 
+        //        pCPESupplier);
+        //    //1.7 Modify ends
+
+        //    //Inserting Exceptions
+        //    if (ptypecharid.Length == 0)
+        //    {
+        //        ptypecharid = new Int32[1];
+        //        ptypecharid[0] = 0;
+        //    }
+
+        //    if (psuppliercharid.Length == 0)
+        //    {
+        //        psuppliercharid = new Int32[1];
+        //        psuppliercharid[0] = 0;
+        //    }
+
+        //    if (pnamecharid.Length == 0)
+        //    {
+        //        pnamecharid = new Int32[1];
+        //        pnamecharid[0] = 0;
+        //    }
+
+        //    if (strInsertCaseIds.Length > 0 || strRemoveCaseIds.Length > 0)
+        //    {
+        //        InsertProductExceptions(strInsertCaseIds.Split(','), strRemoveCaseIds.Split(','), pPlatformcharid, pCountryID, ptypecharid[0], pportspeedcharid, oMcuSessionData.ProductCd, psuppliercharid[0], pnamecharid[0], paccessspeedcharid);
+        //    }
+
+        //    return strOutput;
+        //}
+
+        //private void InsertAccessFilters(int AccessSupplierID, int AccessProductID, int AccessTypeID, string PhaseAttr)
+        //{
+
+        //    Int32[] aintEmpty = new Int32[1];
+        //    aintEmpty[0] = -1;
+
+        //    OracleConnection oConn = new OracleConnection(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //    OracleCommand cmdOra = new OracleCommand("USP_SAVEACCESSSPEEDFILTERS", oConn);
+        //    cmdOra.CommandType = CommandType.StoredProcedure;
+
+        //    OracleParameter PSupplierID = new OracleParameter("PSUPPLIERID ", OracleDbType.Int32, ParameterDirection.Input);
+        //    OracleParameter pProductID = new OracleParameter("PSUPPLIERPRODUCTID", OracleDbType.Int32, ParameterDirection.Input);
+        //    OracleParameter pAccessType = new OracleParameter("PSUPPLIERACCESSTYPE_ID", OracleDbType.Int32, ParameterDirection.Input);
+        //    OracleParameter pEthernetPhaseAttr = new OracleParameter("pETHERNET_PHASE_ATTRIBUTE", OracleDbType.Varchar2, ParameterDirection.Input);
+
+        //    PSupplierID.Value = AccessSupplierID;
+        //    pProductID.Value = AccessProductID;
+        //    pAccessType.Value = AccessTypeID;
+        //    pEthernetPhaseAttr.Value = PhaseAttr;
+
+        //    cmdOra.Parameters.Add(PSupplierID);
+        //    cmdOra.Parameters.Add(pProductID);
+        //    cmdOra.Parameters.Add(pAccessType);
+        //    cmdOra.Parameters.Add(pEthernetPhaseAttr);
+        //    int RecordsAffected = 0;
+
+        //    try
+        //    {
+
+        //        oConn.Open();
+        //        RecordsAffected = cmdOra.ExecuteNonQuery();
+
+        //        // RecordsAffected = Convert.ToInt32(pRecordCount.Value.ToString());
+
+        //    }
+        //    finally
+        //    {
+        //        //close the connection
+        //        if (oConn.State == ConnectionState.Open)
+        //            oConn.Close();
+        //    }
+
+        //}
+
+        private void InsertProductExceptions(Array InsertCaseIDs, Array RemoveCaseIDs, Array PlatformIDs, Array CountryID, int AccessType, Array PortSpeedID, int ProductID, int AccessSupplierID, int SupplierProductID, Array AccessSpeed)
+        {
+
+            Int32[] aintEmpty = new Int32[1];
+            aintEmpty[0] = -1;
+
+            OracleConnection oConn = new OracleConnection(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand cmdOra = new OracleCommand("PKG_MASSCASEUPDATE.INS_CSU_CASE_EXECPTIONS", oConn);
+            cmdOra.CommandType = CommandType.StoredProcedure;
+
+            OracleParameter pInsertCaseIDs = new OracleParameter("InsertCaseIDs ", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter pRemoveCaseIDs = new OracleParameter("RemoveCaseIDs ", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter pPlatformIDs = new OracleParameter("PlatformIDs ", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter pCountryID = new OracleParameter("CountryID ", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter pProductID = new OracleParameter("pproductcd ", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter pportspeedcharid = new OracleParameter("pportspeedcharid ", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter paccessspeedcharid = new OracleParameter("paccessspeedcharid ", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter psuppliercharid = new OracleParameter("psuppliercharid ", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter ptypecharid = new OracleParameter("ptypecharid ", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter pnamecharid = new OracleParameter("pnamecharid ", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter pRecordCount = new OracleParameter("record_count ", OracleDbType.Int32, ParameterDirection.Output);
+
+            pInsertCaseIDs.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            pRemoveCaseIDs.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            pPlatformIDs.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            pCountryID.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            pportspeedcharid.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            paccessspeedcharid.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+
+
+            pProductID.Value = ProductID;
+
+            if (PortSpeedID.Length == 0)
+            {
+                pportspeedcharid.Value = aintEmpty;
+                pportspeedcharid.Size = 0;
+            }
+            else
+            {
+                pportspeedcharid.Value = PortSpeedID;
+                pportspeedcharid.Size = PortSpeedID.Length;
+            }
+
+            if (AccessSpeed.Length == 0)
+            {
+                paccessspeedcharid.Value = aintEmpty;
+                paccessspeedcharid.Size = 0;
+            }
+            else
+            {
+                paccessspeedcharid.Value = AccessSpeed;
+                paccessspeedcharid.Size = AccessSpeed.Length;
+            }
+
+            psuppliercharid.Value = AccessSupplierID;
+            ptypecharid.Value = AccessType;
+            pnamecharid.Value = SupplierProductID;
+
+            if (InsertCaseIDs.Length == 0)
+            {
+                pInsertCaseIDs.Value = aintEmpty;
+                pInsertCaseIDs.Size = 0;
+            }
+            else
+            {
+                pInsertCaseIDs.Value = InsertCaseIDs;
+                pInsertCaseIDs.Size = InsertCaseIDs.Length;
+            }
+
+            if (RemoveCaseIDs.Length <= 1)
+            {
+                if (RemoveCaseIDs.Length == 0)
+                {
+                        pRemoveCaseIDs.Value = aintEmpty;
+                        pRemoveCaseIDs.Size = 0;
+                }
+                else
+                {
+                    pRemoveCaseIDs.Value = RemoveCaseIDs;
+                    pRemoveCaseIDs.Size = RemoveCaseIDs.Length;
+                }
+
+            }
+            else
+            {
+                pRemoveCaseIDs.Value = RemoveCaseIDs;
+                pRemoveCaseIDs.Size = RemoveCaseIDs.Length;
+            }
+
+            if (CountryID.Length == 0)
+            {
+                pCountryID.Value = aintEmpty;
+                pCountryID.Size = 0;
+            }
+            else
+            {
+                pCountryID.Value = CountryID;
+                pCountryID.Size = CountryID.Length;
+            }
+
+            if (PlatformIDs.Length == 0)
+            {
+                pPlatformIDs.Value = aintEmpty;
+                pPlatformIDs.Size = 0;
+            }
+            else
+            {
+                pPlatformIDs.Value = PlatformIDs;
+                pPlatformIDs.Size = PlatformIDs.Length;
+            }
+
+            cmdOra.Parameters.Add(pProductID);
+            cmdOra.Parameters.Add(pportspeedcharid);
+            cmdOra.Parameters.Add(paccessspeedcharid);
+            cmdOra.Parameters.Add(psuppliercharid);
+            cmdOra.Parameters.Add(ptypecharid);
+            cmdOra.Parameters.Add(pnamecharid);
+            cmdOra.Parameters.Add(pInsertCaseIDs);
+            cmdOra.Parameters.Add(pRemoveCaseIDs);
+            cmdOra.Parameters.Add(pPlatformIDs);
+            cmdOra.Parameters.Add(pCountryID);
+            cmdOra.Parameters.Add(pRecordCount);
+            try
+            {
+
+                oConn.Open();
+                int RecordsAffected = cmdOra.ExecuteNonQuery();
+                RecordsAffected = Convert.ToInt32(pRecordCount.Value.ToString());
+            }
+            finally
+            {
+                oConn.Close();
+            }
+        }
+
+        //   // 1.9 modify ends
+        //   //1.5 To get the case id's for Access for selected hub sites
+        //   //get the accessprod type data as well as suppliername type also 
+        //   public DataSet GetAccessCase(int iProductCd, int[] POPlist, int[] iSelSupp, int[] iSelAccType, int[] iSelSupName, int[] iSelSpeed)
+        //   {
+        //       DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //       DataSet dsData = new DataSet();
+        //       try
+        //       {
+        //           dsData = oDataAccess.GetAccessCaseId(iProductCd, POPlist, iSelSupp, iSelAccType, iSelSupName, iSelSpeed);
+        //       }
+        //       catch
+        //       {
+        //           throw;
+        //       }
+        //       return dsData;
+
+        //   }
+        //   //1.5 ends
+        //   //update access case    
+        //   //2.0 Modify begins
+        //   public String[] UpdateCasesAccess(MCUSession oMcuSessionData)
+        //   {
+
+        //       ArrayList iPopId = new ArrayList();
+        //       ArrayList iCaseId = new ArrayList();
+        //       ArrayList pavailcd = new ArrayList();
+        //       ArrayList pcasevalidcd = new ArrayList();
+        //       ArrayList pcharid = new ArrayList();
+        //       ArrayList pcharavailcd = new ArrayList();
+        //       ArrayList pchartypeid = new ArrayList();
+        //       ArrayList pcharvalue = new ArrayList();
+        //       ArrayList pcharvalue2 = new ArrayList();
+        //       ArrayList pchardetailvalidcd = new ArrayList();
+        //       ArrayList pCharCount = new ArrayList();
+        //       Int32 iCharCount = 0;
+        //       String strTemp = String.Empty;
+        //       foreach (CaseData oCase in CaseArray)
+        //       {
+        //           iPopId.Add(oCase.Pop.PopSiteId);
+        //           iCaseId.Add(oCase.CaseId);
+        //           pavailcd.Add(oCase.CaseAvailCd);
+        //           pcasevalidcd.Add(oCase.CaseValidCd);
+
+        //           foreach (Characteristic oChar in oCase.Charecteristics.CharColl)
+        //           {
+        //               pcharid.Add(oChar.CharId);
+        //               pcharavailcd.Add(oChar.CharAvailCd);
+        //               pchartypeid.Add(oChar.CharTypeId);
+        //               //Modified for Drop 6 - Akshita - CharValue2 ->CharValue
+        //               pcharvalue.Add(oChar.CharValue);
+        //               pchardetailvalidcd.Add(oChar.ValidCd);
+        //               iCharCount = iCharCount + 1;
+
+        //           }
+        //           if (iCharCount <= 0)
+        //           {
+        //               pCharCount.Add(1);
+        //           }
+        //           else
+        //           {
+        //               pCharCount.Add(iCharCount);
+        //           }
+        //       }
+        //       DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //       String[] strOutput = new String[1];
+        //       strOutput = oDataAccess.UpdateSelectionsAccess(oMcuSessionData.UserId, iPopId.ToArray(iCharCount.GetType()), iCaseId.ToArray(iCharCount.GetType()), pavailcd.ToArray(iCharCount.GetType()), pcasevalidcd.ToArray(iCharCount.GetType()), pcharid.ToArray(iCharCount.GetType()), pcharavailcd.ToArray(iCharCount.GetType()), pchartypeid.ToArray(iCharCount.GetType()), pcharvalue.ToArray(strTemp.GetType()), pchardetailvalidcd.ToArray(iCharCount.GetType()), pCharCount.ToArray(iCharCount.GetType()));
+        //       return strOutput;
+        //   }
+        //   //public String[] UpdateCasesAccess(MCUSession oMcuSessionData)
+        //   //{
+
+        //   //    Int32[] iPopId = new Int32[CaseArray.Count];
+        //   //    Int32[] iCaseId = new Int32[CaseArray.Count];
+        //   //    Int32[] pavailcd = new Int32[CaseArray.Count];
+        //   //    Int32[] pcasevalidcd = new Int32[CaseArray.Count];
+        //   //    Int32[] pcharid = new Int32[0];
+        //   //    Int32[] pcharavailcd = new Int32[0];
+        //   //    Int32[] pchartypeid = new Int32[0];
+        //   //    String[] pcharvalue = new String[0];
+        //   //    String[] pcharvalue2 = new String[0];
+        //   //    Int32[] pchardetailvalidcd = new Int32[0];
+        //   //    String[] poffnetleadtime = new String[0];
+        //   //    Int32[] pportspeedcharid = new Int32[0];
+        //   //    Int32[] paccessspeedcharid = new Int32[0];
+        //   //    Int32[] psuppliercharid = new Int32[0];
+        //   //    Int32[] ptypecharid = new Int32[0];
+        //   //    Int32[] pnamecharid = new Int32[0];
+        //   //    Int32[] pportavailability = new Int32[0];
+        //   //    Int32[] pportvalidity = new Int32[0];
+        //   //    Int32[] pparentportspeeds = new Int32[0];
+        //   //    Int32[] pparentportspeedvalid = new Int32[0];
+        //   //    Int32[] pparentaccessproducttypeid = new Int32[0];
+        //   //    Int32[] pparentaccesssuppliernameid = new Int32[0];
+        //   //    Int32[] pparentaccesssuppliercharid = new Int32[0];
+        //   //    Int32[] pparentaccessspeedcharid = new Int32[0];
+        //   //    Int32[] paccesssupplierid = new Int32[0];
+        //   //    Int32[] paccesssuppliervalid = new Int32[0];
+        //   //    Int32[] pCharCount = new Int32[CaseArray.Count];
+        //   //    Int32[] pAccessSupplierCount = new Int32[CaseArray.Count];
+        //   //    Int32[] pParentportSpeedCount = new Int32[CaseArray.Count];
+        //   //    Int32[] iportavailability = new Int32[0];
+        //   //    String[] ioffnetleadtime = new String[0];
+        //   //    Int32[] iportvalidity = new Int32[0];
+        //   //    Int32[] iportspeedcharid = new Int32[0];
+        //   //    Int32[] iaccessspeedcharid = new Int32[0];
+        //   //    Int32[] isuppliercharid = new Int32[0];
+        //   //    Int32[] itypecharid = new Int32[0];
+        //   //    Int32[] inamecharid = new Int32[0];
+        //   //    Int32[] icharid = new Int32[0];
+        //   //    Int32[] icharavailcd = new Int32[0];
+        //   //    Int32[] ichartypeid = new Int32[0];
+        //   //    String[] icharvalue = new String[0];
+        //   //    String[] icharvalue2 = new String[0];
+        //   //    Int32[] ichardetailvalidcd = new Int32[0];
+        //   //    Int32[] pportspeedcharcount = new Int32[CaseArray.Count];
+        //   //    Int32[] pTemp = new Int32[0];
+        //   //    Int32[] pTemplong = new Int32[0];
+        //   //    Int32[] paccessspeedcharcount = new Int32[0];
+        //   //    Int32[] iaccessspeedcharcount = new Int32[0];
+        //   //    Int32[] iaccesssupplierid = new Int32[0];
+        //   //    Int32[] iaccesssuppliervalid = new Int32[0];
+        //   //    Int32[] iparentportspeeds = new Int32[0];
+        //   //    Int32[] iparentportspeedvalid = new Int32[0];
+        //   //    Int32[] iparentaccessproducttypeid = new Int32[0];
+        //   //    Int32[] iparentaccesssuppliernameid = new Int32[0];
+        //   //    Int32[] iparentaccesssuppliercharid = new Int32[0];
+        //   //    Int32[] iparentaccessspeedcharid = new Int32[0];
+        //   //    String[] strTemplong = new String[0];
+        //   //    Int32 iInnerCount = 0;
+        //   //    Int32 iInnerAccessCount = 0;
+        //   //    Int32 iCount = 0;
+        //   //    Int32 iPCount;
+        //   //    Int32 iACount;
+        //   //    Int32 iTemp;
+        //   //    Int32 iCharCount = 0;
+        //   //    Int32 iAccessSuppCount = 0;
+        //   //    Int32 iParentPortCount = 0;
+        //   //    foreach (CaseData oCase in CaseArray)
+        //   //    {
+        //   //        switch (oMcuSessionData.LocLevel)
+        //   //        {
+        //   //            case 2:
+        //   //                iPopId[iCount] = Convert.ToInt32(oCase.CountrySite.CountryId);
+        //   //                break;
+        //   //            case 3:
+        //   //                iPopId[iCount] = Convert.ToInt32(oCase.CitySite.CityId);
+        //   //                break;
+        //   //            case 4:
+        //   //                iPopId[iCount] = Convert.ToInt32(oCase.Pop.PopSiteId);
+        //   //                break;
+        //   //        }
+        //   //        iCaseId[iCount] = Convert.ToInt32(oCase.CaseId);
+        //   //        pavailcd[iCount] = oCase.CaseAvailCd;
+        //   //        pcasevalidcd[iCount] = oCase.CaseValidCd;
+        //   //        icharid = new Int32[oCase.Charecteristics.CharColl.Count];
+        //   //        icharavailcd = new Int32[oCase.Charecteristics.CharColl.Count];
+        //   //        ichartypeid = new Int32[oCase.Charecteristics.CharColl.Count];
+        //   //        icharvalue = new String[oCase.Charecteristics.CharColl.Count];
+        //   //        ichardetailvalidcd = new Int32[oCase.Charecteristics.CharColl.Count];
+        //   //        iPCount = 0;
+        //   //        iACount = 0;
+        //   //        foreach (Characteristic oChar in oCase.Charecteristics.CharColl)
+        //   //        {
+        //   //            icharid[iACount] = Convert.ToInt32(oChar.CharId);
+        //   //            icharavailcd[iACount] = Convert.ToInt32(oChar.CharAvailCd);
+        //   //            ichartypeid[iACount] = Convert.ToInt32(oChar.CharTypeId);
+        //   //            icharvalue[iACount] = oChar.CharValue2;
+        //   //            ichardetailvalidcd[iACount] = Convert.ToInt32(oChar.ValidCd);
+        //   //            iACount = iACount + 1;
+        //   //            iCharCount = iCharCount + 1;
+
+        //   //        }
+        //   //        if (iCharCount <= 0)
+        //   //        {
+        //   //            pCharCount[iCount] = 1;
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            pCharCount[iCount] = iCharCount;
+        //   //        }
+        //   //        if (pchardetailvalidcd.Length != 0)
+        //   //        {
+        //   //            iTemp = pchardetailvalidcd.Length + ichardetailvalidcd.Length;
+        //   //            pTemp = new Int32[pchardetailvalidcd.Length];
+        //   //            pTemp = pchardetailvalidcd;
+        //   //            pchardetailvalidcd = new Int32[iTemp];
+        //   //            for (int i = 0; i < pTemp.Length; i++)
+        //   //            {
+        //   //                pchardetailvalidcd[i] = pTemp[i];
+        //   //            }
+        //   //            for (int j = 0; j < ichardetailvalidcd.Length; j++)
+        //   //            {
+        //   //                pchardetailvalidcd[pTemp.Length + j] = ichardetailvalidcd[j];
+        //   //            }
+
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            pchardetailvalidcd = new Int32[ichardetailvalidcd.Length];
+        //   //            pchardetailvalidcd = ichardetailvalidcd;
+        //   //        }
+        //   //        if (pcharvalue.Length != 0)
+        //   //        {
+        //   //            iTemp = pcharvalue.Length + icharvalue.Length;
+        //   //            strTemplong = new String[pcharvalue.Length];
+        //   //            strTemplong = pcharvalue;
+        //   //            pcharvalue = new String[iTemp];
+        //   //            for (int i = 0; i < strTemplong.Length; i++)
+        //   //            {
+        //   //                pcharvalue[i] = strTemplong[i];
+        //   //            }
+        //   //            for (int j = 0; j < icharvalue.Length; j++)
+        //   //            {
+        //   //                pcharvalue[strTemplong.Length + j] = icharvalue[j];
+        //   //            }
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            pcharvalue = new String[icharvalue.Length];
+        //   //            pcharvalue = icharvalue;
+        //   //        }
+
+        //   //        if (pchartypeid.Length != 0)
+        //   //        {
+        //   //            iTemp = pchartypeid.Length + ichartypeid.Length;
+        //   //            pTemp = new Int32[pchartypeid.Length];
+        //   //            pTemp = pchartypeid;
+        //   //            pchartypeid = new Int32[iTemp];
+        //   //            for (int i = 0; i < pTemp.Length; i++)
+        //   //            {
+        //   //                pchartypeid[i] = pTemp[i];
+        //   //            }
+        //   //            for (int j = 0; j < ichartypeid.Length; j++)
+        //   //            {
+        //   //                pchartypeid[pTemp.Length + j] = ichartypeid[j];
+        //   //            }
+
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            pchartypeid = new Int32[ichartypeid.Length];
+        //   //            pchartypeid = ichartypeid;
+        //   //        }
+
+        //   //        if (pcharavailcd.Length != 0)
+        //   //        {
+        //   //            iTemp = pcharavailcd.Length + icharavailcd.Length;
+        //   //            pTemp = new Int32[pcharavailcd.Length];
+        //   //            pTemp = pcharavailcd;
+        //   //            pcharavailcd = new Int32[iTemp];
+        //   //            for (int i = 0; i < pTemp.Length; i++)
+        //   //            {
+        //   //                pcharavailcd[i] = pTemp[i];
+        //   //            }
+        //   //            for (int j = 0; j < icharavailcd.Length; j++)
+        //   //            {
+        //   //                pcharavailcd[pTemp.Length + j] = icharavailcd[j];
+        //   //            }
+
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            pcharavailcd = new Int32[icharavailcd.Length];
+        //   //            pcharavailcd = icharavailcd;
+        //   //        }
+
+        //   //        if (pcharid.Length != 0)
+        //   //        {
+        //   //            iTemp = pcharid.Length + icharid.Length;
+        //   //            pTemp = new Int32[pcharid.Length];
+        //   //            pTemp = pcharid;
+        //   //            pcharid = new Int32[iTemp];
+        //   //            for (int i = 0; i < pTemp.Length; i++)
+        //   //            {
+        //   //                pcharid[i] = pTemp[i];
+        //   //            }
+        //   //            for (int j = 0; j < icharid.Length; j++)
+        //   //            {
+        //   //                pcharid[pTemp.Length + j] = icharid[j];
+        //   //            }
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            pcharid = new Int32[icharid.Length];
+        //   //            pcharid = icharid;
+        //   //        }
+
+        //   //        if (oCase.Charecteristics.AccessSuppliers.Count > 0)
+        //   //        {
+        //   //            iaccesssupplierid = new Int32[oCase.Charecteristics.AccessSuppliers.Count];
+        //   //            iaccesssuppliervalid = new Int32[oCase.Charecteristics.AccessSuppliers.Count];
+        //   //            iACount = 0;
+        //   //            foreach (AccessSuppChar oAccessSupp in oCase.Charecteristics.AccessSuppliers)
+        //   //            {
+        //   //                iaccesssupplierid[iACount] = oAccessSupp.SupplierId;
+        //   //                iaccesssuppliervalid[iACount] = Convert.ToInt32(oAccessSupp.SupplierValidCd);
+        //   //                iAccessSuppCount = iAccessSuppCount + 1;
+        //   //                iACount = iACount + 1;
+        //   //            }
+        //   //            if (paccesssuppliervalid.Length != 0)
+        //   //            {
+        //   //                iTemp = paccesssuppliervalid.Length + iaccesssuppliervalid.Length;
+        //   //                pTemp = new Int32[iaccesssuppliervalid.Length];
+        //   //                pTemp = paccesssuppliervalid;
+        //   //                paccesssuppliervalid = new Int32[iTemp];
+        //   //                for (int i = 0; i < pTemp.Length; i++)
+        //   //                {
+        //   //                    paccesssuppliervalid[i] = pTemp[i];
+        //   //                }
+        //   //                for (int j = 0; j < iaccesssuppliervalid.Length; j++)
+        //   //                {
+        //   //                    paccesssuppliervalid[pTemp.Length + j] = iaccesssuppliervalid[j];
+        //   //                }
+        //   //            }
+        //   //            else
+        //   //            {
+        //   //                paccesssuppliervalid = new Int32[iaccesssuppliervalid.Length];
+        //   //                paccesssuppliervalid = iaccesssuppliervalid;
+        //   //            }
+        //   //            if (paccesssupplierid.Length != 0)
+        //   //            {
+        //   //                iTemp = paccesssupplierid.Length + iaccesssupplierid.Length;
+        //   //                pTemp = new Int32[iaccesssupplierid.Length];
+        //   //                pTemp = paccesssupplierid;
+        //   //                paccesssupplierid = new Int32[iTemp];
+        //   //                for (int i = 0; i < pTemp.Length; i++)
+        //   //                {
+        //   //                    paccesssupplierid[i] = pTemp[i];
+        //   //                }
+        //   //                for (int j = 0; j < iaccesssupplierid.Length; j++)
+        //   //                {
+        //   //                    paccesssupplierid[pTemp.Length + j] = iaccesssupplierid[j];
+        //   //                }
+        //   //            }
+        //   //            else
+        //   //            {
+        //   //                paccesssupplierid = new Int32[iaccesssupplierid.Length];
+        //   //                paccesssupplierid = iaccesssupplierid;
+        //   //            }
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            if (iAccessSuppCount <= 0)
+        //   //            {
+        //   //                pAccessSupplierCount[iCount] = 1;
+        //   //            }
+        //   //            else
+        //   //            {
+        //   //                pAccessSupplierCount[iCount] = iAccessSuppCount;
+        //   //            }
+
+        //   //        }
+
+        //   //        //  }
+
+
+        //   //        iCount = iCount + 1;
+        //   //    }
+        //   //    DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //   //    String[] strOutput = new String[1];
+        //   //    strOutput = oDataAccess.UpdateSelectionsAccess(oMcuSessionData.UserId, iPopId, iCaseId, pavailcd, pcasevalidcd, pcharid, pcharavailcd, pchartypeid, pcharvalue, pchardetailvalidcd, pCharCount);
+        //   //    return strOutput;
+        //   //}
+
+        //   //1.6 ends
+        //   //2.0 Modify ends
+        //   //2.3 Add Begins
+        //   //To get the case id's for Bandwidth for selected hub sites    
+        //   public DataSet GetMultipointCase(int iProductCd,int iSubProductCd, int[] POPlist, int[] iSelSpeed)
+        //   {
+        //       DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //       DataSet dsData = new DataSet();
+        //       try
+        //       {
+        //           dsData = oDataAccess.RetrieveMultiPointCaseData(iProductCd,iSubProductCd,POPlist,iSelSpeed);
+        //       }
+        //       catch
+        //       {
+        //           throw;
+        //       }
+        //       return dsData;
+
+        //   }
+
+        //   //R32:Vikas-Overloaded below function to include PortSpeed as input
+        //   //public void AddAllMultiPointPops(DataSet dsRetreivalInfo, Int32 iProductCd, Int32 iSubProductCd, MCUSession oMcuSessionData, int[] aiSelectedPortSpeeds, PortSpeed oPortSpeed)
+        //   //{
+        //   //    CacheManager mCache = new CacheManager();
+        //   //    CaseData oCase = null;
+        //   //    DataSet dsRegionInfo = new DataSet();
+        //   //    DataView dvRegionInfo = new DataView();
+        //   //    DataView dvCountryInfo = new DataView();
+        //   //    //2.5 starts
+        //   //    DataView dvState = new DataView();
+        //   //    DataView dvCity = new DataView();
+        //   //    //2.5 ends
+        //   //    dsRegionInfo = mCache.retrieveDataset("RegionInfoCache" + oMcuSessionData.CacheId, "", dsRegionInfo.GetType());
+        //   //    dvRegionInfo = dsRegionInfo.Tables[0].DefaultView;
+        //   //    dvCountryInfo = dsRegionInfo.Tables[1].DefaultView;
+
+        //   //    //2.5 starts
+        //   //    dvState = dsRegionInfo.Tables[3].DefaultView;
+        //   //    dvCity = dsRegionInfo.Tables[4].DefaultView;
+        //   //    //2.5 ends
+
+        //   //    foreach (DataRow dr in dsRetreivalInfo.Tables[0].Rows)
+        //   //    {            
+        //   //        dvRegionInfo.RowFilter = "Region_Id=" + dr["Region_Id"].ToString();
+        //   //        //2.5 starts
+        //   //        //dvCountryInfo.RowFilter = "Country_Id=" + dr["ParentId"].ToString();
+        //   //        dvCountryInfo.RowFilter = "Country_Id=" + dr["country_id"].ToString();
+        //   //        dvState.RowFilter = "State_province_id=" + dr["state_province_id"].ToString();
+        //   //        dvCity.RowFilter = "city_id=" + dr["parentid"].ToString();
+        //   //        //2.5 ends
+        //   //        if (dr["HasCase"].ToString() == "0")
+        //   //        {
+        //   //            //R32:Vikas-Changed below loop to foreach of oPortSpeed.PortSpeedColl.Count
+        //   //            //instead of for i=0;aiSelectedPortSpeeds.Length
+        //   //            int i = 0;
+        //   //            foreach (PortSpeedChar psChar in oPortSpeed.PortSpeedColl)
+        //   //            {
+        //   //                oCase = new CaseData();
+        //   //                oCase.CaseId = 0;
+        //   //                oCase.AccessSpeedCharId = aiSelectedPortSpeeds[i];
+        //   //                oCase.Pop.CountryId = Convert.ToInt32(dr["ParentId"].ToString());
+        //   //                oCase.Pop.CountryName = dvCountryInfo[0]["Country_Name"].ToString();
+        //   //                oCase.ProductCd = iProductCd;
+        //   //                oCase.SubProductCd = iSubProductCd;
+        //   //                oCase.Pop.RegionId = Convert.ToInt32(dr["Region_Id"].ToString());
+        //   //                oCase.Pop.RegionName = dvRegionInfo[0]["Region_Name"].ToString();
+        //   //                oCase.Pop.PopSiteId = Convert.ToInt32(dr["Hub_Site_Id"].ToString());
+        //   //                oCase.Pop.PopSiteName = dr["Hub_Site_Name"].ToString();
+        //   //                //2.5 starts
+        //   //                oCase.Pop.CityId = Convert.ToInt32(dvCity[0]["city_id"]);
+        //   //                oCase.Pop.CityName = dvCity[0]["city_name"].ToString();
+        //   //                if (dvState.Count != 0)
+        //   //                {
+        //   //                    oCase.Pop.StateID = Convert.ToInt32(dvState[0]["state_province_id"]);
+        //   //                    oCase.Pop.Statename = dvState[0]["state_province_name"].ToString();
+        //   //                }
+        //   //                //2.5 ends
+        //   //                //R32:Vikas Map 7 new attributes from portSpeed to Ocase
+        //   //                oCase.PortAvailabilityName = psChar.PortAvailabilityName;
+        //   //                oCase.PortAvailability = psChar.PortAvailability;
+        //   //                oCase.validPort = psChar.validPort;
+        //   //                oCase.ValidPortName = psChar.ValidPortName;
+        //   //                oCase.LeadTime = psChar.LeadTime;
+        //   //                oCase.Carrier = psChar.Carrier;
+        //   //                oCase.CarrierName = psChar.CarrierName;
+        //   //                //R32:End
+        //   //                CaseArray.AddMultiPointCase(oCase);
+        //   //                i++;
+        //   //            }
+        //   //            continue;
+        //   //        }
+        //   //        else
+        //   //        {
+        //   //            //Added newly for each loop below. 
+        //   //            //R32:Vikas-Changed below loop to foreach of oPortSpeed.PortSpeedColl.Count
+        //   //            //instead of for i=0;aiSelectedPortSpeeds.Length               
+        //   //            foreach (PortSpeedChar psChar in oPortSpeed.PortSpeedColl)
+        //   //            {
+        //   //                if (psChar.CharId == Convert.ToInt32(dr["access_speed_char_id"].ToString()))
+        //   //                {
+        //   //                    oCase = new CaseData();
+        //   //                    oCase.CaseId = Convert.ToInt32(dr["CaseId"].ToString());
+        //   //                    oCase.AccessSpeedCharId = Convert.ToInt32(dr["access_speed_char_id"].ToString());
+        //   //                    oCase.Pop.CountryId = Convert.ToInt32(dr["ParentId"].ToString());
+        //   //                    oCase.Pop.CountryName = dvCountryInfo[0]["Country_Name"].ToString();
+        //   //                    oCase.ProductCd = iProductCd;
+        //   //                    oCase.SubProductCd = iSubProductCd;
+        //   //                    oCase.Pop.RegionId = Convert.ToInt32(dr["Region_Id"].ToString());
+        //   //                    oCase.Pop.RegionName = dvRegionInfo[0]["Region_Name"].ToString();
+        //   //                    oCase.Pop.PopSiteId = Convert.ToInt32(dr["Hub_Site_Id"].ToString());
+        //   //                    oCase.Pop.PopSiteName = dr["Hub_Site_Name"].ToString();
+        //   //                    //2.5 starts
+        //   //                    oCase.Pop.CityId = Convert.ToInt32(dvCity[0]["city_id"]);
+        //   //                    oCase.Pop.CityName = dvCity[0]["city_name"].ToString();
+        //   //                    if (dvState.Count != 0)
+        //   //                    {
+        //   //                        oCase.Pop.StateID = Convert.ToInt32(dvState[0]["state_province_id"]);
+        //   //                        oCase.Pop.Statename = dvState[0]["state_province_name"].ToString();
+        //   //                    }
+        //   //                    //2.5 ends
+        //   //                    //R32:Vikas Map 7 new attributes from portSpeed to Ocase
+        //   //                    oCase.PortAvailabilityName = psChar.PortAvailabilityName;
+        //   //                    oCase.PortAvailability = psChar.PortAvailability;
+        //   //                    oCase.validPort = psChar.validPort;
+        //   //                    oCase.ValidPortName = psChar.ValidPortName;
+        //   //                    oCase.LeadTime = psChar.LeadTime;
+        //   //                    oCase.Carrier = psChar.Carrier;
+        //   //                    oCase.CarrierName = psChar.CarrierName;
+        //   //                    //R32:End
+        //   //                    CaseArray.AddMultiPointCase(oCase);
+        //   //                }                   
+        //   //            }
+        //   //        }
+
+        //   //    }
+
+        //   //}
+        //   //2.3 Add ends
+
+        //   //added for GSCE-85484 
+        //   public void AddPopsHvpn(DataSet dsRegionInfo, Int32 iAction, String strSelection, String strType,Int32 iProductCd, Int32 iSubProductCd, String parent, Int32 pValid)
+        //   //2.5 ends
+        //   {
+        //    DataView dvSelect = new DataView();    
+        //    DataView dvRegionInfo = new DataView();
+        //    DataView dvCountryInfo = new DataView();
+        //    DataView dvSelect1 = new DataView();
+        //    dvRegionInfo = dsRegionInfo.Tables[0].DefaultView;
+        //    dvCountryInfo = dsRegionInfo.Tables[1].DefaultView;
+        //    //2.5 ends
+        //    DataView dvState = new DataView();
+        //    DataView dvCity = new DataView();
+
+        //    dvSelect = dsRegionInfo.Tables[2].DefaultView;
+
+        //    string vars;
+
+        //     vars = " and 1=1";
+
+        //    switch (strType)
+        //    {
+        //     case "Co":
+        //      dvSelect.RowFilter = "Region_id =" + strSelection + vars;
+        //      break;
+
+        //     //2.5 ends
+        //     case "gpop":
+        //      dvSelect.RowFilter = "Parentid =" + strSelection + vars;
+        //      break;
+        //     case "":
+        //      //Added on 25/8/07 for issue 18492
+
+        //       dvSelect.RowFilter = "Hub_Site_id =" + strSelection + vars;
+
+        //      //addition ends
+        //      break;
+        //    }
+
+        //    if (iAction == 1)
+        //    {
+        //     dvRegionInfo.RowFilter = "Region_Id=" + dvSelect[0]["Region_Id"].ToString();
+        //     CaseData oCase;
+        //     for (int i = 0; i < dvSelect.Count; i++)
+        //     {   //2.5 starts
+        //      //dvCountryInfo.RowFilter = "Country_Id=" + dvSelect[i]["ParentId"].ToString();
+        //      dvCountryInfo.RowFilter = "Country_Id=" + dvSelect[i]["parentid"].ToString();
+
+        //      //2.5 ends
+        //      if (dvCountryInfo.Count == 0)
+        //      {
+        //       continue;
+        //      }
+        //      oCase = new CaseData();
+
+        //       oCase.CaseId = Convert.ToInt32(dvSelect[i]["CaseId"].ToString());
+        //       oCase.CaseValidCd = Convert.ToInt32(dvSelect[i]["CaseValidCd"].ToString());
+        //       oCase.CaseAvailCd = Convert.ToInt32(dvSelect[i]["AVAILABILITY"].ToString());
+        //       oCase.Pop.PopSiteValidCd = Convert.ToInt32(dvSelect[i]["casevalidcd"].ToString());
+
+        //      oCase.Pop.CountryId = Convert.ToInt32(dvSelect[i]["parentid"].ToString());
+        //      oCase.Pop.CountryName = dvCountryInfo[0]["Country_Name"].ToString();
+        //      oCase.ProductCd = iProductCd;
+        //      oCase.SubProductCd = iSubProductCd;
+        //      oCase.Pop.RegionId = Convert.ToInt32(dvSelect[i]["Region_Id"].ToString());
+        //      oCase.Pop.RegionName = dvRegionInfo[0]["Region_Name"].ToString();
+        //      oCase.Pop.PopSiteId = Convert.ToInt32(dvSelect[i]["Hub_Site_Id"].ToString());
+        //      oCase.Pop.PopSiteName = dvSelect[i]["Hub_Site_Name"].ToString();
+        //      oCase.Pop.PopType = dvSelect[i]["pop_type"].ToString();
+
+        //      CaseArray.AddHvpn(oCase);
+
+        //     }
+
+        //    }
+        //    else
+        //    {
+        //     CaseData oCase;
+        //     for (int i = 0; i < dvSelect.Count; i++)
+        //     {
+        //      oCase = new CaseData();
+
+        //         oCase = CaseArray.GetCaseHvpn(Convert.ToInt32(dvSelect[i]["Hub_Site_Id"].ToString()), iProductCd, iSubProductCd);
+
+        //       if (oCase != null)
+        //        {
+        //         CaseArray.Remove(oCase);
+        //        }
+        //       }
+
+        //      }
+
+        //     }
+
+
+        //   public String[] UpdateCasesHVPN(MCUSession oMcuSessionData)
+        //   {
+        //    ArrayList iPopId = new ArrayList();
+        //    ArrayList iCaseId = new ArrayList();
+        //    ArrayList pavailcd = new ArrayList();
+        //    ArrayList pcasevalidcd = new ArrayList();
+        //    ArrayList pcharid = new ArrayList();
+        //    ArrayList pcharavailcd = new ArrayList();
+        //    ArrayList pchartypeid = new ArrayList();
+        //    ArrayList pcharvalue = new ArrayList();
+        //    ArrayList pchardetailvalidcd = new ArrayList();
+        //    ArrayList poffnetleadtime = new ArrayList();
+        //    ArrayList pportspeedcharid = new ArrayList();
+        //    ArrayList paccessspeedcharid = new ArrayList();
+        //    ArrayList psuppliercharid = new ArrayList();
+        //    ArrayList ptypecharid = new ArrayList();
+        //    ArrayList pnamecharid = new ArrayList();
+        //    ArrayList pportavailability = new ArrayList();
+        //    ArrayList paccessavailability = new ArrayList();
+        //    ArrayList pportvalidity = new ArrayList();
+        //    ArrayList pparentportspeeds = new ArrayList();
+        //    ArrayList pparentportspeedvalid = new ArrayList();
+        //    ArrayList pparentaccessproducttypeid = new ArrayList();
+        //    ArrayList pparentaccesssuppliernameid = new ArrayList();
+        //    ArrayList pparentaccesssuppliercharid = new ArrayList();
+        //    ArrayList pparentaccessspeedcharid = new ArrayList();
+        //    ArrayList paccesssupplierid = new ArrayList();
+        //    ArrayList paccesssuppliervalid = new ArrayList();
+        //    ArrayList pCharCount = new ArrayList();
+        //    ArrayList pAccessSupplierCount = new ArrayList();
+        //    ArrayList pParentportSpeedCount = new ArrayList();
+        //    ArrayList pcharvalue2 = new ArrayList();
+        //    ArrayList pCarrier = new ArrayList();
+        //    ArrayList pCPESupplier = new ArrayList();
+        //    ArrayList pportspeedcharcount = new ArrayList();
+        //    ArrayList paccessspeedcharcount = new ArrayList();
+
+        //    Int32 iInnerCount = 0;
+        //    Int32 iInnerAccessCount = 0;
+        //    Int32 iCharCount = 0;
+        //    Int32 iAccessSuppCount = 0;
+        //    Int32 iParentPortCount = 0;
+        //    String strTemporary = String.Empty;
+
+        //    foreach (CaseData oCase in CaseArray)
+        //    {
+        //     switch (oMcuSessionData.LocLevel)
+        //     {
+        //      case 2:
+        //       iPopId.Add(oCase.CountrySite.CountryId);
+        //       break;
+        //      case 3:
+        //       iPopId.Add(oCase.CitySite.CityId);
+        //       pCPESupplier.Add(oCase.CitySite.AccessSupplierCharId);
+        //       break;
+        //      case 4:
+        //       iPopId.Add(oCase.Pop.PopSiteId);
+        //       break;
+        //     }
+        //     iCaseId.Add(oCase.CaseId);
+        //     pavailcd.Add(oCase.CaseAvailCd);
+        //     pcasevalidcd.Add(oCase.CaseValidCd);
+        //     pCarrier.Add(oCase.AccessSupplierCharId);     
+
+        //     foreach (PortSpeedChar oPortSpeed in oCase.PortSpeeds.PortSpeedColl)
+        //     {
+        //      pportspeedcharid.Add(oPortSpeed.CharId);
+        //      pportavailability.Add(oPortSpeed.CharAvailCd);
+        //      pportvalidity.Add(oPortSpeed.ValidCd);
+        //      //R32 : Mapped LeadTime correctly
+        //      poffnetleadtime.Add(oPortSpeed.LeadTime);
+
+        //      foreach (AccessSuppChar oAccess in oPortSpeed.AccessSupps.AccessSuppColl)
+        //      {
+        //       //R32 : Mapped AccessAvailability correctly
+        //       paccessavailability.Add(Convert.ToInt32(oPortSpeed.AccessAvailability));
+        //       paccessspeedcharid.Add(oAccess.AccessId);
+        //       psuppliercharid.Add(oAccess.SupplierId);
+        //       ptypecharid.Add(oAccess.AccessTypeId);
+        //       pnamecharid.Add(oAccess.SupplierNameId);
+        //       iInnerAccessCount = iInnerAccessCount + 1;
+        //      }
+        //      paccessspeedcharcount.Add(iInnerAccessCount);
+        //      iInnerCount = iInnerCount + 1;
+
+        //     }
+        //     pportspeedcharcount.Add(iInnerCount);
+
+        //     foreach (Characteristic oChar in oCase.Charecteristics.CharColl)
+        //     {
+        //      pcharid.Add(oChar.CharId);
+        //      pcharavailcd.Add(oChar.CharAvailCd);
+        //      pchartypeid.Add(oChar.CharTypeId);
+        //      pcharvalue.Add(oChar.CharValue);
+        //      pcharvalue2.Add(oChar.CharValue2);
+        //      pchardetailvalidcd.Add(oChar.ValidCd);
+
+        //      iCharCount = iCharCount + 1;
+
+        //     }
+        //     if (iCharCount <= 0)
+        //     {
+        //      pCharCount.Add(1);
+        //     }
+        //     else
+        //     {
+        //      pCharCount.Add(iCharCount);
+        //     }
+
+        //     if (oCase.Charecteristics.AccessSuppliers.Count > 0)
+        //     {
+        //      foreach (AccessSuppChar oAccessSupp in oCase.Charecteristics.AccessSuppliers)
+        //      {
+        //       paccesssupplierid.Add(oAccessSupp.SupplierId);
+        //       paccesssuppliervalid.Add(oAccessSupp.SupplierValidCd);
+        //       iAccessSuppCount = iAccessSuppCount + 1;
+
+        //      }
+        //     }
+        //     if (iAccessSuppCount <= 0)
+        //     {
+        //      pAccessSupplierCount.Add(1);
+        //     }
+        //     else
+        //     {
+        //      pAccessSupplierCount.Add(iAccessSuppCount);
+        //     }
+
+
+        //     if (oCase.Charecteristics.ParentPortSpeed.Count > 0)
+        //     {
+        //      String[] strTemp = new String[5];
+        //      foreach (PortSpeedChar oPortSpeed in oCase.Charecteristics.ParentPortSpeed)
+        //      {
+        //       strTemp = oPortSpeed.CharDesc.Split('/');
+        //       pparentportspeeds.Add(Convert.ToInt32(strTemp[0]));
+        //       pparentportspeedvalid.Add(oPortSpeed.ValidCd);
+        //       pparentaccessproducttypeid.Add(Convert.ToInt32(strTemp[3]));
+        //       pparentaccesssuppliernameid.Add(Convert.ToInt32(strTemp[4]));
+        //       pparentaccesssuppliercharid.Add(Convert.ToInt32(strTemp[2]));
+        //       pparentaccessspeedcharid.Add(Convert.ToInt32(strTemp[1]));
+        //       iParentPortCount = iParentPortCount + 1;
+        //      }
+        //     }
+        //     if (iParentPortCount <= 0)
+        //     {
+        //      pParentportSpeedCount.Add(1);
+        //     }
+        //     else
+        //     {
+        //      pParentportSpeedCount.Add(iParentPortCount);
+        //     }
+        //    }
+
+        //    DataRetrieval_V oDataAccess = new DataRetrieval_V(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+        //    String[] strOutput = new String[1];
+
+
+        //    strOutput = oDataAccess.UpdateSelectionsHVPN(oMcuSessionData.LocLevel, oMcuSessionData.ProductCd, oMcuSessionData.SubProductCd, oMcuSessionData.UserId, iPopId.ToArray(iInnerAccessCount.GetType()), iCaseId.ToArray(iInnerAccessCount.GetType()), pavailcd.ToArray(iInnerAccessCount.GetType()), pcasevalidcd.ToArray(iInnerAccessCount.GetType()), pcharid.ToArray(iInnerAccessCount.GetType()), pcharavailcd.ToArray(iInnerAccessCount.GetType()), pchartypeid.ToArray(iInnerAccessCount.GetType()), pcharvalue.ToArray(strTemporary.GetType()), pcharvalue2.ToArray(strTemporary.GetType()), pportspeedcharid.ToArray(iInnerAccessCount.GetType()), paccessspeedcharid.ToArray(iInnerAccessCount.GetType()), psuppliercharid.ToArray(iInnerAccessCount.GetType()), ptypecharid.ToArray(iInnerAccessCount.GetType()), pnamecharid.ToArray(iInnerAccessCount.GetType()), pportavailability.ToArray(iInnerAccessCount.GetType()), paccessavailability.ToArray(iInnerAccessCount.GetType()), pportvalidity.ToArray(iInnerAccessCount.GetType()), pportspeedcharcount.ToArray(iInnerAccessCount.GetType()), paccessspeedcharcount.ToArray(iInnerAccessCount.GetType()), pchardetailvalidcd.ToArray(iInnerAccessCount.GetType()), poffnetleadtime.ToArray(strTemporary.GetType()), paccesssupplierid.ToArray(iInnerAccessCount.GetType()), paccesssuppliervalid.ToArray(iInnerAccessCount.GetType()), pparentportspeeds.ToArray(iInnerAccessCount.GetType()), pparentportspeedvalid.ToArray(iInnerAccessCount.GetType()), pparentaccessproducttypeid.ToArray(iInnerAccessCount.GetType()), pparentaccesssuppliernameid.ToArray(iInnerAccessCount.GetType()), pparentaccesssuppliercharid.ToArray(iInnerAccessCount.GetType()), pparentaccessspeedcharid.ToArray(iInnerAccessCount.GetType()), pCharCount.ToArray(iInnerAccessCount.GetType()), pAccessSupplierCount.ToArray(iInnerAccessCount.GetType()), pParentportSpeedCount.ToArray(iInnerAccessCount.GetType()), pCarrier.ToArray(iInnerAccessCount.GetType()), pCPESupplier.ToArray(iInnerAccessCount.GetType()));
+
+        //    return strOutput;
+
+        //   }
+        ////ended GSCE-85484 
+
+
+        public String[] UpdateCasesHVPN(int LocLevel,
+              int ProductCd,
+              int SubProductCd,
+           string UserId,
+            int[] iPopId,
+            int[] iCaseId,
+            int[] pavailcd,
+            int[] pcasevalidcd,
+            int[] pcharid,
+            int[] pcharavailcd,
+            int[] pchartypeid,
+            string[] pcharvalue,
+            string[] pcharvalue2,
+            int[] pportspeedcharid,
+            int[] paccessspeedcharid,
+            int[] psuppliercharid,
+            int[] ptypecharid,
+            int[] pnamecharid,
+            int[] pportavailability,
+            int[] pportvalidity,
+            int[] pportspeedcharcount,
+            int[] paccessspeedcharcount,
+            int[] pchardetailvalidcd,
+         string[] poffnetleadtime,
+            int[] paccesssupplierid,
+            int[] paccesssuppliervalid,
+            int[] pparentportspeeds,
+            int[] pparentportspeedvalid,
+            int[] pparentaccessproducttypeid,
+            int[] pparentaccesssuppliernameid,
+            int[] pparentaccesssuppliercharid,
+            int[] pparentaccessspeedcharid,
+            int[] pCharCount,
+            int[] pAccessSupplierCount,
+            int[] pParentportSpeedCount,
+            int[] pCarrier,
+            int[] pCPESupplier,
+            int[] strInsertCaseIds,
+            int[] strRemoveCaseIds,
+            int[] pPlatformcharid,
+            int[] pCountryID,
+            int[] paccessavailability)
+        {
+            DataRetrieval_V oDataAccess = new DataRetrieval_V(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            String[] strOutput = new String[1];
+            strOutput = oDataAccess.UpdateSelectionsHVPN(LocLevel,ProductCd,SubProductCd, UserId,
+               iPopId, iCaseId, pavailcd, pcasevalidcd, pcharid, pcharavailcd, pchartypeid, pcharvalue, pcharvalue2,
+               pportspeedcharid, paccessspeedcharid, psuppliercharid, ptypecharid, pnamecharid, 
+               pportavailability, paccessavailability, pportvalidity, pportspeedcharcount, paccessspeedcharcount, pchardetailvalidcd, poffnetleadtime, paccesssupplierid, paccesssuppliervalid, pparentportspeeds, pparentportspeedvalid, pparentaccessproducttypeid, pparentaccesssuppliernameid, pparentaccesssuppliercharid, pparentaccessspeedcharid, pCharCount, pAccessSupplierCount, pParentportSpeedCount, pCarrier, pCPESupplier);
+             return strOutput;
+        }
+
+
+
+
+        public string[] UpdateCases(
+              int LocLevel,
+              int ProductCd,
+              int SubProductCd,
+           string UserId,
+            int[] iPopId,
+            int[] iCaseId,
+            int[] pavailcd,
+            int[] pcasevalidcd,
+            int[] pcharid,
+            int[] pcharavailcd,
+            int[] pchartypeid,
+            string[] pcharvalue,
+            string[] pcharvalue2,
+            int[] pportspeedcharid,
+            int[] paccessspeedcharid,
+            int[] psuppliercharid,
+            int[] ptypecharid,
+            int[] pnamecharid,
+            int[] pportavailability,
+            int[] pportvalidity,
+            int[] pportspeedcharcount,
+            int[] paccessspeedcharcount,
+            int[] pchardetailvalidcd,
+         string[] poffnetleadtime,
+            int[] paccesssupplierid,
+            int[] paccesssuppliervalid,
+            int[] pparentportspeeds,
+            int[] pparentportspeedvalid,
+            int[] pparentaccessproducttypeid,
+            int[] pparentaccesssuppliernameid,
+            int[] pparentaccesssuppliercharid,
+            int[] pparentaccessspeedcharid,
+            int[] pCharCount,
+            int[] pAccessSupplierCount,
+            int[] pParentportSpeedCount,
+            int[] pCarrier,
+            int[] pCPESupplier,
+            int[] strInsertCaseIds,
+            int[] strRemoveCaseIds,
+            int[] pPlatformcharid,
+            int[] pCountryID
+            )
+        {
+
+
+            DataRetrieval oDataAccess = new DataRetrieval(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            string[] strOutput = oDataAccess.UpdateSelections(LocLevel, ProductCd, SubProductCd,
+                UserId,
+                iPopId,
+                iCaseId,
+                pavailcd,
+                pcasevalidcd,
+                pcharid,
+                pcharavailcd,
+                pchartypeid,
+                pcharvalue,
+                pcharvalue2,
+                pportspeedcharid,
+                paccessspeedcharid,
+                psuppliercharid,
+                ptypecharid,
+                pnamecharid,
+                pportavailability,
+                pportvalidity,
+                pportspeedcharcount,
+                paccessspeedcharcount,
+                pchardetailvalidcd,
+                poffnetleadtime,
+                paccesssupplierid,
+                paccesssuppliervalid,
+                pparentportspeeds,
+                pparentportspeedvalid,
+                pparentaccessproducttypeid,
+                pparentaccesssuppliernameid,
+                pparentaccesssuppliercharid,
+                pparentaccessspeedcharid,
+                pCharCount,
+                pAccessSupplierCount,
+                pParentportSpeedCount,
+                pCarrier,
+                pCPESupplier);
+
+            //Inserting Exceptions
+            if (ptypecharid.Length == 0)
+            {
+                ptypecharid = new Int32[1];
+                ptypecharid[0] = 0;
+            }
+
+            if (psuppliercharid.Length == 0)
+            {
+                psuppliercharid = new Int32[1];
+                psuppliercharid[0] = 0;
+            }
+
+            if (pnamecharid.Length == 0)
+            {
+                pnamecharid = new Int32[1];
+                pnamecharid[0] = 0;
+            }
+
+            if (strInsertCaseIds.Length > 0 || strRemoveCaseIds.Length > 0)
+            {
+                InsertProductExceptions(strInsertCaseIds, strRemoveCaseIds, pPlatformcharid, pCountryID, ptypecharid[0], pportspeedcharid, ProductCd, psuppliercharid[0], pnamecharid[0], paccessspeedcharid);
+            }
+
+            return strOutput;
+        }
+    }
+}

@@ -1,0 +1,765 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Services;
+using SCAdminBAL;
+using SCAdminBAL.GlobalReferences;
+
+namespace SCAdmin
+{
+    public partial class GlobalReference : System.Web.UI.Page
+    {
+        const int C_PORT_SPEED = 28;
+        const int C_ACCESS_SPEED = 27;
+        const string C_HVPN_PORT_SPEED = "PORT SPEEDS(DOWN/UP)";
+        const string C_ACCESS_SPEED_DOWN_UP = "ACCESS SPEED (D/U)";
+        const int C_ACCESS_TYPE = 581;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        [WebMethod]
+        public static List<AvailabilityGrid> GetGridAvailabilityDetails()
+        {
+            AdminAvailabilityViewBAL objAdminAvialGet = new AdminAvailabilityViewBAL();
+            return objAdminAvialGet.GetGridAvailabilityDetails();
+        }
+        [WebMethod]
+        public static int GetMaxAvailCD()
+        {
+            AdminAvailabilityViewBAL objAdminAvialGet = new AdminAvailabilityViewBAL();
+            return objAdminAvialGet.GetMaxAvailCD();
+        }
+
+
+
+        [WebMethod]
+        public static int InsertAdminAvail(string strAvailCd, string strAvailDesc, string strAvailAbbr, string strAvailValidCd, string User_id)
+        {
+
+            AdminAvailabilityViewBAL objAdminAvialInsert = new AdminAvailabilityViewBAL();
+
+            int count = objAdminAvialInsert.InsertAdminAvail(strAvailCd, strAvailDesc, strAvailAbbr, strAvailValidCd, User_id);
+
+            return count;
+        }
+
+        [WebMethod]
+        public static int DeleteAdminAvail(string strAvailCd)
+        {
+            AdminAvailabilityViewBAL objAdminAvialDelete = new AdminAvailabilityViewBAL();
+            return objAdminAvialDelete.DeleteAdminAvail(strAvailCd);
+
+        }
+
+        [WebMethod]
+        public static List<AvailabilityGrid> PopupGridAdminAvail(string AvailValidCd)
+        {
+            AdminAvailabilityViewBAL objAdminAvialDelete = new AdminAvailabilityViewBAL();
+            return objAdminAvialDelete.PopupGridAdminAvail(AvailValidCd);
+
+        }
+
+        [WebMethod]
+        public static int UpdateAdminAvail(string strAvailDesc, string strAvailAbbr, string strAvailValidCd, string User_id, string strAvailCd)
+        {
+            AdminAvailabilityViewBAL objAdminAvialUpdate = new AdminAvailabilityViewBAL();
+            return objAdminAvialUpdate.UpdateAdminAvail(strAvailDesc, strAvailAbbr, strAvailValidCd, User_id, strAvailCd);
+
+        }
+
+        [WebMethod]
+        public static List<AdminBtgfrGrid> GetGridAdminBtgfrView()
+        {
+            AdminAvailabilityViewBAL objAdminAvialGet = new AdminAvailabilityViewBAL();
+            return objAdminAvialGet.GetGridAdminBtgfrView();
+        }
+
+
+
+
+
+
+
+
+        [WebMethod]
+        public static List<UnitofMeasure> GetGridUnitOfMeasureDetails()
+        {
+            AdminUnitOfMeasureBAL objAdminUOMGet = new AdminUnitOfMeasureBAL();
+            return objAdminUOMGet.GetGridUOMDetails();
+        }
+        [WebMethod]
+        public static int GetMaxUOMCD()
+        {
+            AdminUnitOfMeasureBAL objAdminAvialGet = new AdminUnitOfMeasureBAL();
+            return objAdminAvialGet.GetMaxAvailCD();
+        }
+
+
+
+        [WebMethod]
+        public static int InsertAdminUnitOfMeasure(string strAvailCd, string UOMDescription, string User_id)
+        {
+
+            AdminUnitOfMeasureBAL objAdminUOMInsert = new AdminUnitOfMeasureBAL();
+
+            int count = objAdminUOMInsert.InsertAdminAvail(strAvailCd, UOMDescription, User_id);
+
+            return count;
+        }
+
+        [WebMethod]
+        public static int DeleteAdminUnitOfMeasure(string strAvailCd)
+        {
+            AdminUnitOfMeasureBAL objAdminUOMDelete = new AdminUnitOfMeasureBAL();
+            return objAdminUOMDelete.DeleteAdminAvail(strAvailCd);
+
+        }
+
+        [WebMethod]
+        public static List<UnitofMeasure> PopupGridAdminUnitOfMeasure(string UOMId)
+        {
+            AdminUnitOfMeasureBAL objAdminUOMDelete = new AdminUnitOfMeasureBAL();
+            return objAdminUOMDelete.PopupGridAdminAvail(UOMId);
+
+        }
+
+        [WebMethod]
+        public static int UpdateAdminUnitOfMeasure(string UOMDescription, string User_id, string strAvailCd)
+        {
+            AdminUnitOfMeasureBAL objAdminUOMUpdate = new AdminUnitOfMeasureBAL();
+            return objAdminUOMUpdate.UpdateAdminAvail(UOMDescription, User_id, strAvailCd);
+
+        }
+
+
+
+
+
+
+        [WebMethod]
+        public static List<MapUnitofMeasure> GetGridMapUnitOfMeasureDetails()
+        {
+            MapUnitofMeasureBAL objAdminUOMGet = new MapUnitofMeasureBAL();
+            return objAdminUOMGet.GetGridMapUOMDetails();
+        }
+        [WebMethod]
+        public static List<MapUnitofMeasure> GetListBoxMapUnitOfMeasureDetails(string CharTypeID)
+        {
+            MapUnitofMeasureBAL objAdminUOMGet = new MapUnitofMeasureBAL();
+            return objAdminUOMGet.GetListBoxMapUOMDetails(CharTypeID);
+        }
+
+        [WebMethod]
+        public static List<MapUnitofMeasure> GetDropdownMapUnitOfMeasureDetails(string CharTypeID)
+        {
+            MapUnitofMeasureBAL objAdminUOMGet = new MapUnitofMeasureBAL();
+            return objAdminUOMGet.GetDropdownMapUOMDetails(CharTypeID);
+        }
+
+        [WebMethod]
+        public static List<MapUnitofMeasure> GetUOMSubsetUnitOfMeasureDetails(string CharTypeID, string UOMId)
+        {
+            MapUnitofMeasureBAL objAdminUOMGet = new MapUnitofMeasureBAL();
+            return objAdminUOMGet.GetUOMSubsetMapUOMDetails(CharTypeID, UOMId);
+        }
+        [WebMethod]
+        public static int GetMaxMapUOMCD()
+        {
+            MapUnitofMeasureBAL objAdminAvialGet = new MapUnitofMeasureBAL();
+            return objAdminAvialGet.GetMaxMapUOM();
+        }
+        [WebMethod]
+        public static int InsertAdminMapUnitOfMeasure(string strAvailCd, string CharTypeID, string UOMId, string User_id)
+        {
+
+            MapUnitofMeasureBAL objAdminUOMInsert = new MapUnitofMeasureBAL();
+
+            int count = objAdminUOMInsert.InsertAdminMapUOM(strAvailCd, CharTypeID, UOMId, User_id);
+
+            return count;
+        }
+        [WebMethod]
+        public static List<MapUnitofMeasure> PopupGridAdminMapUnitOfMeasure(string UOMId, string CharTypeID)
+        {
+            MapUnitofMeasureBAL objAdminUOMDelete = new MapUnitofMeasureBAL();
+            return objAdminUOMDelete.PopupGridAdminMapUOM(UOMId, CharTypeID);
+
+        }
+        [WebMethod]
+        public static int DeleteAdminMapUnitOfMeasure(string UOMSubsetID)
+        {
+            MapUnitofMeasureBAL objAdminUOMDelete = new MapUnitofMeasureBAL();
+            return objAdminUOMDelete.AdminMapUOMDelete(UOMSubsetID);
+
+        }
+
+
+
+
+
+        [WebMethod]
+        public static List<NotesPriority> GetGridNotesPriorityDetails()
+        {
+            AdminNotesPriorityBAL objAdminNotesPriorityGet = new AdminNotesPriorityBAL();
+            return objAdminNotesPriorityGet.GetGridNotesPriorityDetails();
+        }
+        [WebMethod]
+        public static int GetMaxPriorityCD()
+        {
+            AdminNotesPriorityBAL objAdminAvialGet = new AdminNotesPriorityBAL();
+            return objAdminAvialGet.GetMaxAvailCD();
+        }
+
+
+
+        [WebMethod]
+        public static int InsertAdminNotesPriority(string strAvailCd, string PriorityDescription, string User_id)
+        {
+
+            AdminNotesPriorityBAL objAdminNotesPriorityInsert = new AdminNotesPriorityBAL();
+
+            int count = objAdminNotesPriorityInsert.InsertAdminAvail(strAvailCd, PriorityDescription, User_id);
+
+            return count;
+        }
+
+        [WebMethod]
+        public static int DeleteAdminNotesPriority(string strAvailCd)
+        {
+            AdminNotesPriorityBAL objAdminNotesPriorityDelete = new AdminNotesPriorityBAL();
+            return objAdminNotesPriorityDelete.DeleteAdminAvail(strAvailCd);
+
+        }
+
+        [WebMethod]
+        public static List<NotesPriority> PopupGridAdminNotesPriority(string PriorityId)
+        {
+            AdminNotesPriorityBAL objAdminNotesPriorityDelete = new AdminNotesPriorityBAL();
+            return objAdminNotesPriorityDelete.PopupGridAdminAvail(PriorityId);
+
+        }
+
+        [WebMethod]
+        public static int UpdateAdminNotesPriority(string PriorityDescription, string User_id, string strAvailCd)
+        {
+            AdminNotesPriorityBAL objAdminNotesPriorityUpdate = new AdminNotesPriorityBAL();
+            return objAdminNotesPriorityUpdate.UpdateAdminAvail(PriorityDescription, User_id, strAvailCd);
+
+        }
+
+
+
+
+
+
+
+        [WebMethod]
+        public static List<NotesCategory> GetGridNotesCategoryDetails()
+        {
+            AdminNotesCategoryBAL objAdminNotesCategoryGet = new AdminNotesCategoryBAL();
+            return objAdminNotesCategoryGet.GetGridNotesCategoryDetails();
+        }
+        [WebMethod]
+        public static int GetMaxCategoryCD()
+        {
+            AdminNotesCategoryBAL objAdminAvialGet = new AdminNotesCategoryBAL();
+            return objAdminAvialGet.GetMaxAvailCD();
+        }
+
+
+
+        [WebMethod]
+        public static int InsertAdminNotesCategory(string strAvailCd, string CategoryDescription, string User_id)
+        {
+
+            AdminNotesCategoryBAL objAdminNotesCategoryInsert = new AdminNotesCategoryBAL();
+
+            int count = objAdminNotesCategoryInsert.InsertAdminAvail(strAvailCd, CategoryDescription, User_id);
+
+            return count;
+        }
+
+        [WebMethod]
+        public static int DeleteAdminNotesCategory(string strAvailCd)
+        {
+            AdminNotesCategoryBAL objAdminNotesCategoryDelete = new AdminNotesCategoryBAL();
+            return objAdminNotesCategoryDelete.DeleteAdminAvail(strAvailCd);
+
+        }
+
+        [WebMethod]
+        public static List<NotesCategory> PopupGridAdminNotesCategory(string CategoryId)
+        {
+            AdminNotesCategoryBAL objAdminNotesCategoryDelete = new AdminNotesCategoryBAL();
+            return objAdminNotesCategoryDelete.PopupGridAdminAvail(CategoryId);
+
+        }
+
+        [WebMethod]
+        public static int UpdateAdminNotesCategory(string CategoryDescription, string User_id, string strAvailCd)
+        {
+            AdminNotesCategoryBAL objAdminNotesCategoryUpdate = new AdminNotesCategoryBAL();
+            return objAdminNotesCategoryUpdate.UpdateAdminAvail(CategoryDescription, User_id, strAvailCd);
+
+        }
+
+
+
+
+
+
+        [WebMethod]
+        public static List<Notes> GetGridNotesDetails()
+        {
+            AdminNotesBAL objAdminNotesCategoryGet = new AdminNotesBAL();
+            return objAdminNotesCategoryGet.GetGridAdminAddress();
+        }
+
+
+
+
+
+
+
+
+        [WebMethod]
+        public static List<DistributorCompanies> GetAdminDistributorCompaniesView(string Level)
+        {
+            DistributorCompaniesBAL objAdminAvialGet = new DistributorCompaniesBAL();
+            return objAdminAvialGet.GetAdminDistributorCompaniesView(Level);
+        }
+        [WebMethod]
+        public static List<DistributorCompanies> EditAdminDistributorCompanies(string Level, string Id)
+        {
+            DistributorCompaniesBAL objAdminAvialGet = new DistributorCompaniesBAL();
+            return objAdminAvialGet.EditAdminDistributorCompanies(Level, Id);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        [WebMethod]
+        public static List<Documentation> GetGridAdminDocumentationView(string AccessLevel, string User_id)
+        {
+            AdminDocumentationBAL objAdminAvialGet = new AdminDocumentationBAL();
+            return objAdminAvialGet.GetGridAdminDocumentationView(AccessLevel, User_id);
+        }
+        [WebMethod]
+        public static List<Documentation> GetProductDocumentationView(string AccessLevel, string User_id)
+        {
+            AdminDocumentationBAL objAdminAvialGet = new AdminDocumentationBAL();
+            return objAdminAvialGet.GetProductsDocumentationView(AccessLevel, User_id);
+        }
+
+        [WebMethod]
+        public static int UpdateAdminDocumentation(int productID, int ProductLocLevelCd, string Title, string DocumentURL, string Description, int User_id, int strAvailCd)
+        {
+            AdminDocumentationBAL objAdminDocumentaionUpdate = new AdminDocumentationBAL();
+            return objAdminDocumentaionUpdate.UpdateAdminDocumentation(productID, ProductLocLevelCd, Title, DocumentURL, Description, User_id, strAvailCd);
+
+        }
+        [WebMethod]
+        public static int InsertAdminDocumentation(int strAvailCd, int productID, int ProductLocLevelCd, string Title, string DocumentURL, string Description, string User_id)
+        {
+
+            AdminDocumentationBAL objAdminDocumentaionInsert = new AdminDocumentationBAL();
+
+            int count = objAdminDocumentaionInsert.InsertAdminDocumentation(strAvailCd, productID, ProductLocLevelCd, Title, DocumentURL, Description, User_id);
+
+            return count;
+        }
+
+        [WebMethod]
+        public static int DeleteAdminDocumentation(string strAvailCd)
+        {
+            AdminDocumentationBAL objAdminDocumentationDelete = new AdminDocumentationBAL();
+            return objAdminDocumentationDelete.DeleteAdminDocumentation(strAvailCd);
+
+        }
+        [WebMethod]
+        public static int GetMaxDocumentationCD()
+        {
+            AdminDocumentationBAL objAdminDocGet = new AdminDocumentationBAL();
+            return objAdminDocGet.GetMDocCD();
+        }
+        [WebMethod]
+        public static int GetProductLevelCDDocumentationCD(int ProductId)
+        {
+            AdminDocumentationBAL objAdminDocGet = new AdminDocumentationBAL();
+            return objAdminDocGet.GetProductLevelCD(ProductId);
+        }
+
+
+
+
+
+
+        [WebMethod]
+        public static List<Glossary> GetGridAdminGlossaryView(string AccessLevel, string User_id)
+        {
+            AdminGlossaryViewBAL objAdminAvialGet = new AdminGlossaryViewBAL();
+            return objAdminAvialGet.GetGridAdminDocumentationView(AccessLevel, User_id);
+        }
+
+        [WebMethod]
+        public static List<Glossary> GetGridAdminGlossaryProductView(string AccessLevel, string User_id)
+        {
+            AdminGlossaryViewBAL objAdminAvialGet = new AdminGlossaryViewBAL();
+            return objAdminAvialGet.GetGridAdminGlossaryProductView(AccessLevel, User_id);
+        }
+
+        [WebMethod]
+        public static List<Glossary> GetAdminGlossaryView(string ProductCD, string lblGlossaryTerm)
+        {
+            AdminGlossaryViewBAL objAdminAvialGet = new AdminGlossaryViewBAL();
+            return objAdminAvialGet.GetAdminGlossaryView(ProductCD, lblGlossaryTerm);
+        }
+        [WebMethod]
+        public static List<Glossary> PopupGridAdminGlossary(string TermId)
+        {
+            AdminGlossaryViewBAL objAdminGlossary = new AdminGlossaryViewBAL();
+            return objAdminGlossary.PopupGridAdminGlossary(TermId);
+
+        }
+        [WebMethod]
+        public static int InsertUpdateAdminGlossary(string ProductCD, string TermName, string TermDesc, string User_id)
+        {
+
+            AdminGlossaryViewBAL objAdminUpdateInsert = new AdminGlossaryViewBAL();
+
+            objAdminUpdateInsert.InsertUpdateAdminGlossary(ProductCD, TermName, TermDesc, User_id);
+
+            return 1;
+        }
+
+        [WebMethod]
+        public static int DeleteAdminGlossary(string TermName, string ProductCD)
+        {
+            AdminGlossaryViewBAL objAdminGlossaryDelete = new AdminGlossaryViewBAL();
+            objAdminGlossaryDelete.AdminGlossaryDelete(TermName, ProductCD);
+            return 1;
+
+        }
+
+
+
+
+
+
+        [WebMethod]
+        public static List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierView()
+        {
+            AdminCallerAccessSupplierBAL objAdminCallerGet = new AdminCallerAccessSupplierBAL();
+            return objAdminCallerGet.GetGridAdminCallerAccessSupplierView();
+        }
+
+        [WebMethod]
+        public static List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierDropdown()
+        {
+            AdminCallerAccessSupplierBAL objAdminCallerGet = new AdminCallerAccessSupplierBAL();
+            return objAdminCallerGet.GetGridAdminCallerAccessSupplierDropdown();
+        }
+
+        [WebMethod]
+        public static List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierMatrix()
+        {
+            AdminCallerAccessSupplierBAL objAdminCallerGet = new AdminCallerAccessSupplierBAL();
+            return objAdminCallerGet.GetGridAdminCallerAccessSupplierMatrix();
+        }
+        [WebMethod]
+        public static List<CallerAccessSupplier> SetDropdownAdminCallerAccessSupplierMatrix(string OptionMatrixId)
+        {
+            AdminCallerAccessSupplierBAL objAdminCallerGet = new AdminCallerAccessSupplierBAL();
+            return objAdminCallerGet.SetDropdownAdminCallerAccessSupplierMatrix(OptionMatrixId);
+        }
+        [WebMethod]
+        public static List<CallerAccessSupplier> GetGridAdminCallerAccessSupplierCharids(string OptionMatrixId)
+        {
+            AdminCallerAccessSupplierBAL objAdminCallerGet = new AdminCallerAccessSupplierBAL();
+            return objAdminCallerGet.GetGridAdminCallerAccessSupplierCharids(OptionMatrixId);
+        }
+        [WebMethod]
+        public static int InsertAdminCallerSupplier(string DepId, string DepOptionMatrixID, string DepProductCD,
+                                            string DepSubproductCD, string DepCharTypeID, string DepCharID, string ArrAvailCD, string ArrOptionMatrixId,
+                                            string ProductCD, string SubProductCD, string CharTypeId, string ArrCharId, string DepValidCD, string User_Id)
+        {
+
+            AdminCallerAccessSupplierBAL objAdminCallerSupplierInsert = new AdminCallerAccessSupplierBAL();
+
+            int count = objAdminCallerSupplierInsert.InsertAdminCallerSupplier(DepId, DepOptionMatrixID, DepProductCD, DepSubproductCD,
+                                                        DepCharTypeID, DepCharID, ArrAvailCD, ArrOptionMatrixId, ProductCD,
+                                                        SubProductCD, CharTypeId, ArrCharId, DepValidCD, User_Id);
+
+
+            return count;
+        }
+
+        [WebMethod]
+        public static int DeleteAdminCallerSupplier(string DepProductCD, string DepSubproductCD, string DepOptionMatrixID)
+        {
+            AdminCallerAccessSupplierBAL objAdminCallerSupplierDelete = new AdminCallerAccessSupplierBAL();
+            return objAdminCallerSupplierDelete.DeleteAdminCallerSupplier(DepProductCD, DepSubproductCD, DepOptionMatrixID);
+
+        }
+        [WebMethod]
+        public static int GetMaxCallerSupplierCD()
+        {
+            AdminCallerAccessSupplierBAL objAdminCallerSupplierGet = new AdminCallerAccessSupplierBAL();
+            return objAdminCallerSupplierGet.GetMaxCallerSuppCD();
+        }
+
+
+
+
+
+
+        [WebMethod]
+        public static List<AdminAddressGrid> GetGridAdminAddress()
+        {
+            AdminAddressViewBAL objAdminAvialGet = new AdminAddressViewBAL();
+            return objAdminAvialGet.GetGridAdminAddress();
+        }
+
+        [WebMethod]
+        public static AdminAddressList GetAdminAddressDetails()
+        {
+            AdminAddressViewBAL objAdminAvialGet = new AdminAddressViewBAL();
+            return objAdminAvialGet.GetAdminAddressDetail();
+        }
+
+
+
+        [WebMethod]
+        public static List<OrderPortSpeed> GetGridAdminOrderPortSpeedView()
+        {
+            OrderPortSpeedBAL objAdminAvialGet = new OrderPortSpeedBAL();
+            return objAdminAvialGet.GetGridAdminBtgfrView();
+        }
+        [WebMethod]
+        public static List<OrderAccessSpeed> GetGridAdminOrderAccessSpeedView()
+        {
+            OrderAccessSpeedBAL objAdminAvialGet = new OrderAccessSpeedBAL();
+            return objAdminAvialGet.GetGridAdminBtgfrView();
+        }
+
+        [WebMethod]
+        public static int UpdateAdminPortSpeed(string User_id, string charid, string charNumValue)
+        {
+            OrderPortSpeedBAL objAdminUOMUpdate = new OrderPortSpeedBAL();
+            return objAdminUOMUpdate.UpdateAdminPortSpeed(User_id, charid, charNumValue);
+
+        }
+        [WebMethod]
+        public static int UpdateAdminAccessSpeed(string User_id, string charid, string charNumValue)
+        {
+            OrderAccessSpeedBAL objAdminUOMUpdate = new OrderAccessSpeedBAL();
+            return objAdminUOMUpdate.UpdateAdminAccessSpeed(User_id, charid, charNumValue);
+
+        }
+        [WebMethod]
+        public static lstUnitOfMeasure GetUnitOfMeasures(string CharTypeID)
+        {
+            MapUnitofMeasureBAL objAdminUOMGet = new MapUnitofMeasureBAL();
+            return objAdminUOMGet.GetUnitOfMeasures(CharTypeID);
+        }
+        [WebMethod]
+        public static int SaveUnitsOfMapping(int CharTypeID, string list, string User_id)
+        {
+            MapUnitofMeasureBAL objAdminUOMGet = new MapUnitofMeasureBAL();
+            return objAdminUOMGet.SaveUnitsOfMapping(CharTypeID, list, User_id);
+        }
+
+        #region Port to Access Speed
+        [WebMethod]//actual function
+        public static List<lstPortToAccessSped> GetPortToAccessSpeed(string myFormval)
+        {
+
+            PortToAccessSpeedBAL objPortAccess = new PortToAccessSpeedBAL();
+            return objPortAccess.GetPortToAccessSpeed(C_PORT_SPEED, C_ACCESS_SPEED, C_HVPN_PORT_SPEED, C_ACCESS_SPEED_DOWN_UP, C_ACCESS_TYPE);
+        }
+
+        [WebMethod]
+        public static lstPortSpeeds GetPortSpeeds()
+        {
+            PortToAccessSpeedBAL objPortAccess = new PortToAccessSpeedBAL();
+            return objPortAccess.GetPortSpeeds(C_PORT_SPEED, C_HVPN_PORT_SPEED, C_ACCESS_SPEED, C_ACCESS_SPEED_DOWN_UP);
+        }
+        [WebMethod]
+        public static List<lstPortToAccessSped> GetPortAccessSpeedDetails(int char_id, int Char_Type_id, string Portspeed_Name, decimal C_HVPN_PORT_SPEED_id, decimal C_ACCESS_SPEED_DOWN_UP_id, string type)
+        {
+
+            PortToAccessSpeedBAL objPortAccess = new PortToAccessSpeedBAL();
+            return objPortAccess.GetPortAccessSpeedDetails(char_id, Char_Type_id, Portspeed_Name, C_HVPN_PORT_SPEED_id, C_ACCESS_SPEED_DOWN_UP_id, C_ACCESS_SPEED, C_ACCESS_TYPE, C_PORT_SPEED, type, C_ACCESS_SPEED_DOWN_UP);
+        }
+        
+        [WebMethod]
+        public static lstPortSpeeds LoadPortAccessSpeedForEdit(int char_id, int Char_Type_id, string Portspeed_Name, decimal C_HVPN_PORT_SPEED_id, decimal C_ACCESS_SPEED_DOWN_UP_id, string type,int StartRowNumMap, int EndRowNumMap, int  StartRowNumUnMap, int EndRowNumUnMap,int TotalMapcount,int TotalUnMapcount )
+        {
+
+            PortToAccessSpeedBAL objPortAccess = new PortToAccessSpeedBAL();
+            return objPortAccess.LoadPortAccessSpeedForEdit(char_id, Char_Type_id, C_ACCESS_SPEED, C_ACCESS_SPEED_DOWN_UP, C_ACCESS_TYPE, C_HVPN_PORT_SPEED_id, C_ACCESS_SPEED_DOWN_UP_id, C_PORT_SPEED, type, StartRowNumMap, EndRowNumMap, StartRowNumUnMap, EndRowNumUnMap, TotalMapcount, TotalUnMapcount);
+        
+        }
+
+
+       [WebMethod]
+        public static int InsertPortToAccessSpeedMapping(int pPortId, string charIDs, string userID)
+        {
+            PortToAccessSpeedBAL objPortAccess = new PortToAccessSpeedBAL();
+            return objPortAccess.InsertPortToAccessSpeedMapping(pPortId, charIDs,  userID);
+        }
+        
+            [WebMethod]
+       public static int DeletePortToAccessSpeedMapping(int pPortId, string charIDs, string userID)
+        {
+            PortToAccessSpeedBAL objPortAccess = new PortToAccessSpeedBAL();
+            return objPortAccess.DeletePortToAccessSpeedMapping(pPortId, charIDs,  userID);
+        }
+           
+        
+        #endregion 
+
+        [WebMethod]
+        public static List<Notes> GetProducts(int curr_state, int userId, int accessLevel, string sLdapGFR, int sBtGfrCodes, int sSegregationCodes, int sMPLSCapOnlyPO)
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.GetProducts(curr_state, userId, accessLevel, sLdapGFR, sBtGfrCodes, sSegregationCodes, sMPLSCapOnlyPO);
+        }
+        [WebMethod]
+        public static List<Country> GetCountries(int productId)
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.GetCountries(productId);
+        }
+
+        [WebMethod]
+        public static List<Region> GetRegions(int productId)
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.GetRegions(productId);
+        }
+        [WebMethod]
+        public static List<city> GetCities(int productId, int countryId)
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.GetCities(productId, countryId);
+        }
+        [WebMethod]
+        public static List<NotesGridData> GetNotesGridData(int Criteria, int productId, int regionId, int countryId, int cityId, int rowNum)
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.GetNotesGridData(Criteria, productId, regionId, countryId, cityId, rowNum);
+        }
+
+        [WebMethod]
+        public static List<NotePriority> GetNotePriority()
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.GetNotePriority();
+        }
+        [WebMethod]
+        public static List<NoteCategory> GetNoteCategory()
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.GetNoteCategory();
+        }
+        [WebMethod]
+        public static int AddNewNote(int Criteria, int productId, int regionId, int countryId, int cityId, string title, string category, string priority, string BegDate, string EndDate, string userId, string description)
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.AddNewNote(Criteria, productId, regionId, countryId, cityId, title, category, priority, BegDate, EndDate, userId, description);
+        }
+        [WebMethod]
+        public static string GetUserName(string userId)
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.GetUserName(userId);
+        }
+        [WebMethod]
+        public static int UpdateNote(int Criteria, int productId, int regionId, int countryId, int cityId, string title, string category, string priority, string BegDate, string EndDate, string userId, long noteId, string description)
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.UpdateNote(Criteria, productId, regionId, countryId, cityId, title, category, priority, BegDate, EndDate, userId, noteId, description);
+
+        }
+        [WebMethod]
+        public static int DeleteNote(string noteId)
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.DeleteNote(noteId);
+        }
+        [WebMethod]
+        public static string GetEmpName(int empId)
+        {
+            AdminNotesBAL objNotesBAL = new AdminNotesBAL();
+            return objNotesBAL.GetEmpName(empId);
+        }
+
+
+        #region MAP Access Product To Country/PoP Level
+        [WebMethod]
+        public static List<PoPTypeMapping> MapAccessProductsForPoP()
+        {
+           AdminAccessMapBAL objAdminAccessMapBAL = new AdminAccessMapBAL();
+            return objAdminAccessMapBAL.MapAccessProductsForPoP();
+
+        }
+        [WebMethod]
+        public static List<PoPTypeMapping> MapAccessProductsForCountry()
+        {
+            AdminAccessMapBAL objAdminAccessMapBAL = new AdminAccessMapBAL();
+            return objAdminAccessMapBAL.MapAccessProductsForCountry();
+        }
+
+        [WebMethod]
+
+        public static List<PoPTypeMapping> PoPLevelMapping()
+        {
+            AdminAccessMapBAL objAdminAccessMapBAL = new AdminAccessMapBAL();
+            return objAdminAccessMapBAL.PoPLevelMapping();
+        }
+
+        [WebMethod]
+
+        public static List<PoPTypeMapping> CountryLevelMapping()
+        {
+            AdminAccessMapBAL objAdminAccessMapBAL = new AdminAccessMapBAL();
+            return objAdminAccessMapBAL.CountryLevelMapping();
+        }
+
+        [WebMethod]
+
+        public static int SaveAccessProductLevelMapping(int[] AccessProductIDs, string User_id)
+        {
+             AdminAccessMapBAL objAdminAccessMapBAL = new AdminAccessMapBAL();
+             return objAdminAccessMapBAL.SaveAccessProductLevelMapping(AccessProductIDs, User_id);
+        }
+
+        [WebMethod]
+
+        public static List<PoPTypeMapping> GetUserDetails()
+        {
+            AdminAccessMapBAL objAdminAccessMapBAL = new AdminAccessMapBAL();
+            return objAdminAccessMapBAL.GetUserDetails();
+        }
+        #endregion
+
+    }
+}

@@ -1,0 +1,105 @@
+﻿
+<div ng-controller="FileUploadCntrl">
+    
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                File Upload
+            </h3>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="clickable active"><a data-toggle="tab" data-target="#divUploadFile">File Upload</a></li>
+        <li><a data-toggle="tab" class=" Arrow" data-target="#divFileHistory">File History </a>
+        </li>
+    </ul>
+   
+      <div class="tab-content clearfix">
+       <div id="divUploadFile" class="tab-pane active">   
+       <form class="form-horizontal" name="userForm1" ng-submit="submitForm()" novalidate>      
+               <div class="form-horizontal">
+                   <div class="form-group">
+                       <div class="col-md-10" ng-class="{ 'has-error' : userForm1.myFile.$invalid && !userForm1.myFile.$pristine }">
+                        <div class="col-md-2">
+                           <label class="col-sm-1" for="attachment">
+                               Attachment<span style="color: Red">&nbsp;*</span></label>
+                               </div>
+                           <div class="col-md-4">
+                               <input type="file" id="myFile" file-model="myFile" style="width: 100%; height: 25px;" />
+                               <div id="divmyFiles" style="display: none;">
+                                   <p class="help-block" style="color: Red">
+                                       Please select File</p>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="form-group">
+                       <div class="col-md-10" ng-class="{ 'has-error' : userForm1.FileDescription.$invalid && !userForm1.FileDescription.$pristine }">
+                        <div class="col-md-2">
+                           <label class="col-sm-1" for="attachment">
+                               Title<span style="color: Red">&nbsp;*</span></label>
+                               </div>
+                           <div class="col-md-4">
+                               <input type="text" style="width: 100%; height: 25px;" ng-model="FileDescription"
+                                   name="FileDescription" maxlength="65" required />
+                               <div id="divFileDescription" style="display: none;">
+                                   <p class="help-block" style="color: Red">
+                                       Please enter Title</p>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="form-group" style="margin-left: 14%;">
+                       <div class="col-md-3">
+                           <input type="button" class="btn btn-primary" value="Upload" ng-click="uploadFile()" /> &nbsp;&nbsp;
+                           <input type="button" class="btn btn-primary" value="Reset"  ng-click="Reset()"/>
+                       </div>
+                   </div>
+               </div>
+</form>
+       </div>
+       <div id="divFileHistory" class="tab-pane">
+            <table ng-table="FileHistoryTable" class="table table-bordered table-striped" show-filter="true" ng-hide="FileHistoryTable.data.length==0">                
+                <tr ng-repeat="user in $data">
+                    <td data-title="'Title'" filter="{ Title: 'text'}" sortable="'Title'" class="Arrow">
+                        {{user.Title}}
+                    </td>
+                    <td data-title="'Originator'" filter="{ Originator: 'text'}" sortable="'Originator'"
+                        class="Arrow">
+                        {{user.Originator}}
+                    </td>
+                    <td data-title="'Created Date'" filter="{ CreatedDate: 'text'}" sortable="'CreatedDate'"
+                        class="Arrow">
+                        {{user.CreatedDate}}
+                    </td>
+                   <!-- <td data-title="'File Name'" filter="{ FileName: 'text'}" sortable="'FileName'" class="Arrow" >
+                        {{user.FileName}}
+                    </td>-->
+                    <td data-title="'File Name'" filter="{ FileName: 'text'}" sortable="'FileName'"
+                        class="Arrow">
+                        <a href="Downloadhandler.ashx?path={{user.serverPath}}/prodcat22/PCUploads/{{user.Attachment}} &filename= {{user.FileName}}" 
+                            style="text-decoration: underline" data-toggle="tooltip" title="Click to download">  {{user.FileName}}</a>
+                    </td>
+                    <td data-title="'Delete'" class="Arrow">
+                        <button value="Delete" class="btn btn-sm btn-danger" id="ApprovalID" ng-click="DeleteFileHistory(user)">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                    </td>
+                </tr>
+                
+            </table>
+
+            <div ng-show="FileHistoryTable.data.length==0">
+                No artefact(s) uploaded.
+            </div>
+        </div>
+        
+      </div>
+    
+</div>
+<div class="pageLoaderOverlay">
+</div>
+

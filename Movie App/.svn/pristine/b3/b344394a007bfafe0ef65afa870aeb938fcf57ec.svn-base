@@ -1,0 +1,135 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+  public  class AdminNotesPriorityBAL
+    {
+      private AdminNotesPriorityDAL objSRD = new AdminNotesPriorityDAL();
+
+        public List<NotesPriority> GetGridNotesPriorityDetails()
+        {
+
+
+            List<NotesPriority> lstOrg = new List<NotesPriority>();
+            DataTable dtGridDistributor = objSRD.GetNotesPriorityDetails();
+
+
+              
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                NotesPriority objOrg = new NotesPriority();
+
+                objOrg.NotesPriorityDesc = Convert.ToString(dr["note_priority_desc"]);
+
+                objOrg.NotesPriorityCD = Convert.ToInt32(dr["note_priority_cd"]);
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+        public int GetMaxAvailCD()
+        {
+            //AvailabilityGrid objOrg = new AvailabilityGrid();
+            return objSRD.MaxAvailCD();
+
+        }
+        public int DeleteAdminAvail(string strAvailCd)
+        {
+
+            int count = objSRD.AdminAvailDelete(strAvailCd);
+
+
+
+            return count;
+        }
+        public List<NotesPriority> PopupGridAdminAvail(string strAvailCd)
+        {
+
+            List<NotesPriority> lstOrg = new List<NotesPriority>();
+            DataTable dtGridDistributor = objSRD.AdminAvailPopupGrid(strAvailCd);
+
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                NotesPriority objOrg = new NotesPriority();
+                //var options = { timeZone: 'UTC', timeZoneName: 'short' };
+                //  console.log(date.toLocaleTimeString('en-US', options));
+                DateTime currentDate = Convert.ToDateTime(dr["CREATED_DT"]);
+                DateTime updatedDate = Convert.ToDateTime(dr["UPDATED_DT"]);
+
+                objOrg.CREATED_EMP_ID = Convert.ToString(dr["CREATED_EMP_ID"]);
+                objOrg.CREATED_DT = currentDate.ToString("dd-MMM-yyyy HH:mm");
+                objOrg.UPDATED_EMP_ID = Convert.ToString(dr["UPDATED_EMP_ID"]);
+                objOrg.UPDATED_DT = updatedDate.ToString("dd-MMM-yyyy HH:mm");
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+        public int InsertAdminAvail(string strAvailCd, string strPrirorityDesc, string User_id)
+        {
+
+            int count = objSRD.AdminAvailInsert(strAvailCd, strPrirorityDesc, User_id);
+
+
+
+            return count;
+        }
+
+        public int UpdateAdminAvail(string strPrirorityDesc,  string User_id, string strAvailCd)
+        {
+
+            int count = objSRD.AdminAvailUpdate(strPrirorityDesc, User_id, strAvailCd);
+
+
+
+            return count;
+        }
+
+
+        public List<AdminBtgfrGrid> GetGridAdminBtgfrView()
+        {
+
+
+            List<AdminBtgfrGrid> lstOrg = new List<AdminBtgfrGrid>();
+            DataTable dtGridDistributor = objSRD.GetGridAdminBtgfr();
+
+
+
+
+
+
+
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                AdminBtgfrGrid objOrg = new AdminBtgfrGrid();
+
+                objOrg.btgfr = Convert.ToString(dr["btgfr"]);
+                objOrg.description = Convert.ToString(dr["description"]);
+
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+    }
+}

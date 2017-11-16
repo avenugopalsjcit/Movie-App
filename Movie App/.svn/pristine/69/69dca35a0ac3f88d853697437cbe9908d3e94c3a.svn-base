@@ -1,0 +1,24 @@
+﻿app.factory("CPEMaintSuppReportFactory", ["$http", function ($http) {
+    var CPEMaintSuppReportFactory = {};
+
+    CPEMaintSuppReportFactory.GetMaintsuppReport = function () {
+
+        return $http.post("CpeCountryAvailibity.aspx/FetchCPEMaintSupplierReport", {});
+    }
+
+    return CPEMaintSuppReportFactory;
+}]);
+
+  app.controller("ManufactDistMaintReportCtrl", ["$scope", "CPEMaintSuppReportFactory", "NgTableParams",function ($scope, CPEMaintSuppReportFactory, NgTableParams) {
+      
+      $(".pageLoaderOverlay").show();
+      CPEMaintSuppReportFactory.GetMaintsuppReport().success(function (data) {
+          $(".pageLoaderOverlay").hide();
+          $scope.ManufactSuppReportAvailability = new NgTableParams({}, { 'dataset': data.d });
+      })
+      .error(function (error) {
+          alert("Problem occured while loading SupplierMainterReport" + error);
+          $(".pageLoaderOverlay").hide();
+      });
+
+  }]);

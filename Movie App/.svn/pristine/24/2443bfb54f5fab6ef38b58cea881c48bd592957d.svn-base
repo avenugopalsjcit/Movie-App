@@ -1,0 +1,95 @@
+﻿app.factory('AdminOrderAccessSpeedGridFactory', function ($http) {
+
+    var AdminOrderAccessSpeedGridFactory = {};
+
+    AdminOrderAccessSpeedGridFactory.GetAvailabilityGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminOrderAccessSpeedView', {});
+
+    }
+
+    return AdminOrderAccessSpeedGridFactory;
+});
+app.factory('AdminOrderAccessSpeedUpdateFactory', function ($http) {
+
+    var AdminOrderAccessSpeedUpdateFactory = {};
+
+    AdminOrderAccessSpeedUpdateFactory.GetOrderAccessUpdate = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/UpdateAdminAccessSpeed', { 'User_id': User_id, 'charid': charid, 'charNumValue': charNumValue });
+          
+    }
+
+    return AdminOrderAccessSpeedUpdateFactory;
+});
+
+app.controller('AdminOrderAccessSpeedCtrl', ['$scope', 'AdminOrderAccessSpeedGridFactory', 'AdminOrderAccessSpeedUpdateFactory', 'NgTableParams', function ($scope, AdminOrderAccessSpeedGridFactory, AdminOrderAccessSpeedUpdateFactory, NgTableParams) {
+
+    AdminOrderAccessSpeedGridFactory.GetAvailabilityGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+        $scope.AvailabilityGrid = data;
+
+        $scope.Reset = 0;
+
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+
+    $scope.EditAdminAvail = function () {
+        $scope.Reset = 1;
+    }
+
+    charid = charNumValue = "";
+    $scope.UpdateAdminAvail = function () {
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to update Order Access Speed?",
+            callback: function (result) {
+                if (result) {
+                    User_id = $scope.User_Id;
+                    for (var i = 0; i < $scope.usersTable.data.length; i++) {
+                        charNumValue += $scope.usersTable.data[i].CharNumValue + ",";
+
+                        charid += $scope.usersTable.data[i].CharId + ",";
+                        // $scope.Reset = 1;
+                    }
+
+
+
+                    AdminOrderAccessSpeedUpdateFactory.GetOrderAccessUpdate().success(function (data) {
+                        AdminOrderAccessSpeedGridFactory.GetAvailabilityGrid().success(function (data) {
+                            $scope.Reset = 0;
+                            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+
+                            bootbox.alert({
+                                "message": "Order Access Speed Updated Successfully",
+                                "className": "my-custom-class",
+                                "callback": function () {
+                                    console.log("Success callback");
+                                }
+                            });
+                        });
+                    });
+                }
+            }
+        });
+
+    }
+
+
+} ]);

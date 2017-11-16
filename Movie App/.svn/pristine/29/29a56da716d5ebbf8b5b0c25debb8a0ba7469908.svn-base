@@ -1,0 +1,237 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+namespace SCAdminDAL.PoPTypeMappingsDAL
+{
+    public class PoPTypeMappingsDAL
+    {
+        private GetDataFromDB GetDataFromDB = new GetDataFromDB();
+        private StringBuilder strbuilder = new StringBuilder();
+        public int GetFieldValue()
+        {
+
+            string Qry = string.Empty;
+            try
+            {
+                Qry = "select FIELDVALUE from CSU_CONFIG_TBL where upper(FIELDNAME) like 'POP TYPE' ";
+
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return GetDataFromDB.GetSingleValue(Qry.ToString());
+        }
+
+        
+
+
+
+
+
+        //Getting the list of all unassigned ACCESS METHODS
+
+        public DataTable UnassignAccessMethods(int FieldValue)
+        {
+            GetDataFromDB = new GetDataFromDB();
+            strbuilder = new StringBuilder();
+
+            try
+            {
+                strbuilder.Append(" select cc.CHAR_TYPE_NAME || '-' || cv.CHAR_NAME char_name, cv.CHAR_ID ");
+                strbuilder.Append(" from csu_ref_char_type cc,csu_ref_valid_char cv where cv.CHAR_TYPE_ID = cc.CHAR_TYPE_ID ");
+                strbuilder.Append(" and cv.char_id not in (select PC_POPTYPE_CHAR_ID from CSU_POPTYPE_MAP) ");
+                strbuilder.Append(" and cc.CHAR_TYPE_ID = " + FieldValue + " order by upper(char_name) ");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return GetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+
+        //Getting the list of all GPOPs
+
+        public DataTable GetAllGPOPs(int FieldValue)
+        {
+            GetDataFromDB = new GetDataFromDB();
+            strbuilder = new StringBuilder();
+          
+            try
+            {
+                strbuilder.Append(" SELECT cc.char_type_name || '-' || cv.char_name char_name, cv.char_id ");
+                strbuilder.Append(" FROM csu_ref_char_type cc, csu_ref_valid_char cv, CSU_POPTYPE_MAP cp ");
+                strbuilder.Append(" WHERE cv.char_type_id = cc.char_type_id ");
+                strbuilder.Append(" AND cc.char_type_id = " + FieldValue + " ");
+                strbuilder.Append(" AND cp.PC_POPTYPE_CHAR_ID = cv.CHAR_ID ");
+                strbuilder.Append(" AND cp.APE_POPTYPE_ID = 1 order by upper(char_name) ");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return GetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+
+        //Getting the list of all APOPs
+
+        public DataTable GetAllAPOPs(int FieldValue)
+        {
+            GetDataFromDB = new GetDataFromDB();
+            strbuilder = new StringBuilder();
+
+            try
+            {
+                strbuilder.Append(" SELECT cc.char_type_name || '-' || cv.char_name char_name, cv.char_id ");
+                strbuilder.Append(" FROM csu_ref_char_type cc, csu_ref_valid_char cv, CSU_POPTYPE_MAP cp ");
+                strbuilder.Append(" WHERE cv.char_type_id = cc.char_type_id ");
+                strbuilder.Append(" AND cc.char_type_id = " + FieldValue + " ");
+                strbuilder.Append(" AND cp.PC_POPTYPE_CHAR_ID = cv.CHAR_ID ");
+                strbuilder.Append(" AND cp.APE_POPTYPE_ID = 2 order by upper(char_name) ");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return GetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+
+        //Getting the list of all LLPOPs
+
+        public DataTable GetAllLLPOPs(int FieldValue)
+        {
+            GetDataFromDB = new GetDataFromDB();
+            strbuilder = new StringBuilder();
+
+            try
+            {
+                strbuilder.Append(" SELECT cc.char_type_name || '-' || cv.char_name char_name, cv.char_id ");
+                strbuilder.Append(" FROM csu_ref_char_type cc, csu_ref_valid_char cv, CSU_POPTYPE_MAP cp ");
+                strbuilder.Append(" WHERE cv.char_type_id = cc.char_type_id ");
+                strbuilder.Append(" AND cc.char_type_id = " + FieldValue + " ");
+                strbuilder.Append(" AND cp.PC_POPTYPE_CHAR_ID = cv.CHAR_ID ");
+                strbuilder.Append(" AND cp.APE_POPTYPE_ID = 3 order by upper(char_name) ");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return GetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+
+        public int PoPTypesInsert(int[] PoPTypeIDs, string SourceID, string TargetID)
+        {
+            int status = 0;
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            // OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString").ToString());
+            //string sql = "insert into CSU_POPTYPE_MAP(PC_POPTYPE_CHAR_ID,APE_POPTYPE_ID,APE_POPTYPE_NAME) values 
+            string query = string.Empty;
+            strbuilder = new StringBuilder();
+            string GPopQry = @"select APE_POPTYPE_ID from APE_POPTYPE where APE_POPTYPE_NAME = 'GPOP'";
+            int GPopId = GetDataFromDB.GetSingleValue(GPopQry.ToString());
+            string APOPQry = @"select APE_POPTYPE_ID from APE_POPTYPE where APE_POPTYPE_NAME = 'APOP' ";
+            int APopId = GetDataFromDB.GetSingleValue(APOPQry.ToString());
+            string LLPOPQry = @" select APE_POPTYPE_ID from APE_POPTYPE where APE_POPTYPE_NAME = 'LLPOP'";
+            int LLPopId = GetDataFromDB.GetSingleValue(LLPOPQry.ToString());
+            try
+            {
+                strbuilder.Append("BEGIN ");
+                foreach (int PoPID in PoPTypeIDs)
+                {
+                    switch (TargetID)
+                    {
+                        case "GPoP": strbuilder.Append("insert into CSU_POPTYPE_MAP(PC_POPTYPE_CHAR_ID,APE_POPTYPE_ID,APE_POPTYPE_NAME) ");
+                            strbuilder.Append(" values(" + PoPID + "," + GPopId + ",'GPOP')");
+                            strbuilder.Append(";");
+                            //values(" + PoPID + "," +  APEPOPTYPEID + ",'GPOP' ";
+                            break;
+
+                        case "APoP": strbuilder.Append("insert into CSU_POPTYPE_MAP(PC_POPTYPE_CHAR_ID,APE_POPTYPE_ID,APE_POPTYPE_NAME) ");
+                            strbuilder.Append(" values(" + PoPID + "," + APopId + ",'APOP')");
+                            strbuilder.Append(";");
+                            break;
+
+                        case "LLPoP": strbuilder.Append("insert into CSU_POPTYPE_MAP(PC_POPTYPE_CHAR_ID,APE_POPTYPE_ID,APE_POPTYPE_NAME) ");
+                            strbuilder.Append(" values(" + PoPID + "," + LLPopId + ",'LLPOP')");
+                            strbuilder.Append(";");
+                            break;
+                    }
+
+
+                }
+               
+                strbuilder.Append(" END; ");
+                //OracleCommand cmd = new OracleCommand(strbuilder.ToString());
+
+                //cmd.CommandType = CommandType.Text;
+
+                //con.Open();
+                //status = cmd.ExecuteNonQuery();
+
+                //con.Close();               
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strbuilder.ToString());
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return status;
+        }
+
+        public int PopTypesDelete(int[] PoPTypeIDs, string SourceID, string TargetID)
+        {
+            int status = 0;
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));         
+            string query = string.Empty;
+            strbuilder = new StringBuilder();
+            string GPopQry = @"select APE_POPTYPE_ID from APE_POPTYPE where APE_POPTYPE_NAME = 'GPOP'";
+            int GPopId = GetDataFromDB.GetSingleValue(GPopQry.ToString());
+            string APOPQry = @"select APE_POPTYPE_ID from APE_POPTYPE where APE_POPTYPE_NAME = 'APOP' ";
+            int APopId = GetDataFromDB.GetSingleValue(APOPQry.ToString());
+            string LLPOPQry = @" select APE_POPTYPE_ID from APE_POPTYPE where APE_POPTYPE_NAME = 'LLPOP'";
+            int LLPopId = GetDataFromDB.GetSingleValue(LLPOPQry.ToString());
+            try
+            {
+                strbuilder.Append("BEGIN ");
+                foreach (int PoPID in PoPTypeIDs)
+                {
+                    switch (SourceID)
+                    {
+                        case "GPoP": strbuilder.Append("delete from CSU_POPTYPE_MAP where PC_POPTYPE_CHAR_ID = " + PoPID + " ");
+                            strbuilder.Append(" and APE_POPTYPE_ID=" + GPopId + " and APE_POPTYPE_NAME='GPOP';");                           
+                            break;
+
+                        case "APoP": strbuilder.Append("delete from CSU_POPTYPE_MAP where PC_POPTYPE_CHAR_ID = " + PoPID + " ");
+                            strbuilder.Append(" and APE_POPTYPE_ID=" + APopId + " and APE_POPTYPE_NAME='APOP';");
+                            break;
+
+                        case "LLPoP": strbuilder.Append("delete from CSU_POPTYPE_MAP where PC_POPTYPE_CHAR_ID = " + PoPID + " ");
+                            strbuilder.Append(" and APE_POPTYPE_ID=" + LLPopId + " and APE_POPTYPE_NAME='LLPOP';");
+                            break;
+                    }
+
+
+                }
+
+                strbuilder.Append(" END; ");
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strbuilder.ToString());
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return status;
+        }
+
+
+    }
+}

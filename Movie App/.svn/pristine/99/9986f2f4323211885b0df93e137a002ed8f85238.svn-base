@@ -1,0 +1,452 @@
+﻿app.controller("Controller.CountryNoPort", function ($scope, $compile, $ngBootbox, MCUParam, MCUHelper) {
+    $('.pageLoaderOverlay').hide();
+    $scope.CaseArray = [];
+    $("#lstRegionlist").select2();
+    $("#CaseAvailDDL").select2();
+    $("#ValidCaseDDL").select2();
+    $scope.MCUSession = MCUParam.getMCUSession();
+    $scope.formData = [];
+    $scope.formData.resetCase = '1';
+
+
+    $scope.prevRadioState = $scope.formData.resetCase;
+    $scope.ResetCountrySel = function (isResetRadio, state) {
+
+        $ngBootbox.confirm('All your current selections will be lost.Are you sure that you want to reset?')
+        .then(function () {
+            $scope.resetAllScopeValue();
+            if (isResetRadio == 1) {
+                $scope.prevRadioState = state;
+                $scope.formData.resetCase = state;
+                $scope.state = state;
+                //if user select any region then few part will remain hidden, to avoid this displaying all
+                $(".showallcountry").show();
+                $scope.$broadcast('loadTree', { resetCase: { caseValidity: state} });
+            }
+        },
+        function () {
+            $scope.formData.resetCase = $scope.prevRadioState;
+            $scope.state = $scope.prevRadioState;
+            //Confirm was cancelled, don't delete customer
+            console.log('Confirm was cancelled');
+        });
+
+    }
+
+
+    $scope.writeSavedCases = function () {
+        saveSelectedChar();
+        $scope.bindCaseArray();
+        $scope.selectedCountry = [];
+        $scope.selectedcaseId = [];
+        $scope.savedCharList = [];
+    }
+
+    $scope.resetCharBtn = function () {
+        if ($scope.modSelectedchar != undefined && $scope.modSelectedchar.length > 0) {
+            $ngBootbox.confirm('Your current selected characteristics will be lost.Are you sure that you want to reset?')
+            .then(function () {
+                $scope.resetChar();
+            });
+        }
+    }
+
+    $scope.resetChar = function () {
+        $scope.modSelectedchar = [];
+        $('#selectedChar').empty();
+    }
+
+    $scope.savedCharList = [];
+    function saveSelectedChar() {
+
+        $(".chkSelectcol input:checked").each(function (e) {
+            var CharId = $(this).attr('id').replace('chkSelect', '');
+            var Type = $(this).attr('charType');
+            if ($scope.savedCharList.length == 0 || getStringArray($scope.savedCharList, 'CharId').indexOf(CharId) == -1) {
+                var productchar = {};
+                productchar.CharId = CharId;
+                productchar.CharName = $('#charname' + productchar.CharId).text();
+
+                productchar.CharAvailCd = $("#avail" + productchar.CharId).val();
+
+                productchar.CharAvailText = $("#avail" + productchar.CharId + " :selected").text();
+
+                if (Type == '')
+                    productchar.CharTypeId = $.grep($scope.selectedCharList, function (e) { return e.CHAR_ID == productchar.CharId })[0].CHAR_TYPE_ID;
+                if (Type == 'AccSupp')
+                    productchar.CharTypeId = -1;
+                if (Type == 'ParentPortSpeed')
+                    productchar.CharTypeId = -2;
+                productchar.CharValue = $("#txt" + productchar.CharId).val() == undefined ? '' : $("#txt" + productchar.CharId).val();
+                productchar.CharValue2 = '';
+                productchar.ValidCd = $("#chkValid" + productchar.CharId).is(':checked') == true ? 1 : 0;
+                productchar.ValidText = $("#chkValid" + productchar.CharId).is(':checked') == true ? 'Valid' : 'Invalid';
+                productchar.Type = Type;
+                $scope.savedCharList.push(productchar);
+            }
+        });
+    }
+
+    $scope.openInnerTable = function (countryId, index) {
+
+        var iconSymbol = 'iconSymbol' + index + countryId;
+        var innerTableId = 'innerTable' + index + countryId;
+        if ($("#" + iconSymbol).html() == '+') {
+            $("#" + innerTableId).show();
+            $("#" + iconSymbol).html("-");
+        } else {
+            $("#" + iconSymbol).html("+");
+            $("#" + innerTableId).hide();
+        }
+    }
+
+    $scope.bindCaseArray = function () {
+        $scope.selectedCountry.forEach(function (item, index) {
+            $scope.savedCountry = getStringArray($scope.CaseArray, 'caseId');
+
+            if ($scope.savedCountry.indexOf(item) == -1) {
+                var country = $.grep($scope.lstCountry, function (e) { return e.COUNTRY_ID == item })[0];
+                if ($scope.savedCharList.length > 0) { $scope.showcharcol = true; }
+                $scope.CaseArray.push({
+                    popID: 0,
+                    countryId: item,
+                    countryName: country.COUNTRY_NAME,
+                    regionName: $.grep($scope.lstRegion, function (e) { return e.REGION_ID == country.PARENTID })[0].REGION_NAME,
+                    caseId: $scope.selectedcaseId[index],
+                    CaseAvailtxt: $scope.modCaseAvail.AVAIL_DESC,
+                    CaseAvailID: $scope.modCaseAvail.AVAIL_CD,
+                    caseValidText: $scope.modValidCase.text,
+                    caseValidID: $scope.modValidCase.id,
+                    savedCharList: $scope.savedCharList,
+                    existingValid: country.CASEVALIDCD,
+                    portspeedList: [],
+                    AccessSuppCharList: []
+                });
+            } else {
+                $scope.CaseArray.forEach(function (obj) {
+                    if (obj.countryId == item) {
+                        obj.CaseAvailtxt = $scope.modCaseAvail.AVAIL_DESC;
+                        obj.CaseAvailID = $scope.modCaseAvail.AVAIL_CD;
+                        obj.caseValidText = $scope.modValidCase.text;
+                        obj.caseValidID = $scope.modValidCase.id;
+                        obj.savedCharList = $scope.savedCharList;
+                    }
+                });
+            }
+
+        });
+    }
+
+    $scope.processChanges = function () {
+        $scope.CasestoUpdate = 'Cases to Update';
+        $("#leftpanel").hide();
+        $("#rightpanel").hide();
+        $("#savecontinuepanel").hide();
+        $("#processChanges").hide();
+        $("#cancelcase").show();
+        $("#updatecase").show();
+        $scope.strInsertCaseIds = [];
+        $scope.strRemoveCaseIds = [];
+        $scope.pCountryID = [];
+        $('.tblSavedDetails input:checked').each(function () {
+            if ($(this).attr('id').indexOf("createException") != -1) {
+                if ($scope.strInsertCaseIds.indexOf($(this).attr('id').replace('createException', '')) == -1) {
+                    $scope.strInsertCaseIds.push($(this).attr('id').replace('createException', ''));
+                    $scope.pCountryID.push($(this).attr('country').replace('createExcountry', ''));
+                }
+            }
+
+
+            if ($(this).attr('id').indexOf("removeException") != -1) {
+                if ($scope.strRemoveCaseIds.indexOf($(this).attr('id').replace('removeException', '')) == -1) {
+                    $scope.strRemoveCaseIds.push($(this).attr('id').replace('removeException', ''));
+                    $scope.pCountryID.push($(this).attr('country').replace('removeExcountry', ''));
+                }
+            }
+        });
+        // $('#FinalSelectedGrid').show();
+        $("#saveddetailspanel").show()
+    }
+
+    $scope.onUpdateCases = function () {
+        app.UpdateCases($scope, MCUHelper, $ngBootbox);
+    }
+
+    $scope.resetAllScopeValue = function () {
+        $('ul.wTreeStyle').find('input[type=checkbox]:checked').removeAttr('checked'); //unchecking all checked checkbox
+        $(".showallcountry").show();
+        $(".collapseall").empty(); //removing child div
+        $(".imgcloseall").attr('src', "image/closefolder.gif"); //assigning close folder to all image
+        $("#saveContinue").prop('disabled', true);
+        $("#processChanges").prop('disabled', true);
+        $scope.modCaseAvail.AVAIL_CD = 0;
+        $scope.modCaseAvail.AVAIL_DESC = '--No Change--';
+        $("#s2id_ddlCaseAvail .select2-chosen").html("--No Change--");
+        $scope.modValidCase.id = -1;
+        $scope.modValidCase.text = "--No Change--";
+        $("#s2id_ddlcasevalid .select2-chosen").html("--No Change--");
+
+        $scope.lstPortspeed = [];
+        $scope.savedCaseDetails = [];
+        $scope.formData.resetCase = 1;
+        //reset charecteristics
+        $scope.resetChar();
+        $(".tblSavedDetails").hide();
+        $scope.CaseArray = [];
+
+    }
+
+});
+
+app.directive('mcuTree', function ($compile) {
+    return {
+        restrict: 'E',
+        templateUrl: '../../Views/Masscaseupdate/mcu_CountryTree.htm',
+
+        controller: function ($scope, MCUHelper) {
+            $scope.lstRegion = [];
+            $scope.lstCountry = [];
+
+            $scope.$on('loadTree', function (event, args) {
+                $scope.loadTree(args.resetCase.caseValidity);
+
+            });
+
+            MCUHelper.GetCountryTreeContent().success(function (data) {
+                $scope.lstRegion = JSON.parse(data.d)[0];
+                $scope.lstCountryList = JSON.parse(data.d)[1];
+                $scope.lstCountry = $.grep($scope.lstCountryList, function (e) { return e.CASEVALIDCD == '1' });
+            });
+
+            $scope.loadTree = function (selectedState) {
+                if (selectedState != -1)
+                    $scope.lstCountry = $.grep($scope.lstCountryList, function (e) { return e.CASEVALIDCD == selectedState });
+                else
+                    $scope.lstCountry = $scope.lstCountryList;
+            }
+        },
+        link: function (scope, elem, attr) {
+            scope.selectedCountry = [];
+            scope.selectedcaseId = [];
+            $('.checktree-root').on('change', 'input[type="checkbox"]', function (e) {
+                checkChildren($(this));
+                checkParents($(this));
+
+                $('.wTreeStyle input:checked').each(function () {
+                    if ($(this).attr('id').indexOf("ChkRegion") > -1) {
+                        var regionId = $(this).attr('id').replace('ChkRegion', '');
+                        scope.lstCountry.forEach(function (item) {
+                            if (scope.selectedCountry.indexOf(item.COUNTRY_ID) == -1) {
+                                scope.selectedCountry.push(item.COUNTRY_ID);
+                                scope.selectedcaseId.push(item.CASEID);
+                            }
+                        });
+                    }
+                    if ($(this).attr('id').indexOf("chkCountry") > -1) {
+                        var countryId = $(this).attr('id').replace('chkCountry', '');
+                        var caseID = $(this).attr('cases');
+                        if (scope.selectedCountry.indexOf(countryId) == -1) {
+                            scope.selectedCountry.push(countryId);
+                            scope.selectedcaseId.push(caseID);
+                        }
+                    }
+                });
+            });
+
+
+            var openFolderIcon = "image/openfolder.gif";
+            var closeFolderIcon = "image/closefolder.gif";
+            scope.loadChildList = function (parentID, type) {
+                var imgtagID = "regionfolderImage" + parentID;
+                var folderIcon = toggleFolderImage(imgtagID);
+                var childID = "regionChild" + parentID;
+                if (folderIcon == openFolderIcon) {
+                    if ($("#" + childID + "").html() == '') {
+                        switch (type) {
+                            case 'Co':
+                                var html = '<ul>';
+                                scope.lstCountry.forEach(function (item) {
+                                    if (parentID == item.PARENTID) {
+                                        if (item.HASCASE == 0) {
+                                            if ($("#ChkRegion" + parentID).prop("checked")) {
+                                                html += "<li><input id='chkCountry" + item.COUNTRY_ID + "' type='checkbox' checked='checked' cases='" + item.CASEID + "' caseValidCd='" + item.CASEVALIDCD + "' parent='" + item.PARENTID + "'/> <span class='text-red'>" + item.COUNTRY_NAME + "</span></li>";
+                                            } else {
+                                                html += "<li><input id='chkCountry" + item.COUNTRY_ID + "' type='checkbox' cases='" + item.CASEID + "' caseValidCd='" + item.CASEVALIDCD + "' parent='" + item.PARENTID + "'/> <span class='text-red'>" + item.COUNTRY_NAME + "</span></li>";
+                                            }
+                                        } else {
+
+                                            switch (item.CASEVALIDCD) {
+                                                case 1:
+                                                    if ($("#ChkRegion" + parentID).prop("checked")) {
+                                                        html += "<li><input id='chkCountry" + item.COUNTRY_ID + "' type='checkbox' checked='checked' cases='" + item.CASEID + "' caseValidCd='" + item.CASEVALIDCD + "' parent='" + item.PARENTID + "'/> <span class='text-green'>" + item.COUNTRY_NAME + "</span></li>";
+                                                    } else {
+                                                        html += "<li><input id='chkCountry" + item.COUNTRY_ID + "' type='checkbox' cases='" + item.CASEID + "' caseValidCd='" + item.CASEVALIDCD + "' parent='" + item.PARENTID + "'/> <span class='text-green'>" + item.COUNTRY_NAME + "</span></li>";
+                                                    }
+                                                    break;
+                                                default:
+                                                    if ($("#ChkRegion" + parentID).prop("checked")) {
+                                                        html += "<li><input id='chkCountry" + item.COUNTRY_ID + "' type='checkbox' checked='checked' cases='" + item.CASEID + "' caseValidCd='" + item.CASEVALIDCD + "' parent='" + item.PARENTID + "'/> <span>" + item.COUNTRY_NAME + "</span></li>";
+                                                    } else {
+                                                        html += "<li><input id='chkCountry" + item.COUNTRY_ID + "' type='checkbox' cases='" + item.CASEID + "' caseValidCd='" + item.CASEVALIDCD + "' parent='" + item.PARENTID + "'/> <span>" + item.COUNTRY_NAME + "</span></li>";
+                                                    }
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                });
+                        }
+                        html += "</ul>";
+                        var temp = $compile(html)(scope);
+                        $("#" + childID + "").html(temp);
+
+                        $('.pageLoaderOverlay').hide();
+                    } else {
+                        $("#" + childID + "").show();
+                    }
+                } else {
+                    $("#" + childID + "").hide();
+                }
+            }
+        }
+    }
+});
+
+app.directive('caseValidity', function ($compile) {
+    return {
+        restrict: 'E',
+        templateUrl: '../../Views/Masscaseupdate/CaseValidityTemplate.htm',
+
+        controller: function ($scope, $timeout) {
+            $scope.lstValidCase = [{ id: -1, text: "--No Change--" }, { id: 0, text: "Invalid" }, { id: 1, text: "Valid"}]
+            $scope.modValidCase = $scope.lstValidCase[0];
+            $timeout(function () {
+                $("#ddlcasevalid").select2();
+            });
+
+        },
+        link: function (scope, elem, attr) {
+
+        }
+    }
+});
+
+app.directive('caseAvailability', function () {
+    return {
+        restrict: 'E',
+        templateUrl: '../../Views/Masscaseupdate/CaseAvailabilityTemplate.htm',
+
+        controller: function ($scope, $timeout, MCUHelper) {
+            MCUHelper.getPortCaseAvail().success(function (data) {
+                var availText = JSON.parse(data.d);
+                var ddlDefaultSelect = { 'AVAIL_ABBR': '', 'AVAIL_CD': 0, AVAIL_DESC: '--No Change--', 'AVAIL_VALID_CD': '' };
+                availText.splice(0, '0', ddlDefaultSelect);
+                $scope.lstCaseAvail = availText;
+                $scope.modCaseAvail = availText[0];
+                $timeout(function () {
+                    $("#ddlCaseAvail").select2();
+                });
+
+            });
+        },
+        link: function (scope, elem, attr) {
+
+        }
+    }
+});
+
+app.directive('displayCharlist', function (MCUHelper, $compile) {
+    return {
+        restrict: 'E',
+        templateUrl: '../../Views/Masscaseupdate/DisplayCharTemplate.htm',
+
+        controller: function ($scope) {
+            MCUHelper.GetCharectristic($scope.MCUSession.ProductCd, $scope.MCUSession.SubProductCd).success(function (data) {
+                $scope.lstCharecteristics = JSON.parse(data.d)[0];
+                $scope.charTypeList = JSON.parse(data.d)[1];
+            });
+
+            $scope.toggleCheckox = function (charid) {
+                if ($("#chkSelect" + charid).is(':checked')) {
+                    $("#chkValid" + charid).attr("disabled", false);
+                    $("#chkChangeVal" + charid).attr("disabled", false);
+                } else {
+                    $("#chkValid" + charid).attr("disabled", true);
+                    $("#chkValid" + charid).attr('checked', false);
+                    $("#chkChangeVal" + charid).attr("disabled", true);
+                    $("#chkChangeVal" + charid).attr("checked", false);
+                    $("#txt" + charid).attr("disabled", true);
+                    $("#txt" + charid).val("");
+                }
+            }
+
+            $scope.toggletextbox = function (charid) {
+                if ($("#chkChangeVal" + charid).is(':checked')) {
+                    $("#txt" + charid).attr("disabled", false);
+                } else {
+                    $("#txt" + charid).attr("disabled", true);
+                    $("#txt" + charid).val("");
+                }
+            }
+
+
+
+            function callWriteCharTable() {
+                if ($scope.counter == $scope.modSelectedchar.length) {
+                    var html = app.writeSelectedCharTable($scope, $compile);
+                }
+            }
+            $scope.availoptionvalue = '';
+            $scope.addSelectedChar = function () {
+                if ($('.wTreeStyle input:checked').length == 0) {
+                    bootbox.alert("Please make a selection in the Case Selection box");
+                    return;
+                }
+
+                if ($scope.modSelectedchar == undefined || $scope.modSelectedchar.length == 0) {
+                    bootbox.alert("Please Select a Characteristic Type");
+                    return;
+                }
+                $('.pageLoaderOverlay').show();
+                $scope.selectedCharTypeID = getStringArray($scope.modSelectedchar, 'CHAR_TYPE_ID');
+                $scope.selectedCharList = [];
+                $scope.selectedAccessSupplier = [];
+                $scope.parentPortSpeedList = [];
+                $scope.counter = 0;
+
+                $scope.modSelectedchar.forEach(function (selectedCharType) {
+                    //If the array value selected is not access supplier or parentportspeed
+                    if (selectedCharType.CHAR_TYPE_ID != -1 && selectedCharType.CHAR_TYPE_ID != -2) {
+                        $scope.charTypeList.forEach(function (item) {
+                            if (item.CHAR_TYPE_ID == selectedCharType.CHAR_TYPE_ID) {
+                                $scope.selectedCharList.push(item);
+                            }
+                        });
+                        $scope.counter++;
+                        callWriteCharTable();
+                    }
+                    else {
+                        if (selectedCharType.CHAR_TYPE_ID == -1) {
+                            MCUHelper.getAccessSupplier($scope.selectedPoPs).success(function (data) {
+                                $scope.selectedAccessSupplier = JSON.parse(data.d);
+                                $scope.counter++;
+                                callWriteCharTable();
+                            }).error(function () { console.log("failed to load Access supplier data"); });
+                        }
+                        else {
+                            MCUHelper.getParentPortSpeed($scope.selectedPoPs, $scope.selectedPlatform, $scope.MCUSession.ProductCd, $scope.MCUSession.SubProductCd)
+                    .success(function (data) {
+                        $scope.parentPortSpeedList = data.d;
+                        $scope.counter++;
+                        callWriteCharTable();
+                    });
+                        }
+                    }
+                });
+            }
+        },
+        link: function (scope, elem, attr) {
+
+
+        }
+    }
+});

@@ -1,0 +1,1284 @@
+﻿
+namespace SCAdminBAL
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using Newtonsoft.Json;
+    using System.Web;
+
+    public class Utility
+    {
+
+    }
+    public class UserAccessData
+    {
+        public string EmpID { get; set; }
+        public string UserName { get; set; }
+        public string UserCategoryDesc { get; set; }
+        public string UserCategoryCD { get; set; }
+        public int UserEmail { get; set; }
+        public List<ProductAccessOwner> lstProducts { get; set; }
+        public int UserStatusId { get; set; }
+        public string UserStatusDesc { get; set; }
+        public string UserEmailID { get; set; }
+
+    }
+
+    public class lstUserAccessData
+    {
+        public List<UserAccessData> SuperAdminData { get; set; }
+        public List<UserAccessData> ProductOwnerData { get; set; }
+        public List<UserAccessData> EndUserData { get; set; }
+    }
+
+    public class ProductAccessOwner
+    {
+        public string ProductName { get; set; }
+        public short PrimaryCD { get; set; }
+    }
+
+    public class UserStatus
+    {
+        public int UserStatusId { get; set; }
+        public string UserStatusDesc { get; set; }
+        public string CreatedBy { get; set; }
+        public string UpdatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedDate { get; set; }
+    }
+
+    public class UserCategory
+    {
+        public int UserCategoryId { get; set; }
+        public string UserCategoryDesc { get; set; }
+        public string CreatedBy { get; set; }
+        public string UpdatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedDate { get; set; }
+    }
+
+    public class ProductOwnerStatus
+    {
+        public int ProductOwnerStatusId { get; set; }
+        public string ProductOwnerStatusDesc { get; set; }
+        public string CreatedBy { get; set; }
+        public string UpdatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedDate { get; set; }
+    }
+
+    public class ProductOwnerDetails
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public List<ProductOwner> Owners { get; set; }
+        public string CurrentPrimaryContact { get; set; }
+        public string CurrentPrimaryContactID { get; set; }
+        public string CurrentEmailID { get; set; }
+    }
+
+    public class ProductDetails
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+
+    }
+
+    public class ProductOwner
+    {
+        public string EmployeeId { get; set; }
+        public string UserName { get; set; }
+        public int PrimaryCD { get; set; }
+        public string Email { get; set; }
+        public string FullName { get; set; }
+    }
+    public class DistributorRestrictionDropDown
+    {
+
+        public int DistributerId { get; set; }
+        public string DistributerName { get; set; }
+    }
+    public class BTGFRRestrictionDropDown
+    {
+
+        public int BTGFRId { get; set; }
+        public string Description { get; set; }
+    }
+
+    public class OrganizationRestrictionDropDown
+    {
+
+        public int DistId { get; set; }
+        public string DistName { get; set; }
+    }
+    public class CountryRestrictionDropDown
+    {
+
+        public int CountryId { get; set; }
+        public string CountryName { get; set; }
+    }
+
+    public class SupplierRestrictionDropDown
+    {
+
+        public int SupplierId { get; set; }
+        public string SupplierName { get; set; }
+    }
+
+    public class SupplierRestrictionGrid
+    {
+        public int countryid { get; set; }
+        public int supplierid { get; set; }
+        public int DistributorId { get; set; }
+        public string DistributerName { get; set; }
+        public string CountryName { get; set; }
+        public string SupplierName { get; set; }
+    }
+
+    public class NotesPriority
+    {
+        public string NotesPriorityDesc { get; set; }
+        public int NotesPriorityCD { get; set; }
+        public string CREATED_EMP_ID { get; set; }
+        public string UPDATED_EMP_ID { get; set; }
+        public string CREATED_DT { get; set; }
+        public string UPDATED_DT { get; set; }
+    }
+    public class NotesCategory
+    {
+        public string NotesCategoryDesc { get; set; }
+        public int NotesCategoryCD { get; set; }
+        public string CREATED_EMP_ID { get; set; }
+        public string UPDATED_EMP_ID { get; set; }
+        public string CREATED_DT { get; set; }
+        public string UPDATED_DT { get; set; }
+    }
+    public class Notes
+    {
+        public string ServiceTypeDesc { get; set; }
+        public int ProductCD { get; set; }
+        public string ProductName { get; set; }
+        public int ProductLocLevelCD { get; set; }
+    }
+
+    public class UnitofMeasure
+    {
+        public string UOMName { get; set; }
+        public int UOMId { get; set; }
+        public string CREATED_EMP_ID { get; set; }
+        public string UPDATED_EMP_ID { get; set; }
+        public string CREATED_DT { get; set; }
+        public string UPDATED_DT { get; set; }
+    }
+
+    public class MapUnitofMeasure
+    {
+        public int UOMSubsetId { get; set; }
+        public string CharTypeName { get; set; }
+        public int CharTypeId { get; set; }
+        public string CREATED_EMP_ID { get; set; }
+        public string UPDATED_EMP_ID { get; set; }
+        public string CREATED_DT { get; set; }
+        public string UPDATED_DT { get; set; }
+        public int UOMId { get; set; }
+        public string UOMName { get; set; }
+    }
+
+    public class CallerAccessSupplier
+    {
+        public string CharName { get; set; }
+        public int OptionMatrixId { get; set; }
+        public string AvailDesc { get; set; }
+        public int AvailCD { get; set; }
+        public string AvailAbbr { get; set; }
+        public string CharActualValue { get; set; }
+
+        public int DepId { get; set; }
+        public int DepProductCD { get; set; }
+        public int DepValidCD { get; set; }
+        public int CharTypeID { get; set; }
+        public int DepSubproductCD { get; set; }
+        public int DepCharTypeID { get; set; }
+        public int DepCharID { get; set; }
+        public int DepOptionMatrixId { get; set; }
+        public int ProductCd { get; set; }
+        public int SubProductCd { get; set; }
+        public int CharId { get; set; }
+       
+    }
+
+    public class DistributorCompanies
+    {
+        public string Name { get; set; }
+        public int Id { get; set; }
+        public string Short { get; set; }
+     
+        public int Valid { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedDate { get; set; }
+    }
+
+    public class Glossary
+    {
+        public string TermName { get; set; }
+        public int ProductCD { get; set; }
+        public string ProductName { get; set; }
+        public int TermId { get; set; }
+        public string TermDesc { get; set; }
+
+        public string CREATED_EMP_ID { get; set; }
+        public string UPDATED_EMP_ID { get; set; }
+        public string CREATED_DT { get; set; }
+        public string UPDATED_DT { get; set; }
+    }
+
+
+    public class BTGFRRestrictionGrid
+    {
+        public int countryid { get; set; }
+        public int supplierid { get; set; }
+        public int BTGFR { get; set; }
+        public string Description { get; set; }
+        public string CountryName { get; set; }
+        public string SupplierName { get; set; }
+    }
+
+    [Serializable]
+    public class Restrictionxml
+    {
+
+        public int BTGFR { get; set; }
+        public int countryid { get; set; }
+        public int supplierid { get; set; }
+        public int DistributorId { get; set; }
+    }
+
+
+
+    public class SaveDelete
+    {
+        public string outputString { get; set; }
+        public int outputInt { get; set; }
+    }
+
+    public class OrganizationRestrictionGrid
+    {
+        public int countryid { get; set; }
+        public int supplierid { get; set; }
+        public int BTGFR { get; set; }
+        public string Description { get; set; }
+        public string CountryName { get; set; }
+        public string SupplierName { get; set; }
+    }
+
+    //Announcements
+
+    public class AnnouncementsGrid
+    {
+        public int annid { get; set; }
+        public string anndate { get; set; }
+        public string title { get; set; }
+        public string announcement { get; set; }
+        public string annenddate { get; set; }
+    }
+
+
+    public class AvailabilityGrid
+    {
+
+        public string AvailabilityDesc { get; set; }
+        public string AvailabilityAbbr { get; set; }
+        public bool AvailabilityValid { get; set; }
+        public int AvailValidCd { get; set; }
+        public int Userid { get; set; }
+        public string Created_Emp_Id { get; set; }
+        public string Created_Dt { get; set; }
+        public string Updated_Emp_Id { get; set; }
+        public string Updated_Dt { get; set; }
+    }
+
+    public class AdminAddressGrid
+    {
+        public AdminAddressGrid()
+        {
+            List<AdminAddressGrid> Adminlst = new List<AdminAddressGrid>();
+        }
+        public int Addressid { get; set; }
+        public string AgentName { get; set; }
+        public string AddressDescription { get; set; }
+        public string SupportDays { get; set; }
+        public int Agentid { get; set; }
+
+
+        public string TollFreeAccNo { get; set; }
+        public string TollFreeAccNo1 { get; set; }
+        public string TollFreeAccNo2 { get; set; }
+        public string DirDialAccNo { get; set; }
+        public string DirDialAccNo1 { get; set; }
+        public string DirDialAccNo2 { get; set; }
+        public string FaxNo { get; set; }
+        public string FaxNo1 { get; set; }
+        public string FaxNo2 { get; set; }
+        public int AddressValidCd { get; set; }
+        public int CharId { get; set; }
+        public string XName { get; set; }
+
+
+    }
+    public class city
+    {
+
+        public decimal Cityid { get; set; }
+        public string CityName { get; set; }
+        public int Count { get; set; }
+        public int PageCount { get; set; }
+    }
+
+    public class StateProvince
+    {
+
+        public decimal StateID { get; set; }
+        public string StateName { get; set; }
+    }
+
+    public class country
+    {
+
+        public int Countryid { get; set; }
+        public string countryname { get; set; }
+    }
+    public class UpdatedDateDetail
+    {
+        public string CreatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedBy { get; set; }
+        public string UpdatedDate { get; set; }
+    }
+    public class lstSubProductDetails
+    {
+        public int SubProductId { get; set; }
+        public string SubProductName { get; set; }
+        public List<ReportDetails> lstSubReports { get; set; }
+    }
+
+    public class region
+    {
+
+        public int regionid { get; set; }
+        public string regionname { get; set; }
+    }
+
+    public class AdminAddressList
+    {
+        public AdminAddressList()
+        {
+            regionLst = new List<region>();
+            countryLst = new List<country>();
+            cityLst = new List<city>();
+        }
+        // public List<AdminAddressGrid> Adminlst;
+        public List<city> cityLst;
+        public List<country> countryLst;
+        public List<region> regionLst;
+
+    }
+
+    public class Documentation
+    {
+        public int DocumentId { get; set; }
+        public string DocumentTitle { get; set; }
+        public string DocumentURL { get; set; }
+        public string DocumentDesc { get; set; }
+
+        public int ProductLevelCD { get; set; }
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+
+    }
+
+    public class OrderAccessSpeed
+    {
+        public int CharId { get; set; }
+        public string CharActualValue { get; set; }
+        public string CharName { get; set; }
+        public string CharNumValue { get; set; }
+    }
+
+    public class OrderPortSpeed
+    {
+        public int CharId { get; set; }
+        public string CharActualValue { get; set; }
+        public string CharName { get; set; }
+        public string CharNumValue { get; set; }
+    }
+
+    public class AdminBtgfrGrid
+    {
+        public string btgfr { get; set; }
+        public string description { get; set; }
+    }
+
+    //MCUProductList
+
+    public class MCUProdcuctList
+    {
+        public List<PoPLevelProductCases> PoPLevelCase { get; set; }
+        public List<CountryLevelProductCases> CountryLevelCases { get; set; }
+    }
+
+    public class PoPLevelProductCases
+    {
+        public string ProductCD { get; set; }
+        public string ProductName { get; set; }
+    }
+    public class CountryLevelProductCases
+    {
+        public string ProductCD { get; set; }
+        public string ProductName { get; set; }
+    }
+
+    public class Product
+    {
+        public int ProductID { get; set; }
+        public string ProductName { get; set; }
+        public decimal ProductAssigned { get; set; }
+    }
+
+
+    public class Region
+    {
+        public decimal RegionID { get; set; }
+        public string RegionName { get; set; }
+    }
+
+    public class Country
+    {
+        public decimal CountryID { get; set; }
+        public string CountryName { get; set; }
+    }
+
+    public class CaseDetails
+    {
+        public int ProductID { get; set; }
+        public int RegionID { get; set; }
+        public decimal CaseID { get; set; }
+        public decimal HubSiteID { get; set; }
+        public decimal CountryID { get; set; }
+        public decimal CityID { get; set; }
+        public decimal StateProvinceID { get; set; }
+        public string RegionName { get; set; }
+        public string CountryName { get; set; }
+        public string StateName { get; set; }
+        public string CityName { get; set; }
+        public string HubSiteName { get; set; }
+        public string ShowValid { get; set; }
+        public string CaseName { get; set; }
+
+        public string SiteAvailability { get; set; }
+
+
+
+
+    }
+
+    public class CPELeadTime
+    {
+        public string countryName { get; set; }
+        public string manufacturerName { get; set; }
+        public string cpeAvailability { get; set; }
+        public string leadTime { get; set; }
+        public string leadTimeStatus { get; set; }
+        public string endOfContractDate { get; set; }
+        public string endOfMigrationDate { get; set; }
+        public string cpeCeaseLeadTime { get; set; }
+        public string cpeCeaseLeadTimeStatus { get; set; }
+        public string supplierId { get; set; }
+        public string supplierName { get; set; }
+        public string color { get; set; }
+        public string SupplierType { get; set; }
+    }
+
+
+    public class CPESupplierReport
+    {
+        public string countryName { get; set; }
+        public string manufacturerName { get; set; }
+        public string supplier { get; set; }
+        public string productName { get; set; }
+        public string SupplierType { get; set; }
+        public string CountryAvailability { get; set; }
+        public string MaintenanceOptions { get; set; }
+        public string CPELeadTime { get; set; }
+        public string CPELeadTimeStatus { get; set; }
+        public string CountrySupplierValidity { get; set; }
+        public string EndofContractDate { get; set; }
+        public string EndofMigrationDate { get; set; }
+        public string CPECeaseLeadTime { get; set; }
+        public string CPECeaseLeadTimeStatus { get; set; }
+        public string color { get; set; }
+
+    }
+
+    //public class CPEBundles
+    //{
+
+    //    public string Router { get; set; }
+    //    public string Bundle { get; set; }
+    //    public string ValidBundle { get; set; }
+    //    public string StandardParts { get; set; }
+    //    public string VariableParts { get; set; }
+    //    public string AccessType { get; set; }
+    //    public string ToShowCountryAssignment { get; set; }
+    //    public string RouterEndofQuoteDate { get; set; }
+    //    public string RouterEndofSupportDate { get; set; }
+    //    public string BundleEndofQuoteDate { get; set; }
+    //    public string ExpectedDate { get; set; }
+    //    public string QuotableStartDate { get; set; }
+    //    public string Valid { get; set; }
+    //    public string CreatedBy { get; set; }
+    //    public string CreatedDate { get; set; }
+    //    public string UpdatedBy { get; set; }
+    //    public string DateLastUpdated { get; set; }
+
+
+    //}
+
+    public class EmailsforCPEproducts
+    {
+        public string ProductID { get; set; }
+        public string EmailID { get; set; }
+    }
+    public class SLAAccSupp
+    {
+        public string supplierId { get; set; }
+        public string supplierName { get; set; }
+    }
+
+    public class AvailDescription
+    {
+        public int AvailID { get; set; }
+        public string AvailDesc { get; set; }
+    }
+
+    public class PoPCharcteristics
+    {
+        public string CharValue { get; set; }
+        public string CharName { get; set; }
+    }
+
+    public class AccessType
+    {
+        public int ID { get; set; }
+        public string Type { get; set; }
+    }
+
+    public class Supplier
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class SupplieerProductName
+    {
+        public int ID { get; set; }
+        public string SupplierProdName { get; set; }
+    }
+
+    public class EditCaseDetails
+    {
+        public List<CaseTypeDetails> lstCaseDetails { get; set; }
+        public List<AccessType> lstAccessType { get; set; }
+        public List<Supplier> lstSupplier { get; set; }
+        public List<SupplieerProductName> lstSupplierProductName { get; set; }
+    }
+
+    public class Suppliers
+    {
+        public int SupplierID { get; set; }
+        public string SupplierName { get; set; }
+        public int Selected { get; set; }
+    }
+
+    public class NetworkDetails
+    {
+        public int NetworkID { get; set; }
+        public string NetworkName { get; set; }
+    }
+
+    public class CPECountryAvailability
+    {
+
+        public string SupplierId { get; set; }
+        public string SupplierName { get; set; }
+
+        public string CountryId { get; set; }
+        public string CountryName { get; set; }
+
+        public string ProductName { get; set; }
+        public string AvtivityName { get; set; }
+        public string CpeAvailabilityStatus { get; set; }
+    }
+    public class CPEMaintSupplierReport
+    {
+        public string CountryId { get; set; }
+        public string CountryName { get; set; }
+        public string ProductID { get; set; }
+        public string ProductName { get; set; }
+        public string ManufacturerName { get; set; }
+        public string DistributorName { get; set; }
+        public string PricingType { get; set; }
+        public string SupplierId { get; set; }
+        public string Installer { get; set; }
+        public string InstallerType { get; set; }
+        public string Maintainer { get; set; }
+        public string SmartAvailability { get; set; }
+    }
+
+    public class FileHistory
+    {
+        public string Title { get; set; }
+        public string Originator { get; set; }
+        public string CreatedDate { get; set; }
+        public string FileName { get; set; }
+        public string Uploadserverpath { get; set; }
+        public int ApprovalID { get; set; }
+        public string serverPath { get; set; }
+        public string Attachment { get; set; }
+    }
+
+
+
+
+    public class CPEBundles
+    {
+        public string ProductID { get; set; }
+        public string ProductName { get; set; }
+        public string CountryID { get; set; }
+        public string CountryName { get; set; }
+        public string RegionName { get; set; }
+        public string RegionID { get; set; }
+        public string Router { get; set; }
+        public string RouterNamedd { get; set; }
+        public string Bundle { get; set; }
+        public string BundleNamedd { get; set; }
+        public string PartType { get; set; }
+        public string ValidBundle { get; set; }
+        public string UpdateBundleValidity { get; set; }
+        public string StandardParts { get; set; }
+        public string Accesstype { get; set; }
+        public string OptionalParts { get; set; }
+        public string Iosparts { get; set; }
+        public string AccessType { get; set; }
+        public string ToShowCountryAssignment { get; set; }
+        public string RouterEndofQuoteDate { get; set; }
+        public string RouterEndofSupportDate { get; set; }
+        public string BundleEndofQuoteDate { get; set; }
+        public string BundleEndofSupportDate { get; set; }
+        public string ExpectedDate { get; set; }
+        public string QuotableStartDate { get; set; }
+        public string Valid { get; set; }
+        public string CreatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedBy { get; set; }
+        public string DateLastUpdated { get; set; }
+        public string VariableParts { get; set; }
+        public string AssignedCountry { get; set; }
+        public string UnAssignedCountry { get; set; }
+        public List<Part> optPart { get; set; }
+        public List<Part> iosPart { get; set; }
+        public List<string> varParts { get; set; }
+    }
+
+
+    public class CPEBundles1
+    {
+        public string ProductID { get; set; }
+        public string ProductName { get; set; }
+        public string CountryID { get; set; }
+        public string CountryName { get; set; }
+        public string RegionName { get; set; }
+        public string RegionID { get; set; }
+        public string Router { get; set; }
+        public string RouterNamedd { get; set; }
+        public string Bundle { get; set; }
+        public string BundleNamedd { get; set; }
+        public string PartType { get; set; }
+        public string ValidBundle { get; set; }
+        public string UpdateBundleValidity { get; set; }
+        public string StandardParts { get; set; }
+        public string Accesstype { get; set; }
+        public string OptionalParts { get; set; }
+        public string Iosparts { get; set; }
+        public string AccessType { get; set; }
+        public string ToShowCountryAssignment { get; set; }
+        public string RouterEndofQuoteDate { get; set; }
+        public string RouterEndofSupportDate { get; set; }
+        public string BundleEndofQuoteDate { get; set; }
+        public string BundleEndofSupportDate { get; set; }
+        public string ExpectedDate { get; set; }
+        public string QuotableStartDate { get; set; }
+        public string Valid { get; set; }
+        public string CreatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedBy { get; set; }
+        public string DateLastUpdated { get; set; }
+        public string VariableParts { get; set; }
+
+    }
+
+
+    public class Part
+    {
+        public string bundleId;
+        public string AceesType;
+        public string PartName;
+        public string AceesTypeOpt;
+
+    }
+
+
+    public class UsageReports
+    {
+        public string Month { get; set; }
+        public string Description { get; set; }
+        public string Product { get; set; }
+        public int Count { get; set; }
+    }
+
+    public class WeeklyReport
+    {
+        public List<WeeklyReports> WeeklyReports { get; set; }
+        public int totalCount { get; set; }
+        public string startDate { get; set; }
+        public string endDate { get; set; }
+    }
+
+    public class WeeklyReports
+    {
+        public string date { get; set; }
+        public int count { get; set; }
+    }
+
+
+    public class CPESupplierfootertblData
+    {
+        public string SUPPLIER_CREATED_DT { get; set; }
+        public string SUPPLIER_UPDATED_DT { get; set; }
+        public string SUPPLIER_CREATED_BY { get; set; }
+        public string SUPPLIER_UPDATED_BY { get; set; }
+
+        public string cnt_assign_created_dt { get; set; }
+        public string CNT_assign_CREATED_BY { get; set; }
+        public string cnt_assign_updated_dt { get; set; }
+        public string CNT_assign_UPDATED_BY { get; set; }
+
+        public string SUP_EMAIL_CREATED_DT { get; set; }
+        public string SUP_EMAIL_CREATED_BY { get; set; }
+        public string SUP_EMAIL_UPDATED_DT { get; set; }
+        public string SUP_EMAIL_UPDATED_BY { get; set; }
+
+        public string ACC_TYPE_CREATED_DT { get; set; }
+        public string ACC_TYPE_CREATED_BY { get; set; }
+        public string ACC_TYPE_UPDATED_DT { get; set; }
+        public string ACC_TYPE_UPDATED_BY { get; set; }
+    }
+
+    public class ServiceTypeProductMap
+    {
+        public string ServiceType { get; set; }
+        public string ProductId { get; set; }
+        public string ProductName { get; set; }
+        public string ProductAbbr { get; set; }
+    }
+
+    public class NotesAuditInfo
+    {
+        public string NoteId { get; set; }
+        public string NoteTitle { get; set; }
+        public string CreatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedBy { get; set; }
+        public string UpdatedDate { get; set; }
+
+
+    }
+
+    public class CaseAuditInfo
+    {
+        public string CaseId { get; set; }
+        public string CountryName { get; set; }
+        public string CityPOPName { get; set; }
+        public string SubProduct { get; set; }
+        public string Carrier { get; set; }
+        public string PortSpeed { get; set; }
+        public string CreatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedBy { get; set; }
+        public string UpdatedDate { get; set; }
+        public string Validity { get; set; }
+    }
+
+    public class CaseDetailsAuditInfo
+    {
+        public string CharTypeName { get; set; }
+        public string CharName { get; set; }
+        public string CreatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedBy { get; set; }
+        public string UpdatedDate { get; set; }
+        public string Validity { get; set; }
+    }
+
+    public class CaseCharDetails
+    {
+        public string CharTypeName { get; set; }
+        public int OptionMatrixId { get; set; }
+        public string CharName { get; set; }
+        public int isMultiple { get; set; }
+
+    }
+
+    public class CaseTypeDetails
+    {
+        public int CharID { get; set; }
+        public int OptionMatrixID { get; set; }
+        public string Type { get; set; }
+        public string TypeData { get; set; }
+        public string Characteristic { get; set; }
+        public string PortSpeedLeadTime { get; set; }
+        public int PortSpeedLeadTimeText { get; set; }
+        public int AccessSpeed { get; set; }
+        public int ProductTypeID { get; set; }
+        public int AccessSupplierNameID { get; set; }
+        public int AccessSupplierID { get; set; }
+        public int Availability { get; set; }
+        public string CaseValue { get; set; }
+        public string CaseValue2 { get; set; }
+        public bool CaseValid { get; set; }
+        public int CharTypeId { get; set; }
+        public int CharAvailId { get; set; }
+        public string CharAvailName { get; set; }
+        public int ShowData { get; set; }
+        public List<CaseCharDetails> charDet { get; set; }
+        public string CaseStaticValue { get; set; }
+        public int CharTypeValueCount { get; set; }
+
+    }
+
+
+    public class ParentPortSpeed
+    {
+        public string PortSpeed { get; set; }
+        public string UnitOfMesure { get; set; }
+        public List<PortSpeedMapping> lsMapping { get; set; }
+
+    }
+
+    public class PortSpeedMapping
+    {
+        public string Availablity { get; set; }
+        public string Mapping { get; set; }
+        public string Valid { get; set; }
+        public bool isChecked { get; set; }
+        public string ValidValue { get; set; }
+        public int isDisabled { get; set; }
+        public int CharID { get; set; }
+        public int AccessSpeed { get; set; }
+        public int ProductTypeID { get; set; }
+        public int AccessSupplierNameID { get; set; }
+        public int AccessSupplierID { get; set; }
+        public int CharTypeID { get; set; }
+        public int OptionMatrixID { get; set; }
+        public int AvailValue { get; set; }
+    }
+
+    public class CountryAccessCases
+    {
+        public string CaseId { get; set; }
+        public string CountryName { get; set; }
+        public int CountryId { get; set; }
+        public string Region { get; set; }
+        public string CreatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedBy { get; set; }
+        public string UpdatedDate { get; set; }
+        public string Validity { get; set; }
+        public int CaseAvailCd { get; set; }
+        public string CaseAvailability { get; set; }
+    }
+
+    public class CPECases
+    {
+        public string CaseId { get; set; }
+        public string CountryName { get; set; }
+        public int CountryId { get; set; }
+        public string CityName { get; set; }
+        public int CityId { get; set; }
+        public string Region { get; set; }
+        public string CreatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedBy { get; set; }
+        public string UpdatedDate { get; set; }
+        public string Validity { get; set; }
+        public int CaseAvailCd { get; set; }
+        public int CPESupplierId { get; set; }
+        public bool Exception { get; set; }
+        public string CaseAvailability { get; set; }
+    }
+
+    public class AccessSpeed
+    {
+        public int AccessSpeedId { get; set; }
+        public string AccessSpeedValue { get; set; }
+    }
+
+    public class InterfaceTypes
+    {
+        public int InterfaceId { get; set; }
+        public string InterfaceType { get; set; }
+    }
+
+    public class AccessReportData
+    {
+        public string Country { get; set; }
+        public string CityPop { get; set; }
+        public string Supplier { get; set; }
+        public string Speed { get; set; }
+        public string DisplayInterface { get; set; }
+        public string Support { get; set; }
+        public string Resiliency { get; set; }
+    }
+
+    public class CityPOPDetails
+    {
+        public string Country { get; set; }
+        public string CityPop { get; set; }
+        public string Speed { get; set; }
+    }
+    public class SubProductDetails
+    {
+        public int SubProductId { get; set; }
+        public string SubProductName { get; set; }
+    }
+
+    [Serializable]
+    public class ChildCaseDetails
+    {
+        [JsonProperty("CaseID")]
+        public string CaseID { get; set; }
+        [JsonProperty("UserID")]
+        public string UserID { get; set; }
+        [JsonProperty("CharID")]
+        public string CharID { get; set; }
+        [JsonProperty("AccessSpeedID")]
+        public string AccessSpeedID { get; set; }
+        [JsonProperty("AccessTypeID")]
+        public string AccessTypeID { get; set; }
+        [JsonProperty("AccessSupplierNameID")]
+        public string AccessSupplierNameID { get; set; }
+        [JsonProperty("AccessSupplierID")]
+        public string AccessSupplierID { get; set; }
+        [JsonProperty("AvailValue")]
+        public string AvailValue { get; set; }
+        [JsonProperty("AvailDate")]
+        public string AvailDate { get; set; }
+        [JsonProperty("CharTypeID")]
+        public string CharTypeID { get; set; }
+        [JsonProperty("CaseValidVal")]
+        public string CaseValidVal { get; set; }
+        [JsonProperty("CharValue2")]
+        public string CharValue2 { get; set; }
+        [JsonProperty("CaseValue")]
+        public string CaseValue { get; set; }
+
+        [JsonProperty("PortSpeedLeadTime")]
+        public string PortSpeedLeadTime { get; set; }
+        [JsonProperty("OptionMatrixID")]
+        public string OptionMatrixID { get; set; }
+    }
+
+    [Serializable]
+    public class ParentCaseDetails
+    {
+        [JsonProperty("CaseID")]
+        public string CaseID { get; set; }
+        [JsonProperty("UserID")]
+        public string UserID { get; set; }
+        [JsonProperty("CharID")]
+        public string CharID { get; set; }
+        [JsonProperty("AccessSpeedID")]
+        public string AccessSpeedID { get; set; }
+        [JsonProperty("ProductTypeID")]
+        public string ProductTypeID { get; set; }
+        [JsonProperty("AccessSupplierNameID")]
+        public string AccessSupplierNameID { get; set; }
+        [JsonProperty("AccessSupplierID")]
+        public string AccessSupplierID { get; set; }
+        [JsonProperty("OptionMatrixID")]
+        public string OptionMatrixID { get; set; }
+        [JsonProperty("CaseValidValue")]
+        public string CaseValidValue { get; set; }
+        [JsonProperty("CharTypeID")]
+        public string CharTypeID { get; set; }
+        [JsonProperty("AvailValue")]
+        public string AvailValue { get; set; }
+    }
+
+    public class ReportStandardDetials
+    {
+        public int ReportId { get; set; }
+        public string ReportName { get; set; }
+    }
+    public class StandardColumnsData
+    {
+        public string ColumnHeader { get; set; }
+        public string ColumnWidth { get; set; }
+        public int valid { get; set; }
+        public string DisplayOrder { get; set; }
+    }
+
+    public class POPCharacteristicsData
+    {
+        public string ColumnHeader { get; set; }
+        public string Width { get; set; }
+        public string Characteristics { get; set; }
+        public string DisplayOrder { get; set; }
+        public int charId { get; set; }
+        public int columnValid { get; set; }
+        public string ColumnHeader2 { get; set; }
+        public string ColumnHeader3 { get; set; }
+    }
+    public class lstProductReportsDetails
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public List<ReportDetails> lstReports { get; set; }
+    }
+
+    public class ReportDetails
+    {
+        public int ReportCD { get; set; }
+        public int productCD { get; set; }
+        public int SubproductCD { get; set; }
+        public int reportLocLevelCD { get; set; }
+        public string reportDescription { get; set; }
+        public string reportPathDesc { get; set; }
+        public bool reportValidCD { get; set; }
+        public string reportAbbr { get; set; }
+    }
+
+    public class CharacteristicsData
+    {
+        public int CharId { get; set; }
+        public string CharName { get; set; }
+        public string OptionMatrixId { get; set; }
+    }
+
+    public class ColumnWidthData
+    {
+        public string ColumnName { get; set; }
+        public string Width { get; set; }
+    }
+    public class MappedProducts
+    {
+        public int MappedProduct { get; set; }
+    }
+
+    public class CharIdDetails
+    {
+        public string CharId { get; set; }
+    }
+
+    public class CPEMaintenanceOptions
+    {
+        public string ColumnName { get; set; }
+        public string IncludeInStandardRep { get; set; }
+        public string Width { get; set; }
+
+    }
+    public class ColumnReferenceData
+    {
+        public string ColumnHeader { get; set; }
+        public string Width { get; set; }
+        public string Characteristics { get; set; }
+        public string DisplayOrder { get; set; }
+        public int charId { get; set; }
+        public int columnValid { get; set; }
+        public string ColumnHeader2 { get; set; }
+        public string ColumnHeader3 { get; set; }
+    }
+
+    public class UpdateCaseDetails
+    {
+        public int CaseID { get; set; }
+        public string UserID { get; set; }
+        public int CharID { get; set; }
+        public int AccessSpeedID { get; set; }
+        public int AccessTypeID { get; set; }
+        public int AccessSupplierNameID { get; set; }
+        public int AccessSupplierID { get; set; }
+        public int AvailValue { get; set; }
+        public string AvailDate { get; set; }
+        public int CharTypeID { get; set; }
+        public int CharValue { get; set; }
+        public int CharValue2 { get; set; }
+    }
+
+    public class CaseAvailability
+    {
+        public int CaseAvailCd { get; set; }
+        public string CaseAvailAbbr { get; set; }
+        public string CaseAvailDesc { get; set; }
+    }
+
+    public class DSLPackages
+    {
+        public int CasePkgCd { get; set; }
+        public string CharId { get; set; }
+        public string CharName { get; set; }
+    }
+
+    public class HVPNProductPortTypes
+    {
+        public string CharacteristicType { get; set; }
+        public string DSLTechnologyType { get; set; }
+        public int DSLTechnologyTypeId { get; set; }
+        public string PortSpeed { get; set; }
+        public int PortSpeedAvailabilityId { get; set; }
+        public string PortSpeedAvailability { get; set; }
+        public string AccessType { get; set; }
+        public string Supplier { get; set; }
+        public string SupplierProduct { get; set; }
+        public string GPOPInterconnect { get; set; }
+        public int AccessAvailabilityId { get; set; }
+        public string AccessAvailability { get; set; }
+        public string InterconnectDesign { get; set; }
+        public string AccessSpeed { get; set; }
+        public string Interface { get; set; }
+        public string Framing { get; set; }
+        public string Connector { get; set; }
+        public bool IsValid { get; set; }
+        public int SupplierProductId { get; set; }
+        public int PortSpeedId { get; set; }
+        public int GPOPInterconnectId { get; set; }
+        public int AccessTypeId { get; set; }
+        public int SupplierId { get; set; }
+        public int PortTypeId { get; set; }
+
+    }
+
+    public class DSLCharacteristics
+    {
+        public string CharacteristicType { get; set; }
+        public string Characteristic { get; set; }
+        public int CharAvailCd { get; set; }
+        public int CharTypeValueCount { get; set; }
+        public string Availability { get; set; }
+        public string CharacteristicValue { get; set; }
+        public bool IsValid { get; set; }
+        public int MatrixId { get; set; }
+    }
+
+    public class DSLCharacteristicsUpdate
+    {
+        public List<DSLCharacteristics> DSLCharacteristics { get; set; }
+        public CaseUpdate CaseUpdateIds { get; set; }
+    }
+    public class CaseUpdate
+    {
+        public int CaseId { get; set; }
+        public int CasePkgId { get; set; }
+        public int UserId { get; set; }
+    }
+
+    public class HVPNProductPortTypesUpdate
+    {
+        public int PortSpeedAvailabilityId { get; set; }
+        public int AccessAvailabilityId { get; set; }
+        public bool IsValid { get; set; }
+
+        public List<HVPNProductPortTypes> HVPNProductPortTypes { get; set; }
+        public CaseUpdate CaseUpdateIds { get; set; }
+    }
+
+    public class GPOPInterConnect
+    {
+        public int HubSiteId { get; set; }
+        public string HubSiteName { get; set; }
+    }
+
+    public class AdminDetailsPortDropdownData
+    {
+        public string CharName { get; set; }
+        //public int AccessTypeId { get; set; }
+        //public int SupplierId { get; set; }
+        //public int SupplierProdId { get; set; }
+        //public int GPOPInterconnectId { get; set; }
+        public int PortTypeId { get; set; }
+        public int AccessSetId { get; set; }
+        //public int AccessPortId { get; set; }        
+    }
+
+    public class SLAAttributeData
+    {
+        public string ServiceName { get; set; }
+        public string Width { get; set; }
+        public string SLAColumnCd { get; set; }
+
+    }
+
+    public class CaseUpdateTimeLines
+    {
+        public string CreatedById { get; set; }
+        public string CreatedBy { get; set; }
+        public string UpdatedById { get; set; }
+        public string UpdatedBy { get; set; }
+        public string CreatedDate { get; set; }
+        public string UpdatedDate { get; set; }
+    }
+    public class UploadModel
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public HttpPostedFileBase Attachment { get; set; }
+    }
+
+
+    public class ProductReportDetails
+    {
+        public int ReportCD { get; set; }
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public int SubProductId { get; set; }
+        public string SubProductName { get; set; }
+        public int reportLocLevelCD { get; set; }
+        public string reportDescription { get; set; }
+        public string reportPathDesc { get; set; }
+        public bool reportValidCD { get; set; }
+        public string reportAbbr { get; set; }
+    }
+     public class PoPDetails
+    {
+        public int PoPID { get; set; }
+        public string PoPName { get; set; }
+    }
+
+
+    public class CPESuppliers
+    {
+        public int SupplierId { get; set; }
+        public string SupplierName { get; set; }        
+    }
+
+    public class SubProduct
+    {
+        public int SubProductID { get; set; }
+        public string SubProductName { get; set; }
+    }
+}
+
+   
+
+

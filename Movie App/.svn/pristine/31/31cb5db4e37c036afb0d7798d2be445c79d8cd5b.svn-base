@@ -1,0 +1,141 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+namespace SCAdminDAL
+{
+   public class AdminAccessMap
+    {
+
+       private GetDataFromDB GetDataFromDB = new GetDataFromDB();
+       private StringBuilder StringBuilder = new StringBuilder();
+
+       public DataTable MapAccessProductsForPoP()
+       {
+           GetDataFromDB = new GetDataFromDB();
+           StringBuilder = new StringBuilder();
+           try
+           {
+               StringBuilder.Append(" select char_name,char_id from csu_ref_valid_char where char_type_id =581 and ");
+               StringBuilder.Append(" char_id not in (Select distinct ACCESS_PRODUCT_TYPE_ID from CSU_ACCESS_PRODUCT_LEVEL) ");
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return GetDataFromDB.GetDataTable(StringBuilder.ToString());
+       }
+
+       public DataTable MapAccessProductsForCountry()
+       {
+           GetDataFromDB = new GetDataFromDB();
+           StringBuilder = new StringBuilder();
+           try
+           {
+               StringBuilder.Append(" select char_name,char_id from csu_ref_valid_char where char_type_id =581 and ");
+               StringBuilder.Append(" char_id in (Select distinct ACCESS_PRODUCT_TYPE_ID from CSU_ACCESS_PRODUCT_LEVEL) ");
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return GetDataFromDB.GetDataTable(StringBuilder.ToString());
+       }
+
+        public DataTable PoPLevelMapping()
+        {
+           GetDataFromDB = new GetDataFromDB();
+           StringBuilder = new StringBuilder();
+           try
+           {
+               StringBuilder.Append(" select char_name,char_id from csu_ref_valid_char where char_type_id =581 and ");
+               StringBuilder.Append(" char_id not in (Select distinct ACCESS_PRODUCT_TYPE_ID from CSU_ACCESS_PRODUCT_LEVEL) ");
+                StringBuilder.Append(" Order by char_name,char_id ");
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return GetDataFromDB.GetDataTable(StringBuilder.ToString());
+       }
+
+        public DataTable CountryLevelMapping()
+        {
+           GetDataFromDB = new GetDataFromDB();
+           StringBuilder = new StringBuilder();
+           try
+           {
+               StringBuilder.Append(" select char_name,char_id from csu_ref_valid_char where char_type_id =581 and ");
+               StringBuilder.Append(" char_id in (Select distinct ACCESS_PRODUCT_TYPE_ID from CSU_ACCESS_PRODUCT_LEVEL) ");
+                StringBuilder.Append(" Order by char_name,char_id ");
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+
+           return GetDataFromDB.GetDataTable(StringBuilder.ToString());
+       }
+
+        public int SaveAccessProductLevelMapping(int[] AccessProductIDs, string User_id)
+        {
+            int status = 0;
+            string DeleteQuery = string.Empty;
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                DeleteQuery = @"Delete from CSU_ACCESS_PRODUCT_LEVEL";
+                status = OracleDataAccess.ExecuteNonQuery(oConn, CommandType.Text, DeleteQuery.ToString());
+
+                foreach (int AccessProdIDs in AccessProductIDs)
+                {
+                    string str = @"Insert into CSU_ACCESS_PRODUCT_LEVEL
+                      (
+                     ACCESS_PRODUCT_TYPE_ID, 
+                      ACCESS_PRODUCT_TYPE_LEVEL, 
+                       CREATED_EMP_ID, 
+                       CREATED_DT, 
+                       UPDATED_EMP_ID,
+                      UPDATED_DT 
+                     
+                      )
+                       VALUES  (" + AccessProdIDs + "," + "'COUNTRY'" + ", '" + User_id +"',sysdate,'" + User_id + "',sysdate)";
+
+                     status = OracleDataAccess.ExecuteNonQuery(oConn, CommandType.Text, str.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return status;
+        }
+
+        public DataTable GetUserDetails()
+        {
+            GetDataFromDB = new GetDataFromDB();
+            StringBuilder = new StringBuilder();
+            try
+            {
+                StringBuilder.Append(" SELECT B.USER_NAME AS CreatedUser,to_char(a.CREATED_DT,'DD-MON-YYYY HH24:MI') AS CreatedDate, ");
+                StringBuilder.Append(" C.USER_NAME AS UpdatedUser,to_char( a.UPDATED_DT,'DD-MON-YYYY HH24:MI') AS UpdatedDate ");
+                StringBuilder.Append(" FROM CSU_ACCESS_PRODUCT_LEVEL A Inner join  ");
+                StringBuilder.Append("  csu_user B On B.EMP_ID=A.CREATED_EMP_ID Inner join csu_user C ON C.EMP_ID=A.UPDATED_EMP_ID ");
+                StringBuilder.Append(" WHERE rownum=1 ORDER BY ACCESS_PRODUCT_TYPE_ID DESC ");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return GetDataFromDB.GetDataTable(StringBuilder.ToString());
+        }
+    }
+}

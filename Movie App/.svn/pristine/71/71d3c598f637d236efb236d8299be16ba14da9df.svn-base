@@ -1,0 +1,505 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using SCAdminBAL;
+using System.Data;
+
+using System.Web.Security;
+using System.Web.Services;
+using System.Web.Script.Services;
+using System.Text;
+using System.Web.UI.WebControls.WebParts;
+using System.IO;
+using System.Web.Script.Serialization;
+//using System
+using Newtonsoft.Json;
+using System.Collections;
+using System.Reflection;
+using SCAdminDAL;
+using SCAdminBAL;
+using System.Data.OracleClient;
+using System.Web.UI;
+
+
+
+namespace SCAdmin
+{
+    public partial class SLAMaster : System.Web.UI.Page
+    {
+
+
+        public void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+
+
+        [WebMethod]
+        public static string getDataFromDB(int FiletypeId, int ProductId)
+        {
+            DataTable dt = SLABuilderBAL.getDataFromDB(FiletypeId, ProductId);
+            var data = new
+            {
+                getFile = dt,
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+
+
+
+
+        //Instead of writing 5 services i have merged into single json string service
+        [WebMethod]
+        public static string sendPageLoadData()
+        {
+            DataTable getCountry = new DataTable();
+            DataTable getPartner = new DataTable();
+            DataTable getPrimary = new DataTable();
+            DataTable getProducts = new DataTable();
+            DataTable getResiliency = new DataTable();
+            DataTable getSecondary = new DataTable();
+
+            var data = new
+            {
+                getCountry = SLABuilderBAL.sendPageLoadData()[0],
+                getPartner = SLABuilderBAL.sendPageLoadData()[1],
+                getPrimary = SLABuilderBAL.sendPageLoadData()[2],
+                getProducts = SLABuilderBAL.sendPageLoadData()[3],
+                getResiliency = SLABuilderBAL.sendPageLoadData()[4],
+                getSecondary = SLABuilderBAL.sendPageLoadData()[5],
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+        //[WebMethod]
+        //public static int sendpageloaddata()
+        //{
+        //    return 1;
+        //}
+
+
+        //public static DataTable getData()
+        //{
+        //    DataTable dt = new DataTable();
+        //    dt.Columns.Add("UserId", typeof(Int32));
+        //    dt.Columns.Add("UserName", typeof(string));
+        //    dt.Columns.Add("Education", typeof(string));
+        //    dt.Columns.Add("Location", typeof(string));
+        //    dt.Rows.Add(1, "Satinder Singh", "Bsc Com Sci", "Mumbai");
+        //    dt.Rows.Add(2, "Amit Sarna", "Mstr Com Sci", "Mumbai");
+        //    dt.Rows.Add(3, "Andrea Ely", "Bsc Bio-Chemistry", "Queensland");
+        //    dt.Rows.Add(4, "Leslie Mac", "MSC", "Town-ville");
+        //    dt.Rows.Add(5, "Vaibhav Adhyapak", "MBA", "New Delhi");
+        //    return dt;
+        //}
+
+        //[WebMethod]
+        //public static string Datatos()
+        //{
+        //    JavaScriptSerializer jsSerializer = new JavaScriptSerializer();
+        //    List<Dictionary<string, object>> parentRow = new List<Dictionary<string, object>>();
+        //    Dictionary<string, object> childRow;
+        //    //DataTable table = SLAMaster.sendPageLoadData();
+        //    foreach (DataRow row in table.Rows)
+        //    {
+        //        childRow = new Dictionary<string, object>();
+        //        foreach (DataColumn col in table.Columns)
+        //        {
+        //            childRow.Add(col.ColumnName, row[col]);
+        //        }
+        //        parentRow.Add(childRow);
+        //    }
+        //    return jsSerializer.Serialize(parentRow);
+        //}   
+
+
+        [WebMethod]
+        public static string getSLAMasterDetails(int product_ID, string lstCountry, string ddlPartner, string lstResiliency, string ddlPrimary, string ddlSecondary)
+        {
+            //  return "masdna";
+            DataTable dt = SLABuilderBAL.getSLAMasterDetails(product_ID, lstCountry, ddlPartner, lstResiliency, ddlPrimary, ddlSecondary);
+            DataTable getSLAMaster = new DataTable();
+            DataTable getBandSLACategery = new DataTable();
+            DataTable dt1 = SLABuilderBAL.getslabanddata();
+            var data = new
+            {
+                getSLAMaster = dt,
+                BandSLACategory = dt1
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+        [WebMethod]
+        public static string getMasterDetails()
+        {
+            DataTable primaryAccessTechnology = new DataTable();
+            DataTable primaryServiceVariant = new DataTable();
+            DataTable PrimaryDeliveryMode = new DataTable();
+            DataTable SLAcategory = new DataTable();
+            DataTable getBandSLACategery = new DataTable();
+            DataTable getslabanddata = SLABuilderBAL.getslabanddata();
+
+            var data = new
+            {
+                primaryAccessTechnology = SLABuilderBAL.getMasterData()[0],
+                primaryServiceVariant = SLABuilderBAL.getMasterData()[2],
+                PrimaryDeliveryMode = SLABuilderBAL.getMasterData()[1],
+                getBandSLACategery = SLABuilderBAL.getMasterData()[3],
+                //getBandSLACategery = getslabanddata,
+
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+        //[WebMethod]
+        //public static int SaveMasterData(string MasterDetailsData)
+        //{
+
+        //    List<SLAMasterData> SLAMasters =
+        //        new System.Web.Script.Serialization.JavaScriptSerializer().
+        //        Deserialize<List<SLAMasterData>>(MasterDetailsData);
+        //    return SLABuilderBAL.SaveMasterData(SLAMasters);
+        //}
+
+
+
+        //[WebMethod]
+        //public static int UpdateMasterData(string updateMasterDetailsData)
+        //{
+        //    List<SLAMasterData> SLAMaster =
+        //        new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<List<SLAMasterData>>(updateMasterDetailsData);
+
+        //}
+
+        //fetch this service after the saving the records
+
+        [WebMethod]
+        public static string getProductLevelSLADetails(int Productid)
+        {
+            DataTable getProductLevelSLADetails = new DataTable();
+            var data = new
+            {
+                getProductLevelSLADetails = SLABuilderBAL.getProductLevelSLADetails(Productid)
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+        [WebMethod]
+        public static string getCountreisByid(int ProductId)
+        {
+            DataTable getCountriesDataBYProductId1 = new DataTable();
+            var data = new
+            {
+                getCountriesDataByProductId1 = SLABuilderBAL.getCountriesDataByProductId(ProductId)
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+        [WebMethod]
+        public static string getProductLevelSLAbyProdId(int ProductId)
+        {
+            List<DataTable> PLATables = SLABuilderBAL.getPLAMasterDetails(ProductId);
+            DataTable SLADetailsofProduct = new DataTable();
+            DataTable MTNISLA = new DataTable();
+            DataTable Restypes = new DataTable();
+            DataTable MainResttype = new DataTable();
+            DataTable SLATable = new DataTable();
+
+            List<DataTable> CountryDAta = SLABuilderBAL.getCountriesData(ProductId);
+            DataTable Country = new DataTable();
+            DataTable Leg1Accessspeed = new DataTable();
+            DataTable Leg2Accessspeed = new DataTable();
+
+            DataTable getCountriesDataBYProductId = new DataTable();
+            DataTable getCountriesDataByProductId = SLABuilderBAL.getCountriesDataByProductId(ProductId);
+
+            DataTable tableData = new DataTable();
+            DataTable PlatformsData = new DataTable();
+            List<DataTable> PlatformConfigurationByID = SLABuilderBAL.PlatformConfigurationByID(ProductId);
+
+            var data = new
+            {
+                SLADetailsofProduct = PLATables[1],
+                MTNISLA = PLATables[0],
+                Restypes = PLATables[2],
+                MainResttype = PLATables[3],
+                SLATable = PLATables[4],
+
+                Country = CountryDAta[0],
+                Leg1Accessspeed = CountryDAta[1],
+                Leg2Accessspeed = CountryDAta[2],
+
+                getCountriesDataByProductId = getCountriesDataByProductId,
+
+                //PlatformsData
+                PlatformsData = PlatformConfigurationByID[0],
+                tableData = PlatformConfigurationByID[1],
+
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+
+        [WebMethod]
+        public static string getPlatformsByid(int ProductId)
+        {
+            DataTable getPlatformsByid = new DataTable();
+            var data = new
+            {
+                getPlatformsByid = SLABuilderBAL.PlatformConfigurationByID(ProductId)[1]
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+
+
+        [WebMethod]
+        public static string getAccessConfigByProdType(int ProductId)
+        {
+            DataTable SLAtable = new DataTable();
+            DataTable Leg1Aceesstable = new DataTable();
+            DataTable Leg2Aceesstable = new DataTable();
+            DataTable LEG1ServiceVarianttable = new DataTable();
+            DataTable LEG2ServiceVarianttable = new DataTable();
+
+            DataTable LEG1DeliveryModetable = new DataTable();
+            DataTable LEG2DeliveryModetable = new DataTable();
+
+            DataTable accessTypeconfigTableData = new DataTable();
+
+
+
+
+            List<DataTable> getSLAaccessConfigByProdId = SLABuilderBAL.getSLAaccessConfigByProdId(ProductId);
+
+            var data = new
+            {
+                SLAtable = getSLAaccessConfigByProdId[0],
+
+                Leg1Aceesstable = getSLAaccessConfigByProdId[1],
+                Leg2Aceesstable = getSLAaccessConfigByProdId[4],
+
+                LEG1ServiceVarianttable = getSLAaccessConfigByProdId[2],
+                LEG2ServiceVarianttable = getSLAaccessConfigByProdId[5],
+
+                LEG1DeliveryModetable = getSLAaccessConfigByProdId[3],
+                LEG2DeliveryModetable = getSLAaccessConfigByProdId[6],
+
+                accessTypeconfigTableData = getSLAaccessConfigByProdId[7]
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+
+        [WebMethod]
+        public static int SaveSLADetails(int ProductId, string SLASaveDetailsJson)
+        {
+            List<SLAConfigData> SLASaveDetails =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<List<SLAConfigData>>(SLASaveDetailsJson);
+            return SLABuilderBAL.SaveSLADetails(ProductId, SLASaveDetails);
+        }
+
+        [WebMethod]
+        public static string AccessConfigData(int productID)
+        {
+            DataTable getAcceessConfigData = new DataTable();
+            var data = new
+            {
+                getProductLevelSLADetails = SLABuilderBAL.AccessConfigData(productID)
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+        //[WebMethod]
+        //public static string getProductLevelSLADetails(int Productid)
+        //{
+        //    DataTable getProductLevelSLADetails = new DataTable();
+        //    var data = new
+        //    {
+        //        getProductLevelSLADetails = SLABuilderBAL.getProductLevelSLADetails(Productid)
+        //    };
+        //    return JsonConvert.SerializeObject(data, Formatting.Indented);
+        //}
+
+
+
+        [WebMethod]
+        public static int DeleteProductsBySLAId(string slaids)
+        {
+            return SLABuilderBAL.DeleteProductsBySLAId(slaids);
+        }
+
+        [WebMethod]
+        public static int DeleteAccssconfig(int producId, string configIds)
+        {
+            List<AccessConfigData> SLAMasters =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<List<AccessConfigData>>(configIds);
+            return SLABuilderBAL.DeleteAccessConfiguration(producId, SLAMasters);
+        }
+
+        [WebMethod]
+        public static int saveAccessconfigData(int ProductId, string SLASaveConfigDetailsJson)
+        {
+            List<AccessConfigData> SLAMasters =
+                            new System.Web.Script.Serialization.JavaScriptSerializer().
+                            Deserialize<List<AccessConfigData>>(SLASaveConfigDetailsJson);
+            return SLABuilderBAL.saveAccessconfigData(ProductId, SLAMasters);
+        }
+
+        [WebMethod]
+        public static string getAccessExceptions(int productId)
+        {
+            DataTable getAccessExceptions = new DataTable();
+            var data = new
+            {
+                getAccessExceptions = SLABuilderBAL.accessTypeExceptions(productId)
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+
+
+        //getProductSLAtable
+        [WebMethod]
+        public static string getProductSLATable(int productId)
+        {
+            DataTable getProductSLATable = new DataTable();
+            var data = new
+            {
+                getProductSLATable = SLABuilderBAL.getProductSLATable(productId)
+            };
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
+        }
+
+
+
+
+
+
+
+        [WebMethod]
+        public static int InsertAccessTypeExcepetions(int productId, string accesstype)
+        {
+            List<SCAdminDAL.AccessTypeException> SLAex =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<List<SCAdminDAL.AccessTypeException>>(accesstype);
+
+            return SLABuilderBAL.InsertAccessTypeExcepetions(productId, SLAex);
+        }
+
+        [WebMethod]
+        public static int Insertcountrydetails(int ProductId, string SaveCountryDetailsJSON)
+        {
+            List<SCAdminDAL.Country> CountriesList =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<List<SCAdminDAL.Country>>(SaveCountryDetailsJSON);
+            return SLABuilderBAL.insertcountrydetails(ProductId, CountriesList);
+        }
+
+        [WebMethod]
+        public static int DeleteCountryDetailsByIds(int productId, string DeleteCountryDetailsJSON)
+        {
+            List<SCAdminDAL.Country> SLAcountries =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<List<SCAdminDAL.Country>>(DeleteCountryDetailsJSON);
+            return SLABuilderBAL.DeleteCountryDetailsByIds(productId, SLAcountries);
+        }
+
+        [WebMethod]
+        public static int InsertPlatformdetails(int ProductId, string SavePlatformDetailsJSON)
+        {
+            List<SCAdminDAL.Platform> PlatformsList =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<List<SCAdminDAL.Platform>>(SavePlatformDetailsJSON);
+            return SLABuilderBAL.InsertPlatform(ProductId, PlatformsList);
+        }
+
+
+        [WebMethod]
+        public static int DeletePlatformsDetailsByIds(int productId, string DeletePlatformsDetailsJSON)
+        {
+            List<SCAdminDAL.Platform> SLAcountries =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<List<SCAdminDAL.Platform>>(DeletePlatformsDetailsJSON);
+            return SLABuilderBAL.DeletePlatformsDetailsByIds(productId, SLAcountries);
+        }
+
+
+
+
+
+
+        [WebMethod]
+        public static int InsertMasterdetails(string CountryName, string SaveMasterDetailsJSON)
+        {
+            List<SCAdminDAL.SLAMasterData> masterdata =
+                new System.Web.Script.Serialization.JavaScriptSerializer().
+                Deserialize<List<SCAdminDAL.SLAMasterData>>(SaveMasterDetailsJSON);
+            return SLABuilderBAL.InsertSLAMasterData(CountryName, masterdata);
+        }
+
+
+        [WebMethod]
+        public static int UpdateMasterdetails(string CurrentItem, string UpdateItem)
+        {
+            List<SCAdminDAL.SLAMasterData> cItem =
+                 new System.Web.Script.Serialization.JavaScriptSerializer().
+                 Deserialize<List<SCAdminDAL.SLAMasterData>>(CurrentItem);
+
+            List<SCAdminDAL.SLAMasterData> uItem =
+              new System.Web.Script.Serialization.JavaScriptSerializer().
+              Deserialize<List<SCAdminDAL.SLAMasterData>>(UpdateItem);
+            //SLAMaster sla
+            return SLABuilderBAL.UpdateMasterDetails(cItem, uItem);
+        }
+
+        [WebMethod]
+        public static int DeleteMasterdetails(string DeleteItemJSON)
+        {
+            List<SCAdminDAL.SLAMasterData> deleteItem =
+                 new System.Web.Script.Serialization.JavaScriptSerializer().
+                 Deserialize<List<SCAdminDAL.SLAMasterData>>(DeleteItemJSON);
+            return SLABuilderBAL.DeleteMasterDetails(deleteItem);
+        }
+
+
+
+
+        [WebMethod]
+        public static string FileDownLoad(int FileTypeId, int ProductId)
+        {
+            // dbservices db = new dbservices();
+            string user = HttpContext.Current.User.Identity.Name;
+            // string id = db.return_id_by_user(user);
+            return "FileDownload.aspx?productID=" + ProductId + "&FileType=" + FileTypeId + "";
+            // return 1;
+
+
+
+
+        }
+
+
+
+
+
+
+
+    }
+}

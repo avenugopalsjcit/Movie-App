@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Services;
+using SCAdminBAL;
+using System.Data;
+using System.Web.Script.Serialization;
+
+
+namespace SCAdmin
+{
+    public partial class CpeLeadTime : System.Web.UI.Page
+    {
+
+
+        CpeLeadTimeBAL supplierBAL = new CpeLeadTimeBAL();
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        [WebMethod]
+        public static List<SLAAccSupp> GetSuppliersData()
+        {
+            return GetAllSupplier();
+        }
+
+        private static List<SLAAccSupp> GetAllSupplier()
+        {
+            CpeLeadTimeBAL supplierBAL = new CpeLeadTimeBAL();
+
+            List<SLAAccSupp> SuppList = supplierBAL.GetAllSupplier();
+            return SuppList;
+        }
+
+        [WebMethod]
+        public static List<CPELeadTime> BindSupplierData()
+        {
+            return BindAllSupplier();
+        }
+
+        private static List<CPELeadTime> BindAllSupplier()
+        {
+            CpeLeadTimeBAL bindSupplierBAL = new CpeLeadTimeBAL();
+
+            List<CPELeadTime> bindSuppList = bindSupplierBAL.BindAllSupplier();
+            return bindSuppList;
+        }
+    }
+}

@@ -1,0 +1,960 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+    public class PortToAccessSpeedBAL
+    {
+        private GlobalReferenceDAL objGRDAL = new GlobalReferenceDAL();
+        public List<lstPortToAccessSped> GetPortToAccessSpeed(int C_PORT_SPEED, int C_ACCESS_SPEED, string C_HVPN_PORT_SPEED, string C_ACCESS_SPEED_DOWN_UP, int C_ACCESS_TYPE)
+        {
+            List<lstPortToAccessSped> lstPortToAccessSpeed = new List<lstPortToAccessSped>();
+            try
+            {
+                DataSet dsGetPortDetails = objGRDAL.GetPortToAccessSpeed(C_PORT_SPEED, C_ACCESS_SPEED, C_HVPN_PORT_SPEED, C_ACCESS_SPEED_DOWN_UP);
+                decimal hvpnport_id, portaccessdownup_id;
+                var hvpnport = from a in dsGetPortDetails.Tables[2].AsEnumerable().Where(t => t.Field<string>("CHAR_TYPE_NAME") == Convert.ToString(C_HVPN_PORT_SPEED.ToString())) select a;
+                hvpnport_id = Convert.ToDecimal(hvpnport.FirstOrDefault().Field<decimal>("CHAR_TYPE_ID"));
+
+                var portaccessdownup = from a in dsGetPortDetails.Tables[2].AsEnumerable().Where(t => t.Field<string>("CHAR_TYPE_NAME") == Convert.ToString(C_ACCESS_SPEED_DOWN_UP.ToString())) select a;
+                portaccessdownup_id = Convert.ToDecimal(portaccessdownup.FirstOrDefault().Field<decimal>("CHAR_TYPE_ID"));
+                foreach (DataRow dr in dsGetPortDetails.Tables[0].Rows)
+                {
+                    lstPortToAccessSped objPort = new lstPortToAccessSped();
+
+                    objPort.CHAR_ID = Convert.ToInt32(dr["CHAR_ID"]);
+
+                    //
+                    string charName = "";
+                    if (dr["CHAR_NAME"] != null)
+                    {
+
+
+                        if (dr["CHAR_NAME"].ToString() != "")
+                        {
+                            charName = Convert.ToString(dr["CHAR_NAME"].ToString());
+                        }
+                    }
+
+
+                    decimal? charTypeId = null;
+                    if (dr["CHAR_TYPE_ID"] != null)
+                    {
+
+
+                        if (dr["CHAR_TYPE_ID"].ToString() != "")
+                        {
+                            charTypeId = Convert.ToDecimal(dr["CHAR_TYPE_ID"].ToString());
+                        }
+                    }
+                    string charActualValue = "";
+                    if (dr["CHAR_ACTUAL_VALUE"] != null)
+                    {
+                        if (dr["CHAR_ACTUAL_VALUE"].ToString() != "")
+                        {
+                            charActualValue = Convert.ToString(dr["CHAR_ACTUAL_VALUE"].ToString());
+                        }
+                    }
+                    string charUnitOfMeasure = "";
+                    if (dr["CHAR_UNIT_OF_MEASURE"] != null)
+                    {
+                        if (dr["CHAR_UNIT_OF_MEASURE"].ToString() != "")
+                        {
+                            charUnitOfMeasure = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE"].ToString());
+                        }
+                    }
+
+                   string charActualValue2 = "";
+                    if (dr["CHAR_ACTUAL_VALUE_2"] != null)
+                    {
+                        if (dr["CHAR_ACTUAL_VALUE_2"].ToString() != "")
+                        {
+                            charActualValue2 = Convert.ToString(dr["CHAR_ACTUAL_VALUE_2"].ToString());
+                        }
+                    }
+                    string charUnitOfMeasure2 = "";
+                    if (dr["CHAR_UNIT_OF_MEASURE_2"] != null)
+                    {
+                        if (dr["CHAR_UNIT_OF_MEASURE_2"].ToString() != "")
+                        {
+                            charUnitOfMeasure2 = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE_2"].ToString());
+                        }
+                    }
+
+                    string PortSpeedDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName, charTypeId, charActualValue, charUnitOfMeasure, charActualValue2, charUnitOfMeasure2);
+                    objPort.PortSpeed = Convert.ToString(PortSpeedDescription);
+
+                    //
+                    var mapPorts = from a in dsGetPortDetails.Tables[1].AsEnumerable().Where(t => t.Field<decimal>("PORT_SPEED_CHAR_ID") == objPort.CHAR_ID) select a;
+                    List<MappedAccessSpeed> objAccessSpeed = new List<MappedAccessSpeed>();
+                    objPort.lstMappedAccessSpeed = objAccessSpeed;
+                    foreach (var accessChar in mapPorts)  //mapdetails
+                    {
+                        // details from accessChar
+                        string charName_accessChar = "";
+                        if (accessChar.Field<string>("CHAR_NAME") != null)
+                        {
+                            if (accessChar.Field<string>("CHAR_NAME").ToString() != "")
+                            {
+                                charName_accessChar = Convert.ToString(accessChar.Field<string>("CHAR_NAME").ToString());
+                            }
+                        }
+
+                        decimal? charTypeId_accessChar = null;
+                        if (accessChar.Field<decimal>("CHAR_TYPE_ID") != null)
+                        {
+                            if (accessChar.Field<decimal>("CHAR_TYPE_ID").ToString() != "")
+                            {
+                                charTypeId_accessChar = Convert.ToDecimal(accessChar.Field<decimal>("CHAR_TYPE_ID").ToString());
+                            }
+                        }
+                        string charActualValue_accessChar = "";
+                        if (accessChar.Field<string>("CHAR_ACTUAL_VALUE") != null)
+                        {
+                            if (accessChar.Field<string>("CHAR_ACTUAL_VALUE") != "")
+                            {
+                                charActualValue_accessChar = Convert.ToString(accessChar.Field<string>("CHAR_ACTUAL_VALUE").ToString());
+                            }
+                        }
+                        string charUnitOfMeasure_accessChar = "";
+                        if (accessChar.Field<string>("CHAR_UNIT_OF_MEASURE") != null)
+                        {
+                            if (accessChar.Field<string>("CHAR_UNIT_OF_MEASURE") != "")
+                            {
+                                charUnitOfMeasure_accessChar = Convert.ToString(accessChar.Field<string>("CHAR_UNIT_OF_MEASURE").ToString());
+                            }
+                        }
+                        string charActualValue2_accessChar = "";
+                        if (accessChar.Field<string>("CHAR_ACTUAL_VALUE_2") != null)
+                        {
+                            if (accessChar.Field<string>("CHAR_ACTUAL_VALUE_2").ToString() != "")
+                            {
+                                charActualValue2_accessChar = Convert.ToString(accessChar.Field<string>("CHAR_ACTUAL_VALUE_2").ToString());
+                            }
+
+                        }
+
+                        string charUnitOfMeasure2_accessChar = "";
+                        if (accessChar.Field<string>("CHAR_UNIT_OF_MEASURE_2") != null)
+                        {
+                            if (accessChar.Field<string>("CHAR_UNIT_OF_MEASURE_2").ToString() != "")
+                            {
+                                charUnitOfMeasure2_accessChar = Convert.ToString(accessChar.Field<string>("CHAR_UNIT_OF_MEASURE_2").ToString());
+                            }
+
+                        }
+
+                        DataSet dsMappedTypeChars = objGRDAL.GetMappedAccessTypeChars(objPort.CHAR_ID, accessChar.Field<int>("CHAR_ID"), C_ACCESS_TYPE);
+                        foreach (DataRow drmappedTypeChar in dsMappedTypeChars.Tables[0].Rows)  //map acces details
+                        {
+                            // details from drmappedTypeChar
+                            int? charid_mappedTypeChar = null;
+                            if (drmappedTypeChar["CHAR_ID"] != null)
+                            {
+                                if (drmappedTypeChar["CHAR_ID"].ToString() != "")
+                                {
+                                    charid_mappedTypeChar = Convert.ToInt32(drmappedTypeChar["CHAR_ID"].ToString());
+                                }
+                            }
+                            string charName_mappedTypeChar = "";
+                            if (drmappedTypeChar["CHAR_NAME"] != null)
+                            {
+                                if (drmappedTypeChar["CHAR_NAME"].ToString() != "")
+                                {
+                                    charName_mappedTypeChar = Convert.ToString(drmappedTypeChar["CHAR_NAME"].ToString());
+                                }
+                            }
+                            int? charTypeId_mappedTypeChar = null;
+                            if (drmappedTypeChar["CHAR_TYPE_ID"] != null)
+                            {
+                                if (drmappedTypeChar["CHAR_TYPE_ID"].ToString() != "")
+                                {
+                                    charTypeId_mappedTypeChar = Convert.ToInt32(drmappedTypeChar["CHAR_TYPE_ID"].ToString());
+                                }
+                            }
+                            string charActualValue_mappedTypeChar = "";
+                            if (drmappedTypeChar["CHAR_ACTUAL_VALUE"] != null)
+                            {
+                                if (drmappedTypeChar["CHAR_ACTUAL_VALUE"].ToString() != string.Empty)
+                                {
+                                    charActualValue_mappedTypeChar = Convert.ToString(drmappedTypeChar["CHAR_ACTUAL_VALUE"].ToString());
+                                }
+                            }
+                            string charUnitOfMeasure_mappedTypeChar = "";
+                            if (drmappedTypeChar["CHAR_UNIT_OF_MEASURE"] != null)
+                            {
+                                if (drmappedTypeChar["CHAR_UNIT_OF_MEASURE"].ToString() != "")
+                                {
+                                    charUnitOfMeasure_mappedTypeChar = Convert.ToString(drmappedTypeChar["CHAR_UNIT_OF_MEASURE"].ToString());
+                                }
+                            }
+                            string charActualValue2_mappedTypeChar = "";
+                            if (drmappedTypeChar["CHAR_ACTUAL_VALUE_2"] != null)
+                            {
+                                if (drmappedTypeChar["CHAR_ACTUAL_VALUE_2"].ToString() != "")
+                                {
+                                    charActualValue2_mappedTypeChar = Convert.ToString(drmappedTypeChar["CHAR_ACTUAL_VALUE_2"].ToString());
+                                }
+                            }
+                            string charUnitOfMeasure2_mappedTypeChar = "";
+                            if (drmappedTypeChar["CHAR_UNIT_OF_MEASURE_2"] != null)
+                            {
+                                if (drmappedTypeChar["CHAR_UNIT_OF_MEASURE_2"].ToString() != "")
+                                {
+                                    charUnitOfMeasure2_mappedTypeChar = Convert.ToString(drmappedTypeChar["CHAR_UNIT_OF_MEASURE_2"].ToString());
+                                }
+                            }
+
+
+                            //string accessCharDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_accessChar, charTypeId_accessChar, charActualValue_accessChar, charUnitOfMeasure_accessChar, charActualValue2_accessChar, charUnitOfMeasure2_accessChar);
+                            //string mappedTypeCharDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_mappedTypeChar, charTypeId_mappedTypeChar, charActualValue_mappedTypeChar, charUnitOfMeasure_mappedTypeChar, charActualValue2_mappedTypeChar, charUnitOfMeasure2_mappedTypeChar);
+                            string accessCharDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_accessChar, charTypeId, charActualValue_accessChar, charUnitOfMeasure_accessChar, charActualValue2_accessChar, charUnitOfMeasure2_accessChar);
+                            string mappedTypeCharDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_mappedTypeChar, charTypeId_accessChar, charActualValue_mappedTypeChar, charUnitOfMeasure_mappedTypeChar, charActualValue2_mappedTypeChar, charUnitOfMeasure2_mappedTypeChar);
+                            string description = accessCharDescription + " " + mappedTypeCharDescription;
+                            objPort.lstMappedAccessSpeed.Add(new MappedAccessSpeed() { charID = Convert.ToInt32(charid_mappedTypeChar), MappedAccessSpeedDescription = description });
+
+                        }
+
+                    }
+                    lstPortToAccessSpeed.Add(objPort);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return lstPortToAccessSpeed;
+        }
+
+        public List<lstPortToAccessSped> GetPortAccessSpeedDetails(int Char_id, int CharType_id, string portSpeedName, decimal C_HVPN_PORT_SPEED_id, decimal C_ACCESS_SPEED_DOWN_UP_id, int C_ACCESS_SPEED, int C_ACCESS_TYPE, int C_PORT_SPEED, string type,string C_ACCESS_SPEED_DOWN_UP)
+        {
+            List<lstPortToAccessSped> lstPortToAccessSpeed = new List<lstPortToAccessSped>();
+            try
+            {
+                lstPortToAccessSped objPort = new lstPortToAccessSped();
+                DataSet dsGetPortDetails = objGRDAL.GetPortAccessSpeedDetails(Char_id, C_ACCESS_SPEED, C_ACCESS_SPEED_DOWN_UP, type, C_ACCESS_TYPE);
+                List<MappedAccessSpeed> objAccessSpeed = new List<MappedAccessSpeed>();
+                objPort.lstMappedAccessSpeed = objAccessSpeed;
+                objPort.CHAR_ID = Char_id;
+                objPort.PortSpeed = portSpeedName;
+                foreach (DataRow dr in dsGetPortDetails.Tables[0].Rows)
+                {
+
+                    int char_Id_accessChar=0;
+                        if (dr["CHAR_ID"] != null)
+                        {
+                            if (dr["CHAR_ID"].ToString() != "")
+                            {
+                                char_Id_accessChar = Convert.ToInt32(dr["CHAR_ID"].ToString());
+                            }
+                        }
+                        string charName_accessChar = "";
+                        if (dr["CHAR_NAME"] != null)
+                        {
+                            if (dr["CHAR_NAME"].ToString() != "")
+                            {
+                                charName_accessChar = Convert.ToString(dr["CHAR_NAME"].ToString());
+                            }
+                        }
+
+                        decimal? charTypeId_accessChar = null;
+                        if (dr["CHAR_TYPE_ID"] != null)
+                        {
+                            if (dr["CHAR_TYPE_ID"].ToString() != "")
+                            {
+                                charTypeId_accessChar = Convert.ToDecimal(dr["CHAR_TYPE_ID"].ToString());
+                            }
+                        }
+                        string charActualValue_accessChar = "";
+                        if (dr["CHAR_ACTUAL_VALUE"] != null)
+                        {
+                            if (dr["CHAR_ACTUAL_VALUE"] != "")
+                            {
+                                charActualValue_accessChar = Convert.ToString(dr["CHAR_ACTUAL_VALUE"].ToString());
+                            }
+                        }
+                        string charUnitOfMeasure_accessChar = "";
+                        if (dr["CHAR_UNIT_OF_MEASURE"] != null)
+                        {
+                            if (dr["CHAR_UNIT_OF_MEASURE"] != "")
+                            {
+                                charUnitOfMeasure_accessChar = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE"].ToString());
+                            }
+                        }
+                        string charActualValue2_accessChar = "";
+                        if (dr["CHAR_ACTUAL_VALUE_2"] != null)
+                        {
+                            if (dr["CHAR_ACTUAL_VALUE_2"].ToString() != "")
+                            {
+                                charActualValue2_accessChar = Convert.ToString(dr["CHAR_ACTUAL_VALUE_2"].ToString());
+                            }
+
+                        }
+
+                        string charUnitOfMeasure2_accessChar = "";
+                        if (dr["CHAR_UNIT_OF_MEASURE_2"] != null)
+                        {
+                            if (dr["CHAR_UNIT_OF_MEASURE_2"].ToString() != "")
+                            {
+                                charUnitOfMeasure2_accessChar = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE_2"].ToString());
+                            }
+
+                        }
+                       
+                            // details from drmappedTypeChar
+                            int? charid_mappedTypeChar = null;
+                            if (dr["CHAR_ID_Map"] != null)
+                            {
+                                if (dr["CHAR_ID_Map"].ToString() != "")
+                                {
+                                    charid_mappedTypeChar = Convert.ToInt32(dr["CHAR_ID_Map"].ToString());
+                                }
+                            }
+                            string charName_mappedTypeChar = "";
+                            if (dr["CHAR_NAME_Map"] != null)
+                            {
+                                if (dr["CHAR_NAME_Map"].ToString() != "")
+                                {
+                                    charName_mappedTypeChar = Convert.ToString(dr["CHAR_NAME_Map"].ToString());
+                                }
+                            }
+                            int? charTypeId_mappedTypeChar = null;
+                            if (dr["CHAR_TYPE_ID_Map"] != null)
+                            {
+                                if (dr["CHAR_TYPE_ID_Map"].ToString() != "")
+                                {
+                                    charTypeId_mappedTypeChar = Convert.ToInt32(dr["CHAR_TYPE_ID_Map"].ToString());
+                                }
+                            }
+                            string charActualValue_mappedTypeChar = "";
+                            if (dr["CHAR_ACTUAL_VALUE_Map"] != null)
+                            {
+                                if (dr["CHAR_ACTUAL_VALUE_Map"].ToString() != string.Empty)
+                                {
+                                    charActualValue_mappedTypeChar = Convert.ToString(dr["CHAR_ACTUAL_VALUE_Map"].ToString());
+                                }
+                            }
+                            string charUnitOfMeasure_mappedTypeChar = "";
+                            if (dr["CHAR_UNIT_OF_MEASURE_Map"] != null)
+                            {
+                                if (dr["CHAR_UNIT_OF_MEASURE_Map"].ToString() != "")
+                                {
+                                    charUnitOfMeasure_mappedTypeChar = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE_Map"].ToString());
+                                }
+                            }
+                            string charActualValue2_mappedTypeChar = "";
+                            if (dr["CHAR_ACTUAL_VALUE_2_Map"] != null)
+                            {
+                                if (dr["CHAR_ACTUAL_VALUE_2_Map"].ToString() != "")
+                                {
+                                    charActualValue2_mappedTypeChar = Convert.ToString(dr["CHAR_ACTUAL_VALUE_2_Map"].ToString());
+                                }
+                            }
+                            string charUnitOfMeasure2_mappedTypeChar = "";
+                            if (dr["CHAR_UNIT_OF_MEASURE_2_Map"] != null)
+                            {
+                                if (dr["CHAR_UNIT_OF_MEASURE_2_Map"].ToString() != "")
+                                {
+                                    charUnitOfMeasure2_mappedTypeChar = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE_2_Map"].ToString());
+                                }
+                            }
+
+
+                            //string accessCharDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_accessChar, charTypeId_accessChar, charActualValue_accessChar, charUnitOfMeasure_accessChar, charActualValue2_accessChar, charUnitOfMeasure2_accessChar);
+                            //string mappedTypeCharDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_mappedTypeChar, charTypeId_mappedTypeChar, charActualValue_mappedTypeChar, charUnitOfMeasure_mappedTypeChar, charActualValue2_mappedTypeChar, charUnitOfMeasure2_mappedTypeChar);
+                            string accessCharDescription = CharDisplayString(C_HVPN_PORT_SPEED_id, C_ACCESS_SPEED_DOWN_UP_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_accessChar, CharType_id, charActualValue_accessChar, charUnitOfMeasure_accessChar, charActualValue2_accessChar, charUnitOfMeasure2_accessChar);
+                            string mappedTypeCharDescription = CharDisplayStringHVPN(C_HVPN_PORT_SPEED_id, C_ACCESS_SPEED_DOWN_UP_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_mappedTypeChar, charTypeId_accessChar, charActualValue_mappedTypeChar, charUnitOfMeasure_mappedTypeChar, charActualValue2_mappedTypeChar, charUnitOfMeasure2_mappedTypeChar,type);
+                            string description = accessCharDescription + " " + mappedTypeCharDescription;
+                            objPort.lstMappedAccessSpeed.Add(new MappedAccessSpeed() { charID = Convert.ToInt32(charid_mappedTypeChar), MappedAccessSpeedDescription = description });
+
+                      
+                }
+                lstPortToAccessSpeed.Add(objPort);
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return lstPortToAccessSpeed;
+        }
+        public lstPortSpeeds GetPortSpeeds(int C_PORT_SPEED, string C_HVPN_PORT_SPEED,int C_ACCESS_SPEED,string C_ACCESS_SPEED_DOWN_UP)
+        {
+
+            List<PortSpeeds> listPortSpeeds = new List<PortSpeeds>();
+            List<PortSpeeds> listHVPNPortSpeeds = new List<PortSpeeds>();
+            lstPortSpeeds lstData = new lstPortSpeeds();
+
+            DataSet dslist = objGRDAL.GetPortSpeeds(C_PORT_SPEED, C_HVPN_PORT_SPEED, C_ACCESS_SPEED_DOWN_UP);
+            decimal hvpnport_id, portaccessdownup_id;
+            var hvpnport = from a in dslist.Tables[2].AsEnumerable().Where(t => t.Field<string>("CHAR_TYPE_NAME") == Convert.ToString(C_HVPN_PORT_SPEED.ToString())) select a;
+            hvpnport_id = Convert.ToDecimal(hvpnport.FirstOrDefault().Field<decimal>("CHAR_TYPE_ID"));
+
+            var portaccessdownup = from a in dslist.Tables[2].AsEnumerable().Where(t => t.Field<string>("CHAR_TYPE_NAME") == Convert.ToString(C_ACCESS_SPEED_DOWN_UP.ToString())) select a;
+            portaccessdownup_id = Convert.ToDecimal(portaccessdownup.FirstOrDefault().Field<decimal>("CHAR_TYPE_ID"));
+            lstData.C_HVPN_PORT_SPEED_id = hvpnport_id;
+            lstData.C_ACCESS_SPEED_DOWN_UP_id = portaccessdownup_id;
+           
+            foreach (DataRow dr in dslist.Tables[0].Rows)
+            {
+                PortSpeeds objPorts = new PortSpeeds();
+                objPorts.CHAR_ID = Convert.ToInt32(dr["CHAR_ID"]);
+                objPorts.CHAR_TYPE_ID = 0;
+                string charName = "";
+                if (dr["CHAR_NAME"] != null)
+                {
+
+
+                    if (dr["CHAR_NAME"].ToString() != "")
+                    {
+                        charName = Convert.ToString(dr["CHAR_NAME"].ToString());
+                    }
+                }
+
+
+                decimal? charTypeId = null;
+                if (dr["CHAR_TYPE_ID"] != null)
+                {
+
+
+                    if (dr["CHAR_TYPE_ID"].ToString() != "")
+                    {
+                        charTypeId = Convert.ToDecimal(dr["CHAR_TYPE_ID"].ToString());
+                        objPorts.CHAR_TYPE_ID = Convert.ToInt32(charTypeId);
+                    }
+                }
+                string charActualValue = "";
+                if (dr["CHAR_ACTUAL_VALUE"] != null)
+                {
+                    if (dr["CHAR_ACTUAL_VALUE"].ToString() != "")
+                    {
+                        charActualValue = Convert.ToString(dr["CHAR_ACTUAL_VALUE"].ToString());
+                    }
+                }
+                string charUnitOfMeasure = "";
+                if (dr["CHAR_UNIT_OF_MEASURE"] != null)
+                {
+                    if (dr["CHAR_UNIT_OF_MEASURE"].ToString() != "")
+                    {
+                        charUnitOfMeasure = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE"].ToString());
+                    }
+                }
+
+                string charActualValue2 = "";
+                if (dr["CHAR_ACTUAL_VALUE_2"] != null)
+                {
+                    if (dr["CHAR_ACTUAL_VALUE_2"].ToString() != "")
+                    {
+                        charActualValue2 = Convert.ToString(dr["CHAR_ACTUAL_VALUE_2"].ToString());
+                    }
+                }
+                string charUnitOfMeasure2 = "";
+                if (dr["CHAR_UNIT_OF_MEASURE_2"] != null)
+                {
+                    if (dr["CHAR_UNIT_OF_MEASURE_2"].ToString() != "")
+                    {
+                        charUnitOfMeasure2 = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE_2"].ToString());
+                    }
+                }
+               
+                string PortSpeedDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName, charTypeId, charActualValue, charUnitOfMeasure, charActualValue2, charUnitOfMeasure2);
+                objPorts.CHAR_NAME = PortSpeedDescription;
+                listPortSpeeds.Add(objPorts);
+            }
+
+
+
+            foreach (DataRow dr in dslist.Tables[1].Rows)
+            {
+                PortSpeeds objHVPNPorts = new PortSpeeds();
+                objHVPNPorts.CHAR_ID = Convert.ToInt32(dr["CHAR_ID"]);
+                string charActualValue = "";
+                objHVPNPorts.CHAR_TYPE_ID = 0;
+
+                string charName = "";
+                if (dr["CHAR_NAME"] != null)
+                {
+
+
+                    if (dr["CHAR_NAME"].ToString() != "")
+                    {
+                        charName = Convert.ToString(dr["CHAR_NAME"].ToString());
+                    }
+                }
+
+
+                decimal? charTypeId = null;
+                if (dr["CHAR_TYPE_ID"] != null)
+                {
+
+
+                    if (dr["CHAR_TYPE_ID"].ToString() != "")
+                    {
+                        charTypeId = Convert.ToDecimal(dr["CHAR_TYPE_ID"].ToString());
+                        objHVPNPorts.CHAR_TYPE_ID = Convert.ToInt32(charTypeId);
+                    }
+                }
+                if (dr["CHAR_ACTUAL_VALUE"] != null)
+                {
+                    if (dr["CHAR_ACTUAL_VALUE"].ToString() != "")
+                    {
+                        charActualValue = Convert.ToString(dr["CHAR_ACTUAL_VALUE"].ToString());
+                    }
+                }
+                string charUnitOfMeasure = "";
+                if (dr["CHAR_UNIT_OF_MEASURE"] != null)
+                {
+                    if (dr["CHAR_UNIT_OF_MEASURE"].ToString() != "")
+                    {
+                        charUnitOfMeasure = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE"].ToString());
+                    }
+                }
+
+                string charActualValue2 = "";
+                if (dr["CHAR_ACTUAL_VALUE_2"] != null)
+                {
+                    if (dr["CHAR_ACTUAL_VALUE_2"].ToString() != "")
+                    {
+                        charActualValue2 = Convert.ToString(dr["CHAR_ACTUAL_VALUE_2"].ToString());
+                    }
+                }
+                string charUnitOfMeasure2 = "";
+                if (dr["CHAR_UNIT_OF_MEASURE_2"] != null)
+                {
+                    if (dr["CHAR_UNIT_OF_MEASURE_2"].ToString() != "")
+                    {
+                        charUnitOfMeasure2 = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE_2"].ToString());
+                    }
+                }
+                string PortSpeedDescription = charActualValue + " " + charUnitOfMeasure + " / " + charActualValue2 + " " + charUnitOfMeasure2;
+                objHVPNPorts.CHAR_NAME = PortSpeedDescription;
+                listHVPNPortSpeeds.Add(objHVPNPorts);
+            }
+            lstData.PortSpeedsList = listPortSpeeds;
+            lstData.HVPNPortSpeedsList = listHVPNPortSpeeds;
+            return lstData;
+        }
+        private string CharDisplayString(decimal hvpnport_id, decimal portaccessdownup_id, int C_PORT_SPEED, int C_ACCESS_TYPE, string Char_name, decimal? charTypeId, string charActualValue, string charUnitOfMeasure, string charActualValue2, string charUnitOfMeasure2)
+        {
+            //charTypeId,charActualValue,
+            //charActualValue2
+            //    if(charTypeId==null)
+            //    {
+            //    charTypeId="";
+            //    }
+            string resultValue = "";
+            try
+            {
+                
+                if (Char_name == "")
+                {
+                    resultValue = string.Empty;
+                }
+                else if (charTypeId == C_ACCESS_TYPE)
+                {
+                    resultValue = Char_name;
+                }
+                else if (charTypeId == C_PORT_SPEED)
+                {
+                    if (Char_name != "")
+                    {
+                        resultValue = charActualValue + " " + charUnitOfMeasure;
+                    }
+                    else
+                    {
+                        resultValue = Char_name;
+                  }
+                }
+                else if (charTypeId == hvpnport_id || charTypeId == portaccessdownup_id)
+                {
+                    resultValue = charActualValue + " " + charUnitOfMeasure;
+                    resultValue = resultValue + "/";
+                    resultValue = resultValue + charActualValue2 + " " + charUnitOfMeasure2;
+                }
+                else
+                {
+                    resultValue = charActualValue + " " + charUnitOfMeasure;
+                }
+            }
+            catch(Exception ex)
+            {
+            
+            }
+            return resultValue;
+        }
+        private string CharDisplayStringHVPN(decimal hvpnport_id, decimal portaccessdownup_id, int C_PORT_SPEED, int C_ACCESS_TYPE, string Char_name, decimal? charTypeId, string charActualValue, string charUnitOfMeasure, string charActualValue2, string charUnitOfMeasure2,string type)
+        {
+            //charTypeId,charActualValue,
+            //charActualValue2
+            //    if(charTypeId==null)
+            //    {
+            //    charTypeId="";
+            //    }
+            string resultValue = "";
+            try
+            {
+
+                if (Char_name == "")
+                {
+                    resultValue = string.Empty;
+                }
+                else if (charTypeId == C_ACCESS_TYPE)
+                {
+                    resultValue = Char_name;
+                }
+                else if (charTypeId == C_PORT_SPEED)
+                {
+                    if (Char_name != "")
+                    {
+                        resultValue = charActualValue + " " + charUnitOfMeasure;
+                    }
+                    else
+                    {
+                        resultValue = Char_name;
+                    }
+                }
+                else if (charTypeId == hvpnport_id || charTypeId == portaccessdownup_id)
+                {
+                    if (type != "HVPN")
+                    {
+                        resultValue = charActualValue + " " + charUnitOfMeasure;
+                        resultValue = resultValue + "/";
+                        resultValue = resultValue + charActualValue2 + " " + charUnitOfMeasure2;
+                    }
+                    else
+                    {
+                        resultValue = Char_name;
+                    }
+                }
+                else
+                {
+                    if (type != "HVPN")
+                    {
+                        resultValue = charActualValue + " " + charUnitOfMeasure;
+                    }
+                    else
+                    {
+                        resultValue = Char_name;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return resultValue;
+        }
+
+        public lstPortSpeeds LoadPortAccessSpeedForEdit(int Char_id, int CharType_id, int C_ACCESS_SPEED, string C_ACCESS_SPEED_DOWN_UP, int C_ACCESS_TYPE, decimal C_HVPN_PORT_SPEED_id, decimal C_ACCESS_SPEED_DOWN_UP_id, int C_PORT_SPEED, string type, int StartRowNumMap, int EndRowNumMap, int StartRowNumUnMap, int EndRowNumUnMap, int TotalMapcount, int TotalUnMapcount)
+        {
+            List<PortSpeeds> listMappedPortSpeeds = new List<PortSpeeds>();
+            List<PortSpeeds> listUnMappedPortSpeeds = new List<PortSpeeds>();
+            lstPortSpeeds lstData = new lstPortSpeeds();
+            DataSet dsPortSpeeds = objGRDAL.LoadPortAccessSpeedForEdit(Char_id, C_ACCESS_SPEED, C_ACCESS_SPEED_DOWN_UP, type, C_ACCESS_TYPE, StartRowNumMap, EndRowNumMap, StartRowNumUnMap, EndRowNumUnMap, TotalMapcount, TotalUnMapcount);
+            if (StartRowNumMap == 0)
+            {
+                if (dsPortSpeeds.Tables[1] != null)
+                {
+                    lstData.TotalMapcount = Convert.ToInt32(dsPortSpeeds.Tables[1].Rows[0][0].ToString());
+                }
+                if (dsPortSpeeds.Tables[3] != null)
+                {
+                    lstData.TotalUnMapcount = Convert.ToInt32(dsPortSpeeds.Tables[3].Rows[0][0].ToString());
+                }
+            }
+            lstData.StartRowNumMap = StartRowNumMap + 100;
+            lstData.EndRowNumMap = EndRowNumMap+100;
+
+            lstData.StartRowNumUnMap = StartRowNumUnMap + 100;
+            lstData.EndRowNumUnMap = EndRowNumUnMap+100;
+
+            if (dsPortSpeeds.Tables[0] != null)
+            {
+                foreach (DataRow drMap in dsPortSpeeds.Tables[0].Rows)
+                {
+                    PortSpeeds objMap = new PortSpeeds();
+                    string charName_accessChar = "";
+                    if (drMap["CHAR_NAME"] != null)
+                    {
+                        if (drMap["CHAR_NAME"].ToString() != "")
+                        {
+                            charName_accessChar = Convert.ToString(drMap["CHAR_NAME"].ToString());
+                        }
+                    }
+
+                    decimal? charTypeId_accessChar = null;
+                    if (drMap["CHAR_TYPE_ID"] != null)
+                    {
+                        if (drMap["CHAR_TYPE_ID"].ToString() != "")
+                        {
+                            charTypeId_accessChar = Convert.ToDecimal(drMap["CHAR_TYPE_ID"].ToString());
+                        }
+                    }
+                    string charActualValue_accessChar = "";
+                    if (drMap["CHAR_ACTUAL_VALUE"] != null)
+                    {
+                        if (drMap["CHAR_ACTUAL_VALUE"] != "")
+                        {
+                            charActualValue_accessChar = Convert.ToString(drMap["CHAR_ACTUAL_VALUE"].ToString());
+                        }
+                    }
+                    string charUnitOfMeasure_accessChar = "";
+                    if (drMap["CHAR_UNIT_OF_MEASURE"] != null)
+                    {
+                        if (drMap["CHAR_UNIT_OF_MEASURE"] != "")
+                        {
+                            charUnitOfMeasure_accessChar = Convert.ToString(drMap["CHAR_UNIT_OF_MEASURE"].ToString());
+                        }
+                    }
+                    string charActualValue2_accessChar = "";
+                    if (drMap["CHAR_ACTUAL_VALUE_2"] != null)
+                    {
+                        if (drMap["CHAR_ACTUAL_VALUE_2"].ToString() != "")
+                        {
+                            charActualValue2_accessChar = Convert.ToString(drMap["CHAR_ACTUAL_VALUE_2"].ToString());
+                        }
+
+                    }
+
+                    string charUnitOfMeasure2_accessChar = "";
+                    if (drMap["CHAR_UNIT_OF_MEASURE_2"] != null)
+                    {
+                        if (drMap["CHAR_UNIT_OF_MEASURE_2"].ToString() != "")
+                        {
+                            charUnitOfMeasure2_accessChar = Convert.ToString(drMap["CHAR_UNIT_OF_MEASURE_2"].ToString());
+                        }
+
+                    }
+                    //DataSet dsMappedTypeChars = new DataSet();
+                    //int charid = Convert.ToInt32(drMap["CHAR_ID"].ToString());
+                    //dsMappedTypeChars = objGRDAL.GetMappedAccessTypeChars(Char_id, charid, C_ACCESS_TYPE);
+
+                    //foreach (DataRow drmappedTypeChar in dsMappedTypeChars.Tables[0].Rows)  //map acces details
+                    //{
+
+                    // details from drmappedTypeChar
+                    int? charid_mappedTypeChar = null;
+                    if (drMap["CHAR_ID_Map"] != null)
+                    {
+                        if (drMap["CHAR_ID_Map"].ToString() != "")
+                        {
+                            charid_mappedTypeChar = Convert.ToInt32(drMap["CHAR_ID_Map"].ToString());
+                        }
+                    }
+                    string charName_mappedTypeChar = "";
+                    if (drMap["CHAR_NAME_Map"] != null)
+                    {
+                        if (drMap["CHAR_NAME_Map"].ToString() != "")
+                        {
+                            charName_mappedTypeChar = Convert.ToString(drMap["CHAR_NAME_Map"].ToString());
+                        }
+                    }
+                    int? charTypeId_mappedTypeChar = null;
+                    if (drMap["CHAR_TYPE_ID_Map"] != null)
+                    {
+                        if (drMap["CHAR_TYPE_ID_Map"].ToString() != "")
+                        {
+                            charTypeId_mappedTypeChar = Convert.ToInt32(drMap["CHAR_TYPE_ID_Map"].ToString());
+                        }
+                    }
+                    string charActualValue_mappedTypeChar = "";
+                    if (drMap["CHAR_ACTUAL_VALUE_Map"] != null)
+                    {
+                        if (drMap["CHAR_ACTUAL_VALUE"].ToString() != string.Empty)
+                        {
+                            charActualValue_mappedTypeChar = Convert.ToString(drMap["CHAR_ACTUAL_VALUE"].ToString());
+                        }
+                    }
+                    string charUnitOfMeasure_mappedTypeChar = "";
+                    if (drMap["CHAR_UNIT_OF_MEASURE_Map"] != null)
+                    {
+                        if (drMap["CHAR_UNIT_OF_MEASURE_Map"].ToString() != "")
+                        {
+                            charUnitOfMeasure_mappedTypeChar = Convert.ToString(drMap["CHAR_UNIT_OF_MEASURE_Map"].ToString());
+                        }
+                    }
+                    string charActualValue2_mappedTypeChar = "";
+                    if (drMap["CHAR_ACTUAL_VALUE_2_Map"] != null)
+                    {
+                        if (drMap["CHAR_ACTUAL_VALUE_2_Map"].ToString() != "")
+                        {
+                            charActualValue2_mappedTypeChar = Convert.ToString(drMap["CHAR_ACTUAL_VALUE_2_Map"].ToString());
+                        }
+                    }
+                    string charUnitOfMeasure2_mappedTypeChar = "";
+                    if (drMap["CHAR_UNIT_OF_MEASURE_2_Map"] != null)
+                    {
+                        if (drMap["CHAR_UNIT_OF_MEASURE_2_Map"].ToString() != "")
+                        {
+                            charUnitOfMeasure2_mappedTypeChar = Convert.ToString(drMap["CHAR_UNIT_OF_MEASURE_2_Map"].ToString());
+                        }
+                    }
+
+
+                    //string accessCharDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_accessChar, charTypeId_accessChar, charActualValue_accessChar, charUnitOfMeasure_accessChar, charActualValue2_accessChar, charUnitOfMeasure2_accessChar);
+                    //string mappedTypeCharDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_mappedTypeChar, charTypeId_mappedTypeChar, charActualValue_mappedTypeChar, charUnitOfMeasure_mappedTypeChar, charActualValue2_mappedTypeChar, charUnitOfMeasure2_mappedTypeChar);
+                    string accessCharDescription = CharDisplayString(C_HVPN_PORT_SPEED_id, C_ACCESS_SPEED_DOWN_UP_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_accessChar, CharType_id, charActualValue_accessChar, charUnitOfMeasure_accessChar, charActualValue2_accessChar, charUnitOfMeasure2_accessChar);
+                    string mappedTypeCharDescription = CharDisplayStringHVPN(C_HVPN_PORT_SPEED_id, C_ACCESS_SPEED_DOWN_UP_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_mappedTypeChar, charTypeId_accessChar, charActualValue_mappedTypeChar, charUnitOfMeasure_mappedTypeChar, charActualValue2_mappedTypeChar, charUnitOfMeasure2_mappedTypeChar, type);
+                    string description = accessCharDescription + " " + mappedTypeCharDescription;
+                    objMap.CHAR_NAME = description;
+                    objMap.CHAR_ID = Convert.ToInt32(drMap["CHAR_ID"]);
+                    objMap.CHAR_ID_combined = Convert.ToString(Char_id) + "-" + Convert.ToString(drMap["CHAR_ID"]) + "-" + Convert.ToString(drMap["CHAR_ID_Map"]);
+                    listMappedPortSpeeds.Add(objMap);
+                }
+            }
+
+            if (dsPortSpeeds.Tables[2] != null)
+            {
+                foreach (DataRow drUnMap in dsPortSpeeds.Tables[2].Rows)
+                {
+                    PortSpeeds objMap1 = new PortSpeeds();
+                    string charName_accessChar = "";
+                    if (drUnMap["CHAR_NAME"] != null)
+                    {
+                        if (drUnMap["CHAR_NAME"].ToString() != "")
+                        {
+                            charName_accessChar = Convert.ToString(drUnMap["CHAR_NAME"].ToString());
+                        }
+                    }
+
+                    decimal? charTypeId_accessChar = null;
+                    if (drUnMap["CHAR_TYPE_ID"] != null)
+                    {
+                        if (drUnMap["CHAR_TYPE_ID"].ToString() != "")
+                        {
+                            charTypeId_accessChar = Convert.ToDecimal(drUnMap["CHAR_TYPE_ID"].ToString());
+                        }
+                    }
+                    string charActualValue_accessChar = "";
+                    if (drUnMap["CHAR_ACTUAL_VALUE"] != null)
+                    {
+                        if (drUnMap["CHAR_ACTUAL_VALUE"] != "")
+                        {
+                            charActualValue_accessChar = Convert.ToString(drUnMap["CHAR_ACTUAL_VALUE"].ToString());
+                        }
+                    }
+                    string charUnitOfMeasure_accessChar = "";
+                    if (drUnMap["CHAR_UNIT_OF_MEASURE"] != null)
+                    {
+                        if (drUnMap["CHAR_UNIT_OF_MEASURE"] != "")
+                        {
+                            charUnitOfMeasure_accessChar = Convert.ToString(drUnMap["CHAR_UNIT_OF_MEASURE"].ToString());
+                        }
+                    }
+                    string charActualValue2_accessChar = "";
+                    if (drUnMap["CHAR_ACTUAL_VALUE_2"] != null)
+                    {
+                        if (drUnMap["CHAR_ACTUAL_VALUE_2"].ToString() != "")
+                        {
+                            charActualValue2_accessChar = Convert.ToString(drUnMap["CHAR_ACTUAL_VALUE_2"].ToString());
+                        }
+
+                    }
+
+                    string charUnitOfMeasure2_accessChar = "";
+                    if (drUnMap["CHAR_UNIT_OF_MEASURE_2"] != null)
+                    {
+                        if (drUnMap["CHAR_UNIT_OF_MEASURE_2"].ToString() != "")
+                        {
+                            charUnitOfMeasure2_accessChar = Convert.ToString(drUnMap["CHAR_UNIT_OF_MEASURE_2"].ToString());
+                        }
+
+                    }
+                    //DataSet dsMappedTypeChars = new DataSet();
+                    //int charid = Convert.ToInt32(drUnMap["CHAR_ID"].ToString());
+                    //dsMappedTypeChars = objGRDAL.GetUnMappedAccessTypeChars(Char_id, charid, C_ACCESS_TYPE);
+
+                    //foreach (DataRow drmappedTypeChar in dsMappedTypeChars.Tables[0].Rows)  //map acces details
+                    //{
+
+                    // details from drmappedTypeChar
+                    int? charid_mappedTypeChar = null;
+                    if (drUnMap["CHAR_ID_Map"] != null)
+                    {
+                        if (drUnMap["CHAR_ID_Map"].ToString() != "")
+                        {
+                            charid_mappedTypeChar = Convert.ToInt32(drUnMap["CHAR_ID_Map"].ToString());
+                        }
+                    }
+                    string charName_mappedTypeChar = "";
+                    if (drUnMap["CHAR_NAME_Map"] != null)
+                    {
+                        if (drUnMap["CHAR_NAME_Map"].ToString() != "")
+                        {
+                            charName_mappedTypeChar = Convert.ToString(drUnMap["CHAR_NAME_Map"].ToString());
+                        }
+                    }
+                    int? charTypeId_mappedTypeChar = null;
+                    if (drUnMap["CHAR_TYPE_ID_Map"] != null)
+                    {
+                        if (drUnMap["CHAR_TYPE_ID_Map"].ToString() != "")
+                        {
+                            charTypeId_mappedTypeChar = Convert.ToInt32(drUnMap["CHAR_TYPE_ID_Map"].ToString());
+                        }
+                    }
+                    string charActualValue_mappedTypeChar = "";
+                    if (drUnMap["CHAR_ACTUAL_VALUE_Map"] != null)
+                    {
+                        if (drUnMap["CHAR_ACTUAL_VALUE_Map"].ToString() != string.Empty)
+                        {
+                            charActualValue_mappedTypeChar = Convert.ToString(drUnMap["CHAR_ACTUAL_VALUE_Map"].ToString());
+                        }
+                    }
+                    string charUnitOfMeasure_mappedTypeChar = "";
+                    if (drUnMap["CHAR_UNIT_OF_MEASURE_Map"] != null)
+                    {
+                        if (drUnMap["CHAR_UNIT_OF_MEASURE_Map"].ToString() != "")
+                        {
+                            charUnitOfMeasure_mappedTypeChar = Convert.ToString(drUnMap["CHAR_UNIT_OF_MEASURE_Map"].ToString());
+                        }
+                    }
+                    string charActualValue2_mappedTypeChar = "";
+                    if (drUnMap["CHAR_ACTUAL_VALUE_2_Map"] != null)
+                    {
+                        if (drUnMap["CHAR_ACTUAL_VALUE_2_Map"].ToString() != "")
+                        {
+                            charActualValue2_mappedTypeChar = Convert.ToString(drUnMap["CHAR_ACTUAL_VALUE_2_Map"].ToString());
+                        }
+                    }
+                    string charUnitOfMeasure2_mappedTypeChar = "";
+                    if (drUnMap["CHAR_UNIT_OF_MEASURE_2_Map"] != null)
+                    {
+                        if (drUnMap["CHAR_UNIT_OF_MEASURE_2_Map"].ToString() != "")
+                        {
+                            charUnitOfMeasure2_mappedTypeChar = Convert.ToString(drUnMap["CHAR_UNIT_OF_MEASURE_2_Map"].ToString());
+                        }
+                    }
+
+
+                    //string accessCharDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_accessChar, charTypeId_accessChar, charActualValue_accessChar, charUnitOfMeasure_accessChar, charActualValue2_accessChar, charUnitOfMeasure2_accessChar);
+                    //string mappedTypeCharDescription = CharDisplayString(hvpnport_id, portaccessdownup_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_mappedTypeChar, charTypeId_mappedTypeChar, charActualValue_mappedTypeChar, charUnitOfMeasure_mappedTypeChar, charActualValue2_mappedTypeChar, charUnitOfMeasure2_mappedTypeChar);
+                    string accessCharDescription = CharDisplayString(C_HVPN_PORT_SPEED_id, C_ACCESS_SPEED_DOWN_UP_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_accessChar, CharType_id, charActualValue_accessChar, charUnitOfMeasure_accessChar, charActualValue2_accessChar, charUnitOfMeasure2_accessChar);
+                    string mappedTypeCharDescription = CharDisplayStringHVPN(C_HVPN_PORT_SPEED_id, C_ACCESS_SPEED_DOWN_UP_id, C_PORT_SPEED, C_ACCESS_SPEED, charName_mappedTypeChar, charTypeId_accessChar, charActualValue_mappedTypeChar, charUnitOfMeasure_mappedTypeChar, charActualValue2_mappedTypeChar, charUnitOfMeasure2_mappedTypeChar, type);
+                    string description = accessCharDescription + " " + mappedTypeCharDescription;
+                    objMap1.CHAR_NAME = description;
+                    objMap1.CHAR_ID = Convert.ToInt32(drUnMap["CHAR_ID"]);
+                    objMap1.CHAR_ID_combined = Convert.ToString(Char_id) + "-" + Convert.ToString(drUnMap["CHAR_ID"]) + "-" + Convert.ToString(drUnMap["CHAR_ID_Map"]);
+                    listUnMappedPortSpeeds.Add(objMap1);
+                }
+            }
+            
+            lstData.PortSpeedsList = listMappedPortSpeeds;
+            lstData.HVPNPortSpeedsList = listUnMappedPortSpeeds;
+            return lstData;
+        }
+
+        public int InsertPortToAccessSpeedMapping(int pPortId, string charIDs, string userID)
+        {
+            int status = objGRDAL.InsertPortToAccessSpeedMapping(pPortId, charIDs,  userID);
+            return status;
+        }
+        public int DeletePortToAccessSpeedMapping(int pPortId, string charIDs,  string userID)
+        {
+            int status = objGRDAL.DeletePortToAccessSpeedMapping(pPortId, charIDs, userID);
+            return status;
+        }
+    }
+}

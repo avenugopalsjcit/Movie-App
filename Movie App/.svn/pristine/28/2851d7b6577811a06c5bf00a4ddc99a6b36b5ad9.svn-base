@@ -1,0 +1,839 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+
+//using Client = System.Data.OracleClient;
+using System.Configuration;
+using System.Collections.Generic;
+using System.Text;
+using adminBAL = SCAdminDAL;
+
+
+namespace SCAdminDAL
+{
+
+    public class ProductDefinationDAL
+    {
+
+        OracleConnection oConn1 = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+        GetDataFromDB objGetDataFromDB1 = new GetDataFromDB();
+        string str = string.Empty;
+        #region ServiceType Operations
+        public static DataTable getSeviceTypes()
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = string.Empty;
+            str = @"select SERVICE_TYPE_CD,SERVICE_TYPE_DESC,CREATED_EMP_ID,SERVICE_VALID_CD,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT from CSU_REF_SERVICE_TYPE ";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return objGetDataFromDB.GetDataTable(str.ToString());
+        }
+
+
+
+        // public static int InsertSeviceTypes(Servicetype service, int UpdateId = 0, int InsertId = 0)
+
+        public static int InsertSeviceTypes(string Userid, Servicetype service, int UpdateId = 0, int InsertId = 0)
+        {
+            int status = 0;
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            try
+            {
+                string query = "";
+                if (InsertId == 1)
+                {
+
+                    query = "INSERT INTO CSU_REF_SERVICE_TYPE (SERVICE_TYPE_CD,SERVICE_TYPE_DESC,CREATED_EMP_ID,SERVICE_VALID_CD,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT) " +
+                                  "values((SELECT MAX(SERVICE_TYPE_CD)+1 FROM CSU_REF_SERVICE_TYPE),'" + service.ServicetypeDesc + "','" + service.CreatedBy + "', " +
+                                  " " + service.Valid + ",sysdate,'" + service.UpdatedBy + "',sysdate)";
+
+                    query = "INSERT INTO CSU_REF_SERVICE_TYPE (SERVICE_TYPE_CD,SERVICE_TYPE_DESC,CREATED_EMP_ID,SERVICE_VALID_CD,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT) " +
+                                  "values((SELECT MAX(SERVICE_TYPE_CD)+1 FROM CSU_REF_SERVICE_TYPE),'" + service.ServicetypeDesc + "','" + Userid + "', " +
+                                  " " + service.Valid + ",sysdate,'" + service.UpdatedBy + "',sysdate)";
+
+
+                }
+
+                //if (UpdateId == 1)
+                //{
+                //    query = "update CSU_REF_SERVICE_TYPE set SERVICE_TYPE_DESC = " + service.ServicetypeDesc + ",SERVICE_VALID_CD=" + service.Valid + " where service_type_cd = " + service.SERVICE_TYPE_CD + ")";
+                //}
+                //OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                //cmdOra.CommandType = CommandType.Text;
+                //cmdOra.ExecuteNonQuery();
+                //return 1;
+
+                if (UpdateId == 1)
+                {
+                    query = "update CSU_REF_SERVICE_TYPE set SERVICE_TYPE_DESC = '" + service.ServicetypeDesc + "',SERVICE_VALID_CD=" + service.Valid + ",UPDATED_EMP_ID='" + Userid + "',UPDATED_DT=sysdate where service_type_cd = " + service.SERVICE_TYPE_CD + " ";
+                }
+                //OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                //cmdOra.CommandType = CommandType.Text;
+                //cmdOra.ExecuteNonQuery();
+                status = OracleDataAccess.ExecuteNonQuery(connection, CommandType.Text, query);
+
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return status;
+        }
+
+
+        public static string DeleteServiceType(int serviceId)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            string Message = "Success";
+            try
+            {
+                string query = "delete from  CSU_REF_SERVICE_TYPE  where service_type_cd=" + serviceId + "";
+                OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return Message;
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return Message;
+        }
+        #endregion
+
+        public static DataTable getCharTypes()
+        {
+
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            //OracleBulkCopy con 
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = string.Empty;
+            str = @"select CHAR_TYPE_ID,CHAR_TYPE_NAME,CREATED_EMP_ID,CHAR_TYPE_VALID_CD,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT,CHAR_TYPE_VALUE_COUNT from CSU_REF_CHAR_TYPE ";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return objGetDataFromDB.GetDataTable(str.ToString());
+        }
+
+        public static int InsertCharTypes(string Userid, Chartype Char, int UpdateId = 0, int InsertId = 0)
+        {
+            int status = 0;
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            try
+            {
+                string query = "";
+                if (InsertId == 1)
+                {
+
+                    query = "INSERT INTO CSU_REF_CHAR_TYPE (CHAR_TYPE_ID,CHAR_TYPE_NAME,CREATED_EMP_ID,CHAR_TYPE_VALID_CD,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT) " +
+                                  "values((SELECT MAX(CHAR_TYPE_ID)+1 FROM CSU_REF_CHAR_TYPE),'" + Char.ChartypeDesc + "','" + Char.CreatedBy + "', " +
+                                  " " + Char.Valid + ",sysdate,'" + Char.UpdatedBy + "',sysdate)";
+
+                    query = "INSERT INTO CSU_REF_CHAR_TYPE (CHAR_TYPE_ID,CHAR_TYPE_NAME,CREATED_EMP_ID,CHAR_TYPE_VALID_CD,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT) " +
+                                  "values((SELECT MAX(CHAR_TYPE_ID)+1 FROM CSU_REF_CHAR_TYPE),'" + Char.ChartypeDesc + "','" + Userid + "', " +
+                                  " " + Char.Valid + ",sysdate,'" + Char.UpdatedBy + "',sysdate)";
+
+
+                }
+
+                if (UpdateId == 1)
+                {
+                    query = "update CSU_REF_CHAR_TYPE set CHAR_TYPE_NAME = " + Char.ChartypeDesc + ",CHAR_TYPE_VALID_CD=" + Char.Valid + " where CHAR_TYPE_ID = " + Char.CHAR_TYPE_ID + ")";
+                }
+                OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+
+                if (UpdateId == 1)
+                {
+                    query = "update CSU_REF_CHAR_TYPE set CHAR_TYPE_NAME = '" + Char.ChartypeDesc + "',CHAR_TYPE_VALID_CD=" + Char.Valid + ",UPDATED_EMP_ID='" + Userid + "',UPDATED_DT=sysdate where CHAR_TYPE_ID = " + Char.CHAR_TYPE_ID + " ";
+                }
+                //OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                //cmdOra.CommandType = CommandType.Text;
+                //cmdOra.ExecuteNonQuery();
+                status = OracleDataAccess.ExecuteNonQuery(connection, CommandType.Text, query);
+
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return status;
+        }
+
+
+        public static string DeleteCharType(int serviceId)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            string Message = "Success";
+            try
+            {
+                string query = "delete from  CSU_REF_CHAR_TYPE  where CHAR_type_cd=" + serviceId + "";
+                OracleCommand cmdOra = new OracleCommand(query.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return Message;
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return Message;
+        }
+
+
+        public static DataSet FetchData(List<string> queries, OracleConnection conn)
+        {
+            DataSet ds = new DataSet();
+            foreach (string query in queries)
+            {
+                DataTable dt = new DataTable();
+                OracleCommand cmd = new OracleCommand(query, conn);
+                OracleDataReader reader = cmd.ExecuteReader();
+                dt.Load(reader);
+                reader.Close();
+                ds.Tables.Add(dt);
+            }
+            conn.Close();
+            return ds;
+        }
+
+
+        #region Product
+        //Page Load event of products page
+        public static DataSet getProducts()
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+            oConn.Open();
+            try
+            {
+                List<string> quiries = new List<string>(new string[]{"Select product_type, product_desc From csu_product_type order by product_desc",
+                                       "Select country_id, country_name From csu_country order by  country_name",
+                                       "select SERVICE_TYPE_CD,SERVICE_TYPE_DESC from CSU_REF_SERVICE_TYPE",
+                                       "select product_loc_level_cd,product_loc_level_desc from CSU_REF_PRODUCT_LOC_LEVEL ",
+                                       "select capman_platform_id,capman_platform_name from CAPMAN_PLATFORMS  order by CAPMAN_PLATFORM_NAME",
+                                       "select  product_cd, product_name,ALIAS_ID,PARENT_PRODUCT_CD from csu_product where product_valid_cd = 1 order by                                                     product_name", "select ID,NAME from csu_phase_attribute where valid=1","select char_id,char_name,char_type_id,char_unit_of_measure from CSU_REF_VALID_CHAR where char_type_id in (868,27)","select distinct(Phase_id),phase_name from csu_product_phase_attribute"});
+                return FetchData(quiries, oConn);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            finally
+            {
+                //return status;
+            }
+        }
+
+
+        public static string UpdateProducts(List<Products> Products1, int[] CapmanRecords, List<SCAdminDAL.csu_product_phase_attribute> phase_attributes, int ProductID)
+        {
+            Products product = Products1[0];
+
+            string editProduct = string.Empty;
+
+
+            editProduct += " update csu_product set PRODUCT_NAME='" + product.PRODUCT_NAME + "', SERVICE_TYPE_CD=" + product.SERVICE_TYPE_CD + "";
+            editProduct += " PRODUCT_LOC_LEVEL_CD=" + product.PRODUCT_LOC_LEVEL_CD + ",PRODUCT_VALID_CD=" + product.PRODUCT_VALID_CD + "";
+            editProduct += " PRODUCT_ABBR='" + product.PRODUCT_ABBR + "',CREATED_EMP_ID='" + product.CREATED_EMP_ID + "',CREATED_DT='" + product.CREATED_DT + "'";
+            editProduct += " UPDATED_EMP_ID ='" + product.UPDATED_EMP_ID + "',UPDATED_DT='" + product.UPDATED_DT + "',PRODUCT_TYPE='" + product.PRODUCT_TYPE + "',COUNTRY_CD=" + product.COUNTRY_CD + "";
+            editProduct += " ALIAS_ID='" + product.ALIAS_ID + "',DISPLAY_LEAD_TIME=" + product.DISPLAY_LEAD_TIME + ",PARENT_PRODUCT_CD=" + product.PARENT_PRODUCT_CD + ",";
+            editProduct += " INTERFACE_UPDATE_DT + '" + product.INTERFACE_UPDATE_DT + "',INTERFACE_UPDATED_BY='" + product.INTERFACE_UPDATED_BY + "'";
+            editProduct += " USE_CPE_PRODUCT=" + product.USE_CPE_PRODUCT + ",VALIDATE_PARENT_PORTSPEED=" + product.VALIDATE_PARENT_PORTSPEED + ",";
+            //str += "DISPLAY_MPLS_PRODUCT=" + DISPLAY_MPLS_PRODUCT + "";
+            editProduct += " ACCESS_METHOD_REQUIRED=" + product.ACCESS_METHOD_REQUIRED + ",EFM_REQUIRED=" + product.EFM_REQUIRED + ",FLEXIPORT=" + product.FLEXIPORT + "";
+            editProduct += " PLAT_RESIL_MAP=" + product.PLAT_RESIL_MAP + ",IS_SUPP_GRP_ENFORCED=" + product.IS_SUPP_GRP_ENFORCED + " where ProductID=" + ProductID + "";
+
+            string editCapman = string.Empty;
+
+            editCapman += "delete from CSU_Product_CAPMANPLATFORM_MAP where product_cd = " + ProductID + "";
+            editCapman += "Begin";
+            foreach (int capman in CapmanRecords)
+            {
+                editCapman += "insert into CSU_Product_CAPMANPLATFORM_MAP (product_cd,CAPMAN_PLATFORM_ID) values (" + ProductID + "," + capman + ");";
+            }
+            editCapman += "end;";
+
+
+            string phase = string.Empty;
+
+            editCapman += "delete from csu_product_phase_attribute where product_cd = " + ProductID + "";
+            editCapman += "Begin";
+
+            foreach (csu_product_phase_attribute phases in phase_attributes)
+            {
+                editCapman += "insert into csu_product_phase_attribute(PHASE_ID,PHASE_NAME) values(" + phases.PHASE_ID + ",'" + phases.PHASE_NAME + "');";
+            }
+
+
+
+            editCapman += "end;";
+
+
+
+            return "success";
+        }
+
+
+
+
+        public static string AddProduct(Products product)
+        {
+            string success = "success";
+
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            oConn.Open();
+
+            try
+            {
+                string query = "Insert into csu_product(PRODUCT_TYPE ,  " +
+            "COUNTRY_CD ,SERVICE_TYPE_CD ,PRODUCT_LOC_LEVEL_CD ,PRODUCT_ABBR ,Product_cd ,PRODUCT_NAME,PARENT_PRODUCT_CD , " + "ALIAS_ID ,PRODUCT_VALID_CD ,DISPLAY_LEAD_TIME ,ACCESS_METHOD_REQUIRED ,EFM_REQUIRED ,CREATED_EMP_ID ,CREATED_DT,UPDATED_EMP_ID ,UPDATED_DT) " +
+            "values(" + product.PRODUCT_TYPE + " ," + product.COUNTRY_CD + " ," + product.SERVICE_TYPE_CD + " ," + product.PRODUCT_LOC_LEVEL_CD + " ,'" + product.PRODUCT_ABBR + "' ,  " +
+            " (SELECT MAX(Product_cd)+1 FROM csu_product) ,'" + product.PRODUCT_NAME + "' ," + product.PARENT_PRODUCT_CD + " ," +
+            "" + product.ALIAS_ID + " ," + product.PRODUCT_VALID_CD + " ," + product.DISPLAY_LEAD_TIME + " , " +
+            " '" + product.ACCESS_METHOD_REQUIRED + "' , '" + product.EFM_REQUIRED + "' , " + product.CREATED_EMP_ID + " ,  sysdate ," + product.UPDATED_EMP_ID + " ,  sysdate )";
+                OracleCommand cmd = new OracleCommand(query, oConn);
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+
+
+                string query2 = "SELECT max(product_cd) FROM CSU_Product";
+                OracleCommand cmd1 = new OracleCommand(query2, oConn);
+                int MaxProductId = Convert.ToInt32(cmd1.ExecuteScalar());
+
+                foreach (int capman_id in product.capman_platform_id)
+                {
+                    string query3 = "insert into CSU_Product_CAPMANPLATFORM_MAP(PRODUCT_CD,CAPMAN_PLATFORM_ID) values(" + MaxProductId + "," + capman_id + ")";
+                    OracleCommand cmd3 = new OracleCommand(query3, oConn);
+                    cmd3.ExecuteNonQuery();
+                }
+                oConn.Close();
+                return success;
+            }
+
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+
+
+        //Code should be simple as much as possible
+        public DataSet getProductsList(int productID)
+        {
+            try
+            {
+                //collect for product
+                string str = string.Empty;
+                DataSet ds = new DataSet();
+                str = @"select * from csu_product where Product_cd=" + productID + "";
+                ds.Tables.Add(objGetDataFromDB1.GetDataTable(str.ToString()));
+
+
+                //Collect for CapmanProducts
+                str = string.Empty;
+                str = @"select map1.capman_platform_id,map1.product_cd,plat.capman_platform_id,plat.capman_platform_name
+                        from CSU_Product_CAPMANPLATFORM_MAP  map1 inner join CAPMAN_PLATFORMS plat on 
+                        map1.capman_platform_id=plat.capman_platform_id where map1.product_cd=" + productID + "";
+                ds.Tables.Add(objGetDataFromDB1.GetDataTable(str.ToString()));
+
+
+                //collect for Ethernet Phase Attribute 
+                str = string.Empty;
+                str = @"select char_name,char_id from csu_ref_valid_char where char_type_id = 581 and char_id
+                         in (Select distinct ACCESS_PRODUCT_TYPE_ID from CSU_ACCESS_PRODUCT_LEVEL) Order by CHAR_NAME ";
+                ds.Tables.Add(objGetDataFromDB1.GetDataTable(str.ToString()));
+
+                //Collect for Supported Country Level Access Type
+                str = string.Empty;
+                str = @"select phase.Id as ID,phase.name as NAME,phaseproduct.product_id 
+                        from csu_phase_attribute phase inner join csu_product_phase_attribute phaseproduct 
+                        on phase.id=phaseproduct.phase_id 
+                        where phaseproduct.product_id = " + productID + " and phase.valid=1 order by phase.name";
+                ds.Tables.Add(objGetDataFromDB1.GetDataTable(str.ToString()));
+
+
+                str = string.Empty;
+                str = @"select PRODUCT_CD,ACCESS_CHAR_ID,INTERFACE_CHAR_ID,PREFERRED_FLAG from csu_product_access_interfaces";
+                ds.Tables.Add(objGetDataFromDB1.GetDataTable(str.ToString()));
+
+
+                str = string.Empty;
+
+                str = @"select distinct   a.access_char_id,b.char_name as  Access_char_name , a.interface_char_id , c.char_name as Interface_char_name," +
+                        " a.preferred_flag,b.char_unit_of_measure,b.char_num_value,substr(b.char_name,14)||' '||b.char_unit_of_measure as Access_Name from csu_product_access_interfaces a join  csu_ref_valid_char b on a.access_char_id=b.char_id join" + " csu_ref_valid_char c on a.interface_char_id=c.char_id where a.product_cd= " + productID + " order by b.char_num_value";
+                ds.Tables.Add(objGetDataFromDB1.GetDataTable(str.ToString()));
+
+
+
+                //AssigendProducts
+                str = string.Empty;
+                str = @"select distinct a.access_speed_char_id, b.char_num_value,b.char_actual_value|| ' ' || b.char_unit_of_measure AS speed_value from                                     valid_parent_mappings a,csu_ref_valid_char b where a.access_speed_char_id=b.char_id and product_cd= " + productID + " order by                                       b.char_num_value";
+                ds.Tables.Add(objGetDataFromDB1.GetDataTable(str.ToString()));
+
+
+
+                //UnAssigendProducts
+                str = string.Empty;
+
+                str = @"select char_id, char_num_value, char_actual_value || ' ' || char_unit_of_measure AS speed_value from csu_ref_valid_char where                                          char_type_id=27 and char_id not in(select distinct b.char_id from valid_parent_mappings a,
+                            csu_ref_valid_char b where a.access_speed_char_id=b.char_id
+                            and product_cd= " + productID + ") order by char_num_value";
+                ds.Tables.Add(objGetDataFromDB1.GetDataTable(str.ToString()));
+
+
+
+                return ds;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
+
+
+        public static DataSet InsertProductAccessInterfaces(List<AccessMappedInterfaces> MappedInterfaces)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            // List<AccessMappedInterfaces> MappedinterfacesList = new List<AccessMappedInterfaces>();
+            DataTable dt = new DataTable();
+            //System.Ora;
+            connection.Open();
+            string sql = "";
+            int ProudctID = MappedInterfaces[0].PRODUCT_CD;
+            sql += "Begin";
+
+            foreach (AccessMappedInterfaces MappedInterface in MappedInterfaces)
+            {
+
+                string sql1 = "";
+                sql1 += "select count(*) from csu_product_access_interfaces where ACCESS_CHAR_ID=" + MappedInterface.ACCESS_CHAR_ID + " ";
+                sql1 += " and INTERFACE_CHAR_ID=" + MappedInterface.INTERFACE_CHAR_ID + " and PREFERRED_FLAG=" + MappedInterface.PREFERRED_FLAG + " ";
+                sql1 += " and PRODUCT_CD=" + MappedInterface.PRODUCT_CD + "";
+                OracleCommand command = new OracleCommand(sql1.ToString(), connection);
+                int rows = Convert.ToInt32(command.ExecuteScalar());
+
+
+                if (rows == 0)
+                {
+                    sql += " Insert into csu_product_access_interfaces values(" + MappedInterface.PRODUCT_CD + ",";
+                    sql += "" + MappedInterface.ACCESS_CHAR_ID + "," + MappedInterface.INTERFACE_CHAR_ID + "," + MappedInterface.PREFERRED_FLAG + ");";
+                }
+
+            }
+            sql += " end;";
+
+            OracleCommand cmd = new OracleCommand(sql.ToString(), connection);
+            cmd.ExecuteNonQuery();
+
+
+
+            string str = "";
+            str = @"select distinct   a.access_char_id,b.char_name as  Access_char_name , a.interface_char_id , c.char_name as Interface_char_name," +
+                        " a.preferred_flag,b.char_unit_of_measure,b.char_num_value,substr(b.char_name,14)||' '||b.char_unit_of_measure as Access_Name from csu_product_access_interfaces a join  csu_ref_valid_char b on a.access_char_id=b.char_id join" + " csu_ref_valid_char c on a.interface_char_id=c.char_id where a.product_cd= " + ProudctID + " order by b.char_num_value";
+
+            OracleCommand cmd1 = new OracleCommand(str.ToString(), connection);
+            OracleDataAdapter da = new OracleDataAdapter(cmd1);
+            da.Fill(dt);
+            connection.Close();
+
+            DataSet ds = new DataSet();
+            ds.Tables.Add(dt);
+
+            return ds;
+        }
+
+
+
+
+
+        //==============================PoPCharcterstic for Product==========================================
+
+        public static DataTable GetPoPCharctersticsforProduct(int ProductID)
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = string.Empty;
+            str = @"select ca.char_id, ca.char_name, 
+	                 cs.display_search, 
+	                 cs.display_reports,  
+	                 cs.created_emp_id,  
+	                 cs.created_dt,  
+	                 cs.updated_emp_id, 
+	                 cs.updated_dt, 
+	                 cs.display_order 
+	                 from capman_pop_chars ca, csu_product_pop_char cs  
+	                 where cs.char_id=ca.char_id and cs.product_cd=" + ProductID + " and subproduct_cd is  null order by ca.char_name  ";
+            return objGetDataFromDB.GetDataTable(str.ToString());
+        }
+
+
+        public static string UpdatePoPCharcterstic(List<SCAdminDAL.PoPCharcterstic> pops,
+             int ProductID, int UpdateEmpId)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            try
+            {
+                string Sql = string.Empty;
+                Sql = "Begin ";
+                foreach (PoPCharcterstic pop in pops)
+                {
+                    Sql += "update csu_product_pop_char ";
+                    Sql += " set display_search= " + pop.DISPLAY_SEARCH + ", ";
+                    Sql += " display_reports= " + pop.DISPLAY_REPORTS + ", ";
+                    if (pop.DISPLAY_ORDER == null)
+                    {
+                        Sql += " display_order= null, ";
+                    }
+                    if (pop.DISPLAY_ORDER != null)
+                    {
+                        Sql += " display_order= " + pop.DISPLAY_ORDER + ", ";
+                    }
+                    Sql += " updated_emp_id = '" + UpdateEmpId + "',";
+                    Sql += " updated_dt = sysdate ";
+                    Sql += " where product_cd= " + ProductID + " and subproduct_cd is null ";
+                    Sql += " and char_id = " + pop.CHAR_ID + " ;";
+                }
+                Sql += "End;";
+                OracleCommand command = new OracleCommand(Sql.ToString(), connection);
+                command.ExecuteNonQuery();
+                connection.Close();
+
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+
+
+
+
+        //===========================================================================================================
+
+
+
+
+
+
+
+
+
+        public static DataTable GetValidMappingforProduct(int ProductID)
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = string.Empty;
+            str = @"(SELECT DISTINCT a.port_speed_char_id,
+                    a.access_type_char_id,
+                    b.char_actual_value,
+                    b.char_unit_of_measure,
+                    c.char_name,
+                    d.char_actual_value,
+                    d.char_unit_of_measure,
+                    0 AS Valid,
+                    a.access_speed_char_id,
+                    b.char_num_value AS chkorder,
+                    b.char_actual_value||' '|| b.char_unit_of_measure as PortSpeed,
+                    d.char_actual_value||d.char_unit_of_measure||c.char_name as Mapped_Access_Speed
+                    FROM port_to_access_speeds a ,
+                    csu_ref_valid_char b,
+                    csu_ref_valid_char c,
+                    csu_ref_valid_char d
+                    WHERE a.port_speed_char_id  =b.char_id
+                    AND a.access_type_char_id   =c.char_id
+                    AND d.char_id               =a.access_speed_char_id
+                    AND a.access_speed_char_id IN ( SELECT DISTINCT a.access_speed_char_id
+                    FROM valid_parent_mappings a,
+                    csu_ref_valid_char b
+                    WHERE a.access_speed_char_id=b.char_id
+                    AND product_cd = " + ProductID + " )";
+            str += @"MINUS
+                        SELECT DISTINCT a.port_speed_char_id,
+                        a.access_type_char_id,
+                        b.char_actual_value,
+                        b.char_unit_of_measure,
+                        c.char_name,
+                        d.char_actual_value,
+                        d.char_unit_of_measure,
+                        0 AS Valid,
+                        a.access_speed_char_id,
+                        b.char_num_value AS chkorder,
+                         b.char_actual_value||' '|| b.char_unit_of_measure as PortSpeed,
+                        d.char_actual_value||d.char_unit_of_measure||c.char_name as Mapped_Access_Speed
+                        FROM valid_parent_mappings a ,
+                        csu_ref_valid_char b,
+                        csu_ref_valid_char c,
+                        csu_ref_valid_char d
+                        WHERE product_cd  = " + ProductID + "";
+            str += @" AND a.port_speed_char_id  =b.char_id
+                        AND a.access_type_char_id =c.char_id
+                        AND d.char_id             =a.access_speed_char_id
+                        AND access_speed_char_id IN ( SELECT DISTINCT a.access_speed_char_id
+                        FROM valid_parent_mappings a,
+                        csu_ref_valid_char b
+                        WHERE a.access_speed_char_id=b.char_id
+                        AND product_cd = " + ProductID + " ))";
+
+            str += @"UNION
+                    SELECT DISTINCT a.port_speed_char_id,
+                      a.access_type_char_id,
+                      b.char_actual_value,
+                      b.char_unit_of_measure,
+                      c.char_name,
+                      d.char_actual_value,
+                      d.char_unit_of_measure,
+                      a.valid_cd Valid,
+                      a.access_speed_char_id,
+                      b.char_num_value AS chkorder,
+                       b.char_actual_value||' '|| b.char_unit_of_measure as PortSpeed,
+                      d.char_actual_value||d.char_unit_of_measure||c.char_name as Mapped_Access_Speed
+                      FROM valid_parent_mappings a ,
+                      csu_ref_valid_char b,
+                      csu_ref_valid_char c,
+                      csu_ref_valid_char d
+                      WHERE product_cd          =  " + ProductID + "";
+            str += @" AND a.port_speed_char_id  =b.char_id
+                      AND a.access_type_char_id =c.char_id
+                      AND d.char_id             =a.access_speed_char_id 
+                      AND access_speed_char_id IN ( SELECT DISTINCT a.access_speed_char_id
+                      FROM valid_parent_mappings a,
+                      csu_ref_valid_char b
+                      WHERE a.access_speed_char_id=b.char_id
+                      AND product_cd              = " + ProductID + ") ORDER BY chkorder";
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+        }
+
+
+
+
+        public static DataTable GetAccessMappingforProduct(int ProductID)
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = string.Empty;
+
+            str = @"SELECT x.*, a.valid_cd
+                             AS
+                            valid FROM
+                            (SELECT DISTINCT a.char_id AS access_speed_char_id,
+                            a.CHAR_ACTUAL_VALUE      AS accspeed,
+                            a.char_unit_of_measure   AS uom,
+                            d.char_id                AS INTERFACE_CHAR_ID,
+                            d.char_name              AS INTERFACE,
+                          
+                            a.char_num_value,
+                            b.product_cd AS product_cd,
+                            a.CHAR_ACTUAL_VALUE ||' '||a.char_unit_of_measure as Custom_AccessSpeed
+                            FROM csu_ref_valid_char a,
+                            valid_parent_mappings b,
+                            csu_product_access_interfaces c,
+                            csu_ref_valid_char d
+                            WHERE a.char_id            = b.access_speed_char_id
+                            AND b.access_speed_char_id = c.access_char_id
+                            AND a.char_type_id         = 27";
+            str += @"AND b.valid_cd=1";
+            str += @" AND d.char_id = c.interface_char_id AND b.product_cd           = " + ProductID + "";
+
+            str += @" AND c.product_cd = 21";
+            str += @"     ORDER BY a.char_num_value,a.CHAR_ACTUAL_VALUE
+                            ) x LEFT OUTER JOIN valid_parent_map_ineterface a ON x.access_speed_char_id = a.access_speed_char_id 
+                            AND x.INTERFACE_CHAR_ID = a.interface_char_id AND x.product_cd = a.product_cd";
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+        }
+
+
+
+        public static string UpdatePortSpeedsMapping(List<SCAdminDAL.PortSpeedMapping> PortSpeeds,
+             int ProductID, int UpdateEmpId)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            try
+            {
+                string str = string.Empty;
+                str = "Begin ";
+                foreach (PortSpeedMapping pspeed in PortSpeeds)
+                {
+                    str += "update valid_parent_mappings set valid_cd = " + pspeed.VALID + " , updated_emp_id=" + UpdateEmpId + ",updated_dt=sysdate where                                       port_speed_char_id=" + pspeed.PORT_SPEED_CHAR_ID + " and access_speed_char_id=" + pspeed.ACCESS_SPEED_CHAR_ID + " ";
+                    str += "and access_type_char_id=" + pspeed.ACCESS_TYPE_CHAR_ID + " and product_cd=" + ProductID + ";";
+                }
+                str += "End;";
+                OracleCommand command = new OracleCommand(str.ToString(), connection);
+                command.ExecuteNonQuery();
+                connection.Close();
+
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+
+
+
+        public static string UpdateAccessSpeedsMapping(List<SCAdminDAL.AccessSpeedMapping> AccessSpeeds,
+            int ProductID, int UpdateEmpId)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            try
+            {
+                string str = string.Empty;
+                str = "Begin ";
+                foreach (AccessSpeedMapping Aspeed in AccessSpeeds)
+                {
+                    str += "update VALID_PARENT_MAP_INETERFACE set valid_cd= " + Aspeed.VALID + ",updated_emp_id= " + UpdateEmpId + ",updated_dt=sysdate where ";
+                    str += " access_speed_char_id= " + Aspeed.Access_SPEED_CHAR_ID + "and INTERFACE_CHAR_ID= " + Aspeed.INTERFACE_CHAR_ID + "";
+                    str += " and product_cd=" + ProductID + ";";
+                }
+                str += "End;";
+                OracleCommand command = new OracleCommand(str.ToString(), connection);
+                command.ExecuteNonQuery();
+                connection.Close();
+
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+
+
+
+
+        #region FlexPorts
+
+        public static DataSet GetFlexPorts(int ProductID)
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            oConn.Open();
+
+            string getFlexPort = string.Empty;
+            getFlexPort += "select flex.*,country.country_name,ref.avail_desc,cref.char_id,cref.char_name from csu_flexiport_availability  flex";
+            getFlexPort += " inner join csu_country  country ";
+            getFlexPort += " on country.country_id = flex.country_id";
+            getFlexPort += " join csu_ref_Availability ref";
+            getFlexPort += " on ref.avail_cd=flex.availability_cd";
+            getFlexPort += " join csu_ref_valid_char cref";
+            getFlexPort += " on flex.access_type_id = cref.char_id ";
+            getFlexPort += " where flex.product_id = " + ProductID + "";
+            getFlexPort += " order by country.country_name";
+
+
+            List<string> quiries = new List<string>(new string[]{"select country_id,country_name from csu_country where country_valid_cd=1 order by country_name",
+                                       "select avail_cd,case when avail_cd=3 then 'ICB' else avail_desc end avail_desc from csu_ref_Availability where avail_cd in (1,3)",
+                                       "select  char_id,char_name from csu_ref_valid_char where char_type_id = 581 order by char_name",
+                                       getFlexPort});
+            return FetchData(quiries, oConn);
+        }
+
+
+
+        public static string AddFlexPort(csu_flexiport_availability Flexport,string CharId)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            string insertQuery = string.Empty;
+            insertQuery += "Begin ";
+            //int[] accessType = CharId.Split(',');
+            List<int> accessTypes = CharId.Split(',').Select(Int32.Parse).ToList();
+            foreach (int accessType in accessTypes)
+            {
+                //Need to check the condition if the value is their or not;
+                insertQuery += "insert into csu_flexiport_availability(COUNTRY_ID,ACCESS_TYPE_ID,AVAILABILITY_CD,CREATED_DT,UPDATED_DT,PRODUCT_ID)";
+                insertQuery += " values(" + Flexport.COUNTRY_ID + "," + accessType + "," + Flexport.AVAIL_CD + ",sysdate,sysdate,";
+                //+ Flexport.CREATED_EMP_ID + "," +  Flexport.UPDATED_EMP_ID
+                insertQuery += ""+ Flexport.PRODUCT_ID +");";
+            }
+            insertQuery += " End;";
+            OracleCommand command = new OracleCommand(insertQuery.ToString(), connection);
+            command.ExecuteNonQuery();
+            return "success";
+           // return GetFlexPorts(Flexport.PRODUCT_ID);
+        }
+
+
+        public static string DeleteFlexPort(List<csu_flexiport_availability> Flexports)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            connection.Open();
+            string DeleteQuery = string.Empty;
+            DeleteQuery += "Begin ";
+            foreach (csu_flexiport_availability Flexport in Flexports)
+            {
+                DeleteQuery += "Delete from csu_flexiport_availability where COUNTRY_ID = " + Flexport.COUNTRY_ID + " and AVAILABILITY_CD= " + Flexport.AVAIL_CD + " ";
+                DeleteQuery += " and PRODUCT_ID ="+Flexport.PRODUCT_ID+";";
+            }
+            DeleteQuery += "End;";
+            OracleCommand command = new OracleCommand(DeleteQuery.ToString(), connection);
+            command.ExecuteNonQuery();
+            return "success";
+        }
+
+
+
+        #endregion
+
+        #region Product Unbundled
+        public static DataSet GetUnbundledNNI(int ProductID, int CountryID, int SupplierID)
+        {
+            OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            oConn.Open();
+
+            string suppliername = string.Empty;
+
+            suppliername += "SELECT DISTINCT supplierid,suppliername FROM v_pc_supplier_product WHERE countryid=(select distinct c_country_id from capman_country_map where pc_country_id=" + CountryID + ")";
+            suppliername += " AND supplierid NOT IN (SELECT b.c_supplier_id FROM csu_unbundlednni_availability a, capman_supplier_map b";
+            suppliername += " WHERE a.supplier_id = b.pc_supplier_id AND country_id  = '10' AND product_id      = '76') ORDER BY suppliername;";
+
+            string AccessType = string.Empty;
+            AccessType += "select distinct supplieraccesstype_id,supplieraccesstype_name from v_pc_supplier_product where countryid=(select distinct c_country_id from capman_country_map where pc_country_id=" + CountryID + ") and supplierid=" + SupplierID + " and supplieraccesstype_id in(10,11) order by supplieraccesstype_name";
+
+            List<string> quiries = new List<string>(new string[] { "select country_id,country_name from csu_country where country_valid_cd=1 order by country_name", suppliername, AccessType });
+            return FetchData(quiries, oConn);
+        }
+
+
+        #endregion
+
+
+
+        #endregion
+
+
+    }
+}

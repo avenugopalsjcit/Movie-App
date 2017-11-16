@@ -1,0 +1,2 @@
+﻿<select ng-model="modValidCase" id="ddlcasevalid" style="width: 100%; margin-bottom: 0px" ng-options="option.text for option in lstValidCase track by option.id">
+</select>

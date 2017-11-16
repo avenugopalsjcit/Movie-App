@@ -1,0 +1,46 @@
+﻿
+
+<div ng-controller="AccessSupplierReportCtrl" class="container">
+        
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                Access Supplier Report
+            </h3>
+        </div>
+ </div>
+<div class="row">
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">                
+
+<div class="form-horizontal">
+<div class="form-group">
+        
+        <label class="col-sm-2 control-label cus-text-left" for="" >
+            Country Name
+            </label>
+
+    <div class="col-md-4">
+        <select ng-model="DDL_PL_Country" ng-change="getAccessReports(DDL_PL_Country)" ng-options="item.COUNTRY_ID as item.COUNTRY_NAME for item in FetchCountreis"
+            id="DDL_PL_Country" style="width: 90%" class="cus-text-left">
+            <option value="">  -- Select Country--</option>
+        </select>
+
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <table id="accessReporttbl" class="table table-striped">
+        <thead>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+</div>
+
+</div>
+</div>
+    <div id="pageLoader" class="pageLoaderOverlay">
+    </div>
+</div>

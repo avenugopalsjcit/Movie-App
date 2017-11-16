@@ -1,0 +1,247 @@
+﻿<div ng-controller="Controllers.CharactericsticTypeCtrl as v">
+   <div class="container">
+        <h2>
+            <span style="float: left; cursor: default">Charctericstic type</span></h2>
+    </div>
+    <br />
+
+    <div class="row">
+      <div style="margin-left: 76%">
+            <a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#newAdminCharViewModal">
+                Add New Characteristic Type </a>
+        </div>
+    </div>
+    <div class="container" margin-right: 29%;">
+        <table ng-table="v.tableParams" class="table" show-filter="true">
+            <tr ng-repeat="user in $data">
+                <td title="'View Characteristics Type'" filter="{ Name: 'text'}" sortable="'name'">
+                    <a data-target="#updateAdminCharViewModal" data-toggle="modal">{{user.Name}} </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+   
+    <div tabindex="-1" class="modal fade in" id="newAdminCharViewModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H1">
+                            Add New Characteristic Type Reference</h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-11">
+                                <label class="control-label col-md-2" for="inputDescription">
+                                    Name</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" value="">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="form-group col-md-12" style="margin-left: -27px;">
+                                    <div class="col-md-2">
+                                        <label class="control-label">
+                                        </label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="sampleinlineradio" value="option1" checked="checked">
+                                                Display Availability Status/Fixed Value (Drop Down)
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="sampleinlineradio" value="option1">
+                                                Text Field
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="sampleinlineradio" value="option1">
+                                                Range of Values
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="sampleinlineradio" value="option1">
+                                                Single Select (Drop Down)
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="sampleinlineradio" value="option1">
+                                                Multi Select (Drop Down)
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="sampleinlineradio" value="option1">
+                                                Text field which allows URL
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="sampleinlineradio" value="option1">
+                                                Memo (This will allow users to attach files)
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="sampleinlineradio" value="option1">
+                                                Speeds(Down/Up)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-11">
+                                <div class="col-md-2">
+                                    <label class="control-label col-md-3" for="inputDescription">
+                                        Valid</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="checkbox">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Save" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in" id="updateAdminCharViewModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H2">
+                            Edit New Characteristic Type Reference</h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label class="control-label col-md-2" for="inputDescription">
+                                    Name</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" value="7 x 24 Access Circuit Restoration">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12" style="margin-left: -27px;">
+                                <div class="col-md-2">
+                                    <label class="control-label">
+                                    </label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" checked="checked" value="option1" name="sampleinlineradio">
+                                            Display Availability Status/Fixed Value (Drop Down)
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" value="option1" name="sampleinlineradio">
+                                            Text Field
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" value="option1" name="sampleinlineradio">
+                                            Range of Values
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" value="option1" name="sampleinlineradio">
+                                            Single Select (Drop Down)
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" value="option1" name="sampleinlineradio">
+                                            Multi Select (Drop Down)
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" value="option1" name="sampleinlineradio">
+                                            Text field which allows URL
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" value="option1" name="sampleinlineradio">
+                                            Memo (This will allow users to attach files)
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" value="option1" name="sampleinlineradio">
+                                            Speeds(Down/Up)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-md-2">
+                                    <label class="control-label col-md-3" for="inputDescription">
+                                        Valid</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="checkbox" checked="true">
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <div class="form-horizontal" style="font-size: 13px; padding-left: 3%">
+                            <div class="form-group col-md-12">
+                                <div class="col-md-3">
+                                    <u><b><span>Created by</span></b></u><br>
+                                    <span>MacGamwell,John</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <u><b><span>Created Date</span></b></u><br>
+                                    <span>21-MAY-1999 09:58:12 AM&nbsp;GMT</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <u><b><span>Updated by</span></b></u><br>
+                                    <span>Prasad, Achutha</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <u><b><span>Date Last Updated</span></b></u><br>
+                                    <span>18-DEC-2003 06:47:38 PM&nbsp;GMT</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Update" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Delete" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

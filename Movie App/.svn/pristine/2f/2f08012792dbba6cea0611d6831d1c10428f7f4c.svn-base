@@ -1,0 +1,348 @@
+﻿<style>
+    #tblShow tr td
+    {
+        white-space: nowrap;
+        vertical-align:middle !important;
+      
+    }
+    table thead tr th
+    {
+        white-space: nowrap;
+    }
+    option:selected
+    {
+        font-weight: bold;
+    }
+    #SLAMasterDatatable > tbody > tr > td > select
+    {
+        width: 258px !important;
+    }
+    
+    
+    #formtable > tbody > tr > td
+    {
+        text-align: left;
+        padding-bottom: 13px;
+        padding-top: 14px;
+        padding-left: 30px;
+    }
+    
+    #formtable
+    {
+        margin-left: -30px;
+    }
+    
+    .cusTd
+    {
+        padding-top: 15px !important;
+        position: absolute;
+    }
+    
+    
+    
+    
+</style>
+<div ng-controller="Controllers.SLAMasterCtrl" style="margin-left: 27px;">
+    <form name="myForm">
+    <h3>
+        <span style="float: left; cursor: default">Product SLA Master</span></h3>
+    <br />
+    <br />
+    <table id="formtable">
+        <tbody>
+            <tr>
+                <td>
+                    <label class="control-label" for="productId">
+                        Product&nbsp;<span style="color: Red">*</span></label>
+                </td>
+                <td>
+                    <select name="ProductID" style="width: 20em;" class="productId" ng-model="productitem"
+                        ng-options="Product.PRODUCT_CD as Product.PRODUCT_NAME for Product in Products"
+                        id="productId" ng-change="CheckRecord('product',productitem)">
+                        <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option>
+                    </select>
+                    <br />
+                    <span ng-show="products" style="color: Red">Please Select Product</span>
+                </td>
+                <td>
+                    <label class="control-label" for="CountryId">
+                        Country(s)&nbsp;<span style="color: Red">*</span></label>
+                </td>
+                <td rowspan="5" class="cusTd">
+                    <select class="form-control" style="font-size: 1.0em; width: 20em;" ng-model="Countryitem"
+                        ng-options="country.COUNTRY_ID as country.COUNTRY_NAME for country in Countries"
+                        id="CountryId" multiple size="9" ng-change="CheckRecord('Countries',Countryitem)">
+                    </select>
+                    <br />
+                    <span id="coutnryId" style="display: none; color: Red">Please Select Country</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="PartnerId">
+                        Partner&nbsp;<span style="color: Red">*</span></label>
+                </td>
+                <td>
+                    <select style="width: 20em;" ng-model="Supplieritem" ng-options="Supplier.SUPPLIERID as Supplier.SUPPLIERNAME for Supplier in Suppliers"
+                        id="PartnerId" ng-change="CheckRecord('partner',Supplieritem)">
+                        <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;--</option>
+                    </select>
+                    <br />
+                    <span ng-show="partners" style="color: Red">Please Select Partner</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="ResiliencyId">
+                        Resiliency&nbsp;<span style="color: Red">*</span>
+                    </label>
+                </td>
+                <td>
+                    <select style="width: 20em;" class="Resiliency" style="font-size: 1.0em;" ng-model="Resiliencyitem"
+                        ng-options="Resiliency.RES_TYPE_ID as Resiliency.RES_TYPE_NAME for Resiliency in Resiliencies"
+                        id="ResiliencyId" ng-change="CheckRecord('resilency',Resiliencyitem)">
+                        <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;--</option>
+                    </select>
+                    <br />
+                    <span ng-show="Resilencys" style="color: Red">Please Select Resilency</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="PrimaryAccessId">
+                        Primary Access
+                    </label>
+                </td>
+                <td>
+                    <select style="width: 20em;" ng-show="IsAddClick" ng-model="primaryitem" ng-options="ol.PARENT_ACCESS_TECHNOLOGY as ol.PARENT_ACCESS_TECHNOLOGY for ol in  Primaries"
+                        id="PrimaryAccessId">
+                        <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp--</option>
+                    </select>
+                    <select style="width: 20em;" id="accessdis1" ng-disabled="true" ng-hide="IsAddClick">
+                        <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp--</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="control-label" for="SecondaryAccessId">
+                        Secondary Access</label>
+                </td>
+                <td>
+                    <select style="width: 20em;" ng-model="secondaryitem" ng-show="IsAddClick" ng-options="o.CHILD_TECHNOLOGY as o.CHILD_TECHNOLOGY for o in Secondaries"
+                        id="SecondaryAccessId">
+                        <option value=''>&nbsp;&nbsp--&nbsp;Select &nbsp;--</option>
+                    </select>
+                    <select style="width: 20em;" id="accessdis2" ng-disabled="true" ng-hide="IsAddClick">
+                        <option value=''>&nbsp;&nbsp--&nbsp;Select &nbsp;--</option>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <br />
+    <br />
+    <div align="center" style="padding-right: 16%; margin-top: -21px">
+        <input type="button" ng-disabled="Countryitem==null||Resiliencyitem==null||productitem==null||Supplieritem==null"
+            class="btn btn-primary" value="Go" ng-click="goClick();UpdateTable=true;InsertTable=false;" />
+        <span></span>
+        <input type="button" ng-disabled="Countryitem==null||Resiliencyitem==null||productitem==null||Supplieritem==null"
+            class="btn btn-primary" value="Add" ng-click="ADDMasterDetails();InsertTable=true;UpdateTable=false;" />
+        <span></span>
+        <input type="button" class="btn btn-default" value="Save" id="SaveMaster" ng-click="SaveMasterDetails()"
+            ng-disabled="disbaleSavebtn" />
+    </div>
+    <!--
+    <input class="btn btn-primary btn-sm" value="uclck" ng-click="upclck()" />-->
+    <br />
+    </form>
+
+  
+    <div ng-show="UpdateTable">
+        <table class="table table-bordered" id="tblShow">
+            <thead>
+                <tr>
+                    <th colspan="3" class="Arrow" style="text-align: center">
+                        Primary
+                    </th>
+                    <th colspan="3" class="Arrow" style="text-align: center">
+                        Secondary
+                    </th>
+                    <th colspan="7">
+                    </th>
+                </tr>
+                <tr>
+                    <th class="Arrow">
+                        Access Technology
+                    </th>
+                    <th class="Arrow">
+                        Service Variant
+                    </th>
+                    <th class="Arrow">
+                        Delivery Mode
+                    </th>
+                    <th class="Arrow">
+                        Access Technology
+                    </th>
+                    <th class="Arrow">
+                        Service Variant
+                    </th>
+                    <th class="Arrow">
+                        Delivery Mode
+                    </th>
+                    <th class="Arrow">
+                        Description
+                    </th>
+                    <th class="Arrow">
+                        SLA Category
+                    </th>
+                    <th class="Arrow">
+                        Site Availability Target
+                    </th>
+                    <th class="Arrow">
+                        Severity Repair Target
+                    </th>
+                    <th class="Arrow">
+                        Resiliency Repair Target
+                    </th>
+                    <th class="Arrow">
+                        Band
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td ng-show="slaMasterData==0" colspan="12">
+                        <label>
+                            No Records Found</label>
+                    </td>
+                </tr>
+                <tr ng-repeat="item in slaMasterData">
+                    <td class="Arrow">
+                        {{item.PRIMARY_ACCESS_TECH}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.PRIMARY_SERVICE_VARIANT}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.PRIMARY_DEL_MODE}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.SECONDARY_ACCESS_TECH}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.SECONDARY_SERVICE_VARIANT}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.SECONDARY_DEL_MODE}}
+                    </td>
+                    <td class="arrow">
+                        {{item.DESCRIPTION}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.SLA_CATEGORY}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.SITE_AVAILABILITY_TARGET}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.SEVERITY_1_REPAIR_TARGET}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.RESILIENCY_REPAIR_TARGET}}
+                    </td>
+                    <td class="Arrow">
+                        {{item.BAND}}
+                    </td>
+                    <td class="Arrow">
+                        <div class="form" ng-show="Edit">
+                            <button class="btn btn-default btn-sm" ng-click="EditMaster($index,$event,item);Edit=false;Save=true">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                            <button class="btn btn-danger btn-sm" ng-click="DeleteRecord($index,$event,item)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
+                        <div ng-show="Save">
+                            <button class="btn btn-primary btn-sm" ng-click="UpdateRecord($index,$event,item);Save=false;Edit=true">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </button>
+                            <button class="btn btn-default btn-sm" ng-click="CancelRecord($index,$event,item);Save=false;Edit=true">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tody>
+        </table>
+    </div>
+    <!--<div ng-show="InsertTable" class="table-responsive">-->
+    <div ng-show="InsertTable">
+        <table class="table table-bordered" id="SLAMasterDatatable">
+            <thead>
+                <tr>
+                    <th class="Arrow" colspan="3" style="text-align: center">
+                        Primary
+                    </th>
+                    <th class="Arrow" colspan="3" style="text-align: center">
+                        Secondary
+                    </th>
+                    <th class="Arrow" colspan="8">
+                    </th>
+                </tr>
+                <tr>
+                    <th class="Arrow">
+                        Access Technology
+                    </th>
+                    <th class="Arrow">
+                        Service Variant
+                    </th>
+                    <th class="Arrow">
+                        Delivery Mode
+                    </th>
+                    <th class="Arrow">
+                        Access Technology
+                    </th>
+                    <th class="Arrow">
+                        Service Variant
+                    </th>
+                    <th class="Arrow">
+                        Delivery Mode
+                    </th>
+                    <th class="Arrow">
+                        Description
+                    </th>
+                    <th class="Arrow">
+                        SLA Category
+                    </th>
+                    <th class="Arrow">
+                        Site Availability Target
+                    </th>
+                    <th class="Arrow">
+                        Severity1 Repair Target
+                    </th>
+                    <th class="Arrow">
+                        Resiliency Repair Target
+                    </th>
+                    <th class="Arrow">
+                        Band
+                    </th>
+                    <th>
+                        SBR
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div id="Go1" class="pageLoaderOverlay">
+    </div>
+    <div id="Add1" class="pageLoaderOverlay">
+    </div>
+</div>

@@ -1,0 +1,33 @@
+﻿<style>
+ ul
+{
+    list-style-type: none;
+}
+.wTreeStyle > li span
+{
+   position:relative;bottom:-4px; 
+}
+.wTreeStyle > li img
+{
+   margin-bottom:-4px;
+}
+</style>
+    
+    <div id="divddlreg">
+    <select ng-change="filterCountry()" id="ddlreg" style="width:20%" ng-model="modRegion" ng-options="option.REGION_NAME for option in lstRegion track by option.REGION_ID">
+        <option value="">All Regions</option>
+    </select>
+    </div>
+  
+   <ul class='wTreeStyle checktree-root'  style="margin-left:0px">
+       <li ng-repeat="item in lstCountry | orderBy:'item.CountryName' track by $index" class="{{item.PARENTID}} showallcountry">
+            <input id='ChkCountry{{item.COUNTRY_ID}}' type='checkbox'/> 
+            <img src="image/closefolder.gif" class="imgcloseall" alt="" id="countryfolderImage{{item.COUNTRY_ID}}" ng-click="loadChild(item.COUNTRY_ID,item.TYPE,'countryChild','countryfolderImage','ChkCountry')"/>
+
+            <span>{{item.COUNTRY_NAME}}</span>
+            <div id="countryChild{{item.COUNTRY_ID}}" class="collapseall"></div>
+              
+        </li>
+    </ul>
+
+</div>

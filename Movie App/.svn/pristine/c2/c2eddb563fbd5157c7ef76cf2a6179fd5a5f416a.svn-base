@@ -1,0 +1,72 @@
+﻿app.BindCaseArray = function ($scope) {
+    $scope.selectedCases.forEach(function (item, index) {
+        $scope.savedCases = getStringArray($scope.CaseArray, 'caseId');
+        if ($scope.savedCases.indexOf(item) == -1) {
+            if ($scope.portspeedList.length == 0) { $scope.AccessSuppCharList = []; }
+            $scope.CaseArray.push({
+                caseId: item,
+                CaseAvailtxt: $scope.modCaseAvail.AVAIL_DESC,
+                CaseAvailID: $scope.modCaseAvail.AVAIL_CD,
+                caseValidText: $scope.modValidCase.text,
+                caseValidID: $scope.modValidCase.id,
+                //                    portAvailID: $scope.modportavail.AVAIL_CD,
+                //                    portAvailText: $scope.modportavail.AVAIL_DESC,
+                //                    portValidID: $scope.modvalidport.id,
+                //                    portValidText: $scope.modvalidport.text,
+                //                    leadTime: $scope.modportspeedleadtime,
+                popID: $scope.selectedPoPs[index],
+                portspeedList: $scope.portspeedList,
+                AccessSuppCharList: $scope.AccessSuppCharList,
+                savedCharList: $scope.savedCharList
+            });
+        } else {
+            $scope.CaseArray.forEach(function (obj) {
+                if (obj.caseId == item) {
+                    obj.caseAvail = $scope.modCaseAvail.AVAIL_CD;
+                    obj.caseValid = $scope.modValidCase.id;
+
+                    var savedPort = getStringArray(obj.portspeedList, 'CharId');
+                    $scope.portspeedList.forEach(function (port) {
+                        if (savedPort.indexOf(port.CharId) == -1) {
+                            obj.portspeedList.push(port);
+
+                        }
+                    });
+                    savedPort = [];
+
+                    var savedaccessID = getStringArray(obj.AccessSuppCharList, 'AccessId');
+                    var savedSupplierId = getStringArray(obj.AccessSuppCharList, 'SupplierId');
+                    var savedAccessTypeId = getStringArray(obj.AccessSuppCharList, 'AccessTypeId');
+                    var saveSupplierNameId = getStringArray(obj.AccessSuppCharList, 'SupplierNameId');
+                    $scope.AccessSuppCharList.forEach(function (access) {
+                        if (savedaccessID.indexOf(access.AccessId) == -1 || savedSupplierId.indexOf(access.SupplierId) == -1 ||
+                        savedAccessTypeId.indexOf(access.AccessTypeId) == -1 || saveSupplierNameId.indexOf(access.SupplierNameId) == -1) {
+                            obj.AccessSuppCharList.push(access);
+                        }
+                    });
+                    savedaccess = [];
+
+                    var savedchar = getStringArray(obj.savedCharList, 'CharId');
+                    $scope.savedCharList.forEach(function (char) {
+                        if (savedchar.indexOf(char.CharId) == -1) {
+                            obj.savedCharList.push(char);
+
+                        }
+                    });
+                    savedchar = [];
+                }
+            });
+        }
+    });
+
+    //remove portspeed data list
+    $scope.portspeedList = [];
+    //remove access speed dropdown data
+    $scope.lstAccSpeed = [];
+    //removed saved access speed data
+    $scope.AccessSuppCharList = [];
+    //removed saved charList
+    $scope.savedCharList = [];
+    //remove selected char panel
+    $("#selectedChar").empty();
+}

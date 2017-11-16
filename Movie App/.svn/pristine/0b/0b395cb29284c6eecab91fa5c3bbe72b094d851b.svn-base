@@ -1,0 +1,3 @@
+﻿<select ng-model="modCaseAvail" id="ddlCaseAvail" style="width: 100%; margin-bottom: 10px"
+    ng-options="option.AVAIL_DESC for option in lstCaseAvail track by option.AVAIL_CD">
+</select>

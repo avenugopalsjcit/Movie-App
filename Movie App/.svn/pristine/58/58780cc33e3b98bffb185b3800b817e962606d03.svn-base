@@ -1,0 +1,74 @@
+﻿
+(function (ng, app) {
+
+    //Usig UserInfo service from AdminController
+    app.controller("Controllers.UserDetailsCtrl", function ($scope, $http, UserInfo) {
+
+        $scope.UserData = false;
+        $scope.NoUserData = false;
+        $scope.EmptyUser = false;
+        $scope.GetUserDtls = function (EINInfo) {
+            $scope.EmptyUser = false;
+           $scope.EINInfo= $('#EINInfo').val();
+           if ($scope.EINInfo != "" && $scope.EINInfo != undefined) {
+                $scope.EmptyUser = false;
+                $scope.NoUserData = false;
+
+                $(".pageLoaderOverlay").show();
+                $scope.UserName = "";
+                $scope.Password = "";
+                UserInfo.GetUserDetails($scope.EINInfo, $scope.UserName, $scope.Password).success(function (data) {
+                    if (data.d.EIN != null) {
+                        $scope.UserData = true;
+                        $scope.NoUserData = false;
+                        $scope.EIN = data.d.EIN;
+                        if (data.d.EIN != null) {
+                            var spitdata = data.d.EIN.split(':');
+                            if (spitdata.length == 2) {
+                                $scope.Country = spitdata[1];
+                                $scope.EIN = spitdata[0];
+                            }
+                        }
+
+                        $scope.FirstName = data.d.FirstName;
+                        $scope.LastName = data.d.LastName;
+                        $scope.Email = data.d.EmailID;
+                        $scope.Mobile = data.d.Mobile;
+                        $scope.TelePhoneNo = data.d.DeskPhone;
+                        $scope.GFRCode = data.d.btGFR;
+                        $scope.UserData = true;
+                    }
+                    //                    else if (EINInfo == "") {
+                    //                        $scope.UserData = false;
+                    //                        $scope.NoUserData = false;
+                    //                        $scope.EmptyUser = true;
+                    //                        $scope.EINInfo = "";
+                    //                        //alert("Please enter User Identifier.");
+                    //                        bootbox.alert({ "className": "my-custom-class", message: "Please enter EIN" });
+                    //                    }
+                    else {
+                        $scope.UserData = false;
+                        $scope.NoUserData = true;
+                        $scope.EmptyUser = false;
+                       // $scope.EINInfo = "";
+                        $scope.ErrorMsg = data.d.ErrorMsg;
+                    }
+                    $(".pageLoaderOverlay").hide();
+                })
+        .error(function (error) {
+            bootbox.alert({ "className": "my-custom-class", message: "Invalid EIN" });
+            $(".pageLoaderOverlay").hide();
+        });
+            }
+            else {
+                $scope.UserData = false;
+                $scope.NoUserData = false;
+                $scope.EmptyUser = true;
+              //  $scope.EINInfo = "";
+            }
+        }
+
+
+    });
+
+} (angular, app));

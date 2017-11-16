@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace SCAdminDAL
+{
+    public class DefineStandardReport
+    {
+        public int productId { get; set; }
+        public string reportId { get; set; }
+        public string strReportColumnCd {get; set;}
+        public string strOptionMatrixId {get; set;}
+        public string strCharId {get; set;}
+        public string strCharTypeId {get; set;}
+        public string strColumnHeader1 {get; set;}
+        public string strColumnHeader2 {get; set;}
+        public string strColumnHeader3 {get; set;}
+        public string strColumnValidCd {get; set;}
+        public string newOrdercd {get; set;}
+        public string strProductMappedId {get; set;}
+        public int userId {get; set;}
+
+     
+             
+    }
+}

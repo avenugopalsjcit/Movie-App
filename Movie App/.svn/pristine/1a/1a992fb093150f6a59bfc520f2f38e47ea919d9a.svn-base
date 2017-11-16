@@ -1,0 +1,9 @@
+﻿<ul class='wTreeStyle checktree-root' style="margin-left: 0px">
+    <li ng-repeat="item in lstRegion | orderBy:'item.REGION_NAME' track by $index" class="showallcountry">
+        <input id='ChkRegion{{item.REGION_ID}}' type='checkbox' />
+      <span> <img src="image/closefolder.gif" class="imgcloseall" alt="" id="regionfolderImage{{item.REGION_ID}}"
+            ng-click="loadChildList(item.REGION_ID,item.TYPE)" />
+        {{item.REGION_NAME}}</span> 
+        <div id="regionChild{{item.REGION_ID}}" class="collapseall"></div>
+    </li>
+</ul>

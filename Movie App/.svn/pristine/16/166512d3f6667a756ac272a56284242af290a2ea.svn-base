@@ -1,0 +1,693 @@
+﻿<style>
+    /* tbody
+    {
+        display: block;
+        height: 500px;
+        overflow: auto;
+    }
+   */
+    .hide
+    {
+        visibility: hidden;
+    }
+    .paddinglabel
+    {
+        margin-top: 5px;
+    }
+    
+    table > tbody > tr > td.chkmiddle2
+    {
+        text-align: center;
+    }
+    
+    table thead tr th
+    {
+    	text-align:center !important;
+    }
+    
+    .uiselect2, .uiselect3, .uiselect4, .uiselect5, .uiselect7
+    {
+        width: 168px !important;
+    }
+    .pageLoadselect
+    {
+        width: 168px !important;
+    }
+    select
+    {
+        cursor: pointer !important;
+    }
+    .uiselect10, .uiselect12
+    {
+        width: 270px !important;
+    }
+    .uiselect11, .uiselect6
+    {
+        width: 200px !important;
+    }
+    
+    span
+    {
+        cursor: default !important;
+    }
+    
+    
+    a > span
+    {
+        cursor: pointer !important;
+    }
+    
+    .glyphicon
+    {
+        cursor: pointer !important;
+    }
+    #nextlink
+    {
+        color: White !important;
+    }
+    #nextlink:hover
+    {
+        color: White !important;
+    }
+    span.important
+    {
+        color: Red !important;
+    }
+    
+    /* <!--#accessLinkid:hover
+    {
+        color: White !important;
+    }-->*/
+</style>
+<div ng-controller="ProductLevelSLACtrl">
+    <!-- <nav class="navbar navbar-default center" role="navigation">
+  <div class="navbar-header ">
+    <a class="navbar-brand" style="text-align: center" href="#">Product Level SLA</a>
+
+    </div>
+    </nav>-->
+    <h3>
+        <span style="float: left; cursor: default">Product Level SLA</span></h3>
+    <br />
+    <br />
+    <div class="row col-md-8">
+        <div class="col-md-1">
+            <label class="paddinglabel">
+                Product</label></div>
+        <div class="col-md-6">
+            <select ng-model="DDL_PL_Product" ng-change="GetProductDetailsById(DDL_PL_Product)"
+                ng-options="item.product_id as item.ProductName for item in ProductsList" id="DDL_PL_Product"
+                style="width: 62%">
+                <option value=''>&nbsp&nbsp--&nbsp Please Select &nbsp--</option>
+            </select>
+        </div>
+    </div>
+    <br />
+    <!--Maintable-->
+    <div ng-show="IsProduct">
+        <div>
+            <!-- <div ng-show="tblSLAProducts">-->
+            <br />
+            <br />
+            <div>
+                <!--    <div ng-show="AccessTypeConfigTable">-->
+                <div class="form-group col-md-12" style="padding-left: 0px; padding-top: 0px;">
+                    <h4 style="float: left; cursor: default; margin-bottom: -4px;">
+                        SLA Details of {{ProudctName}}
+                    </h4>
+                </div>
+                <br />
+                <div>
+                    <button ng-click="AddSLADetails(DDL_PL_Product)" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                    <button ng-click="DeleteSLADetails(DDL_PL_Product)" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                    <button class="btn btn-primary" ng-click="SaveSLADetails(DDL_PL_Product)">
+                        <span class="glyphicon glyphicon-floppy-saved"></span>
+                    </button>
+                </div>
+                <div>
+                    <table id="tblSLAProudcts" class="table table-bordered makeCenter">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <span>Delete </span>
+                                </th>
+                                <th>
+                                    <span>Product SLA&nbsp; </span>
+                                </th>
+                                <th colspan="4" style="text-align:center">
+                                    <span>Secure Supported </span>
+                                </th>
+                                <th>
+                                    <span>Network Resiliency Yes? </span>
+                                </th>
+                                <th>
+
+                                    <span><u><span style="cursor: pointer"><a title="Please Click on the link to View SLA Details"
+                                        id="nextlink" target="_blank" href="https://intra.bt.com/bt/globalservices/salesportal/products/global_access/pages/index.aspx">
+
+                                    <span><u><span data-toggle="Please Click on the link to View SLA Details" style="cursor: pointer"><a id="nextlink" target="_blank" href="https://intra.bt.com/bt/globalservices/salesportal/products/global_access/pages/index.aspx">
+
+                                        Access Resiliency Type</a> </span></u>
+                                        <br />
+
+
+                                       <!-- <span id="accessLinkid">Please Click on the link to View SLA Details &nbsp;</span></span>-->
+
+                                </th>
+                                <th colspan="2">
+                                    <span>Asymmetrical Access Product Type Allowed Yes? </span>
+                                </th>
+                                <th>
+                                    <span>Commericial Separacy Mandatory Yes? </span>
+                                </th>
+                                <th>
+                                    <span>No Common PoP Yes? </span>
+                                </th>
+                                <th>
+                                    <span>MTNI SLA &nbsp;</span>
+                                </th>
+                                <th>
+                                    <span>Updated By </span>
+                                </th>
+                                <th>
+                                    <span>Updated Date </span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span>BAU PoP1 Yes? </span>
+                                </th>
+                                <th>
+                                    <span>Reuters PoP1 Yes? </span>
+                                </th>
+                                <th>
+                                    <span>BAU PoP2 Yes? </span>
+                                </th>
+                                <th>
+                                    <span>Reuters PoP2 Yes? </span>
+                                </th>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span>Access Product Type Allowed Yes? </span>
+                                </th>
+                                <th>
+                                    <span>Access Speed Allowed Yes? </span>
+                                </th>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span></span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="SLADetailsofProduct.length == 0">
+                                <td colspan="15">
+                                    <label style='font-weight: bold; font-size: 12px;'>
+                                        No Records Found</label>
+                                </td>
+                            </tr>
+                            <tr ng-repeat="item in SLADetailsofProduct">
+                                <td class="chkmiddle2">
+                                    <input type="checkbox" id="{{item.SLA_BUILDER_ID}}" ng-model="chkSelectTodelete" />
+                                </td>
+                                <td>
+                                    <select class="uiselect2" id="restypeId" ng-model="item.RES_TYPE_ID" ng-options="item4.RES_TYPE_ID as item4.RES_TYPE_NAME for item4 in MainResttype">
+                                    </select>
+                                </td>
+                                <td class="chkmiddle2">
+                                    <input id="BAUPOP1" type="checkbox" ng-checked="item.SECURE_BAU_POP1" />
+                                </td>
+                                <td class="chkmiddle2">
+                                    <input id="ReutersPOP1" type="checkbox" ng-checked="item.SECURE_REUTERS_POP1" />
+                                </td>
+                                <td class="chkmiddle2">
+                                    <input id="BAUPOP2" type="checkbox" ng-checked="item.SECURE_BAU_POP2" />
+                                </td>
+                                <td class="chkmiddle2">
+                                    <input id="ReutersPOP2" type="checkbox" ng-checked="item.SECURE_REUTERS_POP2" />
+                                </td>
+                                <td class="chkmiddle2">
+                                    <input id="NetworkID" type="checkbox" ng-checked="item.NETWORK_RES" />
+                                </td>
+                                <td>
+                                    <select class="uiselect2" id="ACCESS_RES_TYPE_ID" ng-model="item.ACCESS_RES_TYPE_ID"
+                                        ng-options="item2.ACCESS_RES_TYPE_ID as item2.ACCESS_RES_TYPE_VALUE for item2 in Restypes">
+                                    </select>
+                                </td>
+                                <td class="chkmiddle2">
+                                    <input id="AsymmetricalAccessProductTypeID" type="checkbox" ng-checked="item.ASYM_ACCESS_PROD_TYPE" />
+                                </td>
+                                <td class="chkmiddle2">
+                                    <input id="AsymmetricalAccessSpeedID" type="checkbox" ng-checked="item.ASYM_ACCESS_SPEED_TYPE" />
+                                </td>
+                                <td class="chkmiddle2">
+                                    <input id="CommericialSeparacyID" type="checkbox" ng-checked="item.COM_SEPARACY" />
+                                </td>
+                                <td class="chkmiddle2">
+                                    <input id="NoCommonPOPID" type="checkbox" ng-checked="item.NO_COM_POP" />
+                                </td>
+                                <td>
+                                    <select class="uiselect2" id="SLA_TYPE_ID" ng-model="item.SLA_TYPE_ID" ng-options="item9.SLA_TYPE_ID as item9.SLA_TYPE_VALUE for item9 in MTNISLA">
+                                    </select>
+                                </td>
+                                <td>
+                                    {{item.UPDATED_NAME}}
+                                </td>
+                                <td>
+                                    {{item.UPDATED_DT}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--<div class="form-group col-md-12" style="margin-left: 6em;">
+                    <label class="col-md-2" for="OfferMultiSelect" style="padding-left: 6em;">
+                        Offer MultiCast
+                    </label>
+                    <input class="col-md-1" type="checkbox" id="OfferMultiSelect" name="OfferMultiSelect">
+                    <label class="col-md-3" for="OfferCoreDiversity " style="padding-left: 11em;">
+                        Offer Core Diversity
+                    </label>
+                    <input class="col-md-1" type="checkbox" id="OfferCoreDiversity" name="OfferCoreDiversity"
+                        style="margin-left: -5px;">
+                </div>-->
+                <div class="form-group col-md-12" style="margin-left: -3em;">
+                    <label class="col-md-2" for="OfferMultiSelect" style="padding-left: 24px;">
+                        Offer MultiCast
+                    </label>
+                    <input class="col-md-1" ng-checked="MULTICAST" type="checkbox" id="OfferMultiSelect" name="OfferMultiSelect" style="padding-right: -11px;">
+                    <label class="col-md-3" for="OfferCoreDiversity " style="padding-left: 6em;">
+                        Offer Core Diversity
+                    </label>
+                    <input class="col-md-1" ng-checked="CORE_DIVERSITY" type="checkbox" id="OfferCoreDiversity" name="OfferCoreDiversity"
+                        style="margin-left: -5px;">
+                </div>
+            </div>
+            <!-- Access Speed Cofiguration-->
+            <div>
+                <div>
+                    <!--    <div ng-show="AccessTypeConfigTable">-->
+                    <div class="form-group col-md-12" style="padding-left: 0px; padding-top: 0px;">
+                        <h4 style="float: left; cursor: default; margin-bottom: -4px;">
+                            Access Type Configuration
+                        </h4>
+                    </div>
+                    <br />
+                    <div class="row">
+                     <div class="form-group col-md-12"">
+                        <button ng-click="AddConfig(DDL_PL_Product)" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-plus" title="Add"></span>
+                        </button>
+                        <button ng-click="DeleteConfig(DDL_PL_Product)" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                        <button ng-click="SaveConfig(DDL_PL_Product)" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-floppy-saved"></span>
+                        </button>
+                        </div>
+                    </div>
+                    <table id="AccessTypeConfiguration" class="table table-bordered makeCenter">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <span>Delete </span>
+                                </th>
+                                <th>
+                                    <span>Product SLA </span>
+                                </th>
+                                <th>
+                                    <span>Resiliency SLA </span>
+                                </th>
+                                <th colspan="3" style="text-align: center">
+                                    <span>Leg1</span>
+                                </th>
+                                <th colspan="3" style="text-align: center">
+                                    <span>Leg2</span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span></span>
+                                </th>
+                                <th>
+                                    <span>Access Type </span>
+                                </th>
+                                <th>
+                                    <span>Service Variant </span>
+                                </th>
+                                <th>
+                                    <span>Delivery Mode </span>
+                                </th>
+                                <th>
+                                    <span>Access Type </span>
+                                </th>
+                                <th>
+                                    <span>Service Variant </span>
+                                </th>
+                                <th>
+                                    <span>Delivery Mode </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="accessTypeconfigTableData.length==0">
+                                <td colspan="9">
+                                    <label style='font-weight: bold; font-size: 12px;'>
+                                        No Records Found</label>
+                                </td>
+                            </tr>
+                            <tr ng-repeat="item in accessTypeconfigTableData">
+                                <td class="chkmiddle3" style="padding-left: 17px">
+                                    <input type="checkbox" class="checkbox" />
+                                </td>
+                                <td>
+                                    <select class="uiselect3" name="AccessType_PRODUCT_SLA_TYPE_ID" ng-model="item.PRODUCT_SLA_TYPE_ID"
+                                        ng-options="item12.PRODUCT_SLA_TYPE_ID as item12.PRODUCT_SLA_TYPE_NAME for item12 in SLAtable"
+                                        ng-change="SLAProdtypes_Access_Config('AccessType_PRODUCT_SLA_TYPE_ID{{$index}}',item.PRODUCT_SLA_TYPE_ID)"
+                                        id="AccessType_PRODUCT_SLA_TYPE_ID{{$index}}" data-sla-id="{{item.PRODUCT_SLA_TYPE_ID}}">
+                                    </select>
+                                </td>
+                                <td>
+                                    <span ng-show="IsAvailable(item.PRODUCT_SLA_TYPE_ID,SLAtable)" id="{{item.ACCESS_RES_TYPE_ID}}"
+                                        ng-model="item.ACCESS_RES_TYPE_ID">{{item.ACCESS_RES_TYPE_VALUE}}</span>
+                                </td>
+                                <td>
+                                    <select class="uiselect3" name="LEG1_ACCESSTYPE_ID" ng-model="item.LEG1_ACCESSTYPE_ID"
+                                        ng-options="item25.LEG1_ACCESSTYPE_ID as item25.LEG1_ACCESS_TYPE_NAME for item25 in Leg1Aceess"
+                                        id="LEG1_ACCESSTYPE_ID{{$index}}" ng-change="Platformchangelegs('LEG1_ACCESSTYPE_ID{{$index}}',item.LEG1_ACCESSTYPE_ID,'No','Access')">
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="uiselect3" name="LEG1_SERVICE_VARIANT_ID" ng-model="item.LEG1_SERVICE_VARIANT_ID"
+                                        ng-disabled="item.LEG1_ACCESSTYPE_ID!=2" ng-options="item26.LEG1_SERVICE_VARIANT_ID as item26.LEG1_SERVICE_VARIANT_NAME for item26 in LEG1ServiceVariant"
+                                        id="LEG1_SERVICE_VARIANT_ID">
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="uiselect3" name="LEG1_DELIVERY_MODE_ID" ng-model="item.LEG1_DELIVERY_MODE_ID"
+                                        ng-disabled="item.LEG1_ACCESSTYPE_ID!=2" ng-options="item27.LEG1_DELIVERY_MODE_ID as item27.LEG1_DELIVERY_MODE_NAME for item27 in LEG1DeliveryMode"
+                                        id="LEG1_DELIVERY_MODE_ID">
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="uiselect3" name="LEG2_ACCESSTYPE_ID" ng-model="item.LEG2_ACCESSTYPE_ID"
+                                        ng-options="item28.LEG2_ACCESSTYPE_ID as item28.LEG2_ACCESS_TYPE_NAME for item28 in Leg2Aceess"
+                                        id="LEG2_ACCESSTYPE_ID{{$index}}" ng-change="Platformchangelegs('LEG2_ACCESSTYPE_ID{{$index}}',item.LEG2_ACCESSTYPE_ID,'No','Access')">
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="uiselect3" name="LEG2_SERVICE_VARIANT_ID" ng-model="item.LEG2_SERVICE_VARIANT_ID"
+                                        ng-disabled="item.LEG2_ACCESSTYPE_ID!=2" ng-options="item29.LEG2_SERVICE_VARIANT_ID as item29.LEG2_SERVICE_VARIANT_NAME for item29 in LEG2ServiceVariant"
+                                        id="LEG2_SERVICE_VARIANT_ID">
+                                    </select>
+                                    <td>
+                                        <select class="uiselect3" name="LEG2_DELIVERY_MODE_ID" ng-model="item.LEG2_DELIVERY_MODE_ID"
+                                            ng-disabled="item.LEG2_ACCESSTYPE_ID!=2" ng-options="item30.LEG2_DELIVERY_MODE_ID as item30.LEG2_DELIVERY_MODE_NAME for item30 in LEG2DeliveryMode"
+                                            id="LEG2_DELIVERY_MODE_ID">
+                                        </select>
+                                    </td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!--  Access Speed Exceptions General Rule-->
+            <!-- {{getAccessExceptions}}-->
+            <div>
+                <div class="col-md-12" style="padding-left: 0px; padding-top: 0px; cursor: default">
+                    <h4>
+                        Access Speed Exceptions General Rule
+                    </h4>
+                </div>
+                <br />
+                <div class="col-md-12" style="padding-bottom: 14px; padding-top: 12px">
+                    <div class="col-md-2" style="margin-left: -28px">
+                        <label>
+                            Product SLA</label>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="uiselect2" style="margin-left: -1em" name="PRODUCT_SLA_TYPE_ID" ng-model="item13.PRODUCT_SLA_TYPE_ID"
+                            ng-options="item13.PRODUCT_SLA_TYPE_ID as item13.PRODUCT_SLA_TYPE_NAME for item13 in SLAtable"
+                            id="speed_PRODUCT_SLA_TYPE_ID" ng-change="CheckRule(item13.PRODUCT_SLA_TYPE_ID)">
+                            <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option>
+                        </select>
+                        <span id="ExceptionRulespan" style="display: none; color: red">Please Select General
+                            Rule1</span>
+                    </div>
+                </div>
+                <div class="form-inline col-md-12" style="margin-left: -14px; padding-bottom: 16px">
+                    <div class="radio inline control-label">
+                        <label>
+                            <input class="col-md-5" name="sampleinlineradio" type="radio" value="1" />
+                            <label style="font-size: 12px; padding-right: 93px">
+                                Leg2 Speed should be greater than or equal to Leg1 Speed</label>
+                        </label>
+                    </div>
+                    <div class="radio inline control-label">
+                        <label>
+                            <input name="sampleinlineradio" type="radio" value="2" />
+                            <label style="font-size: 12px; padding-right: 93px">
+                                Leg2 Speed should be less than or equal to leg1 Speed</label>
+                        </label>
+                    </div>
+                    <div class="radio inline control-label">
+                        <label>
+                            <input name="sampleinlineradio" type="radio" value="0" checked />
+                            <label style="font-size: 12px">
+                                None</label>
+                        </label>
+                    </div>
+                </div>
+                <br />
+                <button class="btn btn-primary" ng-click="SaveAccessSpeedExceptions()">
+                    <span class="glyphicon glyphicon-floppy-saved"></span>
+                </button>
+                <div ng-show="false">
+                    {{getAccessExceptions}}</div>
+                <div>
+                    <table id="getAccessExceptions" class="table table-bordered makeCenter">
+                        <thead>
+                            <tr>
+                                <th style="width: 30%">
+                                    Product SLA </span>
+                                </th>
+                                <th>
+                                    <span>General Rule </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td ng-show="getAccessExceptions.length==0" colspan="2">
+
+                                   
+
+                                    <label style='font-weight: bold; font-size: 12px;'>
+                                        No Records Found</label>
+
+                                </td>
+                            </tr>
+                            <tr ng-repeat="item in getAccessExceptions">
+                                <td>
+                                    {{item.PRODUCT_SLA_NAME}}
+                                </td>
+                                <td>
+                                    {{item.SPD_RUL}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!--Platform configurations-->
+            <div>
+                <div class="col-md-12" style="padding-left: 0px; padding-top: 0px; cursor: default">
+                    <h4>
+                        Platform Configuration
+                    </h4>
+                </div>
+                <div>
+                    <button ng-click="AddPlatform(DDL_PL_Product)" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                    <button ng-click="DeletePlatform($index,DDL_PL_Product)" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                    <button ng-click="SavePlatform(DDL_PL_Product)" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-floppy-saved"></span>
+                    </button>
+                </div>
+                <div>
+                    <table class="table table-bordered makeCenter" id="tblPlatform">
+                        <thead>
+                            <th>
+                                <span>Delete </span>
+                            </th>
+                            <th>
+                                <span>Product SLA </span>
+                            </th>
+                            <th>
+                                <span>Resiliency SLA </span>
+                            </th>
+                            <th>
+                                <span>Leg1 Platform </span>
+                            </th>
+                            <th>
+                                <span>Leg2 Platform </span>
+                            </th>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in PlatformstableData">
+                                <td class="chkmiddle5" style="padding-left: 20px">
+                                    <input type="checkbox" class="checkbox" />
+                                </td>
+                                <td>
+                                    <select class="uiselect10" name="Platform_PRODUCT_SLA_TYPE_ID" ng-model="item.PRODUCT_SLA_TYPE_ID"
+                                        ng-options="item14.PRODUCT_SLA_TYPE_ID as item14.PRODUCT_SLA_TYPE_NAME for item14 in SLAtable"
+                                        id="Platform_PRODUCT_SLA_TYPE_ID{{$index}}" data-sla-id="{{item.PRODUCT_SLA_TYPE_ID}}"
+                                        ng-change="PlatformSLAProdtypes('Platform_PRODUCT_SLA_TYPE_ID{{$index}}',item.PRODUCT_SLA_TYPE_ID)">
+                                    </select>
+                                </td>
+                                <td>
+                                    <span ng-show="IsAvailable(item.PRODUCT_SLA_TYPE_ID,SLAtable)" id="{{item.ACCESS_RES_TYPE_ID}}"
+                                        ng-model="item.ACCESS_RES_TYPE_ID">{{item.ACCESS_RES_TYPE_VALUE}}</span>
+                                </td>
+                                <td>
+                                    <select class="uiselect10" name="Leg1_Platform_ID" ng-model="item.CAPMAN_PLATFORM_ID1"
+                                        ng-options="PLATFORM1.CAPMAN_PLATFORM_ID as PLATFORM1.CAPMAN_PLATFORM_NAME for PLATFORM1 in PlatformsData"
+                                        id="P_Leg1_Platform_ID{{$index}}">
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="uiselect10" name="Leg2_Platform_ID" ng-model="item.CAPMAN_PLATFORM_ID2"
+                                        ng-options="PLATFORM2.CAPMAN_PLATFORM_ID as PLATFORM2.CAPMAN_PLATFORM_NAME for PLATFORM2 in PlatformsData"
+                                        id="P_Leg2_Platform_ID{{$index}}">
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!--Country-->
+            <div style="padding-bottom: 7em">
+                <div class="col-md-12" style="padding-left: 0px; padding-top: 0px; cursor: default">
+                    <h4>
+                        Country</h4>
+                </div>
+                <br />
+                <div>
+                    <button ng-click="Addcountry(DDL_PL_Product)" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                    <button ng-click="DeleteCoutryDetails(DDL_PL_Product)" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                    <button ng-click="SaveCountryDetails(DDL_PL_Product)" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-floppy-saved"></span>
+                    </button>
+                </div>
+                <div>
+                    <table id="tblCountry" class="table table-bordered makeCenter">
+                        <thead>
+                            <th>
+                                <span>Delete </span>
+                            </th>
+                            <th>
+                                <span>Country </span>
+                            </th>
+                            <th>
+                                <span>Product SLA </span>
+                            </th>
+                            <th>
+                                <span>Resiliency SLA </span>
+                            </th>
+                            <th>
+                                <span>Leg1 Access speed </span>
+                            </th>
+                            <th>
+                                <span>Leg2 Access speed </span>
+                            </th>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in getCountriesDataByProductId">
+                                <td class="chkmiddle4" style="padding-left: 20px">
+                                    <input type="checkbox" class="checkbox">
+                                </td>
+                                <td>
+                                    <select class="uiselect11" name="COUNTRY_ID" class="CountryId" ng-model="item.COUNTRY_ID"
+                                        ng-options="country.COUNTRY_ID as country.COUNTRY_NAME for country in Countries"
+                                        ng-change="countrychange(item.COUNTRY_ID)" id="COUNTRY_ID">
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="uiselect11" name="Country_PRODUCT_SLA_TYPE_ID" ng-model="item.PRODUCT_SLA_TYPE_ID"
+                                        ng-options="item14.PRODUCT_SLA_TYPE_ID as item14.PRODUCT_SLA_TYPE_NAME for item14 in SLAtable"
+                                        ng-change="CountrySLAProdtypes('Country_PRODUCT_SLA_TYPE_ID{{$index}}',item.PRODUCT_SLA_TYPE_ID)"
+                                        id="Country_PRODUCT_SLA_TYPE_ID{{$index}}" data-sla-id="{{item.PRODUCT_SLA_TYPE_ID}}">
+                                    </select>
+                                </td>
+                                <td>
+                                    <span ng-show="IsAvailable(item.PRODUCT_SLA_TYPE_ID,SLAtable)" id="{{item.ACCESS_RES_TYPE_ID}}"
+                                        ng-model="item.ACCESS_RES_TYPE_ID">{{item.ACCESS_RES_TYPE_VALUE}}</span>
+                                </td>
+                                <td>
+                                    <select class="uiselect11" ng-model="item.LEG1_ACCESSSPEED_ID" ng-options="Leg1.LEG1_ACCESSSPEED_ID as Leg1.LEG1_ACCESSSPEED_NAME for Leg1 in Leg1Accessspeeds"
+                                        id="LEG1_ACCESSSPEED_ID">
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="uiselect11" ng-model="item.LEG2_ACCESSSPEED_ID" ng-options="Leg2.LEG2_ACCESSSPEED_ID as Leg2.LEG2_ACCESSSPEED_NAME for Leg2 in Leg2Accessspeeds"
+                                        id="LEG2_ACCESSSPEED_ID">
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="pageLoad" class="pageLoaderOverlay">
+        </div>
+        <div id="pageLoad1" class="pageLoaderOverlay">
+        </div>
+        <div id="pageLoad2" class="pageLoaderOverlay">
+        </div>
+        <div id="pageLoad3" class="pageLoaderOverlay">
+        </div>
+        <div id="pageLoad4" class="pageLoaderOverlay">
+        </div>
+    </div>

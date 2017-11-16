@@ -1,0 +1,111 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+  public  class DistributorCompaniesBAL
+    {
+      private DistributorCompaniesDAL objSRD = new DistributorCompaniesDAL();
+      public List<DistributorCompanies> GetAdminDistributorCompaniesView(string Level)
+        {
+
+
+            List<DistributorCompanies> lstOrg = new List<DistributorCompanies>();
+            DataTable dtGridDistributor = objSRD.GetAdminDistributorCompanies(Level);
+
+
+
+
+
+            if (Level == "Dist")
+            {
+
+                foreach (DataRow dr in dtGridDistributor.Rows)
+                {
+                    DistributorCompanies objOrg = new DistributorCompanies();
+
+                    objOrg.Name = Convert.ToString(dr["name"]);
+                    objOrg.Short = Convert.ToString(dr["short"]);
+                    objOrg.Id = Convert.ToInt32(dr["id"]);
+
+
+                    lstOrg.Add(objOrg);
+                }
+            }
+            else
+            {
+                foreach (DataRow dr in dtGridDistributor.Rows)
+                {
+                    DistributorCompanies objOrg = new DistributorCompanies();
+
+                    objOrg.Name = Convert.ToString(dr["name"]);
+                    objOrg.Short = Convert.ToString(dr["short"]);
+                    objOrg.Id = Convert.ToInt32(dr["id"]);
+
+
+                    lstOrg.Add(objOrg);
+                }
+            }
+
+
+            return lstOrg;
+        }
+
+
+      public List<DistributorCompanies> EditAdminDistributorCompanies(string Level, string Id)
+        {
+
+
+            List<DistributorCompanies> lstOrg = new List<DistributorCompanies>();
+            DataTable dtGridDistributor = objSRD.EditAdminDistributorCompanies(Level,Id);
+
+
+
+
+
+
+
+            if (Level == "Dist")
+            {
+
+                foreach (DataRow dr in dtGridDistributor.Rows)
+                {
+                    DistributorCompanies objOrg = new DistributorCompanies();
+
+                    objOrg.Name = Convert.ToString(dr["name"]);
+                    objOrg.Short = Convert.ToString(dr["short"]);
+                    objOrg.Id = Convert.ToInt32(dr["id"]);
+                    objOrg.Valid = Convert.ToInt32(dr["valid"]);
+                    objOrg.CreatedDate = Convert.ToString(dr["created_dt"]);
+                    objOrg.UpdatedDate = Convert.ToString(dr["updated_dt"]);
+
+
+                    lstOrg.Add(objOrg);
+                }
+            }
+            else
+            {
+                foreach (DataRow dr in dtGridDistributor.Rows)
+                {
+                    DistributorCompanies objOrg = new DistributorCompanies();
+
+                    objOrg.Name = Convert.ToString(dr["name"]);
+                    objOrg.Short = Convert.ToString(dr["short"]);
+                    objOrg.Id = Convert.ToInt32(dr["id"]);
+                    objOrg.Valid = Convert.ToInt32(dr["valid"]);
+                    objOrg.CreatedDate = Convert.ToString(dr["created_dt"]);
+                    objOrg.UpdatedDate = Convert.ToString(dr["updated_dt"]);
+                    lstOrg.Add(objOrg);
+                }
+            }
+
+
+
+            return lstOrg;
+        }
+    }
+}

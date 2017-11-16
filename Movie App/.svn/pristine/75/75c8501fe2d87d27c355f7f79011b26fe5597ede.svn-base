@@ -1,0 +1,67 @@
+﻿
+app.controller('Controllers.ServicetypeCtrl', function ($scope, NgTableParams) {
+
+
+    $scope.text = "sample text";
+    $('.ddlservicetype').select2();
+    var self = this;
+
+
+
+    var data5 = [
+        { Name: "BT Bandwidth Services " },
+        { Name: "BT Ethernet Services  " },
+        { Name: "BT IP Services " },
+        { Name: "BT Managed Data Services  " },
+        { Name: "BT Managed Voice Services " },
+        { Name: "BT Bandwidth Services " },
+        { Name: "BT Ethernet Services  " },
+        { Name: "BT IP Services " },
+        { Name: "BT Managed Data Services  " },
+        { Name: "BT Managed Voice Services " },
+        { Name: "BT Bandwidth Services " },
+        { Name: "BT Ethernet Services  " },
+        { Name: "BT IP Services " },
+        { Name: "BT Managed Data Services  " },
+{ Name: "BT Bandwidth Services " },
+        { Name: "BT Ethernet Services  " },
+        { Name: "BT IP Services " },
+        { Name: "BT Managed Data Services  " },
+{ Name: "BT Bandwidth Services " },
+        { Name: "BT Ethernet Services  " },
+        { Name: "BT IP Services " },
+        { Name: "BT Managed Data Services  " },
+{ Name: "BT Bandwidth Services " },
+        { Name: "BT Ethernet Services  " },
+        { Name: "BT IP Services " },
+        { Name: "BT Managed Data Services  " },
+{ Name: "BT Bandwidth Services " },
+        { Name: "BT Ethernet Services  " },
+        { Name: "BT IP Services " },
+        { Name: "BT Managed Data Services  " },
+{ Name: "BT Bandwidth Services " },
+        { Name: "BT Ethernet Services  " },
+        { Name: "BT IP Services " },
+        { Name: "BT Managed Data Services  " },
+        { Name: "BT Managed Voice Services " }, { Name: "BT Bandwidth Services " },
+        { Name: "BT Ethernet Services  " },
+        { Name: "BT IP Services " },
+        { Name: "BT Managed Data Services  " },
+{ Name: "BT Bandwidth Services " },
+        { Name: "BT Ethernet Services  " },
+        { Name: "BT IP Services " },
+        { Name: "BT Managed Data Services  " },
+
+        { Name: "BT Managed Voice Services " },
+        { Name: "BT Managed Voice Services " },
+        { Name: "BT Managed Voice Services " },
+        { Name: "BT Managed Voice Services " },
+        { Name: "BT Managed Voice Services " },
+        { Name: "BT Managed Voice Services " },
+        { Name: "BT Managed Voice Services " },
+        { Name: "Other Services  " }
+];
+
+    self.tableParams = new NgTableParams({},
+         { dataset: data5 });
+});

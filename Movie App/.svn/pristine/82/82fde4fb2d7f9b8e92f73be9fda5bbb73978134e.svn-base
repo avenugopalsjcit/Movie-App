@@ -1,0 +1,71 @@
+﻿app.controller("AdminCPECaseCtrl", function ($scope, $timeout, $http, $rootScope, $location, $stateParams, NgTableParams, CPECaseDetailsFactory, CaseAvailabilityFactory) {
+    $(".pageLoaderOverlay").show();
+
+    $scope.CaseId = $stateParams.CaseId;
+
+    CaseAvailabilityFactory.GetCaseAvailability().success(function (data) {
+        $scope.CaseAvailability = data.d;
+
+    });
+
+    CPECaseDetailsFactory.GetCPESuppliers().success(function (data) {
+        $scope.CPESuppliers = data.d;
+
+    });
+
+    CPECaseDetailsFactory.GetCPECaseData($scope.CaseId).success(function (data) {
+        $scope.CaseData = data.d[0];
+        $scope.modCaseAvailability = $scope.CaseData.CaseAvailCd;
+        $scope.modCaseAvailabilityOld = $scope.CaseData.CaseAvailCd;
+        if ($scope.CaseData.Validity == 'Valid') {
+            $scope.CaseValidity = true;
+        }
+        else {
+            $scope.CaseValidity = false;
+        }
+        $scope.CaseValidityOld = $scope.CaseValidity;
+        $scope.CaseId = $scope.CaseData.CaseId;
+        $scope.CreatedBy = $scope.CaseData.CreatedBy;
+        $scope.CreatedDate = $scope.CaseData.CreatedDate;
+        $scope.UpdatedBy = $scope.CaseData.UpdatedBy;
+        $scope.UpdatedDate = $scope.CaseData.UpdatedDate;
+        $scope.CaseAvailableOld = $scope.CaseData.CaseAvailability;
+        $scope.modCPESuppliers = $scope.CaseData.CPESupplierId;
+        $scope.Exception = $scope.CaseData.Exception;
+        $scope.CityName = $scope.CaseData.CityName;
+        $(".pageLoaderOverlay").hide();
+    });
+
+    $scope.ShowCPECaseList = function () {
+        $scope.SearchCases();
+    }
+
+    $scope.ShowCPECaseDetails = function () {
+
+        $location.path('/CaseDefinition/AdminCPECaseDetails').search({ 'CaseId': $scope.CaseId, 'CityName': $scope.CityName, 'CaseAvailable': $scope.CaseAvailableOld, 'CaseValidity': $scope.CaseValidityOld });
+    }
+});
+
+app.factory('CPECaseDetailsFactory', function ($http) {
+
+    var CPECaseDetailsFactory = {};
+
+    CPECaseDetailsFactory.GetCPECaseData = function (CaseId) {
+        return $http.post('SingleCase.aspx/GetCPECaseData', { 'CaseId': CaseId});
+    }
+
+    CPECaseDetailsFactory.GetCPESuppliers = function () {
+        return $http.post('SingleCase.aspx/GetCPESuppliers', { });
+    }
+    return CPECaseDetailsFactory;
+});
+
+app.factory('CaseAvailabilityFactory', function ($http) {
+
+    var CaseAvailabilityFactory = {};
+
+    CaseAvailabilityFactory.GetCaseAvailability = function () {
+        return $http.post('SingleCase.aspx/GetCaseAvailability', {});
+    }
+    return CaseAvailabilityFactory;
+});

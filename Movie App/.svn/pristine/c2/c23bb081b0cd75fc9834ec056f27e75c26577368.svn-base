@@ -1,0 +1,112 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ProductAccurateAdmin.aspx.cs" Inherits="SCSearch.Admin.ProductAccurateAdmin" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html ng-app="ProductAccurateAdmin">
+<head>
+    <title>Users Status</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Bootstrap -->
+    <link href="BootStrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="BootStrap/css/styles.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        td
+        {
+            padding: 0px !important;
+        }
+    </style>
+</head>
+<body ng-controller="ProductAccurateAdminCntrl">
+    <header>
+		<div role="navigation" class="navbar navbarAndLogo">
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 logo-txt text-left Arrow">Sales Catalogue</div>                   
+                    <div ><a class="logo-close pull-right newclass" href="#" onclick="javascript:var win = window.open('', '_self');win.close();return false;">Close</a></div>
+				</div>
+			</div>
+		</div>
+	</header>
+    <section>
+    <div class="container">        
+            <div class="row">
+                                   <%-- <div class="panel-body">
+    <div class="panel panel-primary">
+        <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse" data-target="#prodCaseDet1">
+            <h3 class="panel-title">
+                User Status
+            </h3>
+            <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+        </div>
+        <div id="prodCaseDet1">
+         <div class="panel-body">
+</div>
+</div>
+</div>
+</div>--%>
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading Arrow">
+                            Sales Catalogue Accuracy Administration</div>
+                        <div class="panel-body">
+                        <div class="form-horizontal">
+								<div class="form-group">
+                                 <div>
+             <div class="panel-body">
+                                 <table cellpadding="0" cellspacing="0" class="table table-bordered"> 
+                        <tr>
+                            <th class="Arrow">
+                                Product
+                            </th>
+                            <th>
+                            Product Owners
+                            </th>
+                             <th class="Arrow">
+                             Current Primary Contact
+                             </th>                        
+                           
+                                                      
+                        </tr>
+                        <tr ng-repeat="x in ProductAccurateAdminMapping">
+                            <td class="Arrow">
+                                {{ x.ProductName }}                                
+                            </td>   
+                            <td>
+                          
+						<%--<select id="ddlProductOwners{{$index}}"
+                             ng-options="owner.EmployeeId as owner.UserName for owner in x.Owners"
+                             ng-model="owner" 
+                             ng-change="ddlProductOwnersChange(x.Product, owner, x )"--%>
+
+                              <select id="ddlProductOwners{{$index}}" ng-options="owner.EmployeeId as owner.UserName for owner in x.Owners" 
+                            ng-model="modOwner[$index]" ng-change="ddlProductOwnersChange(modOwner[$index])">	
+
+                        </select>                        
+                            </td>
+                            <td class="Arrow">
+                                {{ x.CurrentPrimaryContact }}
+                            </td>                              
+                              
+                        </tr>
+                    </table>
+                    </div></div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+            </div>
+            </div>
+             <div class="pageLoaderOverlay">
+    </div>
+    <script src="Scripts/angular.js" type="text/javascript"></script>
+    <script src="Scripts/angular-sanitize.min.js" type="text/javascript"></script>
+    <script src="Scripts/angular-ui/ui-bootstrap.min.js" type="text/javascript"></script>
+    <script src="Scripts/angular-ui/ui-bootstrap-tpls.min.js" type="text/javascript"></script>
+    <script src="Scripts/angular-route.js" type="text/javascript"></script>
+    <script src="Scripts/angular-resource.min.js" type="text/javascript"></script>
+    <script src="Scripts/jquery-1.9.1.js" type="text/javascript"></script>
+    <script type="text/javascript" src="BootStrap/js/bootbox.min.js"></script>    
+    <script src="Scripts/app/ProductAccurateAdmin.js" type="text/javascript"></script>
+</body>
+</html>

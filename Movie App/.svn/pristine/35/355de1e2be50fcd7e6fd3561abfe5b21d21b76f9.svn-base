@@ -1,0 +1,1898 @@
+﻿app.controller("ProductLevelSLACtrl", function ($scope, SLA, $compile, $timeout, $http, $rootScope, $parse) {
+
+    $scope.tblSLAProducts = false;
+    $scope.AccessTypeConfigTable = false;
+    $scope.IsProduct = false;
+    $scope.accessConfig = 0;
+    // $.notify("Hello World");
+    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var d = new Date();
+    var getmonth = monthNames[d.getMonth()].substring(0, 3).toUpperCase();
+    var getYear = parseInt(new Date().getFullYear().toString().substr(2, 2));
+    var getDate = new Date().getDate();
+
+
+
+    $scope.TodayDate = getDate + "-" + getmonth + "-" + getYear;
+
+    $("#pageLoad").show();
+
+    $scope.csuProducts = [];
+
+    SLA.getProducts().success(function (data) {
+        $scope.csuProducts = data;
+        $scope.ProductsList = data.d;
+        $("#DDL_PL_Product").select2({});
+        $("#DDL_PL_Product1").select2({});
+        $("#speed_PRODUCT_SLA_TYPE_ID").select2({});
+        $("#pageLoad").hide();
+    });
+
+
+
+    var AccesstypeTableRecords = false;
+    var PlatformTableRecords = false;
+    var CountryTableRecords = false;
+    $scope.UPDATED_EMP_ID = $rootScope.User_Id;
+    $http.post("SLAMaster.aspx/GetUserName", { "EmpID": $scope.UPDATED_EMP_ID }).success(function (data) {
+
+        $scope.UserName = data.d;
+    });
+
+
+
+
+
+
+    $scope.IsPlatForm = 0;
+    $scope.GetProductDetailsById = function (DDL_PL_Product) {
+        $scope.IsPlatForm =
+         ($.grep($scope.csuProducts.d,
+        function (element) {
+            //console.log(element.product_id)
+            return element.product_id == DDL_PL_Product
+        })[0].IsPlatForm) == 1 ? true : false;
+
+
+        $("#pageLoaderOverlay").show();
+        $scope.IsProduct = true;
+        $scope.accessConfig = 0;
+        $("#pageLoad1").show();
+        $("#pageLoad2").show();
+        $("#pageLoad3").show();
+        SLA.getProductLevelSLAbyProdId(DDL_PL_Product)
+        .success(function (data) {
+            $("#pageLoad1").hide();
+            $scope.ProudctName = $("#DDL_PL_Product option:selected").text();
+            // $('#tblSLAProudcts tr:not(:first)').remove();
+
+            if ($('#tblSLAProudcts tbody tr').length > 0) {
+                $('#tblSLAProudcts tbody tr:not(:first)').remove();
+            }
+            if ($('#tblPlatform tbody tr').length > 0) {
+                $('#tblPlatform tbody tr:not(:first)').remove();
+            }
+            if ($('#tblCountry tbody tr').length > 0) {
+                $('#tblCountry tbody tr:not(:first)').remove();
+            }
+
+            $scope.CORE_DIVERSITY = 0;
+            $scope.MULTICAST = 0;
+            $scope.SLADetailsofProduct = JSON.parse(data.d).SLADetailsofProduct;
+            if ($scope.SLADetailsofProduct.length > 0) {
+                $scope.CORE_DIVERSITY = JSON.parse(data.d).SLADetailsofProduct[0].CORE_DIVERSITY;
+                $scope.MULTICAST = JSON.parse(data.d).SLADetailsofProduct[0].MULTICAST;
+            }
+
+            $scope.MTNISLA = JSON.parse(data.d).MTNISLA;
+            $scope.Restypes = JSON.parse(data.d).Restypes;
+            $scope.MainResttype = JSON.parse(data.d).MainResttype;
+            $scope.SLAtable = JSON.parse(data.d).SLATable;
+
+            //For Countries Purpose
+            $scope.Countries = JSON.parse(data.d).Country;
+            $scope.Leg1Accessspeeds = JSON.parse(data.d).Leg1Accessspeed;
+            $scope.Leg2Accessspeeds = JSON.parse(data.d).Leg2Accessspeed;
+            $scope.getCountriesDataByProductId = JSON.parse(data.d).getCountriesDataByProductId;
+            if ($scope.getCountriesDataByProductId.length == 0) {
+                $("#tblCountry tbody").html("<tr><td colspan='6'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>");
+                CountryTableRecords = true;
+            }
+
+
+            //PlatformsData
+            $scope.PlatformsData = JSON.parse(data.d).PlatformsData;
+            $scope.PlatformstableData = JSON.parse(data.d).tableData;
+
+            $("#tblPlatform tbody tr td select").select2({});
+            $("#tblCountry tbody tr td select").select2({});
+            $("#tblSLAProudcts tbody tr td select").select2({});
+            $("#AccessTypeConfiguration tbody tr td select").select2({});
+
+            $scope.IsAvailable = function (item, Collection) {
+                if (Collection.length > 0) {
+                    var value = $.grep(Collection, function (e) { return e.PRODUCT_SLA_TYPE_ID == item }).length;
+                    // var firstValue = $('#' + id + ' option:first').val();
+                    if (value === 0) {
+
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+            }
+
+
+            if ($scope.PlatformstableData.length == 0) {
+                $("#tblPlatform tbody").html("<tr><td colspan='5'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>");
+                PlatformTableRecords = true;
+            }
+
+            $timeout(function () {
+                $(".uiselect2").select2({});
+                $(".uiselect11").select2({});
+                $(".uiselect10").select2({});
+            }, 100);
+
+
+
+            $("#pageLoaderOverlay").hide();
+        })
+        .error(function (data) {
+            console.log(data)
+        });
+
+        SLA.getAccessConfigByProdType(DDL_PL_Product)
+            .success(function (data) {
+                $("#pageLoad2").hide();
+                //As well as the 
+                $scope.SLAtable = JSON.parse(data.d).SLAtable;
+                $scope.Leg1Aceess = JSON.parse(data.d).Leg1Aceesstable;
+                $scope.LEG1ServiceVariant = JSON.parse(data.d).Leg2Aceesstable;
+                $scope.LEG1DeliveryMode = JSON.parse(data.d).LEG1ServiceVarianttable;
+                $scope.Leg2Aceess = JSON.parse(data.d).LEG2ServiceVarianttable;
+                $scope.LEG2ServiceVariant = JSON.parse(data.d).LEG1DeliveryModetable;
+                $scope.LEG2DeliveryMode = JSON.parse(data.d).LEG2DeliveryModetable;
+                $scope.accessTypeconfigTableData = JSON.parse(data.d).accessTypeconfigTableData
+
+
+                $scope.IsAvailable = function (item, Collection) {
+                    if (Collection.length > 0) {
+                        var value = $.grep(Collection, function (e) { return e.PRODUCT_SLA_TYPE_ID == item }).length;
+
+                        if (value === 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                }
+
+                $timeout(function () {
+
+                    $(".uiselect3").select2({});
+                }, 100);
+            })
+            .error(function (data) {
+            });
+
+
+
+
+        $http.post("SLAMaster.aspx/getAccessExceptions", { 'productId': DDL_PL_Product })
+        .success(function (data) {
+            $("#pageLoad3").hide();
+
+            $("#tblPlatform tbody tr td select").select2({});
+            $("#tblCountry tbody tr td select").select2({});
+            $("#tblSLAProudcts tbody tr td select").select2({});
+            $("#AccessTypeConfiguration tbody tr td select").select2({});
+
+
+
+            $scope.getAccessExceptions = JSON.parse(data.d).getAccessExceptions;
+            if ($scope.getAccessExceptions.length == 0) {
+                $("#getAccessExceptions tbody").html("<tr><td colspan='2'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>");
+                AccessExceptionsTableRecords = true;
+            }
+            $timeout(function () {
+                $(".uiselect2").select2({});
+            }, 100);
+        });
+
+
+    }
+
+
+
+    //<---------Change the ProdcutType for show Resilency type------------->
+    var count = 0;
+
+
+
+
+    $scope.CountrySLAProdtypes = function (Id, item) {
+        if (item == null) {
+            // $('#tblCountry tbody tr:last').find("td:nth-child(3) label").show();
+            $('#' + (Id)).next().show();
+        }
+        if (item != null) {
+            $('#tblCountry tbody tr:last').find("td:nth-child(3) label").show();
+            var ACCESS_RES_TYPE_ID = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_ID;
+            var ACCESS_RES_TYPE_VALUE = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_VALUE;
+
+            $('#' + (Id)).parent().next("td").find("span").remove();
+            $('#' + (Id)).parent().next("td").append("<span id='" + ACCESS_RES_TYPE_ID + "'>" + ACCESS_RES_TYPE_VALUE + "</span>")
+            $('#' + (Id)).next().remove();
+            $('#' + (Id)).prev().children('a').find('span:first').attr("style", "display:show");
+
+        }
+    }
+
+
+    $scope.PlatformSLAProdtypes = function (Id, item) {
+
+        if (item == null) {
+            $('#tblPlatform tbody tr:last').find("td:nth-child(2) label").show();
+            $('#' + (Id)).parent().next("td").find("label").remove();
+        }
+
+        if (item != null) {
+            var ACCESS_RES_TYPE_ID = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_ID;
+            var ACCESS_RES_TYPE_VALUE = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_VALUE;
+
+            $('#' + (Id)).parent().next("td").find("span").remove();
+            $('#' + (Id)).parent().next("td").append("<span id='" + ACCESS_RES_TYPE_ID + "'>" + ACCESS_RES_TYPE_VALUE + "</span>")
+            $('#' + (Id)).next().remove();
+            $('#' + (Id)).prev().children('a').find('span:first').attr("style", "display:show");
+
+        }
+    }
+
+    //<----------------------SLA Main Table By Madan--------------------->
+
+    var countSLAAdd = 0;
+    var Access = true;
+    var Platform = true;
+    var Country = true;
+    var Main = true;
+
+    $scope.Platformchangelegs = function (Id, item, IsSLA, TableName, Coinfigtype) {
+        if (item == null && IsSLA == "No") {
+            $('#' + (Id)).next().show();
+            //  $('#' + (Id)).prev().children("a").children("span:first").attr("style", "display:show");
+            if (TableName == "Main") {
+                Main = false;
+            }
+            if (TableName == "Access") {
+                Access = false;
+            }
+            if (TableName == "Platform") {
+                Platform = false;
+            }
+            if (TableName == "Country") {
+                Country = false;
+            }
+        }
+
+        if (item != null && IsSLA == "No") {
+            $('#' + (Id)).next().hide();
+            $('#' + (Id)).prev().children("a").children("span:first").attr("style", "display:show");
+            if (TableName == "Main") {
+                Main = true;
+            }
+            if (TableName == "Access") {
+                Access = true;
+                if (Coinfigtype != 'ConfigType') {
+                    if ($('#' + Id + ' :selected').text().trim() != "Ethernet") {
+                        $('#' + Id).parent().next().next().children("div").children("a").children("span:first").html("&nbsp;&nbsp;--Select--")
+                        $('#' + Id).parent().next().children("div").children("a").children("span:first").html("&nbsp;&nbsp;--Select--")
+                    }
+                }
+            }
+            if (TableName == "Platform") {
+                Platform = true;
+            }
+            if (TableName == "Country") {
+                Country = true;
+            }
+        }
+
+        if (item == null && IsSLA == "Yes") {
+            $('#' + (Id)).next().show();
+            $('#' + (Id)).parent().next("td").find("label").hide();
+            $('#' + (Id)).prev().children("a").children("span:first").attr("style", "display:show");
+            if (TableName == "Main") {
+                Main = false;
+            }
+            if (TableName == "Access") {
+                Access = false;
+            }
+            if (TableName == "Platform") {
+                Platform = false;
+            }
+            if (TableName == "Country") {
+                Country = true;
+            }
+        }
+
+        if (item != null && IsSLA == "Yes") {
+            $('#' + (Id)).next().hide();
+            if (TableName == "Main") {
+                Main = true;
+            }
+            if (TableName == "Access") {
+                var ACCESS_RES_TYPE_ID = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_ID;
+                var ACCESS_RES_TYPE_VALUE = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_VALUE;
+                $('#' + (Id)).parent().next("td").find("span").remove();
+                $('#' + (Id)).prev().children("a").children("span:first").attr("style", "display:show");
+                $('#' + (Id)).parent().next("td").append("<span id='" + ACCESS_RES_TYPE_ID + "'>" + ACCESS_RES_TYPE_VALUE + "</span>");
+                Access = true;
+            }
+            if (TableName == "Platform") {
+                var ACCESS_RES_TYPE_ID = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_ID;
+                var ACCESS_RES_TYPE_VALUE = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_VALUE;
+                $('#' + (Id)).parent().next("td").find("span").remove();
+                //$('#' + (Id)).prev().children("a").children("span:first").attr("style", "display:show");
+                $('#' + (Id)).parent().next("td").append("<span id='" + ACCESS_RES_TYPE_ID + "'>" + ACCESS_RES_TYPE_VALUE + "</span>");
+                Platform = true;
+            }
+            if (TableName == "Country") {
+                var ACCESS_RES_TYPE_ID = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_ID;
+                var ACCESS_RES_TYPE_VALUE = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_VALUE;
+                $('#' + (Id)).parent().next("td").find("span").remove();
+                //$('#' + (Id)).prev().children("a").children("span:first").attr("style", "display:show");
+                $('#' + (Id)).parent().next("td").append("<span id='" + ACCESS_RES_TYPE_ID + "'>" + ACCESS_RES_TYPE_VALUE + "</span>")
+                Country = true;
+            }
+        }
+    }
+
+
+    $scope.AddSLADetails = function () {
+
+        var IsLastRowTrue = true;
+        var TotalRows = $('#tblSLAProudcts tbody tr').length;
+
+        $('#tblSLAProudcts tbody tr:last td').each(function (index, element) {
+            if (index == 1 || index == 7 || index == 12) {
+                if ($(element).find("select :selected").val() == "" || $(element).find("select :selected").val() == "?") {
+                    $(element).find("select").next().show();
+                    IsLastRowTrue = false;
+                }
+                else {
+                    IsLastRowTrue = true;
+                }
+            }
+        });
+
+        var validationsLength = $("#tblSLAProudcts tbody tr td select").next("label:visible").length;
+
+        if ($('#tblSLAProudcts tbody tr:first').text().trim() == "No Records Found") {
+            $("#tblSLAProudcts tbody tr:first").remove();
+        }
+
+        if (IsLastRowTrue == true && validationsLength == 0) {
+            MainTableRecords = false;
+            countSLAAdd++;
+            $scope.dyn_cnt2 = "";
+            $scope.dyn_cnt2 += "<tr><td class=\"chkprod3\" style=\"padding-left:17px\"><input  id=\"chkProduct\" type=\"checkbox\" ng-model=\"SelectTodel_" + countSLAAdd + "\" /></td>";
+            $scope.dyn_cnt2 += "<td><select class=\"uiselect4\"\" id=\"restypeId_" + countSLAAdd + "\" ng-model=\"item5_" + countSLAAdd + "\"";
+            $scope.dyn_cnt2 += "ng-options=\"item5.RES_TYPE_ID as item5.RES_TYPE_NAME for item5 in MainResttype\"";
+            $scope.dyn_cnt2 += "ng-change=\"Platformchangelegs('restypeId_" + countSLAAdd + "',item5_" + countSLAAdd + ",'Yes','Main')\"> <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select Product SLA</label></td>";
+            $scope.dyn_cnt2 += "<td class=\"chkprod3\" ><input id=\"BAUPOP1\" type=\"checkbox\" ng-checked=\"BAUPOP1_" + countSLAAdd + "\" /></td>";
+            $scope.dyn_cnt2 += "<td  class=\"chkprod3\"><input id=\"ReutersPOP1\" type=\"checkbox\" ng-checked=\"ReutersPOP1_" + countSLAAdd + "\" /></td>";
+            $scope.dyn_cnt2 += "<td  class=\"chkprod3\"><input id=\"BAUPOP2\" type=\"checkbox\" ng-checked=\"BAUPOP2_" + countSLAAdd + "\" /></td>";
+            $scope.dyn_cnt2 += "<td  class=\"chkprod3\"><input  id=\"ReutersPOP2\" type=\"checkbox\" ng-checked=\"ReutersPOP2_" + countSLAAdd + "\" /></td>";
+            $scope.dyn_cnt2 += "<td  class=\"chkprod3\"><input  id=\"NetworkID\" type=\"checkbox\" ng-checked=\"Network_" + countSLAAdd + "\" /></td>";
+            $scope.dyn_cnt2 += "<td> <select class=\"uiselect4\"  id=\"ACCESS_RES_TYPE_ID_" + countSLAAdd + "\" ng-model=\"item2_" + countSLAAdd + "\" ng-options=\"item2.ACCESS_RES_TYPE_ID as item2.ACCESS_RES_TYPE_VALUE for item2 in Restypes\" ng-change=\"Platformchangelegs('ACCESS_RES_TYPE_ID_" + countSLAAdd + "',item2_" + countSLAAdd + ",'No','Main')\"> <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><label  style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select Access Resiliency Type</label></td>"
+            $scope.dyn_cnt2 += "<td  class=\"chkprod3\"><input  id=\"AsymmetricalAccessProductTypeID\" type=\"checkbox\" ng-checked=\"AsymmetricalAccess_" + countSLAAdd + "\" /></td>";
+            $scope.dyn_cnt2 += "<td  class=\"chkprod3\"><input  id=\"AsymmetricalAccessSpeedID\" type=\"checkbox\" ng-checked=\"AsymmetricalAccessSpeed" + countSLAAdd + "\" /></td>";
+            $scope.dyn_cnt2 += "<td  class=\"chkprod3\"><input  id=\"CommericialSeparacyID\"  type=\"checkbox\" ng-checked=\"CommericialSeparacy" + countSLAAdd + "\" /></td>";
+            $scope.dyn_cnt2 += "<td  class=\"chkprod3\"><input id=\"NoCommonPOPID\" type=\"checkbox\" ng-checked=\"NoCommonPOP" + countSLAAdd + "\" /></td>";
+            $scope.dyn_cnt2 += "<td> <select ng-change=\"Platformchangelegs('SLA_TYPE_ID_" + countSLAAdd + "',item7_" + countSLAAdd + ",'No','Main')\" class=\"uiselect4\" id=\"SLA_TYPE_ID_" + countSLAAdd + "\" ng-model=\"item7_" + countSLAAdd + "\" ng-options=\"item7.SLA_TYPE_ID as item7.SLA_TYPE_VALUE for item7 in MTNISLA\" > <option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><label  style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select MTNI SLA</label></td>"
+            $scope.dyn_cnt2 += "<td><span>{{UserName}}</span>";
+            $scope.dyn_cnt2 += "<span>{{TodayDate}}</span></td></tr>";
+            $("#tblSLAProudcts tbody").append($compile($scope.dyn_cnt2)($scope));
+            $timeout(function () {
+                $("select").select2({});
+                $(".chkprod3").attr("style", "text-align:center");
+            }, 50);
+
+        }
+
+    }
+
+    $scope.SaveSLADetails = function (ProductId) {
+        if ($('#tblSLAProudcts tbody tr').length == 0 && $('#tblSLAProudcts tbody tr').length > 1) {
+            bootbox.confirm({
+                "className": "my-custom-class",
+                message: "Please Select Atleast One Record",
+                callback: function (result) {
+                }
+            });
+            return false;
+        }
+        var IsLastRowTrue = true;
+        $scope.MultiCast = $("#OfferMultiSelect").is(':checked') ? 1 : 0;
+        $scope.Diversity = $("#OfferCoreDiversity").is(':checked') ? 1 : 0;
+        //  $scope.CREATED_DT =//  $scope.UPDATED_DT = 
+        $scope.UPDATED_EMP_ID = $rootScope.User_Id;
+        $scope.CREATED_EMP_ID = $rootScope.User_Id;
+
+
+        var TotalRows = $('#tblSLAProudcts tbody tr').length;
+
+
+
+
+        if (TotalRows != 0) {
+            var LastRowAccessTechonology = $('#tblSLAProudcts tbody tr:last').find("td:nth-child(2) select :selected").val();
+            if (LastRowAccessTechonology == "") {
+                $('#tblSLAProudcts tbody tr:last').find("td:nth-child(2) label").show();
+                IsLastRowTrue = false;
+            }
+            var LastRowServiceVariant = $('#tblSLAProudcts tbody tr:last').find("td:nth-child(8) select :selected").val();
+            if (LastRowServiceVariant == "") {
+                $('#tblSLAProudcts tbody tr:last').find("td:nth-child(8) label").show();
+                IsLastRowTrue = false;
+            }
+            var LastRowServiceVariant = $('#tblSLAProudcts tbody tr:last').find("td:nth-child(13) select :selected").val();
+            if (LastRowServiceVariant == "") {
+                $('#tblSLAProudcts tbody tr:last').find("td:nth-child(13) label").show();
+                IsLastRowTrue = false;
+            }
+        }
+
+
+
+        var validationsLength = $("#tblSLAProudcts tbody tr td select").next("label:visible").length;
+
+        if (IsLastRowTrue == true && validationsLength == 0) {
+            $("#pageLoad").show();
+            $scope.SLASaveDetailsJson = [];
+
+            if ($('#tblSLAProudcts tbody tr:first').text().trim() == "No Records Found") {
+                $("#tblSLAProudcts tbody tr:first").remove();
+            }
+
+            $('#tblSLAProudcts tbody tr').each(function (index, element) {
+                $scope.restypeId = parseInt($(element).find("td:nth-child(2) :selected").val().replace("number:", ""));
+                $scope.BAUPOP1 = $(element).find("#BAUPOP1").is(':checked') ? 1 : 0;
+                $scope.ReutersPOP1 = $(element).find("#ReutersPOP1").is(':checked') ? 1 : 0;
+                $scope.BAUPOP2 = $(element).find("#BAUPOP2").is(':checked') ? 1 : 0;
+                $scope.ReutersPOP2 = $(element).find("#ReutersPOP2").is(':checked') ? 1 : 0;
+                $scope.NetworkID = $(element).find("#NetworkID").is(':checked') ? 1 : 0;
+                $scope.ACCESS_RES_TYPE_ID = parseInt($(element).find("td:nth-child(8) :selected").val().replace("number:", ""));
+                $scope.AsymmetricalAccessProductTypeID = $(element).find("#AsymmetricalAccessProductTypeID").is(':checked') ? 1 : 0;
+                $scope.AsymmetricalAccessSpeedID = $(element).find("#AsymmetricalAccessSpeedID").is(':checked') ? 1 : 0;
+                $scope.CommericialSeparacyID = $(element).find("#CommericialSeparacyID").is(':checked') ? 1 : 0;
+                $scope.NoCommonPOPID = $(element).find("#NoCommonPOPID").is(':checked') ? 1 : 0;
+                $scope.SLA_TYPE_ID = $(element).find("td:nth-child(13) :selected").val().replace("number:", "");
+
+
+
+                $scope.SLASaveDetailsJson.push(
+                        {
+                            'ProductSLA': $scope.restypeId,
+                            'ProductID': $scope.DDL_PL_Product,
+                            'BAUPOP1': $scope.BAUPOP1,
+                            'ReutersPOP1': $scope.ReutersPOP1,
+                            'BAUPOP2': $scope.BAUPOP2,
+                            'ReutersPOP2': $scope.ReutersPOP2,
+                            'networkrel': $scope.NetworkID,
+                            'AccessResiliencyType': $scope.ACCESS_RES_TYPE_ID,
+                            'AsymmetricalAccessProductType': $scope.AsymmetricalAccessProductTypeID,
+                            'AsymmetricalAccessSpeed': $scope.AsymmetricalAccessSpeedID,
+                            'CommericialSeparacyMandatory': $scope.CommericialSeparacyID,
+                            'NoCommonPOP': $scope.NoCommonPOPID,
+                            'MTNISLA': $scope.SLA_TYPE_ID,
+                            'UpdatedB': $rootScope.User_Id,
+                            'MultiCast': $scope.MultiCast,
+                            'Diversity': $scope.Diversity,
+                            'UPDATED_EMP_ID': $scope.UPDATED_EMP_ID,
+                            'CREATED_EMP_ID': $scope.CREATED_EMP_ID
+                            //'UpdatedDate': 
+                        });
+
+            });
+            $http.post("SLAMaster.aspx/SaveSLADetails",
+                                  {
+                                      'ProductId': $scope.DDL_PL_Product,
+                                      'SLASaveDetailsJson': JSON.stringify($scope.SLASaveDetailsJson)
+                                  }).
+                    success(function (data) {
+
+
+
+                        $http.post("SLAMaster.aspx/getProductLevelSLADetails",
+                                                                              {
+                                                                                  'Productid': $scope.DDL_PL_Product
+                                                                              }).
+                                                                                 success(function (data) {
+
+                                                                                     if ($("#tblSLAProudcts tbody tr").length > 0) {
+                                                                                         $("#tblSLAProudcts tbody tr").remove();
+                                                                                     }
+                                                                                     $scope.SLADetailsofProduct = JSON.parse(data.d).getProductLevelSLADetails[0];
+                                                                                     console.log("success");
+                                                                                     $timeout(function () {
+                                                                                         $("#tblSLAProudcts tbody tr td select").select2({});
+                                                                                     }, 1000);
+
+
+                                                                                     $http.post("SLAMaster.aspx/getProductSLATable",
+                                                          {
+                                                              'productId': $scope.DDL_PL_Product
+                                                          }).
+                                            success(function (data) {
+                                                $("#pageLoad").hide();
+                                                //  $scope.Bootstrap.Success("Successfully added");
+                                                $scope.SLAtable = JSON.parse(data.d).getProductSLATable[0];
+
+
+                                                var MainSLAIds1 = [];
+                                                $("#tblSLAProudcts tbody tr").each(function (index, element) {
+
+                                                    var ProductSLAId1, AccessResId1, ProductSLAId, AccessResId;
+
+                                                    ProductSLAId1 = $(element).find("td:nth-child(2) :selected").val();
+                                                    ProductSLAName1 = $(element).find("td:nth-child(2) :selected").text();
+                                                    AccessResId1 = $(element).find("td:nth-child(8) :selected").val();
+
+                                                    ProductSLAId = parseInt(ProductSLAId1.replace("number:", ""));
+                                                    AccessResId = parseInt(AccessResId1.replace("number:", ""));
+                                                    AccessResName = $(element).find("td:nth-child(8) :selected").text().trim();
+
+                                                    MainSLAIds1.push({ "ProductSLAId": ProductSLAId, "AccessResId": AccessResId, "AccessResName": AccessResName, "ProductSLAName1": ProductSLAName1 })
+
+                                                });
+
+                                                ReloadTables4(MainSLAIds1);
+                                                ReloadTables5(MainSLAIds1);
+                                                ReloadTables6(MainSLAIds1);
+                                                ReloadTables8(MainSLAIds1);
+
+
+                                                console.log("success");
+                                                var speedId = parseInt($('#speed_PRODUCT_SLA_TYPE_ID').val().replace("number:", ""));
+                                                var speedLength = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == speedId });
+                                                if (speedLength.length == 0) {
+                                                    $('#s2id_speed_PRODUCT_SLA_TYPE_ID').children('a').find('span:first').html("&nbsp;&nbsp;--Select--");
+
+                                                    $timeout(function () { $('#speed_PRODUCT_SLA_TYPE_ID').next("span").hide(); }, 50);
+                                                }
+                                            }).error(function () {
+                                                console.log("error");
+                                            });
+
+
+                                                                                 })
+                                                                                 .error(function (data) {
+                                                                                     console.log("error")
+                                                                                 });
+                    })
+                    .error(function () { console.log("some thing is error") });
+        }
+    };
+
+
+    function ReloadTables4(ProductSlaIds) {
+        var text = $("#AccessTypeConfiguration tbody tr:first").text().trim();
+        if ($("#AccessTypeConfiguration tbody tr").length > 0 && text != "No Records Found") {
+            $("#AccessTypeConfiguration tbody tr").each(function (index, element) {
+                var AccesstypeSLA = $(element).find("td:nth-child(3) :selected").val();
+                var CurrentValue = parseInt(AccesstypeSLA.replace("number:", ""));
+                var GetData = $.grep(ProductSlaIds, function (e) { return e.AccessResId == 3 || e.AccessResId == 4 });
+                var AData = $.grep(GetData, function (e) { return e.ProductSLAId == CurrentValue });
+                if (AData.length == 0) {
+                    $(element).remove();
+                }
+                if (AData.length != 0) {
+                    var access = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == CurrentValue })[0];
+                    $(element).find("td:nth-child(4) span").remove();
+                    $(element).find("td:nth-child(3)").next().append("<span id='" + access.ACCESS_RES_TYPE_ID + "'>" + access.ACCESS_RES_TYPE_VALUE + "</span>");
+                }
+            });
+        }
+
+
+        if ($("#AccessTypeConfiguration tbody tr").length == 0) {
+            $("#AccessTypeConfiguration tbody").append("<tr><td colspan='15'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+        }
+        console.log("execute save success config")
+        return true;
+    }
+
+
+    function ReloadTables5(ProductSlaIds) {
+        var text = $("#tblPlatform tbody tr:first").text().trim();
+        if ($("#tblPlatform tbody tr").length > 0 && text != "No Records Found") {
+            $("#tblPlatform tbody tr").each(function (index, element) {
+                var AccesstypeSLA = $(element).find("td:nth-child(2) :selected").val();
+                var CurrentValue = parseInt(AccesstypeSLA.replace("number:", ""));
+                var GetData = $.grep(ProductSlaIds, function (e) { return e.AccessResId == 3 || e.AccessResId == 4 });
+                var AData = $.grep(GetData, function (e) { return e.ProductSLAId == CurrentValue });
+                if (AData.length == 0) {
+                    $(element).remove();
+                }
+            });
+        }
+
+        if ($("#tblPlatform tbody tr").length == 0) {
+            $("#tblPlatform tbody").append("<tr><td colspan='5'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+        }
+        console.log("execute success platform")
+        return true;
+    }
+
+    function ReloadTables6(ProductSlaIds) {
+        //if ($("#getAccessExceptions tbody tr:first").text().trim() == "No Records Found") {
+        var text = $("#tblCountry tbody tr:first").text().trim();
+        if ($("#tblCountry tbody tr").length > 0 && text != "No Records Found") {
+            $("#tblCountry tbody tr").each(function (index, element) {
+                var AccesstypeSLA = $(element).find("td:nth-child(3) :selected").val();
+                var CurrentValue = parseInt(AccesstypeSLA.replace("number:", ""));
+                var GetData = $.grep(ProductSlaIds, function (e) { return e.AccessResId == 3 || e.AccessResId == 4 });
+                var AData = $.grep(GetData, function (e) { return e.ProductSLAId == CurrentValue });
+                if (AData.length == 0) {
+                    $(element).remove();
+                }
+            });
+        }
+
+        if ($("#tblCountry tbody tr").length == 0) {
+            $("#tblCountry tbody").append("<tr><td colspan='6'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+        }
+        console.log("execute success country")
+    }
+
+    function ReloadTables8(ProductSlaIds) {
+        var text = $("#getAccessExceptions tbody tr:first").text().trim();
+        // if ($("#getAccessExceptions tbody tr").length > 0) {
+        $("#getAccessExceptions tbody tr").each(function (index, element) {
+            var records = $(element).text().trim();
+            if (records != "No Records Found") {
+                var ela = $(element).find("td:nth-child(1)").text().trim();
+                var elementlenght = $.grep(ProductSlaIds, function (e) { return e.ProductSLAName1 == ela && (e.AccessResId == 3 || e.AccessResId == 4) });
+                if (elementlenght.length == 0) {
+                    $(element).remove();
+                }
+            }
+        });
+        // }
+        if ($("#getAccessExceptions tbody tr").length == 0) {
+            $("#getAccessExceptions tbody").append("<tr><td colspan='2'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+        }
+        console.log("Execute Rule successfully");
+    }
+
+
+    function ReloadTables7(ProductSlaIds) {
+        $scope.ProductSlas = ProductSlaIds;
+        $("#getAccessExceptions tbody tr").each(function (index, element) {
+            var ele = $(element).find("td:nth-child(1)").text().trim();
+            var records = $(element).text().trim();
+            if (records != "No Records Found") {
+                var elementlenght = $.grep(ProductSlaIds, function (e) { return e.ProductSLAName1 == ele });
+                if (elementlenght.length > 0 && (elementlenght[0].AccessResId == 3 || elementlenght[0].AccessResId == 4)) {
+                    $(element).remove();
+                }
+            }
+        });
+        if ($("#getAccessExceptions tbody tr").length == 0) {
+            $("#getAccessExceptions tbody").append("<tr><td colspan='2'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+        }
+        console.log("Execute Rule successfully");
+    }
+
+
+
+
+    //SLAIds.push({ "ProductSLAId": ProductSLAId, "AccessResId": AccessResId })
+    function ReloadTables1(ProductSlaIds) {
+        var text = $("#AccessTypeConfiguration tbody tr:first").text().trim();
+        if ($("#AccessTypeConfiguration tbody tr").length > 0 && text != "No Records Found") {
+            $("#AccessTypeConfiguration tbody tr").each(function (index, element) {
+                var AccesstypeSLA = $(element).find("td:nth-child(3) :selected").val();
+                var CurrentValue = parseInt(AccesstypeSLA.replace("number:", ""));
+                for (var ii = 0; ii < ProductSlaIds.length; ii++) {
+                    if (ProductSlaIds[ii].AccessResId == 3 || ProductSlaIds[ii].AccessResId == 4) {
+                        var AccessSLAID = ProductSlaIds[ii].ProductSLAId;
+                        if (CurrentValue == AccessSLAID) {
+                            $(element).remove();
+                        }
+                    }
+                }
+            });
+        }
+
+        if ($("#AccessTypeConfiguration tbody tr").length == 0) {
+            $("#AccessTypeConfiguration tbody").append("<tr><td colspan='15'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+        }
+        console.log("execute success config")
+        return true;
+    }
+
+    function ReloadTables2(ProductSlaIds) {
+        var text = $("#tblPlatform tbody tr:first").text().trim();
+        if ($("#tblPlatform tbody tr").length > 0 && text != "No Records Found") {
+            $("#tblPlatform tbody tr").each(function (index, element) {
+                var AccesstypeSLA = $(element).find("td:nth-child(2) :selected").val();
+                var CurrentValue = parseInt(AccesstypeSLA.replace("number:", ""));
+                for (var ii = 0; ii < ProductSlaIds.length; ii++) {
+                    if (ProductSlaIds[ii].AccessResId == 3 || ProductSlaIds[ii].AccessResId == 4) {
+                        var AccessSLAID = ProductSlaIds[ii].ProductSLAId;
+                        if (CurrentValue == AccessSLAID) {
+                            $(element).remove();
+                        }
+                    }
+                }
+            });
+        }
+
+        if ($("#tblPlatform tbody tr").length == 0) {
+            $("#tblPlatform tbody").append("<tr><td colspan='5'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+        }
+        console.log("execute success platform")
+        return true;
+    }
+
+    function ReloadTables3(ProductSlaIds) {
+        //if ($("#getAccessExceptions tbody tr:first").text().trim() == "No Records Found") {
+        var text = $("#tblCountry tbody tr:first").text().trim();
+        if ($("#tblCountry tbody tr").length > 0 && text != "No Records Found") {
+            $("#tblCountry tbody tr").each(function (index, element) {
+                var AccesstypeSLA = $(element).find("td:nth-child(3) :selected").val();
+                var CurrentValue = parseInt(AccesstypeSLA.replace("number:", ""));
+                for (var ii = 0; ii < ProductSlaIds.length; ii++) {
+                    if (ProductSlaIds[ii].AccessResId == 3 || ProductSlaIds[ii].AccessResId == 4) {
+                        var AccessSLAID = ProductSlaIds[ii].ProductSLAId;
+                        if (CurrentValue == AccessSLAID) {
+                            $(element).remove();
+                        }
+                    }
+                }
+            });
+        }
+
+        if ($("#tblCountry tbody tr").length == 0) {
+            $("#tblCountry tbody").append("<tr><td colspan='6'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+        }
+        console.log("execute success country")
+    }
+
+
+
+    $scope.DeleteSLADetails = function (ProductID) {
+        var IsCheckedRecord = true;
+        if ($("#tblSLAProudcts tr td:first-child :checked").length == 0) {
+            bootbox.confirm({
+                "className": "my-custom-class",
+                message: "Please Select Atleast One Record",
+                callback: function (result) {
+                }
+            });
+            IsCheckedRecord = false;
+        }
+
+
+
+        if (IsCheckedRecord == true) {
+
+            var SelectedRecords = "";
+            $("#tblSLAProudcts tbody tr").each(function (index, element) {
+                if ($(element).find('input[type="checkbox"]').eq(0).is(":checked")) {
+                    SelectedRecords += $(element).find("td:nth-child(2) :selected").html() + ",";
+                }
+            });
+
+
+            bootbox.confirm({
+                "className": "my-custom-class",
+                message: "Are you sure to <b>" + SelectedRecords + "</b> delete record(s)?",
+                callback: function (result) {
+                    if (result) {
+                        var SLABuildeIds = [];
+                        var ProductSLAIds = [];
+                        var AccesSLAIds = [];
+
+                        $("#tblSLAProudcts tbody tr").each(function (index, element) {
+                            if ($(element).find('input[type="checkbox"]').eq(0).is(":checked")) {
+                                SLABuildeIds.push(parseInt($(element).find("td:nth-child(1) input[type='checkbox']").attr("id")));
+                                ProductSLAIds.push(parseInt($(element).find("td:nth-child(2) :selected").eq(0).val().replace("number:", "")));
+                                AccesSLAIds.push(parseInt($(element).find("td:nth-child(8) :selected").eq(0).val().replace("number:", "")));
+
+                            }
+                        });
+
+                        $('#pageLoad').show();
+                        $http.post("SLAMaster.aspx/DeleteProductsBySLAId",
+                                  {
+                                      'slaids': SLABuildeIds.join(","),
+                                      'ProductSLAIds': ProductSLAIds.join(","),
+                                      'ProductId': $scope.DDL_PL_Product,
+                                      'AccesSLAIds': AccesSLAIds.join(",")
+                                  }).
+                    success(function (data) {
+                        $http.post("SLAMaster.aspx/getProductSLATable",
+                                                          {
+                                                              'productId': $scope.DDL_PL_Product
+                                                          }).
+                                            success(function (data) {
+                                                var MainSLAIds = [];
+                                                $scope.SLAtable = JSON.parse(data.d).getProductSLATable[0];
+                                                $("#tblSLAProudcts tbody tr").each(function (index, element) {
+
+                                                    if ($(element).find("td:nth-child(1) input[type='checkbox']").is(":checked")) {
+                                                        var ProductSLAId1, AccessResId1, ProductSLAId, AccessResId, AccessResName, ProductSLAName1;
+
+                                                        ProductSLAId1 = $(element).find("td:nth-child(2) :selected").val();
+                                                        ProductSLAName1 = $(element).find("td:nth-child(2) :selected").text();
+                                                        AccessResId1 = $(element).find("td:nth-child(8) :selected").val();
+
+
+                                                        ProductSLAId = parseInt(ProductSLAId1.replace("number:", ""));
+                                                        AccessResId = parseInt(AccessResId1.replace("number:", ""));
+                                                        AccessResName = $(element).find("td:nth-child(8) :selected").text().trim();
+
+                                                        MainSLAIds.push({ "ProductSLAId": ProductSLAId, "AccessResId": AccessResId, "AccessResName": AccessResName, "ProductSLAName1": ProductSLAName1 })
+                                                        $(element).remove();
+                                                    }
+                                                });
+
+                                                var first, second, third;
+                                                ReloadTables1(MainSLAIds);
+
+                                                //if (first == true) {
+                                                // second = ReloadTables2(MainSLAIds);
+                                                ReloadTables2(MainSLAIds);
+                                                //}
+                                                // if (second == true) {
+
+                                                ReloadTables3(MainSLAIds);
+                                                //
+                                                ReloadTables7(MainSLAIds);
+
+                                                //  }
+
+                                                $('#pageLoad').hide();
+                                                //$scope.Bootstrap.Success("Deleted Successfully");
+
+                                                if ($("#tblSLAProudcts tbody tr").length == 0) {
+                                                    $timeout(function () {
+                                                        $("#tblSLAProudcts tbody").append("<tr><td colspan ='15'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+                                                    }, 50);
+
+                                                }
+
+                                                if ($("#tblSLAProudcts tbody tr").length == 1) {
+
+                                                    if ($("#tblSLAProudcts tbody tr:first").text().trim() == "No Records Found") {
+                                                        $("#tblSLAProudcts tbody tr:first").remove();
+                                                        $timeout(function () {
+                                                            $("#tblSLAProudcts tbody").append("<tr><td colspan ='15'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+                                                        }, 50);
+                                                    }
+                                                }
+
+                                                var speedId = parseInt($('#speed_PRODUCT_SLA_TYPE_ID').val().replace("number:", ""));
+                                                var speedLength = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == speedId });
+                                                if (speedLength.length == 0) {
+                                                    $('#s2id_speed_PRODUCT_SLA_TYPE_ID').children('a').find('span:first').html("&nbsp;&nbsp;--Select--");
+                                                    $timeout(function () {
+                                                        $('#speed_PRODUCT_SLA_TYPE_ID').next("span").hide();
+                                                    }, 100);
+
+                                                }
+
+                                            });
+
+                        console.log("success");
+
+                    }).error(function (data) { console.log('error') });
+
+
+
+
+                    }
+                }
+            });
+        }
+    }
+
+    // <-----------------------Access Type Configuration Operaions By Madan----------------------------->
+
+
+    //    var ConfigData = {
+
+    //    };
+
+
+
+
+    $scope.ConfigData = [];
+    $scope.ConfigData.push({ 'COFIGURATIONID': 0, 'ConfigurationName': 'NonStandard' }, { 'COFIGURATIONID': 1, 'ConfigurationName': 'Standard' });
+
+    $scope.AddConfig = function () {
+        var IsLastRowTrue = true;
+        var TotalRows = $('#AccessTypeConfiguration tbody tr').length;
+
+        //check the last record to allow the next value
+        $('#AccessTypeConfiguration tbody tr:last td').each(function (index, element) {
+            if (index == 1 || index == 2 || index == 4 || index == 7) {
+                if ($(element).find("select :selected").val() == "" || $(element).find("select :selected").val() == "?") {
+                    if ($(element).find("select").next().length == 0) {
+                        $(element).append("<label style='display:show;color:Red;font-weight:normal;font-size:12px'>Please Select Product SLA</label>")
+                    }
+                    $(element).find("select").next().show();
+                    IsLastRowTrue = false;
+                }
+                else {
+                    IsLastRowTrue = true;
+                }
+            }
+        });
+
+
+        if ($('#AccessTypeConfiguration tbody tr:first').text().trim() == "No Records Found") {
+            $("#AccessTypeConfiguration tbody tr:first").remove();
+        }
+
+
+        var LengthOfvalidations = $("#AccessTypeConfiguration tbody tr td select").next("label:visible").length;
+
+
+        if (IsLastRowTrue == true && LengthOfvalidations == 0) {
+            AccesstypeTableRecords = false;
+            count++;
+            $scope.dyn_cnt2 = "";
+            $scope.dyn_cnt2 += "<tr><td style=\"padding-left:17px\"><input type=\"checkbox\" class=\"checkbox\"/></td>";
+
+            $scope.dyn_cnt2 += "<td><select id=\"AccessType_Config_TYPE_ID_" + count + "\"  class=\"uiselect5\" name=\"AccessType_Config_TYPE_ID_" + count + "\" ng-model=\"AccessType_Config_TYPE_ID" + count + "\" ng-change=\"Platformchangelegs('AccessType_Config_TYPE_ID_" + count + "',AccessType_Config_TYPE_ID" + count + ",'No','Access','ConfigType')\" ng-options=\"item.COFIGURATIONID as item.ConfigurationName for item in ConfigData\"><option value=''>&nbsp&nbsp--&nbsp Select &nbsp--</option></select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select Config Type</label></td>";
+
+            $scope.dyn_cnt2 += "<td><select class=\"uiselect5\" id=\"AccessType_PRODUCT_SLA_TYPE_ID_" + count + "\" name=\"AccessType_PRODUCT_SLA_TYPE_ID\" ng-change=\"Platformchangelegs('AccessType_PRODUCT_SLA_TYPE_ID_" + count + "',AccessType_PRODUCT_SLA_TYPE_ID_" + count + ",'Yes','Access')\" style=\"width: 20em;\"  ng-model=\"AccessType_PRODUCT_SLA_TYPE_ID_" + count + "\" ng-options=\"item12.PRODUCT_SLA_TYPE_ID as item12.PRODUCT_SLA_TYPE_NAME for item12 in SLAtable\" ><option value=''>&nbsp&nbsp--&nbsp Select &nbsp--</option></select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select Product SLA</label></td>";
+
+            $scope.dyn_cnt2 += "<td><span id=\"{{ACCESS_RES_TYPE_ID}}\">{{ACCESS_RES_TYPE_VALUE}}</span></td>";
+            $scope.dyn_cnt2 += "<td><select  class=\"uiselect5\" ng-change=\"Platformchangelegs('LEG1_ACCESSTYPE_ID_" + count + "',LEG1_ACCESSTYPE_ID" + count + ",'No','Access')\" id=\"LEG1_ACCESSTYPE_ID_" + count + "\" name=\"LEG1_ACCESSTYPE_ID\" style=\"width: 20em;\"  ng-model=\"LEG1_ACCESSTYPE_ID" + count + "\" ng-options=\"item25.LEG1_ACCESSTYPE_ID as item25.LEG1_ACCESS_TYPE_NAME for item25 in Leg1Aceess\" id=\"LEG1_ACCESSTYPE_ID\"><option value=''>&nbsp&nbsp--&nbsp  Select &nbsp--</option> </select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select Leg1 Access Type</label></td>";
+
+            $scope.dyn_cnt2 += "<td><select class=\"uiselect5\" id=\"LEG1_SERVICE_VARIANT_ID\" ng-disabled=\"LEG1_ACCESSTYPE_ID" + count + "!=2\" name=\"LEG1_SERVICE_VARIANT\" style=\"width: 20em;\" ng-model=\"LEG1_SERVICE_VARIANT_ID" + count + "\" ng-options=\"item26.LEG1_SERVICE_VARIANT_ID as item26.LEG1_SERVICE_VARIANT_NAME for item26 in LEG1ServiceVariant\" id=\"LEG1_SERVICE_VARIANT\"><option value=''>&nbsp&nbsp--&nbsp Select &nbsp--</option> </select></td>";
+            $scope.dyn_cnt2 += "<td><select class=\"uiselect5\" id=\"LEG1_DELIVERY_MODE_ID\" ng-disabled=\"LEG1_ACCESSTYPE_ID" + count + "!=2\" name=\"LEG1_DELIVERY_MODE\" style=\"width: 20em;\"  ng-model=\"LEG1_DELIVERY_MODE_ID" + count + "\" ng-options=\"item27.LEG1_DELIVERY_MODE_ID as item27.LEG1_DELIVERY_MODE_NAME for item27 in LEG1DeliveryMode\" id=\"LEG1_DELIVERY_MODE\"><option value=''>&nbsp&nbsp--&nbsp Select &nbsp--</option></select></td>";
+
+            $scope.dyn_cnt2 += "<td><select class=\"uiselect5\" ng-change=\"Platformchangelegs('LEG2_ACCESSTYPE_ID_" + count + "',LEG2_ACCESSTYPE_ID" + count + ",'No','Access')\"  id=\"LEG2_ACCESSTYPE_ID_" + count + "\" name=\"LEG2_ACCESSTYPE_ID\" style=\"width: 20em;\"  ng-model=\"LEG2_ACCESSTYPE_ID" + count + "\" ng-options=\"item28.LEG2_ACCESSTYPE_ID as item28.LEG2_ACCESS_TYPE_NAME for item28 in Leg2Aceess\" id=\"LEG2_ACCESSTYPE_ID\"><option value=''>&nbsp&nbsp--&nbsp  Select &nbsp--</option> </select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select Leg2 Access Type</label></td>";
+            $scope.dyn_cnt2 += "<td><select class=\"uiselect5\" id=\"LEG2_SERVICE_VARIANT_ID\" ng-disabled=\"LEG2_ACCESSTYPE_ID" + count + "!=2\" name=\"LEG2_SERVICE_VARIANT\" style=\"width: 20em;\"  ng-model=\"LEG2_SERVICE_VARIANT_ID" + count + "\" ng-options=\"item29.LEG2_SERVICE_VARIANT_ID as item29.LEG2_SERVICE_VARIANT_NAME for item29 in LEG2ServiceVariant\" id=\"LEG2_SERVICE_VARIANT\"><option value=''>&nbsp&nbsp--&nbsp Select &nbsp--</option></select>";
+            $scope.dyn_cnt2 += "<td><select class=\"uiselect5\" id=\"LEG2_DELIVERY_MODE_ID\" ng-disabled=\"LEG2_ACCESSTYPE_ID" + count + "!=2\" name=\"LEG2_DELIVERY_MODE_ID\" style=\"width: 20em;\"  ng-model=\"LEG2_DELIVERY_MODE_ID" + count + "\" ng-options=\"item30.LEG2_DELIVERY_MODE_ID as item30.LEG2_DELIVERY_MODE_NAME for item30 in LEG2DeliveryMode\" id=\"LEG2_DELIVERY_MODE\"><option value=''>&nbsp&nbsp--&nbsp Select &nbsp--</option></select></td>";
+            $scope.dyn_cnt2 += "</tr>";
+            $("#AccessTypeConfiguration tbody").append($compile($scope.dyn_cnt2)($scope));
+            $timeout(function () {
+                $("select").select2({});
+            }, 50);
+        }
+    }
+
+
+
+
+    $scope.SaveConfig = function () {
+        var IsLastRowTrue = true;
+        var TotalRows = $('#AccessTypeConfiguration tbody tr').length;
+
+        $('#AccessTypeConfiguration tbody tr:last td').each(function (index, element) {
+
+            if (index == 1 || index == 2 || index == 4 || index == 7) {
+                if ($(element).find("select :selected").val() == "" || $(element).find("select :selected").val() == "?") {
+                    $(element).find("select").next().show();
+                    IsLastRowTrue = false;
+                }
+                else {
+                    IsLastRowTrue = true;
+                }
+            }
+        });
+
+        var LengthOfvalidations = $("#AccessTypeConfiguration tbody tr td select").next("label:visible").length;
+
+
+        if (IsLastRowTrue == true && LengthOfvalidations == 0) {
+            $("#pageLoad").show();
+            $scope.SLASaveConfigDetailsJson = [];
+
+            if ($('#AccessTypeConfiguration tbody tr:first').text().trim() == "No Records Found") {
+                $("#AccessTypeConfiguration tbody tr:first").remove();
+            }
+
+            $('#AccessTypeConfiguration tbody tr').each(function (index, element) {
+                var PRODUCT_SLA_TYPE_ID1, PRODUCT_SLA_TYPE_NAME1, LEG1_ACCESSTYPE_ID, LEG2_ACCESSTYPE_ID, LEG1_SERVICE_VARIANT_ID, LEG2_SERVICE_VARIANT_ID, LEG1_DELIVERY_MODE_ID, LEG2_DELIVERY_MODE_ID, PRODUCT_SLA_TYPE_ID
+                LEG1_ACCESSTYPE_ID = (isNaN(LEG1_ACCESSTYPE_ID = parseInt($(element).find("td:nth-child(5) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG1_ACCESSTYPE_ID),
+                LEG2_ACCESSTYPE_ID = (isNaN(LEG2_ACCESSTYPE_ID = parseInt($(element).find("td:nth-child(8) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG2_ACCESSTYPE_ID),
+
+                LEG1_SERVICE_VARIANT_ID = (isNaN(LEG1_SERVICE_VARIANT_ID = parseInt($(element).find("#LEG1_SERVICE_VARIANT_ID :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG1_SERVICE_VARIANT_ID),
+                LEG2_SERVICE_VARIANT_ID = (isNaN(LEG2_SERVICE_VARIANT_ID = parseInt($(element).find("#LEG2_SERVICE_VARIANT_ID :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG2_SERVICE_VARIANT_ID),
+
+                LEG1_DELIVERY_MODE_ID = (isNaN(LEG1_DELIVERY_MODE_ID = parseInt($(element).find("#LEG1_DELIVERY_MODE_ID :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG1_DELIVERY_MODE_ID),
+                LEG2_DELIVERY_MODE_ID = (isNaN(LEG2_DELIVERY_MODE_ID = parseInt($(element).find("#LEG2_DELIVERY_MODE_ID :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG2_DELIVERY_MODE_ID),
+                PRODUCT_SLA_TYPE_ID = (isNaN(PRODUCT_SLA_TYPE_ID = parseInt($(element).find("td:nth-child(3) :selected").val().replace("number:", "")), 10) ? 0 : PRODUCT_SLA_TYPE_ID)
+
+                $scope.SLASaveConfigDetailsJson.push({
+
+                    COFIGURATIONID: parseInt($(element).find("td:nth-child(2) select :selected").eq(0).val().replace('number:', '')),
+
+                    ACCESS_RES_TYPE_ID: parseInt($(element).find("td:nth-child(4) span").attr("id")),
+                    ACCESS_RES_TYPE_VALUE: $(element).find("td:nth-child(4) span").text(),
+
+                    PRODUCT_SLA_TYPE_ID: PRODUCT_SLA_TYPE_ID,
+                    PRODUCT_SLA_TYPE_NAME: $(element).find("td:nth-child(3) select :selected").eq(0).text(),
+
+                    LEG1_ACCESS_TYPE_NAME: $(element).find("td:nth-child(5) :selected").eq(0).text(),
+                    LEG1_ACCESSTYPE_ID: LEG1_ACCESSTYPE_ID,
+                    LEG2_ACCESS_TYPE_NAME: $(element).find("td:nth-child(8) :selected").eq(0).text(),
+                    LEG2_ACCESSTYPE_ID: LEG2_ACCESSTYPE_ID,
+                    LEG1_SERVICE_VARIANT_NAME: $(element).find("#LEG1_SERVICE_VARIANT_ID :selected").eq(0).text(),
+                    LEG1_SERVICE_VARIANT_ID: LEG1_SERVICE_VARIANT_ID,
+                    LEG2_SERVICE_VARIANT_NAME: $(element).find("#LEG2_SERVICE_VARIANT_ID :selected").eq(0).text(),
+                    LEG2_SERVICE_VARIANT_ID: LEG2_SERVICE_VARIANT_ID,
+                    LEG1_DELIVERY_MODE_NAME: $(element).find("#LEG1_DELIVERY_MODE_ID :selected").eq(0).text(),
+                    LEG1_DELIVERY_MODE_ID: LEG1_DELIVERY_MODE_ID,
+                    LEG2_DELIVERY_MODE_NAME: $(element).find("#LEG2_DELIVERY_MODE_ID :selected").eq(0).text(),
+                    LEG2_DELIVERY_MODE_ID: LEG2_DELIVERY_MODE_ID
+                });
+
+
+            });
+
+
+            $http.post("SLAMaster.aspx/saveAccessconfigData",
+                                  {
+                                      'ProductId': $scope.DDL_PL_Product,
+                                      'SLASaveConfigDetailsJson': JSON.stringify($scope.SLASaveConfigDetailsJson)
+                                  }).
+                    success(function (data) {
+                        console.log(data.d);
+                        $("#pageLoad").hide();
+                        console.log("success");
+                        $http.post("SLAMaster.aspx/AccessConfigData",
+                                                                              {
+                                                                                  'productID': $scope.DDL_PL_Product
+                                                                              }).
+                                                                                 success(function (data) {
+
+                                                                                     if ($('#AccessTypeConfiguration tbody tr').length > 0) {
+                                                                                         $('#AccessTypeConfiguration tbody tr').remove();
+                                                                                     }
+                                                                                     $scope.accessTypeconfigTableData = JSON.parse(data.d).getProductLevelSLADetails[0];
+                                                                                     $timeout(function () {
+                                                                                         $(".uiselect3").select2({});
+                                                                                     }, 10);
+                                                                                     console.log("success");
+
+                                                                                 })
+                                                                                 .error(function (data) {
+                                                                                     console.log("error")
+                                                                                 });
+
+                    }).error(function (data) { console.log('error') });
+        }
+
+
+    }
+
+    $scope.DeleteConfig = function (ProductID) {
+        var IsCheckedRecord = true;
+        if ($("#AccessTypeConfiguration tr td:first-child :checked").length == 0) {
+            bootbox.confirm({
+                "className": "my-custom-class",
+                message: "Please Select Atleast One Record",
+                callback: function (result) {
+
+                }
+            });
+            IsCheckedRecord = false;
+        }
+
+        if (IsCheckedRecord == true) {
+            bootbox.confirm({
+                "className": "my-custom-class",
+                message: "Are you sure to delete record(s)?",
+                callback: function (result) {
+                    if (result) {
+                        $scope.SLAAccessConfigData = [];
+                        $("#AccessTypeConfiguration tbody tr").each(function (index, element) {
+                            if ($(element).find('input[type="checkbox"]').eq(0).is(":checked")) {
+                                var ACCESS_RES_TYPE_ID1, PRODUCT_SLA_TYPE_ID1, LEG1_ACCESSTYPE_ID, LEG2_ACCESSTYPE_ID, LEG1_SERVICE_VARIANT_ID, LEG2_SERVICE_VARIANT_ID, LEG1_DELIVERY_MODE_ID, LEG2_DELIVERY_MODE_ID
+                                LEG1_ACCESSTYPE_ID = (isNaN(LEG1_ACCESSTYPE_ID = parseInt($(element).find("td:nth-child(5) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG1_ACCESSTYPE_ID),
+
+                LEG2_ACCESSTYPE_ID = (isNaN(LEG2_ACCESSTYPE_ID = parseInt($(element).find("td:nth-child(8) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG2_ACCESSTYPE_ID),
+                LEG1_SERVICE_VARIANT_ID = (isNaN(LEG1_SERVICE_VARIANT_ID = parseInt($(element).find("#LEG1_SERVICE_VARIANT_ID :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG1_SERVICE_VARIANT_ID),
+                LEG2_SERVICE_VARIANT_ID = (isNaN(LEG2_SERVICE_VARIANT_ID = parseInt($(element).find("#LEG2_SERVICE_VARIANT_ID :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG2_SERVICE_VARIANT_ID),
+                LEG1_DELIVERY_MODE_ID = (isNaN(LEG1_DELIVERY_MODE_ID = parseInt($(element).find("#LEG1_DELIVERY_MODE_ID :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG1_DELIVERY_MODE_ID),
+                LEG2_DELIVERY_MODE_ID = (isNaN(LEG2_DELIVERY_MODE_ID = parseInt($(element).find("#LEG2_DELIVERY_MODE_ID :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG2_DELIVERY_MODE_ID),
+
+                            PRODUCT_SLA_TYPE_ID1 = $(element).find("td:nth-child(3) select :selected").val();
+                                if (PRODUCT_SLA_TYPE_ID1 == "") {
+                                    PRODUCT_SLA_TYPE_NAME1 = $(element).find("td:nth-child(3)").children('div').children('a').find('span:first').text().trim();
+                                    PRODUCT_SLA_TYPE_ID1 = 0;
+                                    ACCESS_RES_TYPE_ID1 = 0;
+                                }
+                                else {
+                                    PRODUCT_SLA_TYPE_NAME1 = $(element).find("#PRODUCT_SLA_TYPE_ID :selected").eq(0).text();
+                                    if ($(element).find("td:nth-child(3) select").attr("data-sla-id") == undefined) {
+                                        PRODUCT_SLA_TYPE_ID1 = 0;
+                                    }
+                                    else {
+                                        PRODUCT_SLA_TYPE_ID1 = parseInt($(element).find("td:nth-child(3) select").attr("data-sla-id"));
+                                    }
+                                    ACCESS_RES_TYPE_ID1 = parseInt($(element).find("td:nth-child(4) span").attr("id"));
+                                }
+
+
+
+                                $scope.SLAAccessConfigData.push({
+
+                                    ACCESS_RES_TYPE_ID: ACCESS_RES_TYPE_ID1,
+                                    //ACCESS_RES_TYPE_VALUE: $(element).find("td:nth-child(3) span").text(),
+                                    PRODUCT_SLA_TYPE_ID: PRODUCT_SLA_TYPE_ID1,
+                                    PRODUCT_SLA_TYPE_NAME: PRODUCT_SLA_TYPE_NAME1,
+
+                                    LEG1_ACCESS_TYPE_NAME: $(element).find("td:nth-child(5) :selected").eq(0).text(),
+                                    LEG1_ACCESSTYPE_ID: LEG1_ACCESSTYPE_ID,
+
+                                    LEG2_ACCESS_TYPE_NAME: $(element).find("td:nth-child(8) :selected").eq(0).text(),
+                                    LEG2_ACCESSTYPE_ID: LEG2_ACCESSTYPE_ID,
+
+                                    LEG1_SERVICE_VARIANT_NAME: $(element).find("#LEG1_SERVICE_VARIANT_ID :selected").eq(0).text(),
+                                    LEG1_SERVICE_VARIANT_ID: LEG1_SERVICE_VARIANT_ID,
+
+                                    LEG2_SERVICE_VARIANT_NAME: $(element).find("#LEG2_SERVICE_VARIANT_ID :selected").eq(0).text(),
+                                    LEG2_SERVICE_VARIANT_ID: LEG2_SERVICE_VARIANT_ID,
+
+                                    LEG1_DELIVERY_MODE_NAME: $(element).find("#LEG1_DELIVERY_MODE_ID :selected").eq(0).text(),
+                                    LEG1_DELIVERY_MODE_ID: LEG1_DELIVERY_MODE_ID,
+
+                                    LEG2_DELIVERY_MODE_NAME: $(element).find("#LEG2_DELIVERY_MODE_ID :selected").eq(0).text(),
+                                    LEG2_DELIVERY_MODE_ID: LEG2_DELIVERY_MODE_ID
+                                });
+                            }
+                        });
+
+                        console.log($scope.SLAAccessConfigData);
+
+                        $("#AccessTypeConfiguration tbody tr").each(function (index, element) {
+                            if ($(element).find("td:nth-child(1) input[type='checkbox']").is(":checked")) {
+                                $(element).remove();
+                            }
+                        });
+
+                        $http.post("SLAMaster.aspx/DeleteAccssconfig",
+                                  {
+                                      'producId': $scope.DDL_PL_Product,
+                                      'configIds': JSON.stringify($scope.SLAAccessConfigData)
+                                  }).
+                    success(function (data) {
+
+                        $("#AccessTypeConfiguration tbody tr").each(function (index, element) {
+                            if ($(element).find("td:nth-child(1) input[type='checkbox']").is(":checked")) {
+                                $(element).remove();
+                            }
+                        });
+
+                        if ($("#AccessTypeConfiguration tbody tr").length == 0) {
+                            $timeout(function () {
+                                $("#AccessTypeConfiguration tbody").html("<tr><td colspan ='10'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+                            }, 50)
+                        }
+
+                        console.log("success")
+
+                    }).error(function (data) { console.log('error') });
+                    }
+
+                }
+            });
+        }
+    }
+
+    // <------------------------Access Speed Exceptions Operations By Madan---------------------->
+
+    $scope.CheckRule = function (item) {
+        $("#speed_PRODUCT_SLA_TYPE_ID").prev().children("a").find('span:first').attr("style", "display:show");
+        if (item == null) {
+            $("#ExceptionRulespan").show();
+        }
+        if (item != null) {
+            $("#ExceptionRulespan").hide();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    $scope.SaveAccessSpeedExceptions = function () {
+        var noSelection = true;
+
+        if ($("#speed_PRODUCT_SLA_TYPE_ID :selected").val() == "") {
+            $("#ExceptionRulespan").show();
+            $scope.UniqueRecord = false;
+            noSelection = false;
+        }
+        if (noSelection == true) {
+
+            $scope.speedExceptionsObj = $.grep($scope.SLAtable, function (e) {
+                return e.PRODUCT_SLA_TYPE_ID == parseInt($("#speed_PRODUCT_SLA_TYPE_ID :selected").val().replace("number:", ""))
+            })[0];
+
+
+            if ($("#getAccessExceptions tbody tr:first").text().trim() == "No Records Found") {
+                $("#getAccessExceptions tbody tr:first").remove();
+            }
+
+
+            $scope.speedExceptionsData = [];
+            if ($(".inline").eq(0).find("input[type='radio']").is(":checked")) {
+                $scope.speedExceptionsData.LegSpeedRdo = 1;
+            }
+            if ($(".inline").eq(1).find("input[type='radio']").is(":checked")) {
+                $scope.speedExceptionsData.LegSpeedRdo = 2;
+            }
+
+            $scope.speedExceptionsData.push({
+                ACCESS_RES_TYPE_ID: $scope.speedExceptionsObj.ACCESS_RES_TYPE_ID,
+                ACCESS_RES_TYPE_VALUE: $scope.speedExceptionsObj.ACCESS_RES_TYPE_VALUE,
+                PRODUCT_SLA_TYPE_ID: $scope.speedExceptionsObj.PRODUCT_SLA_TYPE_ID,
+                PRODUCT_SLA_TYPE_NAME: $scope.speedExceptionsObj.PRODUCT_SLA_TYPE_NAME,
+                LegSpeedRdo: $scope.speedExceptionsData.LegSpeedRdo
+
+            });
+
+            //                $scope.UniqueRecord = true;
+            var ProductSla1 = $("#speed_PRODUCT_SLA_TYPE_ID :selected").text();
+            var Productslaid1 = parseInt($("#speed_PRODUCT_SLA_TYPE_ID :selected").val().replace("number:", ""))
+            var generalrule1 = ""
+            if ($(".inline").eq(0).find("input[type='radio']").is(":checked") == true) {
+                generalrule1 = "Leg2 Speed should be >= Leg1 Speed";
+            }
+
+            if ($(".inline").eq(1).find("input[type='radio']").is(":checked") == true) {
+                generalrule1 = "Leg2 Speed should be <= leg1 Speed";
+            }
+
+            if ($(".inline").eq(2).find("input[type='radio']").is(":checked") == true) {
+                generalrule1 = "None";
+            }
+
+
+
+            var samerecord = true;
+            // if ($scope.getAccessExceptions.length > 0) {
+            // var NewRecord = $scope.speedExceptionsData[0];
+            $("#getAccessExceptions tbody tr").each(function (index, element) {
+                var ProductSla = $(element).find("td").eq(0).text().trim();
+                var generalrule = $(element).find("td").eq(1).text().trim();
+
+                if (ProductSla == ProductSla1 && generalrule.toLowerCase() == generalrule1.toLowerCase()) {
+                    $scope.UniqueRecord = false;
+                    samerecord = false;
+                    bootbox.alert({
+                        "className": "my-custom-class",
+                        message: "Rule already Exists under acess speed exception rule",
+                        callback: function (result) {
+                        }
+                    });
+                    return false;
+                }
+            });
+        }
+        // }
+
+
+
+        if (samerecord == true) {
+            $http.post("SLAMaster.aspx/InsertAccessTypeExcepetions",
+                                  {
+                                      'productId': $scope.DDL_PL_Product,
+                                      'accesstype': JSON.stringify($scope.speedExceptionsData)
+                                  }).
+                    success(function (data) {
+                        $("#getAccessExceptions tbody").append("<tr><td>" + ProductSla1 + "</td><td>" + generalrule1 + "</td></tr>")
+                    }).error(function () {
+                        console.log("error");
+                    });
+        }
+
+    };
+
+    //<------------------------------Country Operations By Madan--------------------------->
+    var countrycount = 0;
+
+
+    $scope.Addcountry = function (DDL_PL_Product) {
+        //        if (CountryTableRecords == true) {
+        //            $("#tblCountry tbody tr:first").remove();
+        //            CountryTableRecords = false;
+        //        }
+
+        if ($("#tblCountry tbody tr:first").text().trim() == "No Records Found") {
+            $("#tblCountry tbody tr:first").remove();
+        }
+
+        //var IsLastRowTrue = true;
+        $('#tblCountry tbody tr:last td').each(function (index, element) {
+            if (index == 1 || index == 2 || index == 4 || index == 5) {
+                if ($(element).find("select :selected").val() == "" || $(element).find("select :selected").val() == "?") {
+                    $(element).find("select").next().show();
+                    //  IsLastRowTrue = false;
+
+                }
+                //                else {
+                //                    IsLastRowTrue = true;
+                //                }
+            }
+        });
+
+
+
+
+        //checking for unique records
+        var validationsLength = $("#tblCountry tbody tr td select").next("label:visible").length;
+
+        var unique3 = 0;
+        var IsLastRowTrue = true;
+        if ($('#tblCountry  tbody tr').length > 1) {
+            var CountryName, PRODUCT_SLA_TYPE_ID, P_Leg1, P_Leg2;
+            CountryName = (isNaN(PRODUCT_SLA_TYPE_ID = parseInt($('#tblCountry  tbody tr:last td').eq(1).find('select').val().replace("number:", "")), 10) ? 0 : PRODUCT_SLA_TYPE_ID);
+            PRODUCT_SLA_TYPE_ID = (isNaN(P_Leg1_Platform_ID = parseInt($('#tblCountry  tbody tr:last td').eq(2).find('select').val().replace("number:", "")), 10) ? 0 : P_Leg1_Platform_ID);
+            P_Leg1 = (isNaN(P_Leg2_Platform_ID = parseInt($('#tblCountry  tbody tr:last td').eq(4).find('select').val().replace("number:", "")), 10) ? 0 : P_Leg2_Platform_ID);
+            P_Leg2 = (isNaN(P_Leg2_Platform_ID = parseInt($('#tblCountry  tbody tr:last td').eq(5).find('select').val().replace("number:", "")), 10) ? 0 : P_Leg2_Platform_ID);
+
+            var beforePRODUCT_SLA_TYPE_ID, beforeP_Leg1_Platform_ID, beforeP_Leg2_Platform_ID
+            $('#tblCountry tbody tr').each(function (index, element) {
+                var len = $('#tblCountry  tbody tr').length - 1;
+                if (index < len) {
+                    beforeCountryName = parseInt($(element).find("td").eq(1).find('select').val().replace("number:", "", 10));
+                    beforePRODUCT_SLA_TYPE_ID = parseInt($(element).find("td").eq(2).find('select').val().replace("number:", "", 10));
+                    beforeP_Leg1 = parseInt($(element).find("td").eq(4).find('select').val().replace("number:", "", 10));
+                    beforeP_Leg2 = parseInt($(element).find("td").eq(5).find('select').val().replace("number:", "", 10));
+
+                    if (unique3 == 0) {
+                        if (CountryName == beforeCountryName && PRODUCT_SLA_TYPE_ID == beforePRODUCT_SLA_TYPE_ID && P_Leg1 == beforeP_Leg1 && P_Leg2 == beforeP_Leg2) {
+                            IsLastRowTrue = false;
+                            unique3 = 1;
+                            bootbox.confirm({
+                                "className": "my-custom-class",
+                                message: "Record is Already Exists.Please Select another Record",
+                                callback: function (result) {
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        }
+
+
+
+
+
+        if (validationsLength == 0 && IsLastRowTrue == true) {
+            countrycount++;
+            $scope.dyn_cnt3 = "";
+            $scope.dyn_cnt3 += "<tr> <td style=\"padding-left:20px\"><input type=\"checkbox\" class=\"checkbox\" ></td>";
+            $scope.dyn_cnt3 += "<td> <select  ng-change=\"Platformchangelegs('COUNTRY_ID_" + countrycount + "',item.COUNTRY_ID_" + countrycount + ",'No')\" class=\"uiselect6\" name=\"CountryId\" style=\"width: 20em;\" class=\"CountryId_" + countrycount + "\" ng-model=\"item.COUNTRY_ID_" + countrycount + "\" ng-options=\"country.COUNTRY_ID as country.COUNTRY_NAME for country in Countries\" id=\"COUNTRY_ID_" + countrycount + "\" required><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select Country</label></td>";
+            $scope.dyn_cnt3 += "<td><select class=\"uiselect6\" id=Country_PRODUCT_SLA_TYPE_ID_" + countrycount + " name=\"Country_PRODUCT_SLA_TYPE_ID\" ng-change=\"Platformchangelegs('Country_PRODUCT_SLA_TYPE_ID_" + countrycount + "',Country_PRODUCT_SLA_TYPE_ID_" + countrycount + ",'Yes','Country')\" style=\"width: 20em;\"  ng-model=\"Country_PRODUCT_SLA_TYPE_ID_" + countrycount + "\" ng-options=\"item12.PRODUCT_SLA_TYPE_ID as item12.PRODUCT_SLA_TYPE_NAME for item12 in SLAtable\" id=\"Country_PRODUCT_SLA_TYPE_ID\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please select Product SLA</label></td>";
+            $scope.dyn_cnt3 += "<td><span id=\"{{ACCESS_RES_TYPE_ID}}\">{{ACCESS_RES_TYPE_VALUE}}</span></td>";
+            $scope.dyn_cnt3 += "<td><select ng-change=\"Platformchangelegs('LEG1_ACCESSSPEED_ID_" + countrycount + "',item.LEG1_ACCESSSPEED_ID_" + countrycount + ",'No','Country')\" class=\"uiselect6\" style=\"width: 20em;\" ng-model=\"item.LEG1_ACCESSSPEED_ID_" + countrycount + "\" ng-options=\"Leg1.LEG1_ACCESSSPEED_ID as Leg1.LEG1_ACCESSSPEED_NAME for Leg1 in Leg1Accessspeeds\" id=\"LEG1_ACCESSSPEED_ID_" + countrycount + "\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please select Leg1 Access Speed</label></td>";
+            $scope.dyn_cnt3 += "<td><select ng-change=\"Platformchangelegs('LEG2_ACCESSSPEED_ID_" + countrycount + "',item.LEG2_ACCESSSPEED_ID_" + countrycount + ",'No','Country')\" class=\"uiselect6\" style=\"width: 20em;\" ng-model=\"item.LEG2_ACCESSSPEED_ID_" + countrycount + "\" ng-options=\"Leg2.LEG2_ACCESSSPEED_ID as Leg2.LEG2_ACCESSSPEED_NAME for Leg2 in Leg2Accessspeeds\" id=\"LEG2_ACCESSSPEED_ID_" + countrycount + "\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please select Leg2 Access Speed</label></td>";
+            $scope.dyn_cnt3 += "</tr>";
+            $("#tblCountry tbody").append($compile($scope.dyn_cnt3)($scope));
+            $timeout(function () {
+                $("select").select2({});
+            });
+        }
+    };
+
+
+
+    $scope.SaveCountryDetails = function (productId) {
+        var IsLastRowTrue = true;
+        var unique3 = 0;
+        var IsLastRowTrue = true;
+        var TotalRows = $('#tblCountry  tbody tr').length;
+
+        if ($("#tblCountry tbody tr:first").text().trim() == "No Records Found") {
+            $("#tblCountry tbody tr:first").remove();
+        }
+
+
+        $('#tblCountry tbody tr:last td').each(function (index, element) {
+            if (index == 1 || index == 2 || index == 4 || index == 5) {
+                if ($(element).find("select :selected").val() == "" || $(element).find("select :selected").val() == "?") {
+                    $(element).find("select").next().show();
+                    IsLastRowTrue = false;
+                }
+                else {
+                    IsLastRowTrue = true;
+                }
+            }
+        });
+
+
+
+        var validationsLength = $("#tblCountry tbody tr td select").next("label:visible").length;
+
+
+
+
+        if (IsLastRowTrue == true) {
+            if ($('#tblCountry  tbody tr').length > 1) {
+                var CountryName, PRODUCT_SLA_TYPE_ID, P_Leg1, P_Leg2;
+                CountryName = (isNaN(PRODUCT_SLA_TYPE_ID = parseInt($('#tblCountry  tbody tr:last td').eq(1).find('select').val().replace("number:", "")), 10) ? 0 : PRODUCT_SLA_TYPE_ID);
+                PRODUCT_SLA_TYPE_ID = (isNaN(P_Leg1_Platform_ID = parseInt($('#tblCountry  tbody tr:last td').eq(2).find('select').val().replace("number:", "")), 10) ? 0 : P_Leg1_Platform_ID);
+                P_Leg1 = (isNaN(P_Leg2_Platform_ID = parseInt($('#tblCountry  tbody tr:last td').eq(4).find('select').val().replace("number:", "")), 10) ? 0 : P_Leg2_Platform_ID);
+                P_Leg2 = (isNaN(P_Leg2_Platform_ID = parseInt($('#tblCountry  tbody tr:last td').eq(5).find('select').val().replace("number:", "")), 10) ? 0 : P_Leg2_Platform_ID);
+
+                var beforePRODUCT_SLA_TYPE_ID, beforeP_Leg1_Platform_ID, beforeP_Leg2_Platform_ID
+                $('#tblCountry  tbody tr').each(function (index, element) {
+                    var len = $('#tblCountry  tbody tr').length - 1;
+                    if (index < len) {
+
+                        beforeCountryName = parseInt($(element).find("td").eq(1).find('select').val().replace("number:", "", 10));
+                        beforePRODUCT_SLA_TYPE_ID = parseInt($(element).find("td").eq(2).find('select').val().replace("number:", "", 10));
+                        beforeP_Leg1 = parseInt($(element).find("td").eq(4).find('select').val().replace("number:", "", 10));
+                        beforeP_Leg2 = parseInt($(element).find("td").eq(5).find('select').val().replace("number:", "", 10));
+
+                        if (CountryName == beforeCountryName && PRODUCT_SLA_TYPE_ID == beforePRODUCT_SLA_TYPE_ID && P_Leg1 == beforeP_Leg1 && P_Leg2 == beforeP_Leg2) {
+                            IsLastRowTrue = false;
+                            unique3 = 1;
+                            bootbox.confirm({
+                                "className": "my-custom-class",
+                                message: " Rule already Exists",
+                                callback: function (result) {
+                                }
+                            });
+                        }
+
+                    }
+
+                });
+            }
+        }
+
+
+        if (validationsLength == 0 && IsLastRowTrue == true) {
+            $scope.SaveCountryDetailsJSON = [];
+            $("#tblCountry tbody tr").each(function (index, element) {
+                var COUNTRY_ID, COUNTRY_NAME, PRODUCT_SLA_TYPE_NAME, PRODUCT_SLA_TYPE_ID, LEG1_ACCESSSPEED_ID, LEG1_ACCESSSPEED_NAME, LEG2_ACCESSSPEED_ID, LEG2_ACCESSSPEED_NAME
+                COUNTRY_ID = (isNaN(COUNTRY_ID = parseInt($(element).find("td:nth-child(2) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : COUNTRY_ID),
+                PRODUCT_SLA_TYPE_ID = (isNaN(PRODUCT_SLA_TYPE_ID = parseInt($(element).find("td:nth-child(3) select :selected").val().replace("number:", "")), 10) ? 0 : PRODUCT_SLA_TYPE_ID),
+                LEG1_ACCESSSPEED_ID = (isNaN(LEG1_ACCESSSPEED_ID = parseInt($(element).find("td:nth-child(5) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG1_ACCESSSPEED_ID),
+                LEG2_ACCESSSPEED_ID = (isNaN(LEG2_ACCESSSPEED_ID = parseInt($(element).find("td:nth-child(6) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG2_ACCESSSPEED_ID),
+
+                $scope.SaveCountryDetailsJSON.push({
+                    ACCESS_RES_TYPE_ID: parseInt($(element).find("td:nth-child(4) span").attr("id")),
+                    ACCESS_RES_TYPE_VALUE: $(element).find("td:nth-child(4) span").text(),
+                    COUNTRY_NAME: $(element).find("td:nth-child(2) :selected").eq(0).text(),
+                    COUNTRY_ID: COUNTRY_ID,
+                    PRODUCT_SLA_TYPE_NAME: $(element).find("td:nth-child(3) select :selected").text(),
+                    PRODUCT_SLA_TYPE_ID: PRODUCT_SLA_TYPE_ID,
+                    LEG1_ACCESSSPEED_NAME: $(element).find("td:nth-child(5) :selected").eq(0).text(),
+                    LEG1_ACCESSSPEED_ID: LEG1_ACCESSSPEED_ID,
+                    LEG2_ACCESSSPEED_NAME: $(element).find("td:nth-child(6) :selected").eq(0).text(),
+                    LEG2_ACCESSSPEED_ID: LEG2_ACCESSSPEED_ID
+                });
+
+            });
+            $("#pageLoad").show();
+            $http.post("SLAMaster.aspx/Insertcountrydetails",
+                                  {
+                                      'ProductId': $scope.DDL_PL_Product,
+                                      'SaveCountryDetailsJSON': JSON.stringify($scope.SaveCountryDetailsJSON)
+                                  }).
+                    success(function (data) {
+                        $("#pageLoad").hide();
+                        console.log("success");
+                    }).error(function (data) { console.log('error') });
+        }
+    }
+
+
+
+    $scope.DeleteCoutryDetails = function (ProductId) {
+        var IsCheckedRecord = true;
+        if ($("#tblCountry tr td:first-child :checked").length == 0) {
+            bootbox.confirm({
+                "className": "my-custom-class",
+                message: "Please Select Atleast One Record",
+                callback: function (result) {
+
+                }
+            });
+            IsCheckedRecord = false;
+
+        }
+
+        if (IsCheckedRecord == true) {
+            bootbox.confirm({
+                "className": "my-custom-class",
+                message: "Are you sure to delete record(s)?",
+                callback: function (result) {
+                    if (result) {
+                        $scope.DeleteCountryDetailsJSON = [];
+                        $("#tblCountry tbody tr").each(function (index, element) {
+                            if ($(element).find('input[type="checkbox"]').eq(0).is(":checked")) {
+                                var PRODUCT_SLA_TYPE_ID1, PRODUCT_SLA_TYPE_NAME1, ACCESS_RES_TYPE_ID1, COUNTRY_ID, COUNTRY_NAME, PRODUCT_SLA_TYPE_NAME, PRODUCT_SLA_TYPE_ID, LEG1_ACCESSSPEED_ID, LEG1_ACCESSSPEED_NAME, LEG2_ACCESSSPEED_ID, LEG2_ACCESSSPEED_NAME
+                                COUNTRY_ID = (isNaN(COUNTRY_ID = parseInt($(element).find("td:nth-child(2) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : COUNTRY_ID),
+                PRODUCT_SLA_TYPE_ID = (isNaN(PRODUCT_SLA_TYPE_ID = parseInt($(element).find("td:nth-child(3) select :selected").val().replace("number:", "")), 10) ? 0 : PRODUCT_SLA_TYPE_ID),
+                LEG1_ACCESSSPEED_ID = (isNaN(LEG1_ACCESSSPEED_ID = parseInt($(element).find("td:nth-child(5) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG1_ACCESSSPEED_ID),
+                LEG2_ACCESSSPEED_ID = (isNaN(LEG2_ACCESSSPEED_ID = parseInt($(element).find("td:nth-child(6) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : LEG2_ACCESSSPEED_ID),
+                ACCESS_RES_TYPE_ID = $(element).find("td:nth-child(4) span").attr("id");
+                                $scope.DeleteCountryDetailsJSON.push({
+                                    ACCESS_RES_TYPE_ID: ACCESS_RES_TYPE_ID,
+                                    ACCESS_RES_TYPE_VALUE: $(element).find("td:nth-child(4) span").text(),
+                                    COUNTRY_NAME: $(element).find("td:nth-child(2) :selected").eq(0).text(),
+                                    COUNTRY_ID: COUNTRY_ID,
+                                    PRODUCT_SLA_TYPE_NAME: PRODUCT_SLA_TYPE_NAME1,
+                                    PRODUCT_SLA_TYPE_ID: PRODUCT_SLA_TYPE_ID,
+                                    LEG1_ACCESSSPEED_NAME: $(element).find("td:nth-child(5) :selected").eq(0).text(),
+                                    LEG1_ACCESSSPEED_ID: LEG1_ACCESSSPEED_ID,
+                                    LEG2_ACCESSSPEED_NAME: $(element).find("td:nth-child(6) :selected").eq(0).text(),
+                                    LEG2_ACCESSSPEED_ID: LEG2_ACCESSSPEED_ID
+                                });
+                            }
+                        })
+                        $("#tblCountry tbody tr").each(function (index, element) {
+                            if ($(element).find("td:nth-child(1) input[type='checkbox']").is(":checked")) {
+                                $(element).remove();
+                            }
+                        });
+
+                        $("#pageLoad").show();
+                        $http.post("SLAMaster.aspx/DeleteCountryDetailsByIds",
+                                  {
+                                      'productId': $scope.DDL_PL_Product,
+                                      'DeleteCountryDetailsJSON': JSON.stringify($scope.DeleteCountryDetailsJSON)
+                                  }).
+                    success(function (data) {
+                        $("#pageLoad").hide();
+                        $("#tblCountry tbody tr").each(function (index, element) {
+                            if ($(element).find("td:nth-child(1) input[type='checkbox']").is(":checked")) {
+                                $(element).remove();
+                            }
+                        });
+                        console.log("success")
+
+                        if ($("#tblCountry tbody tr").length == 0) {
+                            $timeout(function () {
+                                $("#tblCountry tbody").html("<tr><td colspan='6'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+                            }, 50);
+                        }
+
+                    }).error(function (data) {
+                        console.log('deletefailed');
+                        $("#pageLoad").hide();
+                        if ($("#tblCountry tbody tr").length == 0) {
+                            $("#tblCountry tbody").html("<tr><td colspan='6'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+                        }
+
+                    });
+                    }
+                }
+            });
+        }
+    }
+
+
+    //<-------------------------Platform Operations By Madan-------------------------->
+
+
+
+
+    $scope.SLAProdtypes_Access_Config = function (Id, item) {
+        if (item == null) {
+            // $('#AccessTypeConfiguration tbody tr:last').find("td:nth-child(2) label").show();
+            $('#' + (Id)).next().show();
+            $('#' + (Id)).parent().next("td").find("label").remove();
+        }
+
+        if (item != null) {
+            $('#AccessTypeConfiguration tbody tr:last').find("td:nth-child(1) span").hide();
+            var ACCESS_RES_TYPE_ID = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_ID;
+            var ACCESS_RES_TYPE_VALUE = $.grep($scope.SLAtable, function (e) { return e.PRODUCT_SLA_TYPE_ID == item })[0].ACCESS_RES_TYPE_VALUE;
+
+            $('#' + (Id)).next().remove();
+
+            $('#' + (Id)).parent().next("td").find("span").remove();
+            $('#' + (Id)).parent().next("td").append("<span id='" + ACCESS_RES_TYPE_ID + "'>" + ACCESS_RES_TYPE_VALUE + "</span>")
+            $('#' + (Id)).prev().children('a').find('span:first').attr("style", "display:show");
+        }
+
+    }
+
+
+    var platformCount = 0;
+
+    $scope.AddPlatform = function (DDL_PL_Product) {
+        var unique11 = 0;
+        var IsLastRowTrue = true;
+        var TotalRows = $('#tblPlatform  tbody tr').length;
+
+
+        $('#tblPlatform tbody tr:last td').each(function (index, element) {
+            if (index == 1 || index == 3 || index == 4) {
+                if ($(element).find("select :selected").val() == "" || $(element).find("select :selected").val() == "?") {
+                    $(element).find("select").next().show();
+                    IsLastRowTrue = false;
+
+                }
+                else {
+                    IsLastRowTrue = true;
+                }
+            }
+        });
+
+        var validationsLength = $("#tblPlatform tbody tr td select").next("label:visible").length;
+
+
+
+        if (PlatformTableRecords == true || $("#tblPlatform tbody tr td").text().trim() == "No Records Found") {
+            $("#tblPlatform tbody tr:first").remove();
+        }
+
+        if (IsLastRowTrue == true && validationsLength == 0) {
+            if ($('#tblPlatform  tbody tr').length > 1) {
+                var PRODUCT_SLA_TYPE_ID, P_Leg1_Platform_ID, P_Leg2_Platform_ID;
+                PRODUCT_SLA_TYPE_ID = (isNaN(PRODUCT_SLA_TYPE_ID = parseInt($('#tblPlatform  tbody tr:last td').eq(1).find('select').val().replace("number:", "")), 10) ? 0 : PRODUCT_SLA_TYPE_ID);
+                P_Leg1_Platform_ID = (isNaN(P_Leg1_Platform_ID = parseInt($('#tblPlatform  tbody tr:last td').eq(3).find('select').val().replace("number:", "")), 10) ? 0 : P_Leg1_Platform_ID);
+                P_Leg2_Platform_ID = (isNaN(P_Leg2_Platform_ID = parseInt($('#tblPlatform  tbody tr:last td').eq(4).find('select').val().replace("number:", "")), 10) ? 0 : P_Leg2_Platform_ID);
+
+                var beforePRODUCT_SLA_TYPE_ID, beforeP_Leg1_Platform_ID, beforeP_Leg2_Platform_ID
+                $('#tblPlatform  tbody tr').each(function (index, element) {
+                    var len = $('#tblPlatform  tbody tr').length - 1;
+                    if (index < len) {
+                        beforePRODUCT_SLA_TYPE_ID = parseInt($(element).find("td").eq(1).find('select').val().replace("number:", "", 10));
+                        beforeP_Leg1_Platform_ID = parseInt($(element).find("td").eq(3).find('select').val().replace("number:", "", 10));
+                        beforeP_Leg2_Platform_ID = parseInt($(element).find("td").eq(4).find('select').val().replace("number:", "", 10));
+                        if (unique11 == 0) {
+                            if (PRODUCT_SLA_TYPE_ID == beforePRODUCT_SLA_TYPE_ID && P_Leg1_Platform_ID == beforeP_Leg1_Platform_ID && P_Leg2_Platform_ID == beforeP_Leg2_Platform_ID) {
+                                IsLastRowTrue = false;
+                                unique11 = 1;
+                                bootbox.confirm({
+                                    "className": "my-custom-class",
+                                    message: "Record is Already Exists.Please Select another Record",
+                                    callback: function (result) {
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                });
+            }
+        }
+
+        if (validationsLength == 0 && validationsLength == 0) {
+            PlatformTableRecords = false;
+            platformCount++;
+            $scope.dyn_cnt4 = "";
+            $scope.dyn_cnt4 += "<tr><td style=\"padding-left:20px\"><input type=\"checkbox\" class=\"checkbox\" /></td>";
+            $scope.dyn_cnt4 += "<td ><select  class=\"uiselect12\" id=\"Platform_PRODUCT_SLA_TYPE_ID_" + platformCount + "\" name=\"Platform_PRODUCT_SLA_TYPE_ID\" ng-change=\"Platformchangelegs('Platform_PRODUCT_SLA_TYPE_ID_" + platformCount + "',Platform_PRODUCT_SLA_TYPE_ID" + platformCount + ",'Yes','Platform')\" style=\"width: 20em;\"  ng-model=\"Platform_PRODUCT_SLA_TYPE_ID" + platformCount + "\" ng-options=\"item12.PRODUCT_SLA_TYPE_ID as item12.PRODUCT_SLA_TYPE_NAME for item12 in SLAtable\" ><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select Product SLA</label></td>";
+            $scope.dyn_cnt4 += "<td><span id=\"{{ACCESS_RES_TYPE_ID}}\">{{ACCESS_RES_TYPE_VALUE}}</span></td>";
+            $scope.dyn_cnt4 += "<td class=\"platformlen\"><select ng-change=\"Platformchangelegs('P_Leg1_Platform_ID_" + platformCount + "',item.Leg1_Platform_ID_" + platformCount + ",'No','Platform')\" class=\"uiselect12\" id=\"P_Leg1_Platform_ID_" + platformCount + "\" ng-model=\"item.Leg1_Platform_ID_" + platformCount + "\" name=\"Leg1_Platform_ID\" style=\"width: 20em;\"  ng-options=\"PLATFORM1.CAPMAN_PLATFORM_ID as PLATFORM1.CAPMAN_PLATFORM_NAME for PLATFORM1 in PlatformsData\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select Leg1 Platform</label></td>";
+            $scope.dyn_cnt4 += "<td class=\"platformlen\"><select ng-change=\"Platformchangelegs('P_Leg2_Platform_ID_" + platformCount + "',item.Leg2_Platform_ID_" + platformCount + ",'No','Platform')\" class=\"uiselect12\" id=\"P_Leg2_Platform_ID_" + platformCount + "\" name=\"Leg2_Platform_ID\" ng-model=\"item.Leg2_Platform_ID_" + platformCount + "\" style=\"width: 20em;\"  ng-options=\"PLATFORM2.CAPMAN_PLATFORM_ID as PLATFORM2.CAPMAN_PLATFORM_NAME for PLATFORM2 in PlatformsData\"><option value=''>&nbsp;&nbsp--&nbsp;Select&nbsp;-- </option></select><label style=\"display:none;color:Red;font-weight:normal;font-size:12px\">Please Select Leg2 Platform</label></td></tr>";
+            $("#tblPlatform tbody").append($compile($scope.dyn_cnt4)($scope));
+            $timeout(function () {
+                $("select").select2({});
+            });
+
+        }
+    };
+
+
+    $scope.SavePlatform = function (DDL_PL_Product) {
+        var IsLastRowTrue = true;
+
+
+        $('#tblPlatform tbody tr:last td').each(function (index, element) {
+            if (index == 1 || index == 3 || index == 4) {
+                if ($(element).find("select :selected").val() == "" || $(element).find("select :selected").val() == "?") {
+                    $(element).find("select").next().show();
+                    IsLastRowTrue = false;
+                }
+                else {
+                    IsLastRowTrue = true;
+                }
+            }
+        });
+
+        var validationsLength = $("#tblPlatform tbody tr td select").next("label:visible").length;
+
+        if (IsLastRowTrue = true) {
+            if ($('#tblPlatform  tbody tr').length > 1) {
+                var PRODUCT_SLA_TYPE_ID, P_Leg1_Platform_ID, P_Leg2_Platform_ID;
+                PRODUCT_SLA_TYPE_ID = (isNaN(PRODUCT_SLA_TYPE_ID = parseInt($('#tblPlatform  tbody tr:last td').eq(1).find('select').val().replace("number:", "")), 10) ? 0 : PRODUCT_SLA_TYPE_ID);
+                P_Leg1_Platform_ID = (isNaN(P_Leg1_Platform_ID = parseInt($('#tblPlatform  tbody tr:last td').eq(3).find('select').val().replace("number:", "")), 10) ? 0 : P_Leg1_Platform_ID);
+                P_Leg2_Platform_ID = (isNaN(P_Leg2_Platform_ID = parseInt($('#tblPlatform  tbody tr:last td').eq(4).find('select').val().replace("number:", "")), 10) ? 0 : P_Leg2_Platform_ID);
+
+                var beforePRODUCT_SLA_TYPE_ID, beforeP_Leg1_Platform_ID, beforeP_Leg2_Platform_ID
+                $('#tblPlatform  tbody tr').each(function (index, element) {
+                    var len = $('#tblPlatform  tbody tr').length - 1;
+                    if (index < len) {
+                        beforePRODUCT_SLA_TYPE_ID = parseInt($(element).find("td").eq(1).find('select').val().replace("number:", "", 10));
+                        beforeP_Leg1_Platform_ID = parseInt($(element).find("td").eq(3).find('select').val().replace("number:", "", 10));
+                        beforeP_Leg2_Platform_ID = parseInt($(element).find("td").eq(4).find('select').val().replace("number:", "", 10));
+
+                        if (PRODUCT_SLA_TYPE_ID == beforePRODUCT_SLA_TYPE_ID && P_Leg1_Platform_ID == beforeP_Leg1_Platform_ID && P_Leg2_Platform_ID == beforeP_Leg2_Platform_ID) {
+                            IsLastRowTrue = false;
+                            bootbox.confirm({
+                                "className": "my-custom-class",
+                                message: "Record is Already Exists.Please Select another Record",
+                                callback: function (result) {
+                                }
+                            });
+                        }
+                    }
+
+                });
+            }
+        }
+        $scope.SavePlatformDetailsJSON1 = [];
+        var TotalRows = $('#tblPlatform  tbody tr').length;
+
+        //var validationsLength = $("#tblPlatform tbody tr td select").next("label:visible").length;
+
+        if (IsLastRowTrue == true && validationsLength == 0) {
+            $("#tblPlatform tbody tr").each(function (index, element) {
+                var PRODUCT_SLA_TYPE_ID;
+                var P_Leg1_Platform_ID, P_Leg2_Platform_ID, P_Leg1_Platform_Name, P_Leg2_Platform_Name
+                PRODUCT_SLA_TYPE_ID = (isNaN(PRODUCT_SLA_TYPE_ID = parseInt($(element).find("td:nth-child(2) select :selected").val().replace("number:", "")), 10) ? 0 : PRODUCT_SLA_TYPE_ID);
+                P_Leg1_Platform_ID = (isNaN(P_Leg1_Platform_ID = parseInt($(element).find("td:nth-child(4) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : P_Leg1_Platform_ID);
+                P_Leg2_Platform_ID = (isNaN(P_Leg2_Platform_ID = parseInt($(element).find("td:nth-child(5) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : P_Leg2_Platform_ID);
+
+                $scope.SavePlatformDetailsJSON1.push({
+                    ACCESS_RES_TYPE_ID: parseInt($(element).find("td:nth-child(3) span").attr("id")),
+                    ACCESS_RES_TYPE_VALUE: $(element).find("td:nth-child(3) span").text(),
+                    PRODUCT_SLA_TYPE_NAME: $(element).find("td:nth-child(2) select :selected").text(),
+                    PRODUCT_SLA_TYPE_ID: PRODUCT_SLA_TYPE_ID,
+                    LEG1_PLATFORM_ID: P_Leg1_Platform_ID,
+                    LEG2_PLATFORM_ID: P_Leg2_Platform_ID
+                });
+            });
+            console.log("success")
+            $("#pageLoad").show();
+            $http.post("SLAMaster.aspx/InsertPlatformdetails",
+                                  {
+                                      'ProductId': $scope.DDL_PL_Product,
+                                      'SavePlatformDetailsJSON': JSON.stringify($scope.SavePlatformDetailsJSON1)
+                                  }).
+                    success(function (data) { console.log(data.d); $("#pageLoad").hide(); }).error(function (data) { console.log('error') });
+
+        }
+    }
+
+
+    $scope.DeletePlatform = function (ProductId) {
+        var IsCheckedRecord = true;
+        if ($("#tblPlatform tr td:first-child :checked").length == 0) {
+            bootbox.confirm({
+                "className": "my-custom-class",
+                message: "Please Select Atleast One Record",
+                callback: function (result) {
+
+                }
+            });
+            IsCheckedRecord = false;
+
+        }
+
+
+
+        if (IsCheckedRecord == true) {
+
+            bootbox.confirm({
+                "className": "my-custom-class",
+                message: "Are you sure to delete record(s)?",
+                callback: function (result) {
+                    if (result) {
+                        var DeletePlatformDetailsJSON = [];
+                        $("#tblPlatform tbody tr").each(function (index, element) {
+                            if ($(element).find('input[type="checkbox"]').eq(0).is(":checked")) {
+                                var PRODUCT_SLA_TYPE_ID1, PRODUCT_SLA_TYPE_NAME1, ACCESS_RES_TYPE_ID1, PRODUCT_SLA_TYPE_ID, P_Leg1_Platform_ID, P_Leg2_Platform_ID, P_Leg1_Platform_Name, P_Leg2_Platform_Name
+                                PRODUCT_SLA_TYPE_ID = (isNaN(PRODUCT_SLA_TYPE_ID = parseInt($(element).find("td:nth-child(2) select :selected").val().replace("number:", "")), 10) ? 0 : PRODUCT_SLA_TYPE_ID),
+                P_Leg1_Platform_ID = (isNaN(P_Leg1_Platform_ID = parseInt($(element).find("td:nth-child(4) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : P_Leg1_Platform_ID),
+                P_Leg2_Platform_ID = (isNaN(P_Leg2_Platform_ID = parseInt($(element).find("td:nth-child(5) :selected").eq(0).val().replace("number:", "")), 10) ? 0 : P_Leg2_Platform_ID),
+
+
+
+  PRODUCT_SLA_TYPE_ID = parseInt($(element).find("td:nth-child(2) select :selected").val().replace("number:", ""));
+                                ACCESS_RES_TYPE_ID = parseInt($(element).find("td:nth-child(3) span").attr("id"));
+
+                                DeletePlatformDetailsJSON.push({
+                                    ACCESS_RES_TYPE_ID: ACCESS_RES_TYPE_ID,
+                                    ACCESS_RES_TYPE_VALUE: $(element).find("td:nth-child(3) span").text(),
+                                    PRODUCT_SLA_TYPE_NAME: PRODUCT_SLA_TYPE_NAME1,
+                                    PRODUCT_SLA_TYPE_ID: PRODUCT_SLA_TYPE_ID,
+                                    LEG1_PLATFORM_ID: P_Leg1_Platform_ID,
+                                    LEG2_PLATFORM_ID: P_Leg2_Platform_ID
+                                });
+                            }
+                        })
+                        $("#tblPlatform tbody tr").each(function (index, element) {
+                            if ($(element).find("td:nth-child(1) input[type='checkbox']").is(":checked")) {
+                                $(element).remove();
+                            }
+                        });
+
+                        $http.post("SLAMaster.aspx/DeletePlatformsDetailsByIds",
+                                  {
+                                      'productId': $scope.DDL_PL_Product,
+                                      'DeletePlatformsDetailsJSON': JSON.stringify(DeletePlatformDetailsJSON)
+                                  }).
+                    success(function (data) {
+                        //Need
+                        $("#tblPlatform tbody tr").each(function (index, element) {
+                            if ($(element).find("td:nth-child(1) input[type='checkbox']").is(":checked")) {
+                                $(element).remove();
+                            }
+                        });
+                        console.log("success")
+
+                    }).error(function (data) {
+                        console.log('deletefailed');
+                        $("#pageLoad").hide();
+                        //alert("data is not deleted");
+                    });
+                    }
+
+
+                    if ($("#tblPlatform tbody tr").length == 0) {
+                        $timeout(function () {
+                            $("#tblPlatform tbody").html("<tr><td colspan='6'><label style='font-weight:bold;font-size: 12px;'>No Records Found</label></td></tr>")
+                        }, 50);
+                    }
+
+
+
+                }
+            });
+        }
+
+    }
+
+})

@@ -1,0 +1,310 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Globalization;
+using Oracle.DataAccess.Client;
+
+namespace SCAdminDAL
+{
+    public class MCUDAL
+    {
+        private StringBuilder strQuery = new StringBuilder();
+        private int sAccess_Level = 1;
+        private string tempQuery = string.Empty;
+        GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+        public DataTable LoadOwnerProducts(string UserID)
+        {
+            tempQuery = getProductListQuery(UserID);
+            string PROD_DSL_ACCESS_NAME = "DSL ACCESS";
+            strQuery.Clear();
+            strQuery.Append("select * from csu_product where product_cd in (" + tempQuery+ ")");
+            strQuery.Append(" and product_cd not in (select distinct fieldvalue from csu_config_tbl where upper(FIELDNAME) = '" + PROD_DSL_ACCESS_NAME + "')");
+            strQuery.Append(" and product_cd not in (123,124) and PRODUCT_VALID_CD = 1 order by upper(PRODUCT_NAME) ");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public string getProductListQuery(string UserID)
+        {
+            strQuery.Clear();
+            if (sAccess_Level == 1)//for super user
+                strQuery.Append("Select PRODUCT_cd from csu_PRODUCT");
+            else
+            {
+                strQuery.Append("Select PRODUCT_cd from csu_user_PRODUCT_owner where Upper(emp_id) =" + UserID.ToUpper());
+                strQuery.Append(" and PRODUCT_owner_status_cd = 1");
+            }
+           // return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            return strQuery.ToString();
+        }
+
+        public DataTable LoadOwnerProducts_HVPN(string UserID)
+        {
+            tempQuery = getProductListQuery(UserID);
+            strQuery.Clear();
+            strQuery.Append("select DISTINCT b.* from csu_ref_valid_char a,csu_product b,cla_product_access_type c,cla_product_cases d");
+            strQuery.Append(" where b.product_cd in (" + tempQuery + ") and char_id in (select distinct ACCESS_PRODUCT_TYPE_ID from");
+            strQuery.Append(" cla_product_access_type) and c.product_cd = b.product_cd and d.PRODUCT_CD = c.product_cd and");
+            strQuery.Append(" b.product_cd = d.PRODUCT_CD and d.CASE_VALID_CD = 1 and b.PRODUCT_VALID_CD = 1 order by b.product_name");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable getAllProduct(string UserID)
+        {
+            tempQuery = getProductListQuery(UserID);
+            string PROD_DSL_ACCESS_NAME = "DSL ACCESS";
+            strQuery.Clear();
+            strQuery.Append("select * from csu_product where product_cd in (" + tempQuery + ")");
+            strQuery.Append(" and product_cd not in (select distinct fieldvalue from csu_config_tbl where upper(FIELDNAME) = '" + PROD_DSL_ACCESS_NAME + "')");
+            strQuery.Append(" and product_cd not in (123,124) and PRODUCT_VALID_CD = 1");
+            strQuery.Append(" union ");
+            strQuery.Append("select DISTINCT b.* from csu_ref_valid_char a,csu_product b,cla_product_access_type c,cla_product_cases d");
+            strQuery.Append(" where b.product_cd in (" + tempQuery + ") and char_id in (select distinct ACCESS_PRODUCT_TYPE_ID from");
+            strQuery.Append(" cla_product_access_type) and c.product_cd = b.product_cd and d.PRODUCT_CD = c.product_cd and");
+            strQuery.Append(" b.product_cd = d.PRODUCT_CD and d.CASE_VALID_CD = 1 and b.PRODUCT_VALID_CD = 1");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable getValidAccessType(int productID)
+        {
+            strQuery.Clear();
+            strQuery.Append("SELECT distinct parent_access_type_name,product_cd FROM vw_product_access_type_map where  product_cd= " + productID);
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataSet getAccessTypeWithPhaseAttribute(Int32 productCd, Int32 subProdCd, Int32[] selectedCases, string[] SelectedSupps)
+        {
+            DataSet ds = new DataSet();
+            ds.Locale = CultureInfo.InvariantCulture;
+            //create a connection
+            OracleConnection oConn = new OracleConnection(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            //create a command set object
+            OracleCommand cmdOra = new OracleCommand("pkg_masscaseupdate.stp_getAccessTypeWithPhaseAttr", oConn);
+
+            cmdOra.CommandType = CommandType.StoredProcedure;
+            //Add params to the command object which are related to the stored procedure
+
+            //OracleParameter pPop_IdArray = new OracleParameter("ppopid", OracleDbType.Int32, ParameterDirection.Input);
+            //pPop_IdArray.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            //pPop_IdArray.Value = selectedPops;
+            //pPop_IdArray.Size = selectedPops.Length;
+
+            OracleParameter pSupp = new OracleParameter("psuppliers", OracleDbType.Varchar2, ParameterDirection.Input);
+            pSupp.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            pSupp.Value = SelectedSupps;
+            pSupp.Size = SelectedSupps.Length;
+
+            OracleParameter pcase_IdArray = new OracleParameter("pcase_id", OracleDbType.Int32, ParameterDirection.Input);
+            pcase_IdArray.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            pcase_IdArray.Value = selectedCases;
+            pcase_IdArray.Size = selectedCases.Length;
+
+            OracleParameter pProdCd = new OracleParameter("pProductCd", OracleDbType.Int32);
+            pProdCd.Value = productCd;
+
+            OracleParameter pSubProdCd = new OracleParameter("pSubProductCd", OracleDbType.Int32);
+            pSubProdCd.Value = subProdCd;
+            //selectedPOPs;
+            OracleParameter pAccessSupp_Details = new OracleParameter("pAccessSuppDetails", OracleDbType.RefCursor);
+
+            pProdCd.Direction = ParameterDirection.Input;
+            pSubProdCd.Direction = ParameterDirection.Input;
+            pSupp.Direction = ParameterDirection.Input;
+            pcase_IdArray.Direction = ParameterDirection.Input;
+            pAccessSupp_Details.Direction = ParameterDirection.Output;
+
+            //Add parameters to the Command Object
+            cmdOra.Parameters.Add(pProdCd);
+            cmdOra.Parameters.Add(pSubProdCd);
+            cmdOra.Parameters.Add(pSupp);
+            cmdOra.Parameters.Add(pcase_IdArray);
+            //cmdOra.Parameters.Add(pPop_IdArray);
+            cmdOra.Parameters.Add(pAccessSupp_Details);
+
+            //create a dataAdapter
+            OracleDataAdapter daAccessSpeed = new OracleDataAdapter(cmdOra);
+            try
+            {
+                //open the connection
+                oConn.Open();
+                //Fill the dataset
+                daAccessSpeed.Fill(ds);
+            }
+            // catch (OracleException ex)
+            // {
+            // rethrow the exception to the next level
+            // throw;
+            // }
+            finally
+            {
+                //close the connections
+                oConn.Close();
+                oConn.Dispose();
+            }
+            //create data relations and all remaining ....do it later
+            return ds;
+        }
+
+        public DataTable CaseIdExists(string caseID)
+        {
+            strQuery.Clear();
+            strQuery.Append("SELECT case_id FROM csu_case_exceptions WHERE case_id in (" + caseID + ")");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataSet GetAccessFilterHvpn(int iProductCd, int iSubProdCd, int[] iCountryId, int iValid, int[] PopList, int[] Caselist)
+        {
+            DataSet ds = new DataSet();
+            ds.Locale = CultureInfo.InvariantCulture;
+            //Create a connection            
+            OracleConnection oConn = new OracleConnection(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            //Create a command object
+            OracleCommand cmdOra = new OracleCommand("PKG_MASSCASEUPDATE_V1.stp_getaccesssupplierinfohvpn", oConn);
+            cmdOra.CommandType = CommandType.StoredProcedure;
+            //Add parameters to the command object which are related to the stored procedure
+            OracleParameter pProduct_Cd = new OracleParameter("pproductcd", OracleDbType.Int32);
+            OracleParameter pSubProduct_Cd = new OracleParameter("psubproductcd", OracleDbType.Int32);
+            OracleParameter pCountry_Cd = new OracleParameter("pcountry", OracleDbType.Int32);
+            OracleParameter pValid_Cd = new OracleParameter("pvalidcd", OracleDbType.Int32);
+            OracleParameter pPop_IdArray = new OracleParameter("ppopid", OracleDbType.Int32, ParameterDirection.Input);
+            OracleParameter pCase_IdArray = new OracleParameter("pcaseid", OracleDbType.Int32, ParameterDirection.Input);
+
+            pPop_IdArray.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            pPop_IdArray.Value = PopList;
+            pPop_IdArray.Size = PopList.Length;
+            pPop_IdArray.Direction = ParameterDirection.Input;
+
+            pCase_IdArray.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            pCase_IdArray.Value = Caselist;
+            pCase_IdArray.Size = Caselist.Length;
+            pCase_IdArray.Direction = ParameterDirection.Input;
+
+            pCountry_Cd.CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+            pCountry_Cd.Value = iCountryId;
+            pCountry_Cd.Size = iCountryId.Length;
+            pCountry_Cd.Direction = ParameterDirection.Input;
+
+
+            OracleParameter pAccessSupplier = new OracleParameter("psuppier", OracleDbType.RefCursor);
+            //OracleParameter pCountry = new OracleParameter("pcountry", OracleDbType.RefCursor);
+
+            //3.2 ends
+            pProduct_Cd.Direction = ParameterDirection.Input;
+            pProduct_Cd.Value = iProductCd;
+            pSubProduct_Cd.Direction = ParameterDirection.Input;
+            pSubProduct_Cd.Value = iSubProdCd;
+            pValid_Cd.Direction = ParameterDirection.Input;
+            pValid_Cd.Value = iValid;
+            pAccessSupplier.Direction = ParameterDirection.Output;
+            // pAccessSupplier.Direction = ParameterDirection.Output;
+
+            //3.2 ends
+
+            //Add Parameters to the Command Object
+            cmdOra.Parameters.Add(pProduct_Cd);
+            cmdOra.Parameters.Add(pSubProduct_Cd);
+            cmdOra.Parameters.Add(pCountry_Cd);
+            cmdOra.Parameters.Add(pValid_Cd);
+            cmdOra.Parameters.Add(pPop_IdArray);
+            cmdOra.Parameters.Add(pCase_IdArray);
+            cmdOra.Parameters.Add(pAccessSupplier);
+            //cmdOra.Parameters.Add(pCountry);
+
+            //Create a dataadapter
+            OracleDataAdapter dcCust = new OracleDataAdapter(cmdOra);
+            try
+            {
+                //Open the connection
+                oConn.Open();
+                //Fill the dataset
+                dcCust.Fill(ds);
+            }
+            finally
+            {
+                //close the connection
+                oConn.Close();
+                oConn.Dispose();
+            }
+            return ds;
+
+        }
+
+        public DataSet GetAccessFilterInfo(int[] selectedCases, int[] selectedPops, int[] selectedPortSpeeds, int productCd, int subProdCd)
+        {
+            int[] numArray = new int[] { -1 };
+            DataSet dataSet = new DataSet
+            {
+                Locale = CultureInfo.InvariantCulture
+            };
+            OracleConnection conn = new OracleConnection(System.Configuration.ConfigurationManager.AppSettings.Get("OraConnString"));
+            OracleCommand selectCommand = new OracleCommand("PKG_MASSCASEUPDATE.stp_getsupplierinfo", conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            OracleParameter param = new OracleParameter("pPortSpeedArray", OracleDbType.Int32, ParameterDirection.Input)
+            {
+                CollectionType = OracleCollectionType.PLSQLAssociativeArray
+            };
+            if (selectedPortSpeeds.Length == 0)
+            {
+                param.Value = numArray;
+                param.Size = 0;
+            }
+            else
+            {
+                param.Value = selectedPortSpeeds;
+                param.Size = selectedPortSpeeds.Length;
+            }
+            OracleParameter parameter2 = new OracleParameter("ppoparray", OracleDbType.Int32, ParameterDirection.Input)
+            {
+                CollectionType = OracleCollectionType.PLSQLAssociativeArray,
+                Value = selectedPops,
+                Size = selectedPops.Length
+            };
+            OracleParameter parameter3 = new OracleParameter("pcaseid", OracleDbType.Int32, ParameterDirection.Input)
+            {
+                CollectionType = OracleCollectionType.PLSQLAssociativeArray,
+                Value = selectedCases,
+                Size = selectedCases.Length
+            };
+            OracleParameter parameter4 = new OracleParameter("pProductCd", OracleDbType.Int32)
+            {
+                Value = productCd
+            };
+            OracleParameter parameter5 = new OracleParameter("pSubProductCd", OracleDbType.Int32)
+            {
+                Value = subProdCd
+            };
+            OracleParameter parameter6 = new OracleParameter("paccesssuppdetails", OracleDbType.RefCursor);
+            param.Direction = ParameterDirection.Input;
+            parameter3.Direction = ParameterDirection.Input;
+            parameter4.Direction = ParameterDirection.Input;
+            parameter5.Direction = ParameterDirection.Input;
+            parameter6.Direction = ParameterDirection.Output;
+            selectCommand.Parameters.Add(param);
+            selectCommand.Parameters.Add(parameter3);
+            selectCommand.Parameters.Add(parameter2);
+            selectCommand.Parameters.Add(parameter4);
+            selectCommand.Parameters.Add(parameter5);
+            selectCommand.Parameters.Add(parameter6);
+            OracleDataAdapter adapter = new OracleDataAdapter(selectCommand);
+            try
+            {
+                conn.Open();
+                adapter.Fill(dataSet);
+            }
+            catch (OracleException)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+            return dataSet;
+        }
+
+    }
+}

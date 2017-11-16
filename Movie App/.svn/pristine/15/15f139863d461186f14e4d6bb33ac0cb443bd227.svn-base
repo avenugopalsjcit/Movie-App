@@ -1,0 +1,202 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using SCAdminBAL;
+using System.Web.Services;
+
+namespace SCSearch.Admin
+{
+    public partial class UsersData : System.Web.UI.Page
+    {
+
+        public static UsersBAL objUsersBAL = new UsersBAL();
+        public static ProductOwnerBAL objProductOwnerBAL = new ProductOwnerBAL();
+      
+        [WebMethod]
+        public static int PostCurrentUserDetails(int ProductId, string CurrentProductOwner, string OldProductOwner)
+        {
+           
+            objProductOwnerBAL.UpdateProductOwnerDetails(ProductId, CurrentProductOwner, OldProductOwner);
+            return 1;
+
+        }
+
+        [WebMethod]
+        public static SCAdmin.GetUserDetailsService.UserDetails GetUserDetails(string EIN, string UserName, string Password)
+        {
+            var countryDesc = string.Empty;
+            SCAdmin.GetUserDetailsService.Service userDetailsService = new SCAdmin.GetUserDetailsService.Service();
+            SCAdmin.GetUserDetailsService.UserDetails objUserDetails = userDetailsService.GetUserDtls(EIN, UserName, Password);
+            if (objUserDetails != null)
+            {
+                if (objUserDetails.AllProperties != null)
+                {
+                    string[] uDetails = objUserDetails.AllProperties.ToArray();
+
+                    var query = from c in uDetails.Where(c => c.Contains("btLocationCode")) select c;
+                    if (query != null)
+                    {
+                        string datavalue = query.FirstOrDefault();
+                        string[] splitlocationcode = datavalue.Split(':');
+                        if (splitlocationcode.Length == 2)
+                        {
+                            string Locationcode = splitlocationcode[1];
+                            SCAdmin.GetUserDetailsService.LocationDetails objLocationDetails = userDetailsService.GetLocationDetails(Locationcode);
+                            countryDesc = objLocationDetails.btCountryDescription;
+                            objUserDetails.EIN = objUserDetails.EIN + ":" + countryDesc;
+                        }
+                        else
+                        {
+                            objUserDetails.EIN = objUserDetails.EIN;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                objUserDetails.EIN = objUserDetails.EIN;
+            }
+
+            return objUserDetails;
+        }
+
+       
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        [WebMethod]
+        public static List<UserStatus> GetUserStatus()
+        {
+            return objUsersBAL.GetUserStatus();
+        }
+
+        [WebMethod]
+        public static int CreateUserStatus(int UserStatusId, string UserStatusDesc, string User_id)
+        {
+            UserStatus userStatus = new UserStatus();
+            int status = objUsersBAL.CreateUserStatus(UserStatusId, UserStatusDesc, User_id);
+            //if (status != 0)
+            //{
+            //    userStatus = objUsersBAL.GetUserStatus(-1);
+            //}
+
+            return status;
+        }
+
+        [WebMethod]
+        public static UserStatus UpdateUserStatus(int UserStatusId, string UserStatusDesc, string User_id)
+        {
+            UserStatus userStatus = new UserStatus();
+            int status = objUsersBAL.UpdateUserStatus(UserStatusId, UserStatusDesc, User_id);
+            if (status != 0)
+            {
+                userStatus = objUsersBAL.GetUserStatus(UserStatusId)[0];
+            }
+            return userStatus;
+
+        }
+
+        [WebMethod]
+        public static int DeleteUserStatus(int UserStatusId)
+        {
+            return objUsersBAL.DeleteUserStatus(UserStatusId);
+        }
+
+        [WebMethod]
+        public static List<UserCategory> GetUserCategory()
+        {
+            return objUsersBAL.GetUserCategory();
+        }
+
+        [WebMethod]
+        public static UserCategory CreateUserCategory(int UserCategoryId, string UserCategoryDesc, string User_id)
+        {
+            UserCategory userCategory = new UserCategory();
+
+            int status = objUsersBAL.CreateUserCategory(UserCategoryId, UserCategoryDesc, User_id);
+            if (status != 0)
+            {
+                userCategory = objUsersBAL.GetUserCategory(UserCategoryId)[0];
+            }
+            return userCategory;
+        }
+
+        [WebMethod]
+        public static UserCategory UpdateUserCategory(int UserCategoryId, string UserCategoryDesc, string User_id)
+        {
+            UserCategory userCategory = new UserCategory();
+            int status = objUsersBAL.UpdateUserCategory(UserCategoryId, UserCategoryDesc, User_id);
+            if (status != 0)
+            {
+                userCategory = objUsersBAL.GetUserCategory(UserCategoryId)[0];
+            }
+            return userCategory;
+        }
+
+        [WebMethod]
+        public static int DeleteUserCategory(int UserCategoryId)
+        {
+            return objUsersBAL.DeleteUserCategory(UserCategoryId);
+        }
+
+        [WebMethod]
+        public static List<ProductOwnerStatus> GetProductOwnerStatus()
+        {
+            return objUsersBAL.GetProductOwnerStatus();
+        }
+
+        [WebMethod]
+        public static ProductOwnerStatus CreateProductOwnerStatus(int ProductOwnerStatusId, string ProductOwnerStatusDesc, string User_id)
+        {
+            ProductOwnerStatus productOwnerStatus = new ProductOwnerStatus();
+            int status = objUsersBAL.CreateProductOwnerStatus(ProductOwnerStatusId, ProductOwnerStatusDesc, User_id);
+            if (status != 0)
+            {
+                productOwnerStatus = objUsersBAL.GetProductOwnerStatus(ProductOwnerStatusId)[0];
+            }
+            return productOwnerStatus;
+        }
+
+        [WebMethod]
+        public static ProductOwnerStatus UpdateProductOwnerStatus(int ProductOwnerStatusId, string ProductOwnerStatusDesc, string User_id)
+        {
+            ProductOwnerStatus productOwnerStatus = new ProductOwnerStatus();
+            int status = objUsersBAL.UpdateProductOwnerStatus(ProductOwnerStatusId, ProductOwnerStatusDesc, User_id);
+            if (status != 0)
+            {
+                productOwnerStatus = objUsersBAL.GetProductOwnerStatus(ProductOwnerStatusId)[0];
+            }
+            return productOwnerStatus;
+        }
+
+        [WebMethod]
+        public static int DeleteProductOwnerStatus(int ProductOwnerStatusId)
+        {
+            return objUsersBAL.DeleteProductOwnerStatus(ProductOwnerStatusId);
+        }
+
+        [WebMethod]
+        public static List<ProductOwnerDetails> GetProductOwnerDetails()
+        {
+            return objProductOwnerBAL.GetProductOwnersDetails();
+        }
+
+
+        //[WebMethod]
+        //public static int DeleteUserAccess(int empId)
+        //{
+        //    return objUsersBAL.DeleteUserStatus(empId);
+        //}
+
+        //[WebMethod]
+        //public static int UpdateUserAccess(int catId, string UsrStatcd, string UsrEmail, int UsrId, int EmpId)
+        //{
+        //    return objUsersBAL.UpdateUserAccess(catId,UsrStatcd,UsrEmail,UsrId,EmpId);
+        //}
+    }
+}

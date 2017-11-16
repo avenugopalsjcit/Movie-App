@@ -1,0 +1,73 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using ProductDefinations.SCAdminBAL;
+using System.Web.Services;
+using SCAdminBAL;
+namespace SCAdmin
+{
+    public partial class ProductDefLastTwolinks : System.Web.UI.Page
+    {
+        public static PoPTypeMappingBAL objPoPTypeMappingBAL = new PoPTypeMappingBAL();
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+
+        }
+        [WebMethod]
+        public static int GetFieldValue()
+        {
+            return objPoPTypeMappingBAL.GetFieldValue();
+        }
+        //[WebMethod]
+        //public static List<int> APEPOPTYPEIDs()
+        //{
+        //    return objPoPTypeMappingBAL.APEPOPTYPEIDs();
+        //}
+        [WebMethod]
+        public static List<PoPTypeMapping> UnassignAccessMethods(int FieldValue)
+        {
+            return objPoPTypeMappingBAL.UnassignAccessMethods(FieldValue);
+        }
+        [WebMethod]
+        public static List<PoPTypeMapping> GetAllGPOPs(int FieldValue)
+        {
+            return objPoPTypeMappingBAL.GetAllGPOPs(FieldValue);
+        }
+
+        [WebMethod]
+
+        public static List<PoPTypeMapping> GetAllAPOPs(int FieldValue)
+        {
+            return objPoPTypeMappingBAL.GetAllAPOPs(FieldValue);
+
+        }
+
+        [WebMethod]
+        public static List<PoPTypeMapping> GetAllLLPOPs(int FieldValue)
+        {
+            return objPoPTypeMappingBAL.GetAllLLPOPs(FieldValue);
+        }
+
+        [WebMethod]
+        public static int PoPTypesInsert(int[] PoPTypeIDs, string SourceID,string TargetID)
+        {
+            //if (PoPTypeIDs.Length > 1)
+            //{
+            //}
+            //int[] PoPIDs = { };
+            //PoPIDs = PoPTypeIDs.Split(',');
+
+            //int [] aData={0};
+            return objPoPTypeMappingBAL.PoPTypesInsert(PoPTypeIDs, SourceID, TargetID);
+        }
+        [WebMethod]
+        public static int PopTypesDelete(int[] PoPTypeIDs, string SourceID, string TargetID)
+        {
+            return objPoPTypeMappingBAL.PopTypesDelete(PoPTypeIDs, SourceID, TargetID);
+        }
+    }
+}

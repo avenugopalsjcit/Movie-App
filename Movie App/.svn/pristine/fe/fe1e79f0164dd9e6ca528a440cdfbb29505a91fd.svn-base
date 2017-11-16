@@ -1,0 +1,153 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+   public class AdminAddressViewDAL
+    {
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+        public DataTable GetGridAdminAddressDAL()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"Select address_id, agent_name, address_desc x_name 
+                     from csu_address a, csu_ref_agent b where a.agent_id = b.agent_id 
+                     order by upper(address_desc) ";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public DataSet GetAdminAddressDetails()
+        {
+
+            OracleCommand cmd = new OracleCommand("GetAdminAddressView", oConn);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.Add("PARAM", OracleDbType.Varchar2).Value = ""; //3967;// pcityid;
+            cmd.Parameters.Add("paramint", OracleDbType.Int32).Value = 0; //3465;// phub_site_id;
+            cmd.Parameters.Add("p_recordset1", OracleDbType.RefCursor, ParameterDirection.Output);
+            cmd.Parameters.Add("p_recordset2", OracleDbType.RefCursor, ParameterDirection.Output);
+            cmd.Parameters.Add("p_recordset3", OracleDbType.RefCursor, ParameterDirection.Output);
+            cmd.Parameters.Add("p_recordset4", OracleDbType.RefCursor, ParameterDirection.Output);
+            cmd.Parameters.Add("p_recordset5", OracleDbType.RefCursor, ParameterDirection.Output);
+            cmd.Parameters.Add("p_recordset6", OracleDbType.RefCursor, ParameterDirection.Output);
+            DataSet dsgeneral = new DataSet();
+            dad = new OracleDataAdapter(cmd);
+            dsgeneral = new DataSet();
+            dad.Fill(dsgeneral);
+            return dsgeneral;
+
+
+        }
+
+        public DataTable GetGridAdminBtgfr()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"select btgfr,description from csu_btgfr where btgfr > '0' order by btgfr asc,description";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public int MaxAvailCD()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"Select Max(avail_cd) from CSU_REF_AVAILABILITY";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str));
+        }
+
+        public int AdminAvailInsert(string strAvailCd, string strAvailDesc, string strAvailAbbr, string strAvailValidCd, string User_id)
+        {
+            int validbool = 0;
+            DateTime date = DateTime.ParseExact(DateTime.Now.Date.ToShortDateString(), "dd/MM/yyyy", null);
+            string end_date = String.Format("{0:dd-MMM-yyyy}", date);
+
+            if (Convert.ToBoolean(strAvailValidCd) == true)
+            {
+                validbool = 1;
+            }
+            else
+            {
+                validbool = 0;
+            }
+            int id = Convert.ToInt32(strAvailCd);
+
+            string str = @"INSERT INTO CSU_REF_AVAILABILITY ( AVAIL_CD, AVAIL_DESC, AVAIL_ABBR,CREATED_EMP_ID,
+                        AVAIL_VALID_CD,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT) VALUES (" + id + ",'" + strAvailDesc + "' ,'"
+                        + strAvailAbbr + "','" + User_id + "'," + validbool + ",'" + end_date + "','" + User_id + "','" + end_date + "')";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+
+        public int AdminAvailUpdate(string strAvailDesc, string strAvailAbbr, string strAvailvalidCd, string User_id, string strAvailCd)
+        {
+
+            int validbool = 0;
+            DateTime date = DateTime.ParseExact(DateTime.Now.Date.ToShortDateString(), "dd/MM/yyyy", null);
+            string end_date = String.Format("{0:dd-MMM-yyyy}", date);
+
+            if (Convert.ToBoolean(strAvailvalidCd) == true)
+            {
+                validbool = 1;
+            }
+            else
+            {
+                validbool = 0;
+            }
+            int id = Convert.ToInt32(strAvailCd);
+            string str = @"update CSU_REF_AVAILABILITY set  
+                        avail_desc='" + strAvailDesc + "',avail_abbr='" + strAvailAbbr + "', avail_valid_cd =" + validbool +
+                            ", updated_emp_id ='" + User_id + "',updated_dt='" + end_date + "' where avail_cd =" + id;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+
+        public int AdminAvailDelete(string strAvailCd)
+        {
+
+            string str = @"Delete from CSU_REF_AVAILABILITY where avail_cd =" + strAvailCd;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+        public DataTable AdminAvailPopupGrid(string strAvailCd)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"select CREATED_EMP_ID,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT from CSU_REF_AVAILABILITY where avail_cd =" + strAvailCd;
+            //OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+        }
+    }
+}

@@ -1,0 +1,276 @@
+﻿
+(function (ng, app) {
+    app.controller("Controllers.UsersDataCtrl", function ($scope, userDatafactory, $rootScope) {
+        $(".pageLoaderOverlay").show();
+        $scope.DataLoadCount = 0;
+        $scope.$watchCollection('DataLoadCount', function (newNames, oldNames) {
+            if ($scope.DataLoadCount == 3) {
+                $(".pageLoaderOverlay").hide();
+            }
+        });
+        $scope.UserStatus = [];
+        userDatafactory.GetUserStatus().success(function (data) {
+            $scope.UserStatus = data.d;
+            $scope.DataLoadCount++;
+        })
+        .error(function (error) {
+            // alert("Problem occured while loading products; " + error);
+        });
+
+        userDatafactory.GetUserCategory(0).success(function (data) {
+            $scope.UserCategory = data.d;
+            $scope.DataLoadCount++;
+        })
+        .error(function (error) {
+            // alert("Problem occured while loading products; " + error);
+        });
+
+        userDatafactory.GetProductOwnerStatus(0).success(function (data) {
+            $scope.ProductOwnerStatus = data.d;
+
+            $scope.DataLoadCount++;
+        })
+        .error(function (error) {
+            // alert("Problem occured while loading products; " + error);
+        });
+
+
+        //    $http.post('UsersData.aspx/GetProductOwnerDetails', {}).success(function (data) {
+        //       
+        //    })
+        //        .error(function (error) {
+        //            // alert("Problem occured while loading products; " + error);
+        //        });
+
+        $scope.EditRecord = function (Id) {
+
+            if ($.trim($('#' + Id).find('td').first().text()) != '') {
+
+                $('#' + Id).find('td').first().html("<input type='text' maxlength='19' value='" + $.trim($('#' + Id).find('td').first().text()) + "'></input>");
+                $('#' + Id).find('span').first().hide();
+                $('#' + Id).find('span').first().next().show();
+
+            }
+        }
+
+        $scope.UpdateRecord = function (Id, RecordId, TableId) {
+
+            if ($.trim($('#' + Id).find('input').first().val()) != '') {
+                var desc = $.trim($('#' + Id).find('input').first().val());
+                if (TableId == 1) {
+                    userDatafactory.UpdateUserStatus(RecordId, desc, $rootScope.User_Id).success(function (data) {
+                        $scope.UserStatus.forEach(function (item) {
+                            if (item.UserStatusId == RecordId) {
+                                item.UserStatusDesc = data.d.UserStatusDesc;
+                                item.UpdatedBy = data.d.UpdatedBy;
+                                item.UpdatedDate = data.d.UpdatedDate;
+                            }
+                        });
+                        //                        alert(JSON.stringify(data.d));
+                    })
+        .error(function (error) {
+            // alert("Problem occured while loading products; " + error);
+        });
+                } else if (TableId == 2) {
+                    userDatafactory.UpdateUserCategory(RecordId, desc, $rootScope.User_Id).success(function (data) {
+                        $scope.UserCategory.forEach(function (item) {
+                            if (item.UserCategoryId == RecordId) {
+                                item.UserCategoryDesc = data.d.UserCategoryDesc;
+                                item.UpdatedBy = data.d.UpdatedBy;
+                                item.UpdatedDate = data.d.UpdatedDate;
+                            }
+                        });
+                        //                        alert(JSON.stringify(data.d));
+                    })
+        .error(function (error) {
+            // alert("Problem occured while loading products; " + error);
+        });
+
+                } else if (TableId == 3) {
+
+                    userDatafactory.UpdateProductOwnerStatus(RecordId, desc, $rootScope.User_Id).success(function (data) {
+                        $scope.ProductOwnerStatus.forEach(function (item) {
+                            if (item.ProductOwnerStatusId == RecordId) {
+                                item.ProductOwnerStatusDesc = data.d.ProductOwnerStatusDesc;
+                                item.UpdatedBy = data.d.UpdatedBy;
+                                item.UpdatedDate = data.d.UpdatedDate;
+                            }
+                        });
+                        //                        alert(JSON.stringify(data.d));
+                    })
+        .error(function (error) {
+            // alert("Problem occured while loading products; " + error);
+        });
+
+                }
+
+
+                $('#' + Id).find('td').first().html($.trim($('#' + Id).find('input').first().val()));
+                $('#' + Id).find('span').first().show();
+                $('#' + Id).find('span').first().next().hide();
+
+            }
+            else {
+                $('#' + Id).find('td').first().html("<input type='text' value=''></input>" + "<br /><span style='color:Red;' class='Arrow'> The Description cannot be blank</span>");
+            }
+        }
+
+        $scope.CancelUpdate = function (Id, data) {
+
+            $('#' + Id).find('td').first().html(data);
+            $('#' + Id).find('span').first().show();
+            $('#' + Id).find('span').first().next().hide();
+            $('#' + Id).find('td').first().find('span').hide();
+
+        }
+
+        $scope.DeleteRecord = function (Id, RecordId, TableId, data) {
+            var TableDesc = ($('#' + Id).find('td').first().html());
+            bootbox.confirm({
+                "className": "my-custom-class",
+                message: "Are you sure to delete " + TableDesc + "?",
+                callback: function (result) {
+                    if (result) {
+                        $scope.DeleteRecordConfirm(Id, RecordId, TableId);
+                    }
+                }
+            });
+
+        }
+
+        $scope.DeleteRecordConfirm = function (Id, RecordId, TableId) {
+
+
+
+            if (TableId == 1) {
+                userDatafactory.DeleteUserStatus(RecordId).success(function (data) {
+
+                    var tableData = [];
+                    if (data.d == 1) {
+                        $scope.UserStatus.forEach(function (item) {
+                            if (item.UserStatusId != RecordId) {
+                                tableData.push(item);
+                            }
+                        });
+                        $scope.UserStatus = tableData;
+                    }
+                    else if (data.d == 2) {
+                        bootbox.alert({ "className": "my-custom-class", message: "User Status is already mapped to existing Users and hence you will not be able to delete it" });
+                    }
+                    //$('#' + Id).hide();
+                })
+        .error(function (error) {
+            // alert("Problem occured while loading products; " + error);
+        });
+            } else if (TableId == 2) {
+
+                userDatafactory.DeleteUserCategory(RecordId).success(function (data) {
+
+                    var tableData = [];
+                    if (data.d == 1) {
+                        $scope.UserCategory.forEach(function (item) {
+                            if (item.UserCategoryId != RecordId) {
+                                tableData.push(item);
+                            }
+                        });
+                        $scope.UserCategory = tableData;
+                    }
+                    else if (data.d == 2) {
+                        bootbox.alert({ "className": "my-custom-class", message: "User Category is already mapped to existing Users and hence you will not be able to delete it" });
+                    }
+                    //$('#' + Id).hide();
+                })
+        .error(function (error) {
+            // alert("Problem occured while loading products; " + error);
+        });
+
+            } else if (TableId == 3) {
+
+                userDatafactory.DeleteProductOwnerStatus(RecordId).success(function (data) {
+
+                    var tableData = [];
+                    if (data.d == 1) {
+                        $scope.ProductOwnerStatus.forEach(function (item) {
+                            if (item.ProductOwnerStatusId != RecordId) {
+                                tableData.push(item);
+                            }
+                        });
+                        $scope.ProductOwnerStatus = tableData;
+                    }
+                    else if (data.d == 2) {
+                        bootbox.alert({ "className": "my-custom-class", message: "Product Owner status is already mapped to existing Product Owners and hence you will not be able to delete it" });
+                    }
+                    //$('#' + Id).hide();
+                })
+        .error(function (error) {
+            // alert("Problem occured while loading products; " + error);
+        });
+
+            }
+
+        }
+
+
+        $scope.CreateRecord = function (Id, TableId, ErrorId) {
+            if ($('#' + Id).val() == "") {
+                $("#" + ErrorId).show();
+                return false;
+            }
+            else {
+                $("#" + ErrorId).hide();
+            }
+
+            if (TableId == 1) {
+                var id = $scope.UserStatus.length + 1;
+                userDatafactory.CreateUserStatus(id, $('#' + Id).val(), $rootScope.User_Id).success(function (data) {
+                    if (data.d == 1) {
+                        $(".pageLoaderOverlay").show();
+                        $scope.UserStatus = [];
+                        userDatafactory.GetUserStatus(-1).success(function (data) {
+                            $scope.UserStatus = data.d;
+                            $scope.DataLoadCount++;
+                            $(".pageLoaderOverlay").hide();
+                        })
+        .error(function (error) {
+            $(".pageLoaderOverlay").hide();
+            // alert("Problem occured while loading products; " + error);
+        });
+                    }
+                    //$scope.UserStatus.push(data.d);
+                })
+        .error(function (error) {
+            // alert("Problem occured while loading products; " + error);
+        });
+
+            } else if (TableId == 2) {
+                var id = $scope.UserCategory.length + 1;
+                $(".pageLoaderOverlay").show();
+                userDatafactory.CreateUserCategory(id, $('#' + Id).val(), $rootScope.User_Id).success(function (data) {
+
+                    $scope.UserCategory.push(data.d);
+                    $(".pageLoaderOverlay").hide();
+                })
+        .error(function (error) {
+            $(".pageLoaderOverlay").hide();
+            // alert("Problem occured while loading products; " + error);
+        });
+            } else if (TableId == 3) {
+                var id = $scope.ProductOwnerStatus.length;
+                $(".pageLoaderOverlay").show();
+                userDatafactory.CreateProductOwnerStatus(id, $('#' + Id).val(), $rootScope.User_Id).success(function (data) {
+
+                    $scope.ProductOwnerStatus.push(data.d);
+                    $(".pageLoaderOverlay").hide();
+                })
+        .error(function (error) {
+            $(".pageLoaderOverlay").hide();
+            // alert("Problem occured while loading products; " + error);
+        });
+            }
+            $('#' + Id).val("");
+        }
+
+    });
+
+
+} (angular, app));

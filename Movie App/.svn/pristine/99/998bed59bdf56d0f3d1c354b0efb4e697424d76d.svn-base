@@ -1,0 +1,156 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+  public  class AdminGlossaryViewDAL
+    {
+
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+      public DataTable GetGridAdminDocumentation(string AccessLevel, string user_id)
+      {
+          GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            
+          string str = string.Empty;
+          if (AccessLevel == "1")
+          {
+              str = @"Select Term_name, Product_Name, b.Product_Cd 	from CSU_Glossary a,CSU_Product b where a.Product_Cd = b.Product_Cd";
+          }
+
+          OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+          return objGetDataFromDB.GetDataTable(str.ToString());
+
+      }
+
+
+      public DataTable GetGridAdminGlossaryProduct(string AccessLevel, string user_id)
+      {
+          GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+          string str = string.Empty;
+          if (AccessLevel == "1")
+          {
+              str = @"Select Product_cd, product_name from CSU_PRODUCT order by Upper(Product_name)";
+          }
+
+
+          OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+          return objGetDataFromDB.GetDataTable(str.ToString());
+
+      }
+      
+      public DataTable GetAdminGlossary(string ProductCD,string TermName)
+      {
+          GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+          string str = string.Empty;
+         
+              str = @"Select Term_id, Term_Desc from CSU_Glossary WHERE Trim(Term_Name)='"+TermName+"'  AND Product_Cd="+ProductCD;
+       
+
+          OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+          return objGetDataFromDB.GetDataTable(str.ToString());
+
+      }
+
+      public void GetAdminInsertIndicatorGlossary(string ProductCD, string TermName, string TermDesc, string User_id)
+              {
+                  GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+                  string str = string.Empty;
+                  OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+                  string[] productCD = ProductCD.Split(',');
+                  for (int i = 0; i < productCD.Length; i++)
+                  {
+                      if (productCD[i] != "")
+                      {
+                          str = @"Select count(*) from CSU_Glossary WHERE Product_Cd = " + productCD[i] + " AND Term_Name = '" + TermName + "'";
+                         
+
+
+                          int status = Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str.ToString()));
+
+                          if (status == 0)
+                          {
+                              InsertGlossary(productCD[i], TermName, TermDesc, User_id);
+                          }
+                          else
+                          {
+                              UpdateGlossary(productCD[i], TermName, TermDesc, User_id);
+                          }
+                      }
+                  }
+
+              }
+      public void InsertGlossary(string ProductCD,string TermName,string TermDesc,string User_id)
+      {
+          //int count = 0;
+          
+          oConn.Open();
+          OracleCommand cmd = new OracleCommand("Insert_Glossary", oConn);
+          cmd.CommandType = CommandType.StoredProcedure;
+
+          cmd.Parameters.Add("p_product_cd", OracleDbType.Varchar2).Value = ProductCD; //3465;// phub_site_id;
+          cmd.Parameters.Add("p_term_name", OracleDbType.Varchar2).Value = TermName;
+          cmd.Parameters.Add("p_term_desc", OracleDbType.Varchar2).Value = TermDesc;
+          cmd.Parameters.Add("p_created_emp_id", OracleDbType.Varchar2).Value = User_id;
+          cmd.Parameters.Add("pglossaryid", OracleDbType.Int32, ParameterDirection.Output);
+          cmd.ExecuteNonQuery();
+          oConn.Close();
+          
+      }
+
+      public void UpdateGlossary(string ProductCD, string TermName, string TermDesc, string User_id)
+      {
+          //int count = 0;
+          oConn.Open();
+          OracleCommand cmd = new OracleCommand("Update_Glossary", oConn);
+          cmd.CommandType = CommandType.StoredProcedure;
+
+          cmd.Parameters.Add("p_product_cd", OracleDbType.Varchar2).Value = ProductCD; //3465;// phub_site_id;
+          cmd.Parameters.Add("p_term_name", OracleDbType.Varchar2).Value = TermName;
+          cmd.Parameters.Add("p_description", OracleDbType.Varchar2).Value = TermDesc;
+          cmd.Parameters.Add("p_user_id", OracleDbType.Varchar2).Value = User_id;
+         // cmd.Parameters.Add("pglossaryid", OracleDbType.Int32, ParameterDirection.Output);
+          cmd.ExecuteNonQuery();
+          oConn.Close();
+         
+      }
+
+
+      public int AdminGlossaryDelete(string TermName,string ProductCD)
+      {
+
+          string str = @" Delete from CSU_Glossary where Term_Name = '"+TermName+"' and Product_cd = " +ProductCD;
+          OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+          oConn.Open();
+          int status = cmd.ExecuteNonQuery();
+          oConn.Close();
+          return status;
+      }
+
+      public DataTable AdminGlossaryPopupGrid(string strAvailCd)
+      {
+          GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+          string str = @"       SELECT CREATED_EMP_ID,  TO_CHAR(CREATED_DT,'DD-MON-YYYY HH24:MI') AS CREATED_DT,  UPDATED_EMP_ID,
+  TO_CHAR(UPDATED_DT,'DD-MON-YYYY HH24:MI') AS UPDATED_DT FROM CSU_Glossary WHERE Term_Id =" + strAvailCd;
+          //OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+          OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+          return objGetDataFromDB.GetDataTable(str.ToString());
+      }
+    }
+}

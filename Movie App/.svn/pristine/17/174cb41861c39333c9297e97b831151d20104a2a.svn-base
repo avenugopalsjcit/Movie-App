@@ -1,0 +1,99 @@
+﻿app.controller("Controllers.SLABuilderFileCtrl", function ($scope, SLA, $http, JSONToCSVConvertor) {
+
+    SLA.getProducts().success(function (data) {
+        $("#Go1").hide();
+
+        //$scope.ProductsList = data.d;
+
+        $scope.ProductsList = $.grep(data.d, function (e) {
+            e.product_id == 75 
+         });
+
+
+        $("#DDL_Product").select2({});
+    });
+
+
+    $scope.Filetypes = ["BT Base Line", "Cos Table 1", "Cos Table 4", "Cos Table 5", "SLA Master"];
+    $("#Go1").show();
+
+
+    $scope.SelectedItemFiletype = function (index) {
+//        if ($scope.item1 == null) {
+//            $("#prodspan").show();
+//            return;
+//        }
+//        else {
+            $("#Go1").show();
+            $http.post("SLAMaster.aspx/getDataFromDB",
+                                  {
+                                      'FiletypeId': index,
+                                      'ProductId': 75
+                                  }).success(function (data) {
+                                      $scope.Getdatatable = JSON.parse(data.d).getFile;
+                                      switch (index) {
+                                          case 0:
+                                              JSONToCSVConvertor.ConvertJSONToCSV($scope.Getdatatable, true, "BT Base Line", "csvDownloadFrame");
+                                              break;
+                                          case 1:
+                                              JSONToCSVConvertor.ConvertJSONToCSV($scope.Getdatatable, true, "Cos Table 1", "csvDownloadFrame");
+                                              break;
+                                          case 2:
+                                              JSONToCSVConvertor.ConvertJSONToCSV($scope.Getdatatable, true, "Cos Table 4", "csvDownloadFrame");
+                                              break;
+                                          case 3:
+                                              JSONToCSVConvertor.ConvertJSONToCSV($scope.Getdatatable, true, "Cos Table 5", "csvDownloadFrame");
+                                              break;
+                                          case 4:
+                                              JSONToCSVConvertor.ConvertJSONToCSV($scope.Getdatatable, true, "SLA Master", "csvDownloadFrame");
+                                              break;
+                                      }
+                                      $("#Go1").hide();
+                                  }).error(function (data) {
+                                      $("#Go1").hide();
+                                      console.log("error");
+                                  });
+      //  }
+    }
+
+
+//    $scope.ProdChange = function (item) {
+//        if (item == null) {
+//            $("#prodspan").show();
+//            return false
+//        }
+//        else {
+//            $("#prodspan").hide();
+//        }
+//    }
+
+    //    $scope.ProdChange = function (item) {
+    //        if (item == null) {
+    //            $("prodspan").show();
+    //        }
+    //    }
+
+
+    //    $scope.ProdChange1 = function (item) {
+    //        if (item == null) {
+    //            $("prodspan").show();
+    //        }
+    //    }
+
+    //    $scope.ProdChange1 = function (item) {
+
+    //        if (item == null) {
+    //            $("#prodspan").show();
+    //            return false;
+    //        }
+    //        else {
+    //            $("#prodspan").hide();
+
+    //        }
+    //    }
+
+    //   
+
+
+
+});

@@ -1,0 +1,228 @@
+﻿<div ng-controller="PortToAccessSpeedCtrl">
+
+    <div class="row" style="padding-left: 10px">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class=" ">
+                <div class="panel-body Arrow">
+                <h3  class="Arrow">Admin - Port Speed to Access Speed Mapping</h3>
+                <div class="row">
+                <div class="col-lg-12">
+                    <div class="">
+                        
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#PortSpeed" data-toggle="tab">Port Speed</a>
+                                </li>
+                                <li><a href="#PortSpeedUpDown" data-toggle="tab">Port Speed (Down/Up)</a>
+                                </li>
+                            </ul>
+
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="PortSpeed">
+                                 <div class="row col-lg-12"  style="height:40px";>
+                                  <div class="col-lg-2">
+                                         <label class="control-label pull-left Arrow" style="text-align:left;" for="inputDescription">
+                                    Product Speed </label>
+                                       </div>
+                                 <div class="col-lg-5">
+                                  <select id="PortSpeedModel" ng-model="PortSpeedModel" ng-change="GetPortDetails(PortSpeedModel,'NORMAL')" ng-options="item.CHAR_NAME for item in PortSpeedsList track by item.CHAR_ID"   required  style="width:100%;" >
+                                                <option value="">-- Select Port Speed --</option>
+                                    
+                                 </select>
+                                  </div>
+                                  </div>
+                                    <div ng-show="PortToAccessSpeedData.data.length==0" class="alert alert-danger Arrow" role="alert">
+                       No Port(s) present.
+                   </div>
+                                    <div ng-show="PortToAccessSpeedData.data.length!=0"  >
+                        <table ng-table="PortToAccessSpeedTable" class="table table-striped table-bordered " show-filter="true">
+                            <tr ng-repeat="ports in $data" id="portData{{$index}}">
+                                <td title="'Port Speed'" sortable="'PortSpeed'" class="Arrow" filter="{ 'PortSpeed': 'text' }">
+                                  {{ports.PortSpeed}}
+                                  <!-- <u><a href="#" ng-click="OpenEditReportPopUp(report.ProductId,'',report.ReportCD,report.reportDescription,report.reportLocLevelCD,report.reportPathDesc,report.reportValidCD,report.reportAbbr,'Report','','',modProduct)">{{report.reportDescription}}</a></u>-->
+                                </td>
+                                 <td title="'Currently Mapped Access Speed'"  sortable="'MappedAccessSpeedDescription'"  class="Arrow" filter="{ 'MappedAccessSpeedDescription': 'text' }">
+                                  <ul class="uiStyle">
+                                         <li ng-repeat="item in ports.lstMappedAccessSpeed" class="listyle">
+                                          {{item.MappedAccessSpeedDescription}}
+                                            <label style="display:none;">{{item.charID}}</label>
+                                          </li>
+                                          </ul>
+                                </td>
+                             
+                               <!-- <td title="'Created User/Date'"  sortable="'CREATED_DT'"  class="Arrow" filter="{ 'CREATED_DT': 'text' }">
+                                  {{report.CREATED_EMP_ID}}<br /> {{report.CREATED_DT}}
+                                </td>
+                                 <td title="'Updated User/Date'"  sortable="'UPDATED_DT'"  class="Arrow" filter="{ 'UPDATED_DT': 'text' }">
+                                   {{report.UPDATED_EMP_ID}}<br /> {{report.UPDATED_DT}}
+                                </td>-->
+                                <td data-title="'Action'"  class="Arrow">
+                                <button class="btn btn-default btn-sm" ng-click="OpenEditPortSpeedPopUp(PortSpeedModel,'NORMAL')" title="Edit"><span class="glyphicon glyphicon-pencil"></span></button>
+                                 
+                             
+                                <label style="display:none;">{{ports.CHAR_ID}}</label>
+                               
+                                 
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="PortSpeedUpDown">
+                                       <div class="row col-lg-12" style="height:40px";>
+                                       <div class="col-lg-2">
+                                         <label class="control-label pull-left Arrow" style="text-align:left;" for="inputDescription">
+                                    HVPN Product Speed </label>
+                                       </div>
+                                 <div class="col-lg-5">
+                                  <select id="HVPNPortSpeedModel" ng-model="HVPNPortSpeedModel" ng-change="GetPortDetails(HVPNPortSpeedModel,'HVPN')" ng-options="item.CHAR_NAME for item in HVPNPortSpeedsList  track by item.CHAR_ID"   required  style="width:100%;" >
+                                                <option value="">-- Select HVPN Port Speed --</option>
+                                    
+                                 </select>
+                                  </div>
+                                  </div>
+                                   <div ng-show="PortToAccessSpeedUpDownData.data.length==0" class="alert alert-danger Arrow" role="alert">
+                       No Port(s) present.
+                                  </div>
+                                   <div ng-show="PortToAccessSpeedUpDownData.data.length!=0"  >
+                        <table ng-table="PortToAccessSpeedUpDownDataTable" class="table table-striped table-bordered " show-filter="true">
+                            <tr ng-repeat="ports in $data" id="Tr1">
+                                <td title="'Port Speed (Down/Up)'" sortable="'PortSpeed'" class="Arrow" filter="{ 'PortSpeed': 'text' }">
+                                  {{ports.PortSpeed}}
+                                  <!-- <u><a href="#" ng-click="OpenEditReportPopUp(report.ProductId,'',report.ReportCD,report.reportDescription,report.reportLocLevelCD,report.reportPathDesc,report.reportValidCD,report.reportAbbr,'Report','','',modProduct)">{{report.reportDescription}}</a></u>-->
+                                </td>
+                                 <td title="'Currently Mapped Access Speed (Down/Up)'"  sortable="'MappedAccessSpeedDescription'"  class="Arrow" filter="{ 'MappedAccessSpeedDescription': 'text' }">
+                                  <ul class="uiStyle">
+                                         <li ng-repeat="item in ports.lstMappedAccessSpeed" class="listyle">
+                                          {{item.MappedAccessSpeedDescription}}
+                                            <label style="display:none;">{{item.charID}}</label>
+                                          </li>
+                                          </ul>
+                                </td>
+                             
+                               <!-- <td title="'Created User/Date'"  sortable="'CREATED_DT'"  class="Arrow" filter="{ 'CREATED_DT': 'text' }">
+                                  {{report.CREATED_EMP_ID}}<br /> {{report.CREATED_DT}}
+                                </td>
+                                 <td title="'Updated User/Date'"  sortable="'UPDATED_DT'"  class="Arrow" filter="{ 'UPDATED_DT': 'text' }">
+                                   {{report.UPDATED_EMP_ID}}<br /> {{report.UPDATED_DT}}
+                                </td>-->
+                                <td data-title="'Action'"  class="Arrow">
+                             <button class="btn btn-default btn-sm" ng-click="OpenEditPortSpeedPopUp(HVPNPortSpeedModel,'HVPN')" title="Edit"><span class="glyphicon glyphicon-pencil"></span></button>
+                                 
+                             
+                                <label style="display:none;">{{ports.CHAR_ID}}</label>
+                               
+                                 
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                                </div>
+                               
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                    <div class="form-horizontal">
+                        <div class="form-group ">
+                        <!--<div class="col-sm-6">
+                            <input type="radio" name="radioPort" value="NORMAL" ng-model="checkboxSelection" ng-click="Loaddata(checkboxSelection)" checked/>  Port Speed 
+                            </div>
+                            <div  class="col-sm-6">
+                             <input type="radio" name="radioPort" value="HVPN" ng-model="checkboxSelection" ng-click="Loaddata(checkboxSelection)"/> Port Speed (Down/Up) 
+                             </div>-->
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+  
+
+    
+</div>
+<input type="text"  id="dragPortvalues" style="display:none;"/>
+<input type="text"  id="hdnPortID" style="display:none;"/>
+<input type="text"  id="hdnPortID_combined" style="display:none;"/>
+<input type="text"  id="hdnUserID" style="display:none;"/>
+  <div tabindex="-1" class="modal fade in md modalalign" id="editPortSpeedtoAccessSpeedMappingModal" role="dialog" aria-hidden="true"
+        aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title Arrow" id="H1">
+                          Admin - Edit Port Speed to Access Speed Mapping</h4>
+                    </div>
+                  <div class="container">
+                        <div class="modal-body">
+                         <form class="form-horizontal" name="userForm1" ng-submit="submitForm()" novalidate>
+                            <div class="form-group col-md-12">
+                             <div class="row" style="height:30px;">
+                             </div>
+                            <div class="row" style="height:30px;">
+                              <div class="col-sm-6">UnMapped</div>
+                              <div class="col-sm-6">Mapped</div>
+                              </div>
+                                <div id="divddlCharacteristicType" title="Drag and Drop Port Speeds to map or Unmap  Access Speed" class="row">
+                                    <!-- <select id="ddlCharacteristicType" ng-click="CharacteristicChange(Avail)"  ng-model="UOMName" ng-options="Avail.UOMId as Avail.UOMName for Avail in DropdownData"  
+                                                    style="width:15em" required>
+                                                    <option value="">--- Select ---</option>
+                                                </select>-->
+                                    <div class="col-sm-6">
+                                       <!-- <input type="text" class="control-label " style="display: none;" ng-model="CharacterTypeID"
+                                            id="CharacterTypeID" />-->
+                                        <ol data-draggable="target" id="DivUnMap">
+                                            <li ng-repeat="Avail in UnMappedPortSpeed track by $index" data-draggable="item"
+                                                title="Drag and Drop Units to map or Unmap" id="DivUnMap{{$index}}">
+                                                <p style="display: none">
+                                                    {{Avail.CHAR_ID_combined}}</p>
+                                                     <label  style="display: none" id="MapPort_charid">Avail.CHAR_ID</label>
+                                                {{Avail.CHAR_NAME}} </li>
+                                               
+                                        </ol>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <ol data-draggable="target" id="DivMap">
+                                            <li ng-repeat="Avail1 in MappedPortSpeed track by $index" data-draggable="item"
+                                                title="Drag and Drop to map or Unmap" id="DivMap{{$index}}">
+                                                <p style="display: none">
+                                                    {{Avail1.CHAR_ID_combined}}</p>
+                                                    {{Avail1.CHAR_NAME}}
+                                                     <label  style="display: none" id="UnMapPort_charid">Avail1.CHAR_ID</label>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                           
+                           
+                             </form>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                       <!-- <button class="btn btn-sm btn-primary btn-sm" value="Save" type="button"  ng-click="AddNewReport()">Save</button>
+                        <button class="btn btn-sm btn-primary btn-sm" type="button" value="Reset" ng-click="ResetReport()">Reset </button>-->
+                       <button class="btn btn-default" type="button"  ng-click="UpdateParent()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="pageLoaderOverlay">
+</div>
+ <script src="Scripts/dragdropitems.js" type="text/javascript"></script>

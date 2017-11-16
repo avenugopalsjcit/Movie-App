@@ -1,0 +1,44 @@
+﻿<div class="container" ng-controller="ManufactDistMaintReportCtrl">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+               Manufacturer – Distributor – Maintainer Report
+            </h3>
+        </div>
+    </div>
+    <br />
+    <table ng-table="ManufactSuppReportAvailability" class="table  table-bordered table-striped">
+        <tr ng-repeat="user in $data">
+            <td data-title="'Country'" sortable="'CountryName'" filter="{ CountryName : 'text'}" class="Arrow">
+                {{user.CountryName}}
+            </td>
+            <td data-title="'Product'" sortable="'ProductName'" filter="{ ProductName : 'text'}"  class="Arrow">
+                {{user.ProductName}}
+            </td>
+            <td data-title="'Manufacturer'" sortable="'ManufacturerName'" filter="{ ManufacturerName : 'text'}"  class="Arrow">
+                {{user.ManufacturerName}}
+            </td>
+            <td data-title="'Distributor'" sortable="'DistributorName'" filter="{ DistributorName : 'text'}"  class="Arrow">
+                {{user.DistributorName}}
+            </td>
+            <td data-title="'Maintainer'" sortable="'Maintainer'"  filter="{ Maintainer : 'text'}" class="Arrow">
+                {{user.Maintainer}}
+            </td>
+            <td data-title="'Installer'" sortable="'Installer'" filter="{ Installer : 'text'}"  class="Arrow">
+                {{user.Installer}}
+            </td>
+            <td data-title="'InstallerType'" sortable="'InstallerType'" filter="{ InstallerType : 'text'}"  class="Arrow">
+                {{user.InstallerType}}
+            </td>
+            <td data-title="'PricingType'" sortable="'PricingType'" filter="{ PricingType : 'text'}"  class="Arrow">
+                {{user.PricingType}}
+            </td>
+            <td data-title="'Smart Service Availability'" sortable="'SmartAvailability'" filter="{ SmartAvailability : 'text'}"  class="Arrow">
+                {{user.SmartAvailability}}
+            </td>
+        </tr>
+    </table>
+    <div class="pageLoaderOverlay">
+</div>
+</div>
+

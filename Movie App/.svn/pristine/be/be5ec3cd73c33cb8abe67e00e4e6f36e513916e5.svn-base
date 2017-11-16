@@ -1,0 +1,725 @@
+﻿
+
+app.controller("CPEBundlesCtrl", function ($scope, CPESuppliersfactory, $http, NgTableParams, $rootScope, $sce) {
+    $(".pageLoaderOverlay").show();
+    $scope.showNodataRouter = false;
+    $http.post("CPEBundles.aspx/GetCPEProducts", {
+    }).success(function (data) {
+        $scope.cpeproduct = data.d;
+        if (data.d != null && data.d.length != 0) {
+            //            data.d.forEach(function (item) {
+            //                $scope.CPEProductitem = item.ProductName;
+            //            });
+            $(".pageLoaderOverlay").hide();
+        }
+        $("#ddlProduct").select2(
+                    {
+                    });
+        $("#ddlRegion").select2(
+                    {
+                    });
+    })
+
+    $http.post("CPEBundles.aspx/GetCPERegion", {
+    }).success(function (data) {
+        $scope.cperegion = data.d;
+        if (data.d != null && data.d.length != 0) {
+            data.d.forEach(function (item) {
+                $scope.CPERegionitem = item.RegionName;
+            });
+            $(".pageLoaderOverlay").hide();
+        }
+        $("#ddlRegion").select2(
+                    {
+                    });
+        $("#ddlCountry").select2(
+                    {
+
+
+                    });
+
+    })
+
+    $(".pageLoaderOverlay").show();
+    $http.post("CPEBundles.aspx/GetCPECountry", { "RegionID": $scope.CPERegionitem
+    }).success(function (data) {
+
+        $scope.cpecountry = data.d;
+        if (data.d != null && data.d.length != 0) {
+            data.d.forEach(function (item) {
+                $scope.CPECountryitem = item.CountryName;
+            });
+            $(".pageLoaderOverlay").hide();
+        }
+        $("#ddlCountry").select2(
+                    {
+
+
+                    });
+    })
+
+    $scope.to_trusted = function (val) {
+
+        return $sce.trustAsHtml(val);
+    };
+
+
+    $scope.DisplayBundleTable = function (ProductID, RegionID, CountryID) {
+
+        $(".pageLoaderOverlay").show();
+        $scope.shownorouterselected = false;
+        $scope.shownobundleselected = false;
+        $('#idbtnshow').attr('style', 'Visibility:hidden;');
+        $('#divtable').hide();
+        var RegionID = "0";
+        $('#Div2').hide();
+
+        if ($('#ddlCountrylist .col-sm-2 #s2id_ddlCountry .select2-choice .select2-chosen').text() == "--Select--") {
+
+            $scope.showNodataRouter = false;
+            $scope.showNodata = false;
+            $('#idbtnshow').attr('style', 'Visibility:hidden;');
+            $("#rouetrmultidd option:selected").removeAttr("selected");
+            $("#bundlemultidd option:selected").removeAttr("selected");
+            $('#divtable').hide();
+            $('#Div1').hide();
+            $('#Div2').hide();
+            $(".pageLoaderOverlay").hide();
+        }
+
+        else {
+
+            $http.post("CPEBundles.aspx/GetCPERouter", { "ProductID": $scope.CPEProductitem, "RegionID": RegionID, "CountryID": $scope.CPECountryitem
+            }).success(function (data) {
+                //            $scope.cperouter = data.d;
+
+                $scope.cperouter = [];
+                if (data.d != null && data.d.length != 0) {
+                    data.d.forEach(function (item) {
+
+                        $scope.cperouter.push(item.RouterNamedd);
+                    });
+                    $scope.CPERouteritem = [];
+                    $scope.CPEBundleitem = [];
+
+                }
+                $('#Div1').attr('style', 'visibility:visible;padding-top:15px;padding-left: 0px;');
+                if (data.d.length == 0) {
+
+                    $('#ddlCountrylist').attr('style', 'padding-bottom:12px;');
+                    $scope.showNodataRouter = true;
+                    $scope.shownorouterselected = false;
+
+
+                    $scope.NodataRouter = "No Router Available for  " + $('#productselected .col-sm-2 #s2id_ddlProduct .select2-choice .select2-chosen').text() + " and  " + $('#ddlCountrylist .col-sm-2 #s2id_ddlCountry .select2-choice .select2-chosen').text();
+                    $('#Div1').attr('style', 'visibility:hidden;padding-top:15px');
+                }
+
+                $(".pageLoaderOverlay").hide();
+                $("#ddlRouter").select2(
+                    {
+                    });
+                $("#ddlBundle").select2(
+                    {
+                    });
+                if (data.d.length > 0) {
+                    $scope.showNodataRouter = false;
+
+                    $('#Div1').attr('style', 'visibility:visible;padding-top:15px;padding-left:0px;');
+                }
+            })
+
+
+
+
+
+        }
+
+
+    }
+
+
+
+
+
+    $scope.DisplayBundleTableFinal = function (ProductID, RegionID, CountryID, RouterNamedd, BundleNamedd) {
+        var RegionID = "0";
+        if ($scope.CPEProductitem == undefined || $scope.CPECountryitem == undefined || $scope.CPERouteritem == undefined || $scope.CPEBundleitem == undefined) {
+            bootbox.alert("Please select all required input parameters");
+        }
+        else {
+            $(".pageLoaderOverlay").show();
+
+
+
+            $http.post("CPEBundles.aspx/GetCPEBundleTableDetails", { "ProductID": $scope.CPEProductitem, "RegionID": RegionID, "CountryID": $scope.CPECountryitem, "RouterNamedd": $scope.CPERouteritem, "BundleNamedd": $scope.CPEBundleitem
+            }).success(function (data) {
+
+                $scope.showNodata = false;
+                if (data.d.length == 0) {
+
+
+                    $scope.showNodata = true;
+                    $('#tblbundles').hide();
+                    $('#updatebutton1').hide();
+
+                    $scope.Nodata = "No Data Available";
+                }
+
+
+                var items = data.d;
+
+
+
+
+                var index = 0;
+                $scope.validbundle = [];
+                if (data.d != null && data.d.length != 0) {
+
+                    data.d.forEach(function (item) {
+                        if (index >= 0) {
+
+                            if (item.ValidBundle == 0) {
+                                $scope.validbundle.push(false);
+                            }
+                            else {
+                                $scope.validbundle.push(true);
+                            }
+
+                        }
+                        index = index + 1;
+                    })
+                };
+
+
+
+
+
+                $scope.usersTable = new NgTableParams({ // initial grouping
+
+                }, {
+                    'dataset': data.d
+                });
+
+                if (data.d.length > 0) {
+                    $('#divtable').show();
+                    $('#tblbundles').attr('Style', 'Visibility:Visible');
+                    $('#updatebutton1').attr('Style', 'Visibility:Visible;margin-bottom: 10px; margin-left: 10px;');
+                    $('#btnshowassignedcoiuntries').attr('Style', 'margin: 0px 2px 10px 18px; padding-top: 6px; padding-right: 12px; visibility:Visible')
+                }
+                $("#tblbundles tbody tr td span").html(function (i, val) {
+                    return val.replace(/\@123@234@456/g, '<br />');
+                });
+
+                $(".pageLoaderOverlay").hide();
+            })
+
+
+        }
+
+    }
+
+
+
+
+    $scope.DisplayCountryDropDown = function (RegionID) {
+
+        $(".pageLoaderOverlay").show();
+        $scope.shownorouterselected = false;
+        $scope.shownobundleselected = false;
+        $scope.CPECountryitem = [];
+        $('#Div1').hide();
+        $('#Div2').hide();
+        $('#divtable').hide();
+        $('#idbtnshow').attr('style', 'Visibility:hidden;');
+
+        var RegionID = "0";
+        if ($('#productselected .col-sm-2 #s2id_ddlProduct .select2-choice .select2-chosen').text() == "--Select--") {
+            $('#idregiondd').hide();
+            $('#ddlCountrylist').hide();
+            $('#divtable').hide();
+            $('#idbtnshow').hide();
+            $('#Div1').hide();
+            $('#Div2').hide();
+            $(".pageLoaderOverlay").hide();
+        }
+        else {
+            $http.post("CPEBundles.aspx/GetCPECountry", { "RegionID": RegionID
+            }).success(function (data) {
+                $scope.cpecountry = data.d;
+                if (data.d != null && data.d.length != 0) {
+                    data.d.forEach(function (item) {
+                        $scope.CPECountryitem = item.CountryName;
+                    });
+                    $scope.showNodataRouter = false;
+                    $('#ddlCountrylist .col-sm-2 #s2id_ddlCountry .select2-choice .select2-chosen').html('--Select--');
+                    $('#ddlCountrylist').attr('style', 'visibility:visible');
+                    $(".pageLoaderOverlay").hide();
+                }
+
+
+            })
+        }
+    }
+
+    $scope.Bundle = [];
+
+    $scope.UpdateBundleValidity111 = function (BundleNameValues, BundleNameValuesUnchecked, Userid) {
+
+        $(".pageLoaderOverlay").show();
+        BundleNameValues = "";
+        //  $scope.Bundle = [];
+        BundleNameValuesUnchecked = "";
+        //$rootScope.User_Id = "609682300";
+        count = 0;
+        var index = -1;
+
+        var comArr = eval($scope.usersTable);
+
+
+        for (var i = 0; i < $scope.usersTable.data.length; i++) {
+            if ($(chekid)[i].checked == true) {
+
+                // $scope.Bundle.push({ "CustomBundle": $scope.usersTable.data[i].Bundle });
+                BundleNameValues += $scope.usersTable.data[i].Bundle + ",";
+
+                count = count + 1;
+            }
+        }
+
+        if (BundleNameValues != "") {
+
+            $http.post("CPEBundles.aspx/UpdateCPEBundleValidity", { "BundleNameValues": BundleNameValues, "Userid": $rootScope.User_Id }).
+                        success(function (data) {
+
+                        });
+
+        }
+
+        for (var i = 0; i < $scope.usersTable.data.length; i++) {
+            if ($(chekid)[i].checked == false) {
+                BundleNameValuesUnchecked += $scope.usersTable.data[i].Bundle + ",";
+
+                count = count + 1;
+            }
+        }
+        if (BundleNameValuesUnchecked != "") {
+            $http.post("CPEBundles.aspx/UpdateCPEBundleValidity1", { "BundleNameValuesUnchecked": BundleNameValuesUnchecked, "Userid": $rootScope.User_Id }).
+            success(function (data) {
+                $(".pageLoaderOverlay").hide();
+                bootbox.alert("Bundle validity updated succesfully");
+            });
+        }
+
+
+
+
+
+
+
+
+    }
+
+
+
+    $scope.DisplayBundleValidityStatus = function (ProductID, RegionID, CountryID, RouterNamedd, BundleNamedd) {
+
+
+        $(".pageLoaderOverlay").show();
+        $http.post("CPEBundles.aspx/GetCPEBundleTableDetails_UpdateBundleValidity", { "ProductID": $scope.CPEProductitem, "RegionID": $scope.CPERegionitem, "CountryID": $scope.CPECountryitem, "RouterNamedd": $scope.CPERouteritem, "BundleNamedd": $scope.CPEBundleitem
+        }).success(function (data) {
+
+            $scope.showNodata = false;
+            if (data.d.length == 0) {
+
+
+                $scope.showNodata = true;
+                $('#tblbundles').hide();
+
+                $scope.Nodata = "No Data Available";
+            }
+
+            var index = 0;
+            if (data.d != null && data.d.length != 0) {
+
+                data.d.forEach(function (item) {
+                    if (index > 0) {
+
+                        if (item.ValidBundle == 0) {
+                            $scope.validbundle.push(false);
+                        }
+                        else {
+                            $scope.validbundle.push(true);
+                        }
+
+                    }
+                    index = index + 1;
+                })
+            };
+
+
+
+
+
+            $scope.usersTable2 = new NgTableParams({ // initial grouping
+
+            }, {
+                'dataset': data.d
+            });
+
+            $('.ng-table-pager').hide();
+
+            $(".pageLoaderOverlay").hide();
+        })
+
+
+    }
+
+
+    $scope.showbuttonenable = function () {
+        $('#tblbundles').hide();
+
+        if ($scope.CPEBundleitem.length > 0) {
+            $scope.shownobundleselected = false;
+            $('#Button2').removeAttr("disabled");
+            $('#idbtnshow').attr('style', 'Visibility:Visible;padding-top: 55px; padding-bottom: 0px;');
+        }
+        else {
+            //bootbox.alert('Please select atleast one bundle');
+
+            $scope.shownobundleselected = true;
+            $('#idbtnshow').attr('style', 'Visibility:hidden;padding-top: 55px; padding-bottom: 0px;');
+        }
+
+
+
+    }
+    $scope.showbuttonenablerouter = function () {
+
+        $(".pageLoaderOverlay").show();
+        $('#divtable').hide();
+        $('#tblbundles').hide();
+        $('.ng-table-pager').hide();
+        var RegionID = "0";
+        if ($scope.CPERouteritem.length > 0) {
+            $http.post("CPEBundles.aspx/GetCPEBundle", { "ProductID": $scope.CPEProductitem, "RegionID": RegionID, "CountryID": $scope.CPECountryitem, "RouterNamedd": $scope.CPERouteritem
+            }).success(function (data) {
+                $scope.cpebundle = [];
+                if (data.d != null && data.d.length != 0) {
+                    data.d.forEach(function (item) {
+                        $scope.cpebundle.push(item.BundleNamedd);
+                        $scope.shownorouterselected = false;
+
+                    });
+
+                }
+
+                //                $scope.CPEBundleitem = [];
+
+                $("#ddlBundle").select2(
+                    {
+                    });
+
+                $(".pageLoaderOverlay").hide();
+
+            })
+            $('#Div2').attr('style', 'visibility:visible;padding-top:15px');
+        }
+
+        else {
+
+            $scope.shownorouterselected = true;
+            $scope.shownobundleselected = false;
+            // bootbox.alert("Please select atleast one router");
+            $('#Div2').hide();
+            $('#idbtnshow').hide();
+            // $("option:selected").removeAttr("selected");
+            $(".pageLoaderOverlay").hide();
+        }
+
+    }
+
+    $scope.showregion = function () {
+
+
+        if ($('#productselected .col-sm-2 #s2id_ddlProduct .select2-choice .select2-chosen').text() == "--Select--") {
+            $('#idregiondd').hide();
+            $('#ddlCountrylist').hide();
+            $('#divtable').hide();
+            $('#idbtnshow').hide();
+            $('#Div1').hide();
+            $('#Div2').hide();
+        }
+
+        else {
+            $scope.CPERegionitem = [];
+            // $scope.CPECountryitem = [];
+            $('#Div1').hide();
+            $('#Div2').hide();
+            $('#idbtnshow').hide();
+            $('#tblbundles').hide();
+            $('#updatebutton1').hide();
+            $('#divtable').hide();
+
+            $('#idregiondd .col-sm-2 #s2id_ddlRegion .select2-choice .select2-chosen').html('--Select--');
+            $('#ddlCountrylist .col-sm-2 #s2id_ddlCountry .select2-choice .select2-chosen').html('--Select--');
+            //            $("option:selected").removeAttr("selected");
+            //        $('#select2-chosen-2').html('--Select--');
+            //        $('#select2-chosen-4').html('--Select--'); 
+            $('#idregiondd').attr('Style', 'Visibility:Visible');
+            $scope.showNodata = false;
+            $scope.showNodataRouter = false;
+
+        }
+
+    }
+    var regionname = "";
+
+    $scope.ShowCountryAssignment = function () {
+        //  $scope.$new();
+
+        $scope.BundleandAccess = [];
+
+        $(' .col-sm-3 #s2id_ddlCPEBundleAccess .select2-choice .select2-chosen').html('--Select--');
+        $("#ddlCPEBundleAccess").select2(
+                    {
+                    });
+
+
+
+        count = 0;
+        // var comArr = eval($scope.usersTable);
+        var bundle = [];
+
+        for (var i = 0; i < $scope.usersTable.data.length; i++) {
+            if ($(chkshowcountryassignment)[i].checked == true) {
+                var temp = new Array();
+                temp = $scope.usersTable.data[i].Accesstype.split(".");
+                bundle = $scope.usersTable.data[i].Bundle;
+                for (var j = 0; j < (temp.length) - 1; j++) {
+
+                    $scope.BundleandAccess.push({ "CustomBundle": bundle + ":-" + temp[j].substr(temp[j].indexOf("with") + 4) });
+
+
+                }
+                //    var substr = $scope.usersTable.data[i].Accesstype.split(".").pop();
+
+                //  $scope.BundleandAccess.push({ "AccessType": $scope.usersTable.data[i].Accesstype });
+
+                count = count + 1;
+            }
+        }
+
+    }
+    $scope.BundleandAccess = [];
+    $('.col-sm-3 #s2id_ddlCPEBundleAccess .select2-choice .select2-chosen').html('--Select--');
+
+    $scope.clickshowcountryassignmentchkbox = function () {
+
+        $scope.$new();
+
+        $scope.cpeassignedcountries = [];
+        $('.col-sm-3 #s2id_ddlCPEBundleAccess .select2-choice .select2-chosen').html('--Select--');
+        $('.col-sm-3 #idAssignedCountries').html('');
+        $("#ddlCPEBundleAccess").select2(
+                    {
+                    });
+
+        $scope.BundleandAccess = [];
+        count = 0;
+        var comArr = eval($scope.usersTable);
+        var bundle = [];
+
+
+        if ($(chkshowcountryassignment)[this.$index].checked == true) {
+            var temp = new Array();
+            temp = $scope.usersTable.data[this.$index].Accesstype.split(".");
+            bundle = $scope.usersTable.data[this.$index].Bundle;
+            for (var j = 0; j < (temp.length) - 1; j++) {
+                $scope.BundleandAccess.push({ "CustomBundle": bundle + ":-" + temp[j].substr(temp[j].indexOf("with") + 4) });
+            }
+
+            //    var substr = $scope.usersTable.data[i].Accesstype.split(".").pop();
+
+            //  $scope.BundleandAccess.push({ "AccessType": $scope.usersTable.data[i].Accesstype });
+
+
+
+        }
+
+        //        if ($("input[type='checkbox'][name='chkshowcountryassigned']:checked").length > 0) {
+        //           
+        //        }
+
+
+        //        else {
+        //            $('#btnshowassignedcoiuntries').attr('disabled', 'disabled');
+        //        }
+
+
+    }
+
+    var accesstype = [];
+    $scope.bindassignedunassignedcountryvalues = function (BundleName, AccessType, CustomBundle) {
+
+
+        $scope.Access = [];
+        count = 0;
+        var comArr = eval($scope.usersTable);
+
+        //        $scope.BundleandAccess = [];
+
+        var bundle = [];
+
+
+        for (var i = 0; i < $scope.usersTable.data.length; i++) {
+            if ($(chkshowcountryassignment)[i].checked == true) {
+                var temp = new Array();
+                temp = $scope.usersTable.data[i].Accesstype.split(".");
+                bundle = $scope.usersTable.data[i].Bundle;
+                accesstype = $scope.usersTable.data[i].Router + " with" + $scope.BundleandAccess[i].CustomBundle.substr($scope.BundleandAccess[i].CustomBundle.indexOf(":-") + 2);
+                for (var j = 0; j < (temp.length) - 1; j++) {
+                    $scope.Access.push(temp[j]);
+                }
+                //    var substr = $scope.usersTable.data[i].Accesstype.split(".").pop();
+
+                //  $scope.BundleandAccess.push({ "AccessType": $scope.usersTable.data[i].Accesstype });
+
+                count = count + 1;
+            }
+
+
+        }
+
+
+        $(".pageLoaderOverlay").show();
+        $http.post("CPEBundles.aspx/ShowAssignedCountries", { "BundleName": bundle, "AccessType": accesstype }).
+            success(function (data) {
+
+                $scope.cpeassignedcountries = [];
+                if (data.d != null && data.d.length != 0) {
+                    data.d.forEach(function (item) {
+                        $scope.cpeassignedcountries.push(item.AssignedCountry);
+                    });
+                    $(".pageLoaderOverlay").hide();
+                }
+
+            });
+
+
+        //        $http.post("CPEBundles.aspx/ShowUnAssignedCountries", { "BundleName": bundle, "AccessType": accesstype }).
+        //            success(function (data) {
+        //                
+        //                $scope.cpeunassignedcountries = [];
+        //                if (data.d != null && data.d.length != 0) {
+        //                    data.d.forEach(function (item) {
+        //                        $scope.cpeunassignedcountries.push(item.UnAssignedCountry);
+        //                    });
+        //                    $(".pageLoaderOverlay").hide();
+        //                }
+
+        //            });
+
+    }
+
+    $scope.updatebundlevaliditycheckbox = function () {
+
+        $(".pageLoaderOverlay").show();
+        BundleNameValues = "";
+        //  $scope.Bundle = [];
+        BundleNameValuesUnchecked = "";
+        //  $rootScope.User_Id = "609682300";
+        count = 0;
+        var index = -1;
+
+        var comArr = eval($scope.usersTable);
+
+
+        var m_names = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+        var d = new Date();
+        if (d.getDate() < 10) {
+            var curr_date = '0' + d.getDate();
+        }
+        else {
+            var curr_date = d.getDate();
+        }
+
+        var curr_month = d.getMonth();
+        var curr_year = d.getFullYear();
+        var updateddate = curr_date + "-" + m_names[curr_month] + "-" + curr_year;
+
+
+
+
+
+
+        // $scope.Bundle.push({ "CustomBundle": $scope.usersTable.data[i].Bundle });
+        BundleNameValues = $scope.usersTable.data[this.$index].Bundle;
+        BundleNameValuesUnchecked = $scope.usersTable.data[this.$index].Bundle;
+        var updatedby = $scope.usersTable.data[this.$index].UpdatedBy;
+        $http.post("CPEBundles.aspx/FetchUpdatedByuserName", {  "Userid": $rootScope.User_Id }).
+                        success(function (data) {
+
+
+                            $scope.updatedbyusername = data.d[0].UpdatedByUserName;
+                            $(".pageLoaderOverlay").hide();
+                           
+                        });
+
+           
+
+        if ($(chekid)[this.$index].checked == true) {
+            if (BundleNameValues != "") {
+                
+                var chkindex = "";
+                chkindex = this.$index;
+                $http.post("CPEBundles.aspx/UpdateCPEBundleValidity", { "BundleNameValues": BundleNameValues, "Userid": $rootScope.User_Id }).
+                        success(function (data) {
+
+
+                            $scope.usersTable.data[chkindex].DateLastUpdated = updateddate;
+                            $scope.usersTable.data[chkindex].UpdatedBy = $scope.updatedbyusername;
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert("Bundle validity updated succesfully");
+                        });
+
+            }
+        }
+
+        if ($(chekid)[this.$index].checked == false) {
+            if (BundleNameValuesUnchecked != "") {
+
+                var chkindex1 = "";
+                chkindex1 = this.$index;
+                $http.post("CPEBundles.aspx/UpdateCPEBundleValidity1", { "BundleNameValuesUnchecked": BundleNameValuesUnchecked, "Userid": $rootScope.User_Id }).
+            success(function (data) {
+
+                $scope.usersTable.data[chkindex1].DateLastUpdated = updateddate;
+                $scope.usersTable.data[chkindex1].UpdatedBy = $scope.updatedbyusername;
+                $(".pageLoaderOverlay").hide();
+                bootbox.alert("Bundle validity updated succesfully");
+            });
+            }
+        }
+
+
+
+
+
+    };
+
+
+
+    $('#closeshowconutryassignemnt').on('click', function () {
+
+        $scope.BundleandAccess = [];
+        $('.chkshowcountryassignment').attr('checked', false);
+        $('.col-sm-3 #s2id_ddlCPEBundleAccess .select2-choice .select2-chosen').html('--Select--');
+        $('.col-sm-3 #idAssignedCountries').html('');
+
+    })
+
+});
+
+ 

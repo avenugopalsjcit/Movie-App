@@ -1,0 +1,43 @@
+﻿app.factory('AvailabilityBtgfrGridFactory', function ($http) {
+
+    var AvailabilityBtgfrGridFactory = {};
+
+    AvailabilityBtgfrGridFactory.GetAvailabilityGrid = function () {
+        $(".pageLoaderOverlay").show();
+        return $http.post('GlobalReference.aspx/GetGridAdminBtgfrView', {});
+
+    }
+
+    return AvailabilityBtgfrGridFactory;
+});
+
+
+app.controller('AdminBtgfrCtrl', ['$scope', 'AvailabilityBtgfrGridFactory', 'NgTableParams', function ($scope, AvailabilityBtgfrGridFactory, NgTableParams) {
+
+    AvailabilityBtgfrGridFactory.GetAvailabilityGrid().success(function (data) {
+
+        //$scope.CurrentDate = new Date();
+
+
+        $scope.AvailabilityGrid = data;
+
+
+      
+
+        if (data.d.length == 0) {
+
+
+            $scope.showNodata = true;
+            $('#tblAnnouncements').hide();
+            $scope.Nodata = "There are no Announcement(s).";
+        }
+        else {
+            $scope.showNodata = false;
+            $scope.usersTable = new NgTableParams({}, { 'dataset': data.d });
+            $(".pageLoaderOverlay").hide();
+            //$("div[ng-table-pagination = 'params']").remove();
+        }
+    });
+
+
+} ]);

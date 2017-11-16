@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace SCAdmin
+{
+    /// <summary>
+    /// Summary description for Downloadhandler
+    /// </summary>
+    public class Downloadhandler : IHttpHandler
+    {
+
+        public void ProcessRequest(HttpContext context)
+        {
+            System.Net.WebClient req = new System.Net.WebClient();
+            string path = context.Request["path"].ToString();
+            string filename = context.Request["filename"].ToString();
+            HttpContext.Current.Response.Clear();
+            HttpContext.Current.Response.ClearContent();
+            HttpContext.Current.Response.ClearHeaders();
+            HttpContext.Current.Response.Buffer = true;
+
+            HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment;filename=\"" + filename + "\"");
+            byte[] data = req.DownloadData(path);
+            HttpContext.Current.Response.BinaryWrite(data);
+            HttpContext.Current.Response.Flush();
+            HttpContext.Current.Response.End();
+       }
+
+        public bool IsReusable
+        {
+            get
+            {
+                return false;
+            }
+        }
+    }
+}

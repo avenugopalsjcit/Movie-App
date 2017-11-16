@@ -1,0 +1,192 @@
+// -----------------------------------------------------------------------------------------------------------------
+// Version     Date            Modified by            Comments
+//             DD/MM/YY        Infosys ID
+// -----------------------------------------------------------------------------------------------------------------
+// 1.0         06/06/07        madhav_shenoy            Created
+// -----------------------------------------------------------------------------------------------------------------
+#region Imported Namespaces
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+
+#endregion
+namespace SCAdminBAL.MCU
+{
+    /// <summary>
+    /// Summary description for City
+    /// </summary>
+    [Serializable]
+    public class City
+    {
+        #region Private Variables
+        private Int32 _CITY_ID = -1;
+        private String _CITY_NAME = String.Empty;
+        private Int32 _COUNTRY_ID = -1;
+        private String _COUNTRY_NAME = String.Empty;
+        private Int32 _REGION_ID = -1;
+        private String _REGION_NAME = String.Empty;
+        private Int32 _CITY_VALID_CD = -1;
+        private String _CREATED_EMP_ID = String.Empty;
+        private DateTime _CREATED_DT = DateTime.Now;
+        private String _UPDATED_EMP_ID = String.Empty;
+        private DateTime _UPDATED_DT = DateTime.Now;
+        private int _ACCESS_SUPPLIER_CHAR_ID = -1;
+        private String _ACCESS_SUPPLIER_CHAR_NAME = String.Empty;
+        #endregion
+
+        #region Public Properties
+
+        public int AccessSupplierCharId
+        {
+            get
+            {
+                return _ACCESS_SUPPLIER_CHAR_ID;
+            }
+            set
+            {
+                _ACCESS_SUPPLIER_CHAR_ID = value;
+            }
+        }
+
+        public String AccessSupplierCharName
+        {
+            get
+            {
+                return _ACCESS_SUPPLIER_CHAR_NAME;
+            }
+            set
+            {
+                _ACCESS_SUPPLIER_CHAR_NAME = value;
+            }
+        }
+
+        public String CityName
+        {
+            get
+            {
+                return _CITY_NAME;
+            }
+            set
+            {
+                _CITY_NAME = value;
+            }
+        }
+        public String CountryName
+        {
+            get
+            {
+                return _COUNTRY_NAME;
+            }
+            set
+            {
+                _COUNTRY_NAME = value;
+            }
+        }
+        public String RegionName
+        {
+            get
+            {
+                return _REGION_NAME;
+            }
+            set
+            {
+                _REGION_NAME = value;
+            }
+        }
+
+        public DateTime UpdatedDt
+        {
+            get
+            {
+                return _UPDATED_DT;
+            }
+            set
+            {
+                _UPDATED_DT = value;
+            }
+        }
+        public DateTime CreatedDt
+        {
+            get
+            {
+                return _CREATED_DT;
+            }
+            set
+            {
+                _CREATED_DT = value;
+            }
+        }
+        public String UpdatedEmpId
+        {
+            get
+            {
+                return _UPDATED_EMP_ID;
+            }
+            set
+            {
+                _UPDATED_EMP_ID = value;
+            }
+        }
+        public String CreatedEmpId
+        {
+            get
+            {
+                return _CREATED_EMP_ID;
+            }
+            set
+            {
+                _CREATED_EMP_ID = value;
+            }
+        }
+        public Int32 CityValidCd
+        {
+            get
+            {
+                return _CITY_VALID_CD;
+            }
+            set
+            {
+                _CITY_VALID_CD = value;
+            }
+        }
+        public Int32 RegionId
+        {
+            get
+            {
+                return _REGION_ID;
+            }
+            set
+            {
+                _REGION_ID = value;
+            }
+        }
+
+        public Int32 CityId
+        {
+            get
+            {
+                return _CITY_ID;
+            }
+            set
+            {
+                _CITY_ID = value;
+            }
+        }
+
+        public Int32 CountryId
+        {
+            get
+            {
+                return _COUNTRY_ID;
+            }
+            set
+            {
+                _COUNTRY_ID = value;
+            }
+        }
+        #endregion
+
+
+    }
+}

@@ -1,0 +1,906 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+using System.Text;
+using System.Collections;
+
+namespace SCAdminDAL
+{
+    public class GlobalReferenceDAL
+    {
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        private StringBuilder strQuery = new StringBuilder();
+        private GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+        public DataTable GetGridAvailabilityDetails()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"select AVAIL_DESC,AVAIL_ABBR,AVAIL_VALID_CD,AVAIL_CD from CSU_REF_AVAILABILITY order by AVAIL_DESC";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public DataTable GetGridAdminBtgfr()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+
+            str = @"select btgfr,description from csu_btgfr where btgfr > '0' order by btgfr asc,description";
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public int MaxAvailCD()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"Select Max(avail_cd) from CSU_REF_AVAILABILITY";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str));
+        }
+
+        public int AdminAvailInsert(string strAvailCd, string strAvailDesc, string strAvailAbbr, string strAvailValidCd, string User_id)
+        {
+            int validbool = 0;
+
+            if (Convert.ToBoolean(strAvailValidCd) == true)
+            {
+                validbool = 1;
+            }
+            else
+            {
+                validbool = 0;
+            }
+            int id = Convert.ToInt32(strAvailCd);
+
+            string str = @"INSERT INTO CSU_REF_AVAILABILITY ( AVAIL_CD, AVAIL_DESC, AVAIL_ABBR,CREATED_EMP_ID,
+                        AVAIL_VALID_CD,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT) VALUES (" + id + ",'" + strAvailDesc + "' ,'"
+                        + strAvailAbbr + "','" + User_id + "'," + validbool + ",   sysdate,'" + User_id + "',sysdate)";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+
+        public int AdminAvailUpdate(string strAvailDesc, string strAvailAbbr, string strAvailvalidCd, string User_id, string strAvailCd)
+        {
+
+            int validbool = 0;
+            //DateTime date = DateTime.ParseExact(DateTime.Now.Date.ToString(), "dd/MM/yyyy", null);
+            string end_date = String.Format("{0:dd-MMM-yyyy HH:mm}", DateTime.Now);
+
+            if (Convert.ToBoolean(strAvailvalidCd) == true)
+            {
+                validbool = 1;
+            }
+            else
+            {
+                validbool = 0;
+            }
+            int id = Convert.ToInt32(strAvailCd);
+            string str = @"update CSU_REF_AVAILABILITY set  
+                        avail_desc='" + strAvailDesc + "',avail_abbr='" + strAvailAbbr + "', avail_valid_cd =" + validbool +
+                            ", updated_emp_id ='" + User_id + "',updated_dt=sysdate where avail_cd =" + id;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+
+        public int AdminAvailDelete(string strAvailCd)
+        {
+
+            string str = @"Delete from CSU_REF_AVAILABILITY where avail_cd =" + strAvailCd;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+        public DataTable AdminAvailPopupGrid(string strAvailCd)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"SELECT CREATED_EMP_ID,  TO_CHAR(CREATED_DT,'DD-MON-YYYY HH24:MI') AS CREATED_DT,  UPDATED_EMP_ID,  TO_CHAR(UPDATED_DT,'DD-MON-YYYY HH24:MI') AS UPDATED_DT FROM CSU_REF_AVAILABILITY
+                            WHERE avail_cd=" + strAvailCd;
+            //OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+        }
+
+        #region Notes
+
+        public DataTable GetProducts(int curr_state, int userId, int accessLevel, string sLdapGFR, int sBtGfrCodes, int sSegregationCodes, int sMPLSCapOnlyPO)
+        {
+            strQuery.Clear();
+            if (curr_state == 100 || curr_state == 101)
+            {
+                strQuery.Append("Select distinct b.Service_Type_Desc, a.Product_cd, a.product_name, ");
+                strQuery.Append(" Product_Loc_Level_cd from CSU_PRODUCT a,");
+                strQuery.Append(" CSU_REF_SERVICE_TYPE b");
+                //if (accessLevel != 1)
+                //{
+                //    if (accessLevel != 2)
+                //    {
+                //        if (sLdapGFR != "")
+                //        {
+                //            strQuery.Append(" , csu_btgfr_product_map cbp, csu_segregation_vw v ");
+                //        }
+                //        else
+                //        {
+                //            strQuery.Append(" , csu_segregation cs, csu_segregation_vw v ");
+                //        }
+                //    }
+                //}
+                strQuery.Append(" where a.Product_valid_cd = 1 ");
+                strQuery.Append(" and a.Product_cd <> 16 ");
+                strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd ");
+                if (accessLevel != 1)
+                {
+                    if (accessLevel == 2)
+                    {
+                        strQuery.Append(" and a.Product_cd in (Select product_cd from csu_user_product_owner where emp_id='" + userId + "' ");
+                        strQuery.Append(" union");
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" select distinct b.Service_Type_Desc,a.product_cd,a.product_name,Product_Loc_Level_cd from csu_product a,CSU_REF_SERVICE_TYPE b, csu_btgfr_product_map cbp, csu_segregation_vw v ");
+                            strQuery.Append(" where a.Product_valid_cd = 1");
+                            strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd ");
+                            strQuery.Append(" and cbp.product_cd = a.product_cd and ");
+                            strQuery.Append(" cbp.btgfr in (" + sBtGfrCodes + " ) and ");
+                            strQuery.Append(" v.id = cbp.btgfr");
+                        }
+                        else
+                        {
+                            strQuery.Append(" select distinct b.Service_Type_Desc,a.product_cd,a.product_name,Product_Loc_Level_cd from csu_product a,CSU_REF_SERVICE_TYPE b, csu_segregation cs, csu_segregation_vw v ");
+                            strQuery.Append(" where a.Product_valid_cd = 1");
+                            strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd");
+                            strQuery.Append(" and cs.product_cd = a.product_cd and");
+                            strQuery.Append(" cs.segregation_id in (" + sSegregationCodes + ") and");
+                            strQuery.Append(" v.id = cs.segregation_id");
+                        }
+                        strQuery.Append(" order by Service_Type_Desc,product_name");
+
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" and cbp.product_cd = a.product_cd and ");
+                            strQuery.Append(" cbp.btgfr in (" + sBtGfrCodes + ") and ");
+                            strQuery.Append(" v.id = cbp.btgfr");
+                        }
+                        else
+                        {
+                            strQuery.Append(" and cs.product_cd = a.product_cd and ");
+                            strQuery.Append(" cs.segregation_id in (" + sSegregationCodes + ") and  ");
+                            strQuery.Append(" v.id = cs.segregation_id ");
+                        }
+
+                    }
+                }
+                if (accessLevel != 2)
+                {
+                    strQuery.Append(" ORDER BY b.Service_type_desc, UPPER(a.Product_name)");
+                }
+            }
+            else if (curr_state == 103 || curr_state == 108)
+            {
+                strQuery.Append(" Select distinct b.Service_Type_Desc, a.Product_cd, a.product_name, ");
+                strQuery.Append(" Product_Loc_Level_cd from CSU_PRODUCT a, ");
+                strQuery.Append(" CSU_REF_SERVICE_TYPE b");
+                if (accessLevel != 1)
+                {
+                    if (accessLevel != 2)
+                    {
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" , csu_btgfr_product_map cbp, csu_segregation_vw v ");
+                        }
+                        else
+                        {
+                            strQuery.Append(" , csu_segregation cs, csu_segregation_vw v ");
+                        }
+
+                    }
+                }
+                strQuery.Append(" where a.Product_valid_cd = 1");
+                strQuery.Append("  and a.Service_type_cd = b.Service_Type_cd");
+
+                if (accessLevel != 1)
+                {
+                    if (accessLevel == 2)
+                    {
+                        strQuery.Append(" and a.Product_cd in (Select product_cd from csu_user_product_owner where emp_id='" + userId + "' )");
+                        strQuery.Append(" union");
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" select distinct b.Service_Type_Desc,a.product_cd,a.product_name,Product_Loc_Level_cd from csu_product a,CSU_REF_SERVICE_TYPE b, csu_btgfr_product_map cbp, csu_segregation_vw v ");
+                            strQuery.Append(" where a.Product_valid_cd =1 ");
+                            strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd");
+                            strQuery.Append(" and cbp.product_cd = a.product_cd and");
+                            strQuery.Append(" cbp.btgfr in (" + sBtGfrCodes + ") and ");
+                            strQuery.Append(" v.id = cbp.btgfr");
+                        }
+                        else
+                        {
+                            strQuery.Append(" select distinct b.Service_Type_Desc,a.product_cd,a.product_name,Product_Loc_Level_cd from csu_product a,CSU_REF_SERVICE_TYPE b, csu_segregation cs, csu_segregation_vw v ");
+                            strQuery.Append(" where a.Product_valid_cd = 1 ");
+                            strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd");
+                            strQuery.Append(" and cs.product_cd = a.product_cd and ");
+                            strQuery.Append(" cs.segregation_id in (" + sSegregationCodes + ") and");
+                            strQuery.Append(" v.id = cs.segregation_id");
+                        }
+                        strQuery.Append("order by Service_Type_Desc,product_name");
+
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" and cbp.product_cd = a.product_cd and ");
+                            if (curr_state == 103 && (accessLevel != 2 || sMPLSCapOnlyPO == 0))
+                            {
+                                strQuery.Append(" a.product_cd <> 21 and ");
+                            }
+                            strQuery.Append(" cbp.btgfr in (" + sBtGfrCodes + ") and ");
+                            strQuery.Append(" v.id = cbp.btgfr ");
+                        }
+                        else
+                        {
+                            strQuery.Append(" and cs.product_cd = a.product_cd and ");
+                            if (curr_state == 103 && (accessLevel != 2 || sMPLSCapOnlyPO == 0))
+                            {
+                                strQuery.Append(" a.product_cd <> 21 and ");
+                            }
+                            strQuery.Append(" cs.segregation_id in (" + sSegregationCodes + ") and");
+                            strQuery.Append(" v.id = cs.segregation_id ");
+                        }
+                    }
+
+                }
+                if (accessLevel == 3)
+                {
+                    strQuery.Append(" and a.Product_cd in (Select product_cd from product_launch where launch_flag=1)");
+                }
+                if (accessLevel != 2)
+                {
+                    strQuery.Append(" ORDER BY b.Service_type_desc, UPPER(a.Product_name)");
+                }
+            }
+            else if (curr_state == 107)
+            {
+                strQuery.Append(" Select distinct b.Service_Type_Desc, a.Product_cd, a.product_name, ");
+                strQuery.Append(" Product_Loc_Level_cd from CSU_PRODUCT a, ");
+                strQuery.Append(" CSU_REF_SERVICE_TYPE b ");
+                if (accessLevel != 1)
+                {
+                    if (accessLevel != 2)
+                    {
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" , csu_btgfr_product_map cbp, csu_segregation_vw v ");
+                        }
+                        else
+                        {
+                            strQuery.Append(" , csu_segregation cs, csu_segregation_vw v ");
+                        }
+                    }
+                }
+
+                strQuery.Append(" where a.Product_valid_cd = 1");
+                strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd ");
+
+                if (accessLevel != 1)
+                {
+                    if (accessLevel == 2)
+                    {
+                        strQuery.Append(" and a.Product_cd in (Select product_cd from csu_user_product_owner where emp_id='" + userId + "' ");
+                        strQuery.Append(" union ");
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" select distinct b.Service_Type_Desc,a.product_cd,a.product_name,Product_Loc_Level_cd from csu_product a,CSU_REF_SERVICE_TYPE b, csu_btgfr_product_map cbp, csu_segregation_vw v ");
+                            strQuery.Append(" where a.Product_valid_cd =1 ");
+                            strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd");
+                            strQuery.Append(" and cbp.product_cd = a.product_cd and");
+                            strQuery.Append(" cbp.btgfr in (" + sBtGfrCodes + ") and ");
+                            strQuery.Append(" v.id = cbp.btgfr");
+                        }
+                        else
+                        {
+                            strQuery.Append(" select distinct b.Service_Type_Desc,a.product_cd,a.product_name,Product_Loc_Level_cd from csu_product a,CSU_REF_SERVICE_TYPE b, csu_segregation cs, csu_segregation_vw v ");
+                            strQuery.Append(" where a.Product_valid_cd = 1 ");
+                            strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd ");
+                            strQuery.Append(" and cs.product_cd = a.product_cd and ");
+                            strQuery.Append(" cs.segregation_id in (" + sSegregationCodes + ") and  ");
+                            strQuery.Append(" v.id = cs.segregation_id");
+                        }
+                        strQuery.Append(" order by Service_Type_Desc,product_name");
+
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" and cbp.product_cd = a.product_cd and ");
+                            strQuery.Append(" cbp.btgfr in (" + sBtGfrCodes + ") and  ");
+                            strQuery.Append(" v.id = cbp.btgfr");
+                        }
+                        else
+                        {
+                            strQuery.Append(" and cs.product_cd = a.product_cd and ");
+                            strQuery.Append(" cs.segregation_id in (" + sSegregationCodes + ") and ");
+                            strQuery.Append(" v.id = cs.segregation_id ");
+                        }
+                    }
+                }
+                if (accessLevel != 2)
+                {
+                    strQuery.Append(" ORDER BY b.Service_type_desc, UPPER(a.Product_name)");
+                }
+            }
+
+            else if (curr_state == 208)
+            {
+                if (accessLevel == 1)
+                {
+                    strQuery.Append(" Select b.Service_Type_Desc, a.Product_cd, a.product_name,");
+                    strQuery.Append(" Product_Loc_Level_cd from CSU_PRODUCT a, ");
+                    strQuery.Append(" CSU_REF_SERVICE_TYPE b WHERE");
+                    strQuery.Append(" a.Service_type_cd = b.Service_Type_cd");
+                    strQuery.Append(" ORDER BY b.Service_type_desc, UPPER(a.Product_name)");
+                }
+                else
+                {
+                    strQuery.Append(" Select b.Service_Type_Desc, a.Product_cd, a.product_name, ");
+                    strQuery.Append(" Product_Loc_Level_cd from CSU_PRODUCT a,");
+                    strQuery.Append(" CSU_REF_SERVICE_TYPE b, CSU_USER_PRODUCT_OWNER c WHERE ");
+                    strQuery.Append(" Emp_id ='" + userId + "' ");
+                    strQuery.Append(" AND c.Product_cd = a.Product_cd AND");
+                    strQuery.Append(" c.Product_Owner_Status_cd = 1");
+                    strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd ");
+                    strQuery.Append(" ORDER BY b.Service_type_desc, UPPER(a.Product_name) ");
+                }
+                strQuery.Append(" Select distinct b.Service_Type_Desc, a.Product_cd, a.product_name,");
+                strQuery.Append(" Product_Loc_Level_cd from CSU_PRODUCT a, ");
+                strQuery.Append(" CSU_REF_SERVICE_TYPE b");
+
+                if (accessLevel != 1)
+                {
+                    if (accessLevel != 2)
+                    {
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" , csu_btgfr_product_map cbp, csu_segregation_vw v ");
+                        }
+                        else
+                        {
+                            strQuery.Append(" , csu_segregation cs, csu_segregation_vw v");
+                        }
+                    }
+                }
+
+                strQuery.Append(" where Product_valid_cd = 1");
+                strQuery.Append(" and a.Product_cd <> 16");
+                strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd");
+                if (accessLevel != 1)
+                {
+                    if (accessLevel == 2)
+                    {
+                        strQuery.Append(" and a.Product_cd in (Select product_cd from csu_user_product_owner where emp_id='" + userId + "' ");
+                        strQuery.Append(" union");
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" select distinct b.Service_Type_Desc,a.product_cd,a.product_name,Product_Loc_Level_cd from csu_product a,CSU_REF_SERVICE_TYPE b, csu_btgfr_product_map cbp, csu_segregation_vw v ");
+                            strQuery.Append(" where a.Product_valid_cd = 1 ");
+                            strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd");
+                            strQuery.Append(" and cbp.product_cd = a.product_cd and ");
+                            strQuery.Append(" cbp.btgfr in (" + sBtGfrCodes + ") and ");
+                            strQuery.Append(" v.id = cbp.btgfr");
+                        }
+                        else
+                        {
+                            strQuery.Append(" select distinct b.Service_Type_Desc,a.product_cd,a.product_name,Product_Loc_Level_cd from csu_product a,CSU_REF_SERVICE_TYPE b, csu_segregation cs, csu_segregation_vw v");
+                            strQuery.Append(" where a.Product_valid_cd = 1");
+                            strQuery.Append(" and a.Service_type_cd = b.Service_Type_cd");
+                            strQuery.Append(" and cs.product_cd = a.product_cd and");
+                            strQuery.Append(" cs.segregation_id in (" + sSegregationCodes + ") and ");
+                            strQuery.Append(" v.id = cs.segregation_id");
+                        }
+                        strQuery.Append(" order by Service_Type_Desc,product_name");
+                        if (sLdapGFR != "")
+                        {
+                            strQuery.Append(" and cbp.product_cd = a.product_cd and ");
+                            strQuery.Append(" cbp.btgfr in (" + sBtGfrCodes + ") and");
+                            strQuery.Append(" v.id = cbp.btgfr ");
+                        }
+                        else
+                        {
+                            strQuery.Append(" and cs.product_cd = a.product_cd and");
+                            strQuery.Append(" cs.segregation_id in (" + sSegregationCodes + ") and ");
+                            strQuery.Append(" v.id = cs.segregation_id ");
+                        }
+                    }
+                }
+
+                if (accessLevel != 2)
+                {
+                    strQuery.Append(" ORDER BY b.Service_type_desc, UPPER(a.Product_name)");
+                }
+
+            }
+
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable GetRegions(int productId)
+        {
+            strQuery.Clear();
+            strQuery.Append("Select distinct Region.Region_Name, Region.Region_id from CSU_Region Region,");
+            strQuery.Append(" CSU_Cases Cases, CSU_Ref_Availability Status Where");
+            strQuery.Append(" Cases.Region_id = Region.Region_id");
+            strQuery.Append(" and Cases.Case_Avail_cd = Status.Avail_Cd");
+            strQuery.Append(" and Cases.Product_Cd =" + productId + " ");
+            strQuery.Append(" order by region_name");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable GetCountries(int productId)
+        {
+            strQuery.Clear();
+            strQuery.Append("Select distinct Country.Country_Name, Country.Country_id from CSU_Country Country,");
+            strQuery.Append(" CSU_Cases Cases, CSU_Ref_Availability Status Where");
+            strQuery.Append(" Cases.Region_id = country.Region_id");
+            strQuery.Append(" and Cases.Country_id = Country.Country_id");
+            strQuery.Append(" and Cases.Case_Avail_cd = Status.Avail_Cd");
+            strQuery.Append(" and Cases.Product_Cd =" + productId + " ");
+            strQuery.Append(" order by country_name");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable GetCities(int productId)
+        {
+            //country_name - state_province_name - city_name
+            strQuery.Clear();
+            strQuery.Append("Select distinct Country.Country_Name, City.City_Name, City.City_id,state.state_province_name");
+            strQuery.Append(" from CSU_City City, CSU_Cases Cases, CSU_Ref_Availability Status, CSU_Country Country,CSU_State_Province State");
+            strQuery.Append(" Where Cases.City_id = City.city_id and Country.Country_id = City.country_id");
+            strQuery.Append(" and City.state_province_id = State.state_province_id(+)");
+            strQuery.Append(" and Cases.Case_Avail_cd = Status.Avail_Cd");
+            strQuery.Append(" and Cases.Product_Cd =" + productId + " ");
+            strQuery.Append(" order by country_name,city_name");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable GetNotesGridData(int Criteria, int productId, int regionId, int countryId, int cityId, int rowNum)
+        {
+            //strQuery.Clear();
+
+            strQuery.Clear();
+            if (Criteria == 1)
+            {
+                strQuery.Append("(SELECT CREATED_DT,NOTE_ID,PRODUCT_CD,ROWNUM,CREATED_EMP_ID,CAST(NOTE_CONTENT AS VARCHAR2(3999)),UPDATED_DT,NOTE_TITLE,NOTE_EFF_BEG_DATE,NOTE_EFF_END_DATE,NOTE_CATEGORY_DESC,NOTE_CATEGORY_CD,NOTE_PRIORITY_DESC,NOTE_PRIORITY_CD  FROM (SELECT A.CREATED_DT,A.PRODUCT_CD, ROWNUM R, A.CREATED_EMP_ID, A.NOTE_CONTENT, A.UPDATED_DT, A.NOTE_TITLE, A.NOTE_EFF_BEG_DATE, A.NOTE_EFF_END_DATE,");
+                strQuery.Append(" B.NOTE_CATEGORY_DESC, B.NOTE_CATEGORY_CD, C.NOTE_PRIORITY_DESC, C.NOTE_PRIORITY_CD, NOTE_ID FROM CSU_NOTES A, CSU_REF_NOTES_CATEGORY B,");
+                strQuery.Append(" CSU_Ref_Notes_Priority c WHERE ");
+                strQuery.Append(" A.NOTE_CATEGORY_CD = B.NOTE_CATEGORY_CD");
+                strQuery.Append(" AND A.NOTE_PRIORITY_CD = C.NOTE_PRIORITY_CD");
+                strQuery.Append(" and a.Region_id is Null ");
+                strQuery.Append(" and a.Country_id is Null ");
+                strQuery.Append(" and a.City_id is Null ");
+                strQuery.Append(" and a.Product_Cd = " + productId + " order by A.CREATED_DT desc) where ");
+                if (rowNum == 100)
+                {
+                    strQuery.Append(" rownum between 0 and 100)");
+                }
+                else
+                {
+                    strQuery.Append(" rownum between 0 and " + rowNum + " )");
+                    strQuery.Append(" Minus");
+                    strQuery.Append("(SELECT CREATED_DT,NOTE_ID,PRODUCT_CD,ROWNUM,CREATED_EMP_ID,CAST(NOTE_CONTENT AS VARCHAR2(3999)),UPDATED_DT,NOTE_TITLE, ");
+                    strQuery.Append(" NOTE_EFF_BEG_DATE,NOTE_EFF_END_DATE,NOTE_CATEGORY_DESC,NOTE_CATEGORY_CD,NOTE_PRIORITY_DESC,NOTE_PRIORITY_CD ");
+                    strQuery.Append(" FROM(SELECT A.CREATED_DT,A.PRODUCT_CD,ROWNUM R,A.CREATED_EMP_ID,A.NOTE_CONTENT,A.UPDATED_DT,A.NOTE_TITLE,A.NOTE_EFF_BEG_DATE, ");
+                    strQuery.Append(" A.NOTE_EFF_END_DATE,B.NOTE_CATEGORY_DESC,B.NOTE_CATEGORY_CD,C.NOTE_PRIORITY_DESC,C.NOTE_PRIORITY_CD,NOTE_ID FROM CSU_NOTES A, ");
+                    strQuery.Append(" CSU_REF_NOTES_CATEGORY B,CSU_Ref_Notes_Priority c WHERE A.NOTE_CATEGORY_CD = B.NOTE_CATEGORY_CD");
+                    strQuery.Append(" AND A.NOTE_PRIORITY_CD   = C.NOTE_PRIORITY_CD AND a.Region_id IS NULL");
+                    strQuery.Append(" AND a.Country_id IS NULL AND a.City_id IS NULL");
+                    strQuery.Append(" AND A.PRODUCT_CD = " + productId + " ");
+                    strQuery.Append(" ORDER BY A.CREATED_DT DESC )WHERE ROWNUM ");
+                    strQuery.Append(" BETWEEN 0 AND  " + (rowNum - 100) + " )");
+                    strQuery.Append(" Order by CREATED_DT Desc");
+                }
+            }
+            else if (Criteria == 2)
+            {
+                strQuery.Append("(SELECT CREATED_DT,NOTE_ID,PRODUCT_CD,ROWNUM,CREATED_EMP_ID,CAST(NOTE_CONTENT AS VARCHAR2(3999)),UPDATED_DT,NOTE_TITLE,NOTE_EFF_BEG_DATE,NOTE_EFF_END_DATE,NOTE_CATEGORY_DESC,NOTE_CATEGORY_CD,NOTE_PRIORITY_DESC,NOTE_PRIORITY_CD  FROM (SELECT A.CREATED_DT,A.PRODUCT_CD, ROWNUM R, A.CREATED_EMP_ID, A.NOTE_CONTENT, A.UPDATED_DT, A.NOTE_TITLE, A.NOTE_EFF_BEG_DATE, A.NOTE_EFF_END_DATE,");
+                strQuery.Append(" B.NOTE_CATEGORY_DESC,B.NOTE_CATEGORY_CD, C.NOTE_PRIORITY_DESC,C.NOTE_PRIORITY_CD, NOTE_ID FROM CSU_NOTES A, CSU_REF_NOTES_CATEGORY B,");
+                strQuery.Append(" CSU_Ref_Notes_Priority c WHERE ");
+                strQuery.Append(" A.NOTE_CATEGORY_CD = B.NOTE_CATEGORY_CD");
+                strQuery.Append(" AND A.NOTE_PRIORITY_CD = C.NOTE_PRIORITY_CD");
+                strQuery.Append(" and a.Region_id =" + regionId + " ");
+                strQuery.Append(" and a.Country_id is Null ");
+                strQuery.Append(" and a.City_id is Null ");
+                strQuery.Append(" and a.Product_Cd = " + productId + " order by A.CREATED_DT desc)WHERE");
+                if (rowNum == 100)
+                {
+                    strQuery.Append(" rownum between 0 and 100)");
+                }
+                else
+                {
+                    strQuery.Append(" rownum between 0 and " + rowNum + " )");
+                    strQuery.Append(" Minus");
+                    strQuery.Append("(SELECT CREATED_DT,NOTE_ID,PRODUCT_CD,ROWNUM,CREATED_EMP_ID,CAST(NOTE_CONTENT AS VARCHAR2(3999)),UPDATED_DT,NOTE_TITLE, ");
+                    strQuery.Append(" NOTE_EFF_BEG_DATE,NOTE_EFF_END_DATE,NOTE_CATEGORY_DESC,NOTE_CATEGORY_CD,NOTE_PRIORITY_DESC,NOTE_PRIORITY_CD ");
+                    strQuery.Append(" FROM(SELECT A.CREATED_DT,A.PRODUCT_CD,ROWNUM R,A.CREATED_EMP_ID,A.NOTE_CONTENT,A.UPDATED_DT,A.NOTE_TITLE,A.NOTE_EFF_BEG_DATE, ");
+                    strQuery.Append(" A.NOTE_EFF_END_DATE,B.NOTE_CATEGORY_DESC,B.NOTE_CATEGORY_CD,C.NOTE_PRIORITY_DESC,C.NOTE_PRIORITY_CD,NOTE_ID FROM CSU_NOTES A, ");
+                    strQuery.Append(" CSU_REF_NOTES_CATEGORY B,CSU_Ref_Notes_Priority c WHERE A.NOTE_CATEGORY_CD = B.NOTE_CATEGORY_CD");
+                    strQuery.Append(" AND A.NOTE_PRIORITY_CD   = C.NOTE_PRIORITY_CD AND a.Region_id IS NULL");
+                    strQuery.Append(" AND a.Country_id IS NULL AND a.City_id IS NULL");
+                    strQuery.Append(" AND A.PRODUCT_CD =" + productId + " ");
+                    strQuery.Append(" ORDER BY A.CREATED_DT DESC )WHERE ROWNUM ");
+                    strQuery.Append(" BETWEEN 0 AND  " + (rowNum - 100) + " )");
+                    strQuery.Append(" Order by CREATED_DT Desc");
+                }
+            }
+            else if (Criteria == 3)
+            {
+                strQuery.Append("(SELECT CREATED_DT,NOTE_ID,PRODUCT_CD,ROWNUM,CREATED_EMP_ID,CAST(NOTE_CONTENT AS VARCHAR2(3999)),UPDATED_DT,NOTE_TITLE,NOTE_EFF_BEG_DATE,NOTE_EFF_END_DATE,NOTE_CATEGORY_DESC,NOTE_CATEGORY_CD,NOTE_PRIORITY_DESC,NOTE_PRIORITY_CD  FROM (SELECT A.CREATED_DT,A.PRODUCT_CD, ROWNUM R, A.CREATED_EMP_ID, A.NOTE_CONTENT, A.UPDATED_DT, A.NOTE_TITLE, A.NOTE_EFF_BEG_DATE, A.NOTE_EFF_END_DATE,");
+                strQuery.Append(" B.NOTE_CATEGORY_DESC,B.NOTE_CATEGORY_CD, C.NOTE_PRIORITY_DESC,C.NOTE_PRIORITY_CD, NOTE_ID FROM CSU_NOTES A, CSU_REF_NOTES_CATEGORY B,");
+                strQuery.Append(" CSU_Ref_Notes_Priority c WHERE ");
+                strQuery.Append(" A.NOTE_CATEGORY_CD = B.NOTE_CATEGORY_CD");
+                strQuery.Append(" AND A.NOTE_PRIORITY_CD = C.NOTE_PRIORITY_CD");
+                strQuery.Append(" and Country_id = " + countryId + " ");
+                strQuery.Append(" and a.City_id is Null ");
+                strQuery.Append(" and a.Product_Cd = " + productId + " order by A.CREATED_DT desc)WHERE");
+                if (rowNum == 100)
+                {
+                    strQuery.Append(" rownum between 0 and 100)");
+                }
+                else
+                {
+                    strQuery.Append(" rownum between 0 and " + rowNum + " )");
+                    strQuery.Append(" Minus");
+                    strQuery.Append("(SELECT CREATED_DT,NOTE_ID,PRODUCT_CD,ROWNUM,CREATED_EMP_ID,CAST(NOTE_CONTENT AS VARCHAR2(3999)),UPDATED_DT,NOTE_TITLE, ");
+                    strQuery.Append(" NOTE_EFF_BEG_DATE,NOTE_EFF_END_DATE,NOTE_CATEGORY_DESC,NOTE_CATEGORY_CD,NOTE_PRIORITY_DESC,NOTE_PRIORITY_CD ");
+                    strQuery.Append(" FROM(SELECT A.CREATED_DT,A.PRODUCT_CD,ROWNUM R,A.CREATED_EMP_ID,A.NOTE_CONTENT,A.UPDATED_DT,A.NOTE_TITLE,A.NOTE_EFF_BEG_DATE, ");
+                    strQuery.Append(" A.NOTE_EFF_END_DATE,B.NOTE_CATEGORY_DESC,B.NOTE_CATEGORY_CD,C.NOTE_PRIORITY_DESC,C.NOTE_PRIORITY_CD,NOTE_ID FROM CSU_NOTES A, ");
+                    strQuery.Append(" CSU_REF_NOTES_CATEGORY B,CSU_Ref_Notes_Priority c WHERE A.NOTE_CATEGORY_CD = B.NOTE_CATEGORY_CD");
+                    strQuery.Append(" AND A.NOTE_PRIORITY_CD   = C.NOTE_PRIORITY_CD AND a.Region_id IS NULL");
+                    strQuery.Append(" AND a.Country_id IS NULL AND a.City_id IS NULL");
+                    strQuery.Append(" AND A.PRODUCT_CD = " + productId + " ");
+                    strQuery.Append(" ORDER BY A.CREATED_DT DESC )WHERE ROWNUM ");
+                    strQuery.Append(" BETWEEN 0 AND  " + (rowNum - 100) + " )");
+                    strQuery.Append(" Order by CREATED_DT Desc");
+                }
+            }
+            else if (Criteria == 4)
+            {
+                strQuery.Append("(SELECT CREATED_DT,NOTE_ID,PRODUCT_CD,ROWNUM,CREATED_EMP_ID,CAST(NOTE_CONTENT AS VARCHAR2(3999)),UPDATED_DT,NOTE_TITLE,NOTE_EFF_BEG_DATE,NOTE_EFF_END_DATE,NOTE_CATEGORY_DESC,NOTE_CATEGORY_CD,NOTE_PRIORITY_DESC,NOTE_PRIORITY_CD  FROM (SELECT A.CREATED_DT,A.PRODUCT_CD, ROWNUM R, A.CREATED_EMP_ID, A.NOTE_CONTENT, A.UPDATED_DT, A.NOTE_TITLE, A.NOTE_EFF_BEG_DATE, A.NOTE_EFF_END_DATE,");
+                strQuery.Append(" B.NOTE_CATEGORY_DESC,B.NOTE_CATEGORY_CD, C.NOTE_PRIORITY_DESC,C.NOTE_PRIORITY_CD, NOTE_ID FROM CSU_NOTES A, CSU_REF_NOTES_CATEGORY B,");
+                strQuery.Append(" CSU_Ref_Notes_Priority c WHERE ");
+                strQuery.Append(" A.NOTE_CATEGORY_CD = B.NOTE_CATEGORY_CD");
+                strQuery.Append(" AND A.NOTE_PRIORITY_CD = C.NOTE_PRIORITY_CD");
+                strQuery.Append(" and City_id = " + cityId + " ");
+                strQuery.Append(" and a.Product_Cd = " + productId + " order by A.CREATED_DT desc)WHERE");
+                if (rowNum == 100)
+                {
+                    strQuery.Append(" rownum between 0 and 100)");
+                }
+                else
+                {
+                    strQuery.Append(" rownum between 0 and " + rowNum + " )");
+                    strQuery.Append(" Minus");
+                    strQuery.Append("(SELECT CREATED_DT,NOTE_ID,PRODUCT_CD,ROWNUM,CREATED_EMP_ID,UPDATED_DT,NOTE_TITLE, ");
+                    strQuery.Append(" NOTE_EFF_BEG_DATE,NOTE_EFF_END_DATE,NOTE_CATEGORY_DESC,NOTE_CATEGORY_CD,NOTE_PRIORITY_DESC,NOTE_PRIORITY_CD ");
+                    strQuery.Append(" FROM(SELECT A.CREATED_DT,A.PRODUCT_CD,ROWNUM R,A.CREATED_EMP_ID,A.NOTE_CONTENT,A.UPDATED_DT,A.NOTE_TITLE,A.NOTE_EFF_BEG_DATE, ");
+                    strQuery.Append(" A.NOTE_EFF_END_DATE,B.NOTE_CATEGORY_DESC,B.NOTE_CATEGORY_CD,C.NOTE_PRIORITY_DESC,C.NOTE_PRIORITY_CD,NOTE_ID FROM CSU_NOTES A, ");
+                    strQuery.Append(" CSU_REF_NOTES_CATEGORY B,CSU_Ref_Notes_Priority c WHERE A.NOTE_CATEGORY_CD = B.NOTE_CATEGORY_CD");
+                    strQuery.Append(" AND A.NOTE_PRIORITY_CD   = C.NOTE_PRIORITY_CD AND a.Region_id IS NULL");
+                    strQuery.Append(" AND a.Country_id IS NULL AND a.City_id IS NULL");
+                    strQuery.Append(" AND A.PRODUCT_CD = " + productId + " ");
+                    strQuery.Append(" ORDER BY A.CREATED_DT DESC )WHERE ROWNUM ");
+                    strQuery.Append(" BETWEEN 0 AND  " + (rowNum - 100) + " )");
+                    strQuery.Append(" Order by CREATED_DT Desc");
+                }
+            }
+
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            //IDataReader dr = OracleDataAccess.ExecuteReader(con, CommandType.Text, strQuery.ToString());
+
+            //DataTable dt = new DataTable();
+            //dt.Load(dr);
+            //return dt;
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable GetNotePriority()
+        {
+            strQuery.Clear();
+            strQuery.Append("SELECT NOTE_PRIORITY_CD, NOTE_PRIORITY_DESC FROM CSU_REF_NOTES_PRIORITY");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public DataTable GetNoteCategory()
+        {
+            strQuery.Clear();
+            strQuery.Append("SELECT NOTE_CATEGORY_CD, NOTE_CATEGORY_DESC FROM CSU_REF_NOTES_CATEGORY");
+            return objGetDataFromDB.GetDataTable(strQuery.ToString());
+        }
+
+        public int AddNewNote(int Criteria, int productId, int regionId, int countryId, int cityId, string title, string category, string priority, string BegDate, string EndDate, string userId, string description)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                connection.Open();
+                strQuery.Clear();
+                long noteId = 0;
+                strQuery.Append("Select CSU_Note_id_S.NextVal from DUAL");
+                DataTable dtNoteId = objGetDataFromDB.GetDataTable(strQuery.ToString());
+                if (dtNoteId.Rows.Count > 0)
+                {
+                    noteId = Convert.ToInt64(dtNoteId.Rows[0]["NextVal"]);
+                }
+                else
+                {
+                    strQuery.Append("Select max(Note_id) + 1 from CSU_Notes");
+                    DataTable dtCurrentNoteId = objGetDataFromDB.GetDataTable(strQuery.ToString());
+                    if (dtCurrentNoteId.Rows.Count > 0)
+                    {
+                        noteId = Convert.ToInt64(dtCurrentNoteId.Rows[0]["Note_id"]);
+                    }
+                }
+
+                if (userId == "")
+                {
+                    userId = "Null";
+                }
+                if (Criteria == 1)
+                {
+                    strQuery.Clear();
+                    strQuery.Append("Insert into Csu_Notes (Note_id, Product_cd,");
+                    strQuery.Append(" Note_title, Note_category_cd, Note_priority_cd,");
+                    strQuery.Append(" Note_eff_beg_Date, Note_eff_end_Date, Created_emp_id, created_dt,");
+                    strQuery.Append(" Updated_emp_id, Updated_dt, NOTE_CONTENT");
+                    strQuery.Append(" ) Values ( " + noteId + ",");
+                    strQuery.Append(" " + productId + " , '" + title + "' , '" + category + "','" + priority + "',  ");
+                    strQuery.Append(" to_date('" + BegDate + "','MM/DD/YYYY') ,");
+                    strQuery.Append(" to_date('" + EndDate + "','MM/DD/YYYY') ,");
+                    strQuery.Append(" '" + userId + "', sysdate,");
+                    strQuery.Append(" '" + userId + "', sysdate, '" + description + "' )");
+                }
+                else if (Criteria == 2)
+                {
+                    strQuery.Clear();
+                    strQuery.Append("SELECT Region_name FROM CSU_Region WHERE Region_id = " + regionId + " ");
+                    DataTable dtRegionDetails = objGetDataFromDB.GetDataTable(strQuery.ToString());
+                    string sRegionName = Convert.ToString(dtRegionDetails.Rows[0]["Region_name"]);
+
+                    strQuery.Clear();
+                    strQuery.Append(" Insert into Csu_Notes (Note_id, Region_id, Product_cd,");
+                    strQuery.Append(" Note_title, Note_category_cd, Note_priority_cd,");
+                    strQuery.Append(" Note_eff_beg_Date, Note_eff_end_Date, Created_emp_id, created_dt,");
+                    strQuery.Append(" Updated_emp_id, Updated_dt,note_symbol, NOTE_CONTENT");
+                    strQuery.Append(" ) Values ( " + noteId + ", '" + regionId + "'  ,");
+                    strQuery.Append(" " + productId + " , '" + title + "' , '" + category + "','" + priority + "',  ");
+                    strQuery.Append(" to_date('" + BegDate + "','MM/DD/YYYY') ,");
+                    strQuery.Append(" to_date('" + EndDate + "','MM/DD/YYYY') ,");
+                    strQuery.Append(" '" + userId + "', sysdate,");
+                    strQuery.Append(" '" + userId + "', sysdate, '" + sRegionName + "', '" + description + "') ");
+                }
+                else if (Criteria == 3)
+                {
+                    strQuery.Clear();
+                    strQuery.Append("SELECT Region_id,country_name FROM CSU_Country WHERE Country_id = " + countryId + " ");
+                    DataTable dtCountryDetails = objGetDataFromDB.GetDataTable(strQuery.ToString());
+                    string sCountryName = countryId + "-" + Convert.ToString(dtCountryDetails.Rows[0]["country_name"]);
+                    int regionCode = Convert.ToInt32(dtCountryDetails.Rows[0]["Region_id"]);
+
+                    strQuery.Clear();
+                    strQuery.Append("Insert into Csu_Notes (Note_id, Region_id, Product_cd,Country_id,");
+                    strQuery.Append(" Note_title, Note_category_cd, Note_priority_cd, ");
+                    strQuery.Append(" Note_eff_beg_Date, Note_eff_end_Date, Created_emp_id, created_dt,");
+                    strQuery.Append(" Updated_emp_id, Updated_dt,note_symbol, NOTE_CONTENT");
+                    strQuery.Append(" ) Values ( " + noteId + ", '" + regionCode + "'  ,");
+                    strQuery.Append(" " + productId + " , " + countryId + ", '" + title + "' , '" + category + "','" + priority + "',  ");
+                    strQuery.Append(" to_date('" + BegDate + "','MM/DD/YYYY') ,");
+                    strQuery.Append(" to_date('" + EndDate + "','MM/DD/YYYY') ,");
+                    strQuery.Append(" '" + userId + "', sysdate,");
+                    strQuery.Append(" '" + userId + "', sysdate, '" + sCountryName.Replace(sCountryName, "''") + "', '" + description + "' ) ");
+                }
+                else if (Criteria == 4)
+                {
+                    strQuery.Clear();
+                    strQuery.Append("SELECT Region_id, Country_id,city_name FROM CSU_CITY WHERE City_id = " + cityId + " ");
+                    DataTable dtCityDetails = objGetDataFromDB.GetDataTable(strQuery.ToString());
+                    if (dtCityDetails != null)
+                    {
+                        string sCityName = cityId + "-" + Convert.ToString(dtCityDetails.Rows[0]["city_name"]);
+                        int regionCode = Convert.ToInt32(dtCityDetails.Rows[0]["Region_id"]);
+                        int countryCode = Convert.ToInt32(dtCityDetails.Rows[0]["Country_id"]);
+
+
+                        strQuery.Clear();
+                        strQuery.Append("Insert into Csu_Notes (Note_id, Region_id, Product_cd,Country_id, City_id,");
+                        strQuery.Append(" Note_title, Note_category_cd, Note_priority_cd, ");
+                        strQuery.Append(" Note_eff_beg_Date, Note_eff_end_Date, Created_emp_id, created_dt, ");
+                        strQuery.Append(" Updated_emp_id, Updated_dt,note_symbol, NOTE_CONTENT");
+                        strQuery.Append(" ) Values ( " + noteId + ", '" + regionCode + "'  ,");
+                        strQuery.Append(" " + productId + " , '" + countryCode + "' , '" + cityId + "' , '" + title + "' , '" + category + "','" + priority + "',  ");
+                        strQuery.Append(" to_date('" + BegDate + "','MM/DD/YYYY') ,");
+                        strQuery.Append(" to_date('" + EndDate + "','MM/DD/YYYY') ,");
+                        strQuery.Append(" '" + userId + "', sysdate,");
+                        strQuery.Append(" '" + userId + "', sysdate,'" + sCityName.Replace(sCityName, "''") + "', '" + description + "') ");
+                    }
+                }
+
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            //OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQuery);
+            return 0;
+        }
+
+        public string GetUserName(string userId)
+        {
+            strQuery.Clear();
+            string createdBy = string.Empty;
+            strQuery.Append("select user_name from csu_user where emp_id='" + userId + "' ");
+            DataTable dtEmpName = objGetDataFromDB.GetDataTable(strQuery.ToString());
+            if (dtEmpName.Rows.Count > 0)
+            {
+                createdBy = Convert.ToString(dtEmpName.Rows[0]["user_name"]);
+            }
+            else
+            {
+                createdBy = "UNKNOWN";
+            }
+            return createdBy;
+        }
+
+        public int UpdateNote(int Criteria, int productId, int regionId, int countryId, int cityId, string title, string category, string priority, string BegDate, string EndDate, string userId, long noteId, string description)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            try
+            {
+                connection.Open();
+                if (userId == "")
+                {
+                    userId = "Null";
+                }
+                if (Criteria == 1)
+                {
+                    strQuery.Clear();
+                    strQuery.Append("Update Csu_Notes set ");
+                    strQuery.Append(" Note_Title = '" + title + "', Note_category_cd ='" + category + "', Note_priority_cd ='" + priority + "', Note_content ='" + description + "', ");
+                    strQuery.Append(" Note_eff_beg_Date = to_date('" + BegDate + "','DD/MM/YYYY'), Note_eff_end_Date = to_date('" + EndDate + "','DD/MM/YYYY'), Updated_Emp_id ='" + userId + "', Updated_dt =sysdate ");
+                    //strQuery.Append(" where Region_id='" + regionId + "' ");
+                    strQuery.Append(" Where Product_cd=" + productId + " ");
+                    strQuery.Append(" and Note_id=" + noteId + " ");
+                }
+                else if (Criteria == 2)
+                {
+                    strQuery.Clear();
+                    strQuery.Append("Update Csu_Notes set ");
+                    strQuery.Append(" Note_Title = '" + title + "', Note_category_cd ='" + category + "', Note_priority_cd ='" + priority + "', Note_content ='" + description + "', ");
+                    strQuery.Append(" Note_eff_beg_Date = to_date('" + BegDate + "','DD/MM/YYYY'), Note_eff_end_Date = to_date('" + EndDate + "','DD/MM/YYYY'), Updated_Emp_id ='" + userId + "', Updated_dt =sysdate ");
+                    //strQuery.Append(" where Region_id='" + regionId + "' ");
+                    strQuery.Append(" where Product_cd=" + productId + " ");
+                    strQuery.Append(" and Country_id is Null ");
+                    strQuery.Append(" City_id is Null ");
+                    strQuery.Append(" and Note_id=" + noteId + " ");
+                }
+                else if (Criteria == 3)
+                {
+                    strQuery.Clear();
+                    strQuery.Append("SELECT Region_id FROM CSU_Country WHERE Country_id =" + countryId + " ");
+                    DataTable dtCountryDetails = objGetDataFromDB.GetDataTable(strQuery.ToString());
+                    int regionCode = Convert.ToInt32(dtCountryDetails.Rows[0]["Region_id"]);
+
+                    strQuery.Clear();
+                    strQuery.Append("Update Csu_Notes set ");
+                    strQuery.Append(" Note_Title = '" + title + "', Note_category_cd ='" + category + "', Note_priority_cd ='" + priority + "', Note_content ='" + description + "', ");
+                    strQuery.Append(" Note_eff_beg_Date = to_date('" + BegDate + "','DD/MM/YYYY'), Note_eff_end_Date = to_date('" + EndDate + "','DD/MM/YYYY'), Updated_Emp_id ='" + userId + "', Updated_dt =sysdate ");
+                    //strQuery.Append(" where Region_id='" + regionCode + "' ");
+                    strQuery.Append(" where Product_cd=" + productId + " ");
+                    strQuery.Append(" and Country_id= " + countryId + " ");
+                    strQuery.Append(" City_id is Null ");
+                    strQuery.Append(" and Note_id=" + noteId + " ");
+                }
+                else if (Criteria == 4)
+                {
+                    strQuery.Clear();
+                    strQuery.Append("SELECT Region_id, Country_id FROM CSU_CITY WHERE City_id = " + cityId + " ");
+                    DataTable dtCityDetails = objGetDataFromDB.GetDataTable(strQuery.ToString());
+                    if (dtCityDetails != null)
+                    {
+                        string sCityName = cityId + "-" + Convert.ToString(dtCityDetails.Rows[0]["city_name"]);
+                        int regionCode = Convert.ToInt32(dtCityDetails.Rows[0]["Region_id"]);
+                        int countryCode = Convert.ToInt32(dtCityDetails.Rows[0]["Country_id"]);
+
+
+                        strQuery.Clear();
+                        strQuery.Append("Update Csu_Notes set ");
+                        strQuery.Append(" Note_Title = '" + title + "', Note_category_cd ='" + category + "', Note_priority_cd ='" + priority + "', Note_content ='" + description + "', ");
+                        strQuery.Append(" Note_eff_beg_Date = to_date('" + BegDate + "','DD/MM/YYYY'), Note_eff_end_Date = to_date('" + EndDate + "','DD/MM/YYYY'), Updated_Emp_id ='" + userId + "', Updated_dt =sysdate ");
+                        //strQuery.Append(" where Region_id='" + regionCode + "' ");
+                        strQuery.Append(" where Product_cd=" + productId + " ");
+                        strQuery.Append(" and Country_id= " + countryCode + " ");
+                        strQuery.Append(" City_id= " + cityId + " ");
+                        strQuery.Append(" and Note_id=" + noteId + " ");
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            //OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, strQuery);
+            return 0;
+        }
+
+        public int DeleteNote(string noteId)
+        {
+            OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+            //int reportColumnCd = GetReportColumnCdData(reportId, orderCd);
+            try
+            {
+                connection.Open();
+                strQuery.Clear();
+                strQuery.Append("DELETE FROM CSU_NOTES WHERE Note_id ='" + noteId + "' ");
+                OracleCommand cmdOra = new OracleCommand(strQuery.ToString(), connection);
+                cmdOra.CommandType = CommandType.Text;
+                cmdOra.ExecuteNonQuery();
+                return 1;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
+            return 0;
+        }
+
+        #endregion
+
+    }
+}

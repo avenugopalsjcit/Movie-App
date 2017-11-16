@@ -1,0 +1,59 @@
+// -----------------------------------------------------------------------------------------------------------------
+// Version     Date            Modified by            Comments
+//             DD/MM/YY        Infosys ID
+// -----------------------------------------------------------------------------------------------------------------
+// 1.0         06/06/07        madhav_shenoy            Created
+// -----------------------------------------------------------------------------------------------------------------
+
+#region Imported Namespaces
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+
+#endregion
+
+namespace SCAdminBAL.MCU
+{
+
+    /// <summary>
+    /// Summary description for CapmanPlatform
+    /// </summary>
+    [Serializable]
+    public class CapmanPlatform
+    {
+        #region Private Variables
+
+        private int _CapmanPlatformId = -1;
+        private string _CapmanPlatformName = String.Empty;
+        #endregion
+
+        #region Public Properties
+        public int CapmanPlatformId
+        {
+            get
+            {
+                return _CapmanPlatformId;
+            }
+            set
+            {
+                _CapmanPlatformId = value;
+            }
+        }
+
+        public string CapmanPlatformName
+        {
+            get
+            {
+                return _CapmanPlatformName;
+            }
+            set
+            {
+                _CapmanPlatformName = value;
+            }
+        }
+        #endregion
+    }
+
+}
+

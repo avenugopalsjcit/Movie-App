@@ -1,0 +1,289 @@
+﻿app.controller("Controller.MCU_HVPN_TreeView", function ($scope, $rootScope, $compile, MCUParam, HVPNMCUHelper) {
+    $scope.productID = MCUParam.getProductId();
+    $scope.subProductID = MCUParam.getSubProductId();
+    var openFolderIcon = "image/openfolder.gif";
+    var closeFolderIcon = "image/closefolder.gif";
+    // $('.pageLoaderOverlay').show();
+    MCUParam.storeScope('MCU_HVPN_TreeView', $scope);
+    if ($scope.productID == "") {
+        EthernetMCUHelper.getSessionData().success(function (data) {
+            $scope.productID = data.d.ProductCd;
+        });
+    }
+
+    $scope.loadTree = function (productID, subProductID, type, selectionstate, key) {
+        $('.pageLoaderOverlay').show();
+        if (type == "Region") {
+            //to reset region dropdown
+            $scope.modRegion = [];
+            HVPNMCUHelper.getRegionTree(productID, subProductID, type, selectionstate, key).success(function (data) {
+                $scope.TreeContents = JSON.parse(data.d);
+                $scope.lstRegion = $scope.TreeContents[0];
+                $scope.lstCountry = $scope.TreeContents[1];
+                $("#ddlRegion").select2();
+                $('.pageLoaderOverlay').hide();
+
+            }).error(function () {
+                console.log("Load tree data failed");
+                $('.pageLoaderOverlay').hide();
+            });
+        }
+    }
+
+    $scope.loadTree($scope.productID, $scope.subProductID, "Region", 1, 0);
+
+    $scope.filterCountry = function () {
+        if ($scope.modRegion != undefined && $scope.modRegion != '' && $scope.modRegion != null) {
+            $(".showallcountry").hide();
+            $("." + $scope.modRegion.REGION_ID).show();
+        } else {
+            $(".showallcountry").show();
+        }
+    }
+
+
+    $scope.selectedCases = [];
+    $scope.selectedPlatform = [];
+    $scope.selecedCaseValidCd = [];
+    $scope.selectedPoPs = [];
+    $scope.selectedCountry = [];
+    $scope.CaseArray = [];
+    $scope.savePopIDbyCounytry = function ($event) {
+        var countryID = $event.currentTarget.id.replace('ChkCountry', '');
+        $scope.selectedCountry = getStringArray($scope.CaseArray, 'selectedPoPId');
+        if ($event.currentTarget.checked) {
+            $scope.selectedPoPs = getStringArray($scope.CaseArray, 'selectedPoPId');
+            $('.pageLoaderOverlay').show();
+            HVPNMCUHelper.getRegionTree($scope.productID, $scope.subProductID, "gpop", "1", countryID).success(function (data) {
+                $scope.GPoPList = JSON.parse(data.d);
+                $scope.GPoPList.forEach(function (item) {
+                    if ($scope.selectedPoPs.indexOf(item.HUB_SITE_ID) == -1) {
+                        $scope.CaseArray.push({ selectedCases: item.CASEID,
+                            selecedCaseValidCd: item.CASEVALIDCD,
+                            CaseAvailCd: item.AVAILABILITY,
+                            productCD: $scope.productID,
+                            subProductID: $scope.subProductID,
+                            selectedPoPId: item.HUB_SITE_ID,
+                            selectedPoPName: item.HUB_SITE_NAME,
+                            selectedPoPType: item.POP_TYPE,
+                            selectedCountryId: item.PARENTID,
+                            selectedCountryName: $.grep($scope.lstCountry, function (e) { return e.COUNTRY_ID == item.PARENTID })[0].COUNTRY_NAME,
+                            selectedRegionId: item.REGION_ID,
+                            selectedRegionName: $.grep($scope.lstRegion, function (e) { return e.REGION_ID == item.REGION_ID })[0].REGION_NAME
+
+                        });
+                    }
+                });
+                $('.pageLoaderOverlay').hide();
+            });
+
+        } else {
+
+            if ($scope.CaseArray.indexOf(countryID) != -1) {
+                removeArrayObject($scope.CaseArray, countryID);
+            }
+        }
+    }
+
+    $scope.savePopID = function ($event) {
+        if ($event.currentTarget.checked) {
+            //            if ($(this).attr('id').indexOf("ChkCountry") > -1) {
+            //                var countryID = $(this).attr('id').replace('ChkCountry', '');
+
+            //                if ($scope.GPoPList.length > 0) {
+            //                    $scope.GPoPList.forEach(function (item) {
+            //                        if (item.PARENTID == countryID) {
+            //                            if ($scope.selectedPoPs.indexOf(item.HUB_SITE_ID) == -1) {
+            //                                // $scope.selectedPoPs.push({ id: item.PoPID, type: item.popType });
+            //                                $scope.selectedPoPs.push(item.HUB_SITE_ID);
+            //                            }
+            //                            if ($scope.selectedCases.indexOf(item.CASEID) == -1) {
+            //                                $scope.selectedCases.push(item.CASEID);
+            //                                $scope.selecedCaseValidCd.push(item.CASEVALIDCD);
+            //                            }
+            //                            if ($scope.selectedCountry.indexOf(countryID) == -1) {
+            //                                $scope.selectedCountry.push(countryID);
+            //                            }
+            //                            $scope.checkedVal = true;
+            //                        }
+            //                    });
+            //                }
+
+            var caseID = $event.currentTarget.attributes['5'].value;
+            var PoPID = $event.currentTarget.id.replace('chkPoP', '');
+            var parentID = $event.currentTarget.attributes['3'].value; ;
+            var caseValidCd = $event.currentTarget.attributes['4'].value;
+            $scope.selectedPoPs = getStringArray($scope.CaseArray, 'selectedPoPId');
+            if ($scope.selectedPoPs.indexOf(parseInt(PoPID)) == -1) {
+
+                HVPNMCUHelper.getRegionTree($scope.productID, $scope.subProductID, "gpop", "1", parentID).success(function (data) {
+                    var GPoPList = JSON.parse(data.d);
+                    var selectedPop = $.grep(GPoPList, function (e) { return e.HUB_SITE_ID == PoPID; });
+                    selectedPop.forEach(function (item) {
+
+                        $scope.CaseArray.push({ selectedCases: item.CASEID,
+                            selecedCaseValidCd: caseValidCd,
+                            CaseAvailCd: item.AVAILABILITY,
+                            productCD: $scope.productID,
+                            subProductID: $scope.subProductID,
+                            selectedPoPId: item.HUB_SITE_ID,
+                            selectedPoPName: item.HUB_SITE_NAME,
+                            selectedPoPType: item.POP_TYPE,
+                            selectedCountryId: item.PARENTID,
+                            selectedCountryName: $.grep($scope.lstCountry, function (e) { return e.COUNTRY_ID == item.PARENTID })[0].COUNTRY_NAME,
+                            selectedRegionId: item.REGION_ID,
+                            selectedRegionName: $.grep($scope.lstRegion, function (e) { return e.REGION_ID == item.REGION_ID })[0].REGION_NAME
+                        });
+                    });
+
+                });
+
+
+                //                $scope.selectedPoPs.push(PoPID);
+                //                $scope.selectedCases.push(caseID);
+                //                $scope.selecedCaseValidCd.push(caseValidCd);
+                //                $scope.selectedCountry.push(parentID);
+            }
+            //            if ($scope.selectedCases.indexOf(caseID) == -1) {
+            //                $scope.selectedCases.push(caseID);
+            //                $scope.selecedCaseValidCd.push(caseValidCd);
+            //            }
+            //            if ($scope.selectedCountry.indexOf(parentID) == -1) {
+            //                $scope.selectedCountry.push(parentID);
+            //            }
+
+            $scope.checkedVal = true;
+
+        } else {
+            if ($scope.CaseArray.indexOf(PoPID) != -1) {
+                removeArrayObject($scope.CaseArray, countryID);
+            }
+
+        }
+        $('.pageLoaderOverlay').hide();
+    }
+
+    $scope.$on("getSelectedTree", function (event, args) {
+
+        MCUParam.setSelectedCase($scope.selectedCases);
+        MCUParam.setSelectedPoP($scope.selectedPoPs);
+        MCUParam.setselecedCaseValidCd($scope.selecedCaseValidCd);
+        MCUParam.setSelectedCountryHVPN($scope.selectedCountry);
+
+    });
+
+
+
+    $scope.GPoPList = [];
+    //this function will be called on click of country
+    $scope.loadChild = function (countryID, type) {
+        var childID = "countryChild" + countryID;
+        //folder should be toggled
+        var imgtagID = "countryfolderImage" + countryID;
+
+        var folderIcon = toggleFolderImage(imgtagID);
+
+        //if ($("#ChkCountry" + countryID).prop("checked")) {
+        if (folderIcon == openFolderIcon) {
+            if ($("#" + childID + "").html() == '') {
+                var treeCity = [];
+                var html = "<ul >";
+                $('.pageLoaderOverlay').show();
+                HVPNMCUHelper.getRegionTree($scope.productID, $scope.subProductID, "gpop", "1", countryID).success(function (data) {
+                    $scope.GPoPList = JSON.parse(data.d);
+                    if ($scope.GPoPList.length > 0) {
+                        $scope.GPoPList.forEach(function (item) {
+                            if ($("#ChkCountry" + countryID).prop("checked")) {
+                                if (item.CASEVALIDCD == 0)
+                                    html += "<li><input id='chkPoP" + item.HUB_SITE_ID + "' type='checkbox' checked='checked' cases='" + item.CASEID + "' caseValidCd='" + item.CASEVALIDCD + "' parent='" + item.PARENTID + "' ng-click='savePopID($event)'/> <span>" + item.HUB_SITE_NAME + "</span></li>";
+                                else {
+                                    html += "<li><input id='chkPoP" + item.HUB_SITE_ID + "' type='checkbox' checked='checked' cases='" + item.CASEID + "' caseValidCd='" + item.CASEVALIDCD + "' parent='" + item.PARENTID + "' ng-click='savePopID($event)'/> <span class='text-green'>" + item.HUB_SITE_NAME + "</span></li>";
+                                }
+                            }
+                            else {
+                                if (item.CASEVALIDCD == 0)
+                                    html += "<li><input id='chkPoP" + item.HUB_SITE_ID + "' type='checkbox' cases='" + item.CASEID + "' caseValidCd='" + item.CASEVALIDCD + "' parent='" + item.PARENTID + "' ng-click='savePopID($event)'/> <span>" + item.HUB_SITE_NAME + "</span></li>";
+                                else {
+                                    html += "<li><input id='chkPoP" + item.HUB_SITE_ID + "' type='checkbox' cases='" + item.CASEID + "' caseValidCd='" + item.CASEVALIDCD + "' parent='" + item.PARENTID + "' ng-click='savePopID($event)'/> <span class='text-green'>" + item.HUB_SITE_NAME + "</span></li>";
+                                }
+                            }
+
+
+                        });
+
+                        html += "</ul>";
+                    } else {
+                        html = "<ul></ul>";
+                    }
+                    var temp = $compile(html)($scope);
+                    $("#" + childID + "").html(temp);
+
+                    $('.pageLoaderOverlay').hide();
+
+                }).error(function () {
+                    console.log("Load tree data failed");
+                    $('.pageLoaderOverlay').hide();
+                });
+
+            } else {
+                $("#" + childID + "").show();
+            }
+        } else {
+            $("#" + childID + "").hide();
+            // clearChildDiv(childID);
+        }
+    }
+
+    $('.checktree-root').on('change', 'input[type="checkbox"]', function (e) {
+        checkChildren($(this));
+    });
+
+
+});
+
+function clearChildDiv(divID) {
+    $("#" + divID + "").empty();
+}
+
+function toggleFolderImage(imgID) {
+    var src = ($("#" + imgID).attr('src') == "image/closefolder.gif")
+            ? "image/openfolder.gif"
+            : "image/closefolder.gif";
+    $("#" + imgID).attr('src', src);
+    return src;
+}
+
+
+app.factory('HVPNMCUHelper', function ($http) {
+    return {
+
+        getSessionData: function () {
+            return $http.post('MCU.aspx/LoadMCUSession', { data: {} })
+            .error(function (error) {
+                console.log(error);
+            });
+        },
+
+        getRegionTree: function (productID, subProductID, type, selectionstate, key) {
+            return $http.post('GetTreeContent.aspx/GetHVPNTreeContents', { 'ProductCd': productID, 'SubProductCd': subProductID,
+                'type': type, 'selectionstate': selectionstate, 'key': key
+            })
+            .error(function (error) {
+                console.log(error);
+            });
+        },
+        CaseIdExists: function (caseIDs) {
+            return $http.post('MCU.aspx/CaseIdExists', { 'caseIDs': caseIDs });
+        }
+
+    }
+});
+
+var checkChildren = function (c) {
+    var childLi = $('ul li input[type="checkbox"]', c.parents('li:eq(0)'));
+
+    if (childLi.length)
+        childLi.prop('checked', c.is(':checked'));
+}
+
+

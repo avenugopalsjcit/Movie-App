@@ -1,0 +1,876 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+ <div id="divStandardReport" class="tab-pane active">
+                <div ng-controller="DefineStandardReportCtrl" class="container">
+                    <div class="row text-left Arrow" style="margin-left:20px;">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-left:-10px;">
+                            <h3>
+                                Define Standard Report
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-left: 10px">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="panel-body">
+                                <!--<h4 style="text-align:left">Notes Audit Information</h4>-->
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" for="" style="text-align:left;">
+                                            Product<span style="color:Red;"> *</span>
+                                        </label>
+                                        <div class="col-sm-3">
+                                            <select id="Select1" ng-model="modProductType" ng-change="GetProducts()" ng-options="item.ProductId as item.ProductName for item in ProductsType"
+                                                style="width: 90%">
+                                                <option value="">-- Please Select --</option>
+                                            </select>
+                                        </div>
+                                       <!-- <div class="col-sm-3" style="padding-left: 0px;">
+                                            <input type="button" value="Export" ng-click="ExportCapmanReport()" />
+                                        </div>-->
+                                    </div>
+                                </div>
+                                <div ng-show="SubProductData" class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" for="" style="text-align:left;">
+                                            Sub Product<span style="color:Red;"> *</span>
+                                        </label>
+                                        <div class="col-sm-3" id="productDiv">
+                                            <select id="subProd" ng-model="modSubProductType" ng-change="GetSubProducts()"
+                                                ng-options="item.SubProductId as item.SubProductName for item in SubProductsType" style="width: 90%">
+                                                <option value="">-- Please Select --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div ng-show="ReportData" class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label"  for="" style="text-align:left;">
+                                            Report Name<span style="color:Red;"> *</span> 
+                                        </label>
+                                        <div class="col-md-3" id="ReportDiv">
+                                            <!--<label for="inputDescription" class="control-label">
+                                             {{ReportName}}</label>
+                                        </div>
+                                        <div  ng-show="ShowReportId" class="col-sm-3" ng-model="ReportId" style="white-space: nowrap;">
+                                            {{ReportId}}-->
+                                            <select id="standardReport" ng-model="modReport" ng-change="GetReports()"
+                                                ng-options="item.ReportId as item.ReportName for item in ReportsType" style="width: 90%">
+                                                <option value="">-- Please Select --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br/> <br />
+                                <div ng-show="DefineReportData">
+                                <div style="text-align:left;font-size:18px;">
+                                            Standard Columns Data
+                                    </div>
+                                    <table ng-table="StandardColumnsTable" class="table table-striped table-bordered no-pager" id="tblStandardColumns">
+                                        <tr ng-repeat="standardColumns in $data">
+                                            <td title="'Column Header'" filter="{ ColumnHeader: 'text'}" sortable="'ColumnHeader'">
+                                                {{standardColumns.ColumnHeader}}
+                                            </td>
+                                            <td title="'Column Width'" filter="{ ColumnWidth: 'text'}" sortable="'ColumnWidth'">
+                                                <div class="col-md-7">
+                                                     <input type="text" id="modStandardCol" value="{{standardColumns.ColumnWidth}}" class="form-control" />
+                                                 </div>
+                                            </td>
+                                            <td title="'Valid'" filter="{ valid: 'text'}" sortable="'valid'">
+                                               <div class="col-md-5">
+                                                   <input type="checkbox" ng-checked="{{standardColumns.valid}}" ng-model="modStandardValid" />
+                                               </div>
+                                                
+                                            </td>
+                                            <td title="'Display Order'" filter="{ DisplayOrder: 'text'}" sortable="'DisplayOrder'">
+                                                <div class="col-md-7">
+                                                     <input type="text" id="modStandardDisplay" value="{{standardColumns.DisplayOrder}}" class="form-control" />
+                                                 </div>
+                                            </td>
+                                        </tr>
+                                    </table> <br /> <br/>
+                                    <a ng-click="showData()" data-target="#AddNewReportColumn" data-toggle="modal" style="text-decoration:underline;font-size:14px;">Add New Report Column </a>
+                                </div>
+                                <div ng-show="ColumnReferenceData">
+                                <div style="text-align:left;font-size:18px">
+                                     View Report Column Reference
+                                </div>
+                                 <table ng-table="ColumnReferenceDataTable" class="table table-striped table-bordered no-pager" id="tblColumnReferenceData">
+                                        <tr ng-repeat="ColumnReference in $data">
+                                            <td title="'Column Header'" filter="{ ColumnHeader: 'text'}" sortable="'ColumnHeader'">
+                                                {{ColumnReference.ColumnHeader}}
+                                            </td>
+                                            <td title="'Column Header2'" filter="{ ColumnHeader2: 'text'}" sortable="'ColumnHeader2'">
+                                                {{ColumnReference.ColumnHeader2}}
+                                            </td>
+                                            <td title="'Column Header3'" filter="{ ColumnHeader3: 'text'}" sortable="'ColumnHeader3'">
+                                                {{ColumnReference.ColumnHeader3}}
+                                            </td>
+                                            <td title="'Characteristics'" filter="{ Characteristics: 'text'}" sortable="'Characteristics'">
+                                                <a id="lnkColRef" ng-click="passColumnReferenceValues(ColumnReference.Characteristics,ColumnReference.charId,ColumnReference.DisplayOrder,ColumnReference.columnValid,ColumnReference.ColumnHeader2,ColumnReference.ColumnHeader3,ColumnReference.ColumnHeader)">{{ColumnReference.Characteristics}}</a>
+                                                  <!-- data-target="#Characteristics" data-toggle="modal"-->
+                                            </td>
+                                            <td title="'Width'" filter="{ Width: 'text'}" sortable="'Width'">
+                                              <div class="col-md-7">
+                                                     <input type="text" id="modReferenceWidth" value="{{ColumnReference.Width}}" class="form-control" />
+                                                 </div>
+                                            </td>
+                                            <td title="'Display Order'" filter="{ DisplayOrder: 'text'}" sortable="'DisplayOrder'">
+                                                <div class="col-md-7">
+                                                     <input type="text" id="modReferenceDisplay" value="{{ColumnReference.DisplayOrder}}" class="form-control" />
+                                                 </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    </div>
+                                    <br />
+                                <div ng-show="DefinePOPData">
+                                <div style="text-align:left;font-size:18px">
+                                      View PoP Characteristic Column 
+                                </div>
+                                    <table ng-table="StandardPOPTable" class="table table-striped table-bordered no-pager" id="tblStandardPOP">
+                                        <tr ng-repeat="standardPOP in $data">
+                                            <td title="'Column Header'" filter="{ ColumnHeader: 'text'}" sortable="'ColumnHeader'">
+                                                {{standardPOP.ColumnHeader}}
+                                            </td>
+                                            <td title="'Column Header2'" filter="{ ColumnHeader2: 'text'}" sortable="'ColumnHeader2'">
+                                                {{standardPOP.ColumnHeader2}}
+                                            </td>
+                                            <td title="'Column Header3'" filter="{ ColumnHeader3: 'text'}" sortable="'ColumnHeader3'">
+                                                {{standardPOP.ColumnHeader3}}
+                                            </td>
+                                            <td title="'Characteristics'" filter="{ Characteristics: 'text'}" sortable="'Characteristics'">
+                                                <a id="lnkPoPChar" ng-click="passCharacteristicValues(standardPOP.Characteristics,standardPOP.charId,standardPOP.columnValid,standardPOP.ColumnHeader2,standardPOP.ColumnHeader3)">{{standardPOP.Characteristics}}</a>
+                                                <!--data-target="#POPCharacteristics" data-toggle="modal"-->
+                                            </td>
+                                            <td title="'Width'" filter="{ Width: 'text'}" sortable="'Width'">
+                                                <div class="col-md-6">
+                                                     <input type="text" id="modPoPWidth" value="{{standardPOP.Width}}" class="form-control" />
+                                                 </div>
+                                            </td>
+                                            <td title="'Display Order'" filter="{ DisplayOrder: 'text'}" sortable="'DisplayOrder'">
+                                                <div class="col-md-6">
+                                                     <input type="text" id="modPoPDisplay" value="{{standardPOP.DisplayOrder}}" class="form-control" />
+                                                 </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+
+                                <div ng-show="showTabLinks">
+                                <span style="font-weight:bold;">Should All Columns be Text Wrapped?</span>
+                                    <input type="checkbox" id="wrapText" ng-checked="{{modWrappedValid}}" ng-model="modWrappedValid" style="margin-bottom: 5px; margin-left: 50px;" />
+                                    <span style="margin-left: 80px;font-weight:bold;">Wrap Text= Data in entire excel sheet will wrap to fit the column widths as defined above</span> <br /> <br />
+                                    <a ng-click="showColumnWidthInSpeedData()" id="lnkWidthInSpeedData" ng-show="showSpeedtabData"  style="text-decoration:underline;">Click here to set the standard report column width in Speed Tabs </a> <br />
+                                      <!--data-target="#SetColumnWidthInSpeedDataTabs" data-toggle="modal"-->
+                                    <a ng-click="showColumnInCPEDataData()" style="text-decoration:underline;">Click here to edit columns in CPE data tabs </a> <br /><br />
+                                    <!--data-target="#EditColumnInCPEDataTabs" data-toggle="modal"-->
+                                <div class="row"">
+                                <div ng-show="ShowSLAInfo"> 
+                                    <span style="margin-left: 15px;font-weight:bold">Display SLA Information</span>
+                                    <input type="checkbox" id="chkSLA" ng-checked="true" ng-model="modSLAValid" style="margin-bottom: 5px; margin-left: 133px;" />
+                                     <a ng-click="showSLAData()" ng-show="showSLALink"  style="text-decoration:underline; margin-left: 80px;" id="lnkSLAAttributes">Click here to display SLA Attributes for Product</a> 
+                                    <!--data-target="#EditDisplayOfSLAAttributes" data-toggle="modal"-->
+                                    </div>
+                                   
+                                </div>
+                                </div>
+                                <br />
+                                <div ng-show="ShowInfo">
+                                <hr />
+                                <table>
+                                <tr>
+                                <td><span>Created by</span></td>
+                                <td><span style="margin-left: 200px;">Created Date</span></td>
+                                <td><span style="margin-left: 200px;">Updated by</span></td>
+                                <td><span style="margin-left: 200px;">Date Last Updated</span></td>
+                                </tr>
+                                 <tr ng-repeat="data in UpdatedData">
+                                <td><span>{{data.CreatedBy}}</span></td>
+                                <td><span style="margin-left: 200px;">{{data.CreatedDate}}</span></td>
+                                <td><span style="margin-left: 200px;">{{data.UpdatedBy}}</span></td>
+                                <td><span style="margin-left: 200px;">{{data.UpdatedDate}}</span></td>
+                                </tr>
+                                </table>
+                                <hr />
+                                </div>
+                                <div ng-show="ShowSaveAndUpdateButton" style="text-align:center;">
+                                     <input type="button" class="btn btn-sm btn-primary" value="Update" ng-click="UpdateCompleteDetails()" />
+                                     <input type="button" class="btn btn-sm btn-primary" value="Reset" ng-click="ResetCompleteDetails()" style="margin-left:30px;"/>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                         
+                        <div class="pageLoaderOverlay">
+                        </div>
+                    </div>
+
+                     <div tabindex="-1" class="modal fade in modalalign" id="AddNewReportColumn" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 100%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel" style="margin-left:7px;">
+                            Add Report Column</h4>
+                    </div>
+                    <div class="container" style="margin-left:-22px;">
+                        <div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Product</label>
+                                    <div class="col-md-5">
+                                <label id="productName" for="inputDescription" class="control-label">
+                                       </label>
+                                        </div>
+                            </div>
+                            <div ng-show="ShowSubProducts" class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label  col-md-5">
+                                    Feature</label>
+                                <div class="col-md-5">
+                                <label id="subProductName" for="inputDescription" class="control-label">
+                                        </label>
+                                        </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Report</label>
+                                <div class="col-md-5">
+                                <label for="inputDescription" class="control-label" id="addReport">
+                                        {{modReport}}</label>
+                                        </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Characteristics<span style="color:Red;"> *</span></label>
+                                <div class="col-md-7" id="CharDiv">
+                                            <select id="charType" ng-model="modCharacteristicType" style="width: 64%" class="js-example-basic-single" ng-change="GetCharacteristics()"
+                                                ng-options="item.CharName for item in CharacteristicsType track by item.CharId">
+                                                <option value="">-- Please Select --</option>
+                                            </select>
+                            </div><br /> <br />
+                             <div ng-show="ShowCharacteristicsAlert">
+                                    <span style="color:Red;text-align:left;margin-left:15px;">Please select any characteristics.</span>
+                                </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="margin-left:-15px;">
+                                    Column Header 1</label>
+                                <div class="col-md-5" style="margin-left:13px;">
+                                    <input type="text" value="" id="AddColhdr" class="form-control" ng-model="modColHeader1" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="margin-left:-15px;">
+                                    Column Header 2</label>
+                                <div class="col-md-5" style="margin-left:13px;">
+                                    <input type="text" value="" class="form-control" ng-model="modColHeader2" />
+                                </div>
+                            </div>
+                             <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="margin-left:-15px;">
+                                    Column Header 3</label>
+                                <div class="col-md-5" style="margin-left:13px;">
+                                    <input type="text" value="" class="form-control" ng-model="modColHeader3" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="margin-left:-15px;">
+                                    Valid</label>
+                                <div class="col-md-5" style="margin-left:15px;">
+                                    <input type="checkbox" ng-checked="true" ng-model="modValid" />
+                                </div>
+                            </div>
+
+                            <div ng-show="AddReportValidation" style="text-align:left;">
+                            <span style="color:Red;text-align:left;margin-left:15px;">Column already exist. Please select different Characteristic type.</span>
+                            </div>
+                        </div>
+                    </div>
+                   
+
+                    <div class="modal-footer" style="text-align:center;margin-left:130px;">
+                        <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click="saveDetails()" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" ng-click="resetCharacteristics()" />
+                        <button class="btn btn-default" id="CloseNewReport" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+     <div tabindex="-1" class="modal fade in modalalign" id="msgAddReportColumn" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 100%">
+                <div class="modal-content" style="width:800px;">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+
+                    </div>
+                    <div class="container" style="margin-left:-22px;">
+                     <h4 class="modal-title" id="H6" style="text-align:center;">
+                            Report Successfully added.</h4>
+
+                    <div class="modal-footer" style="text-align:center;margin-left:110px;">
+                        <button class="btn btn-default" id="Button1" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <div tabindex="-1" class="modal fade in modalalign" id="msgUpdateReportColumn" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 100%">
+                <div class="modal-content" style="width:800px;">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+
+                    </div>
+                    <div class="container" style="margin-left:-22px;">
+                     <h4 class="modal-title" id="H7" style="text-align:center;">
+                            Report Updated Successfully.</h4>
+
+                    <div class="modal-footer" style="text-align:center;margin-left:110px;">
+                        <button class="btn btn-default" id="Button2" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <div tabindex="-1" class="modal fade in modalalign" id="msgReset" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 100%">
+                <div class="modal-content" style="width:800px;">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+
+                    </div>
+                    <div class="container" style="margin-left:-22px;">
+                     <h4 class="modal-title" id="H8" style="text-align:center;">
+                            Reset done Successfully.</h4>
+
+                    <div class="modal-footer" style="text-align:center;margin-left:110px;">
+                        <button class="btn btn-default" id="Button3" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div tabindex="-1" class="modal fade in modalalign" id="msgDeleteReportColumn" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 100%">
+                <div class="modal-content" style="width:800px;">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+
+                    </div>
+                    <div class="container" style="margin-left:-22px;">
+                    <div class="col-md-7" style="text-align:center;">
+                          <label id="Label1" ng-model="CharValueConfirm">Do you want to delete the Report Column <span style="color:Red;">{{CharValueConfirm}}</span> ?</label>
+                    </div>
+                    <!-- <h4 class="modal-title" id="H7" style="text-align:center;">
+                            Do you want to delete the Report Column <span style="color:Red;">{{ColumnReference.Characteristics}}</span> ?</h4>-->
+
+                    <div class="modal-footer" style="text-align:center;margin-left:110px;">
+                    <input type="button" class="btn btn-sm btn-primary" value="Yes" ng-click="deleteConfirm()" />
+                        <input type="button" class="btn btn-sm btn-primary" value="No" ng-click="NoChange()" />
+                        <button class="btn btn-default" id="closeConfirm" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                     <div tabindex="-1" class="modal fade in modalalign" id="POPCharacteristics" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H1" style="margin-left:8px;">
+                            Edit Report Column Definition </h4>
+                    </div>
+                    <div class="container" style="margin-left:-22px;">
+                        <div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left;">
+                                    Product</label>
+                                    <div class="col-md-5">
+                                <label id="productChar" for="inputDescription" class="control-label" style="margin-left:-11px;">
+                                        {{modProductType}}</label>
+                                        </div>
+                            </div>
+                            <div ng-show="ShowSubProducts" class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label  col-md-5" style="text-align:left;">
+                                    Feature</label>
+                                <div class="col-md-5">
+                                <label for="inputDescription" class="control-label" id="POPSubProdId" style="margin-left:-11px;">
+                                        {{modSubProductType}}</label>
+                                        </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left;">
+                                    Report</label>
+                                <div class="col-md-5">
+                                <label for="inputDescription" class="control-label" id="POPReport" style="margin-left:-11px;">
+                                        {{modReport}}</label>
+                                        </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left;">
+                                    PoP Characteristic</label>
+                                <div class="col-md-7" style="margin-left:-11px;">
+                                           <label id="POPCharId" ng-model="POPcharValue"></label> {{standardPOP.Characteristics}}
+                            </div> <br /><br />
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left; margin-left:-15px;">
+                                    Column Header 1</label>
+                                <div class="col-md-5">
+                                    <input type="text" value="" class="form-control" id="POPcolhdr1" ng-model="columnhdr1" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left; margin-left: -15px;">
+                                    Column Header 2</label>
+                                <div class="col-md-5">
+                                    <input type="text" value="" class="form-control" id="POPcolhdr2" ng-model="columnhdr2" />
+                                </div>
+                            </div>
+                             <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left; margin-left:-15px;">
+                                    Column Header 3</label>
+                                <div class="col-md-5">
+                                    <input type="text" value="" class="form-control" id="POPcolhdr3" ng-model="columnhdr3" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left; margin-left:-15px;">
+                                    Valid</label>
+                                <div class="col-md-5" style="margin-left:2px;">
+                                    <input type="checkbox" ng-checked="true" id="POPvalidchk" ng-model="POPchkValid" />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="text-align:center;margin-left:112px;">
+                        <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click="SavePOPCharacteristics()" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" ng-click="resetPOPCharacteristics()" />
+                        <button class="btn btn-default" id="closePOPChar" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                     <div tabindex="-1" class="modal fade in modalalign" id="Characteristics" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content" style="width:650px;">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H4" style="margin-left:20px;">
+                            Edit Report Column Definition  </h4>
+                    </div>
+                    <div class="container" style="margin-left:-22px;">
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left;">
+                                    Product</label>
+                                    <div class="col-md-5">
+                                <label id="ProductCharName" for="inputDescription" class="control-label" style="margin-left:-11px;">
+                                        {{modProductType}}</label>
+                                        </div>
+                            </div>
+                            <div ng-show="ShowSubProducts" class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label  col-md-5" style="text-align:left;">
+                                    Feature</label>
+                                <div class="col-md-5">
+                                <label for="inputDescription" class="control-label" id="subProdRef" style="margin-left:-11px;">
+                                        {{modSubProductType}}</label>
+                                        </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left;">
+                                    Report</label>
+                                <div class="col-md-5">
+                                <label for="inputDescription" class="control-label" id="RefReport" style="margin-left:-11px;">
+                                        {{modReport}}</label>
+                                        </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left;">
+                                    Characteristic</label>
+                                <div class="col-md-7" style="margin-left:-11px;">
+                                           <label id="CharID" ng-model="CharValue"></label> {{ColumnReference.Characteristics}}
+                            </div><br />
+                            <br />
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left; margin-left:-15px;">
+                                    Column Header 1</label>
+                                <div class="col-md-5">
+                                    <input type="text" value="" class="form-control" id="Refhdr1" ng-model="columnRefhdr1" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left; margin-left:-15px;">
+                                    Column Header 2</label>
+                                <div class="col-md-5">
+                                    <input type="text" value="" class="form-control" id="Refhdr2" ng-model="columnRefhdr2"/>
+                                </div>
+                            </div>
+                             <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left; margin-left:-15px;">
+                                    Column Header 3</label>
+                                <div class="col-md-5">
+                                    <input type="text" value="" class="form-control" id="Refhdr3" ng-model="columnRefhdr3"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5" style="text-align:left; margin-left:-15px;">
+                                    Valid</label>
+                                <div class="col-md-5" style="margin-left: 2px;">
+                                    <input type="checkbox" ng-checked="true" id="RefchkValid" ng-model="chkRefValid"/>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <br />
+                   
+                                <table>
+                                <tr>
+                                <td><span style="margin-left: 46px;">Created by</span></td>
+                                <td><span style="margin-left: 40px;">Created Date</span></td>
+                                <td><span style="margin-left: 40px;">Updated by</span></td>
+                                <td><span style="margin-left: 40px;">Date Last Updated</span></td>
+                                </tr>
+                                 <tr ng-repeat="data in UpdatedCharData">
+                                <td><span style="margin-left: 46px;">{{data.CreatedBy}}</span></td>
+                                <td><span style="margin-left: 40px;">{{data.CreatedDate}}</span></td>
+                                <td><span style="margin-left: 40px;">{{data.UpdatedBy}}</span></td>
+                                <td><span style="margin-left: 40px;">{{data.UpdatedDate}}</span></td>
+                                </tr>
+                                </table>
+                 
+
+                    <div class="modal-footer" style="text-align:center;margin-left:180px;">
+                        <input type="button" class="btn btn-sm btn-primary"  value="Update" ng-click="saveColumnReferences()" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Delete" ng-click="deleteColumnReferences(columnRefhdr1)" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" ng-click="resetColumnReferences()" />
+                        <button class="btn btn-default" id="closeColumnRef" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                     <div tabindex="-1" class="modal fade in modalalign" id="SetColumnWidthInSpeedDataTabs" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H2" style="margin-left:25px;">
+                            Edit Column Width</h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                        
+                              <div ng-show="showColumnWidthTable">
+                             
+                                    <table ng-table="ColumnWidthTable" class="table table-striped table-bordered no-pager" id="tblColumnWidth">
+                                        <tr ng-repeat="ColumnWidth in $data">
+                                            <td title="'Column Name'" filter="{ ColumnName: 'text'}" sortable="'ColumnName'">
+                                                {{ColumnWidth.ColumnName}}
+                                            </td>
+                                            <td title="'Column Width'" filter="{ Width: 'text'}" sortable="'Width'">
+                                                 <div class="col-md-7">
+                                                     <input type="text" id="colwidth" value="{{ColumnWidth.Width}}" class="form-control" />
+                                                 </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    
+                                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click="saveWidthInSpeedData()" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" ng-click="resetWidthInSpeedData()" />
+                        <button class="btn btn-default" id="closeWidthInSpeedData" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                     <div tabindex="-1" class="modal fade in modalalign" id="EditColumnInCPEDataTabs" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H3" style="margin-left:25px;">
+                            Edit Column Width</h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                              <div>
+                               <div style="text-align:left;font-size:14px">
+                                     CPE Router Bundles
+                                </div>
+                                    <table ng-table="RouterBundlesTable" class="table table-striped table-bordered no-pager" id="tblBundles">
+                                        <tr ng-repeat="RouterBundles in $data">
+                                            <td title="'Column Name'">
+                                                {{RouterBundles.ColumnName}}
+                                            </td>
+                                            <td title="'Include in Standard Report'">
+                                                <div class="col-md-5" style="text-align: center; margin-left: 40px;">
+                                                <!--<input type="checkbox" name="chk" ng-model="{{RouterBundles.IncludeInStandardRep}}" id="checkallid" />-->
+                                                      <input type="checkbox" ng-checked="{{RouterBundles.IncludeInStandardRep}}" ng-value="{{RouterBundles.IncludeInStandardRep}}" />
+                                                </div>
+                                            </td>
+                                            <td title="'Column Width'">
+                                                 <div class="col-md-7">
+                                                     <input type="text" id="routerwidth" value="{{RouterBundles.Width}}" class="form-control" />
+                                                 </div>
+                                                
+                                            </td>
+                                        </tr>
+                                    </table>
+                                  
+                                </div>
+
+                              <div>
+                               <div style="text-align:left;font-size:14px">
+                                     CPE Maintenance Options Tab
+                                </div>
+                                    <table ng-table="MaintenanceTable" class="table table-striped table-bordered no-pager" id="tblMaintenance">
+                                        <tr ng-repeat="Maintenance in $data">
+                                            <td title="'Column Name'" >
+                                                {{Maintenance.ColumnName}}
+                                            </td>
+                                            <td title="'Include in Standard Report'">
+                                                <div class="col-md-5" style="text-align: center; margin-left: 40px;">
+                                                      <input type="checkbox" ng-checked="{{Maintenance.IncludeInStandardRep}}" ng-value="{{Maintenance.IncludeInStandardRep}}" />
+                                                     <!-- <input type="checkbox" name="chk" ng-model="{{Maintenance.IncludeInStandardRep}}" id="Checkbox1" />-->
+                                                </div>
+                                            </td>
+                                            <td title="'Column Width'">
+                                                 <div class="col-md-7">
+                                                     <input type="text" id="maintenancewidth" value="{{Maintenance.Width}}" class="form-control" />
+                                                 </div>
+                                                
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    
+                                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click="saveColumnInCPEData()" style="text-align:center;" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" ng-click="resetColumnInCPEData()" />
+                        <button class="btn btn-default" id="closeColInCPEData" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                     
+                     <div tabindex="-1" class="modal fade in modalalign" id="EditDisplayOfSLAAttributes" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="H5" style="margin-left:29px;">
+                            Edit Display of SLA Attributes</h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                              <div ng-show="ShowSLATableData">
+                                    <!--<table ng-table="SLAAttributeTable" class="table table-striped table-bordered no-pager" id="tblSLAAttribute">
+                                        <tr ng-repeat="SLAData in $data">
+                                            <td title="'Column Name'">
+                                                {{SLAData.ServiceName}}
+                                            </td>
+                                            <td title="'Column Width'">
+                                                 <div class="col-md-7">
+                                                     <input type="text" id="Text1" value="{{SLAData.Width}}" class="form-control" />
+                                                 </div>
+                                            </td>
+                                        </tr>
+                                    </table>-->
+                                    <div>
+                                    <table cellpadding="0" cellspacing="0" class="table table-bordered" id="tblSLADelivery">
+                                        <thead>
+                                            <tr>
+                                                <th style="vertical-align:middle;">
+                                                    Service Delivery
+                                                </th>
+                                                <th style="vertical-align:middle;">
+                                                    Width
+                                                </th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="SLADelivery in SLADeliveryData">
+                                                <td>
+                                                    {{SLADelivery.ServiceName}}
+                                                </td>
+                                                <td>
+                                                <div class="col-md-7">
+                                                     <input type="text" id="modDeliveryWidth" value="{{SLADelivery.Width}}" class="form-control" />
+                                                 </div>
+                                                    
+                                                </td>
+                                               
+                                            </tr>
+                                        </tbody>
+                                    </table>
+									
+									
+									<table cellpadding="0" cellspacing="0" class="table table-bordered" id="tblSLAAssurance" >
+                                        <thead>
+                                            <tr>
+                                                <th style="vertical-align:middle;">
+                                                    Service Assurance
+                                                </th>
+                                                <th style="vertical-align:middle;">
+                                                    Width
+                                                </th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="SLAAssurance in SLAAssuranceData">
+                                                <td>
+                                                    {{SLAAssurance.ServiceName}}
+                                                </td>
+                                                <td>
+                                                <div class="col-md-7">
+                                                     <input type="text" id="modAssuranceWidth" value="{{SLAAssurance.Width}}" class="form-control" />
+                                                 </div>
+                                                    
+                                                </td>
+                                               
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                   
+                                    </div>
+                                        <div>
+                                    <table>
+                                    <tr>
+                                    <td><span style="margin-left: 18px;">Created by</span></td>
+                                    <td><span style="margin-left: 40px;">Created Date</span></td>
+                                    <td><span style="margin-left: 40px;">Updated by</span></td>
+                                    <td><span style="margin-left: 40px;">Date Last Updated</span></td>
+                                    </tr>
+                                     <tr ng-repeat="data in UpdatedSLAData">
+                                    <td><span style="margin-left: 18px;">{{data.CreatedBy}}</span></td>
+                                    <td><span style="margin-left: 40px;">{{data.CreatedDate}}</span></td>
+                                    <td><span style="margin-left: 40px;">{{data.UpdatedBy}}</span></td>
+                                    <td><span style="margin-left: 40px;">{{data.UpdatedDate}}</span></td>
+                                    </tr>
+                                    </table>
+                                </div>
+                   <br />
+                                  </div>
+
+                              <div ng-show="ShowNoSLAData" class="alert alert-danger Arrow" role="alert">
+                                    No Data available for this set of combination.
+                                    </div>
+                                   
+                              </div>
+                    </div>
+                   
+                        
+                    <div class="modal-footer" style="margin-right:30px;">
+                        <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click="saveSLAAttributes()" style="text-align:center;" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" ng-click="resetSLAAttributes()" />
+                        <button class="btn btn-default" id="closeSLAAttribute" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                    
+                    </div>
+                     
+                </div>
+            </div>
+             <div class="pageLoaderOverlay">
+                                    </div>
+        </div>
+       
+    </div>
+                     <div ng-show="NoColumnReferenceData" class="alert alert-danger Arrow" role="alert">
+                                    No Column Reference Data available for this set of combination.
+                                </div>
+                                <div ng-show="NoPOPCharacteristicColumnData" class="alert alert-danger Arrow" role="alert">
+                                    No PoP Characteristic Column Data available for this set of combination.
+                                </div>
+                   
+            </div>
+  </div>
+</body>
+</html>

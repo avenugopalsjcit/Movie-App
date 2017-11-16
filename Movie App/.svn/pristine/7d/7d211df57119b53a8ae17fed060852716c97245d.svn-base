@@ -1,0 +1,38 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SLABuilder.aspx.cs" Inherits="SCAdmin.SLABuilder" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+     <div>
+   <%--  <asp:Button runat="server" ID="btnSubmit" onclick="btnSubmit_Click1" />--%>
+    <asp:GridView ID="gvcostable1data" runat="server" Visible ="false"  AutoGenerateColumns="False" BackColor="White"
+        BorderColor="#CC9966" BorderStyle="None" BorderWidth="1px" CellPadding="4">
+        <Columns>
+           <asp:BoundField DataField="PRODUCT_CD" HeaderText="PRODUCT_CD" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="PARTNER" HeaderText="PARTNER" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="ACCESS_TYPE" HeaderText="ACCESS_TYPE" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="SERVICE_VARIANT" HeaderText="SERVICE_VARIANT" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="DELIVERY_MODE" HeaderText="DELIVERY_MODE" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="PORT_SPEED" HeaderText="PORT_SPEED" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="EF " HeaderText="EF" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="AF1" HeaderText="AF1" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="AF2" HeaderText="AF2" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="AF3" HeaderText="AF3" ItemStyle-Width="100px" />
+                <asp:BoundField DataField="AF4" HeaderText="AF4" ItemStyle-Width="150px" />
+                <asp:BoundField DataField="COS_PROFILE_ID" HeaderText="COS_PROFILE_ID" ItemStyle-Width="150px" />
+				
+        </Columns>
+        <FooterStyle BackColor="#FFFFCC" ForeColor="#330099" />
+        <PagerStyle BackColor="#FFFFCC" ForeColor="#330099" HorizontalAlign="Center" />
+        <SelectedRowStyle BackColor="#FFCC66" Font-Bold="True" ForeColor="#663399" />
+        <HeaderStyle BackColor="#990000" Font-Bold="True" ForeColor="#FFFFCC" />
+    </asp:GridView>
+    </div>
+    </form>
+</body>
+</html>

@@ -1,0 +1,16 @@
+﻿
+
+
+(function (ng, app) {
+
+
+    app.controller('Controllers.DisplayOrderCtrl', function ($scope, NgTableParams) {
+
+        $(".clsdisplayproduct2").select2();
+        $(".clsdisplayproduct1").select2();
+        $(".clsdefineproduct").select2();
+        $(".clsCharastricType").select2();
+        $(".clsdefinesubproduct").select2();
+    })
+
+} (angular, app));

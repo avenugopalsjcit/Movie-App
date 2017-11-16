@@ -1,0 +1,458 @@
+﻿app.controller("Controller.MCU_TreeView", function ($scope, $rootScope, $compile, filterFilter, MCUParam, EthernetMCUHelper) {
+    $scope.productID = MCUParam.getProductId();
+    $scope.subProductID = MCUParam.getSubProductId();
+    var openFolderIcon = "image/openfolder.gif";
+    var closeFolderIcon = "image/closefolder.gif";
+    // $('.pageLoaderOverlay').show();
+    if ($scope.productID == "") {
+        EthernetMCUHelper.getSessionData().success(function (data) {
+            $scope.productID = data.d.ProductCd;
+        });
+    }
+    MCUParam.storeScope("MCU_TreeView", $scope);
+
+    //$('ul.wTreeStyle').checktree();
+    $scope.$on('loadTree', function (event, args) {
+        $scope.loadTree(0, args.resetCase.caseValidity, 0, 0, 0);
+
+    });
+
+    $('.checktree-root').on('change', 'input[type="checkbox"]', function (e) {
+        $('.pageLoaderOverlay').show();
+        $scope.selectedCases = [];
+        $scope.selectedPlatform = [];
+        $scope.selecedCaseValidCd = [];
+        $scope.selectedPoPs = [];
+        checkChildren($(this));
+        checkParents($(this));
+        //        var id = $(this).attr('id');
+        //        var divid = $("#" + id).closest("div")[0].id;
+        //        if (divid != '') {
+        //            var all_checkboxes = $('#' + divid + ' input[type="checkbox"]');
+
+        //            if (all_checkboxes.length === all_checkboxes.filter(":checked").length) {
+        //                checkParents($(this));
+        //            }
+        //        }
+
+        $('.wTreeStyle input:checked').each(function () {
+            if ($(this).attr('id').indexOf("ChkCountry") > -1) {
+                var countryID = $(this).attr('id').replace('ChkCountry', '');
+                //                if ($scope.checkedCountry.indexOf(countryID))
+                //                    $scope.checkedCountry.push(countryID);
+
+                $scope.sessionPoP.forEach(function (item) {
+                    if (item.CountryID == countryID) {
+                        if ($scope.selectedPoPs.indexOf(item.PoPID) == -1) {
+                            // $scope.selectedPoPs.push({ id: item.PoPID, type: item.popType });
+                            $scope.selectedPoPs.push(item.PoPID);
+                        }
+                        if ($scope.selectedCases.indexOf(item.caseID) == -1) {
+                            $scope.selectedCases.push(item.caseID);
+                            $scope.selecedCaseValidCd.push(item.caseValidCd);
+                        }
+                    }
+                });
+                $scope.checkedVal = true;
+            }
+
+            if ($(this).attr('id').indexOf("chkState") > -1) {
+                var stateID = $(this).attr('id').replace('chkState', '')
+
+                //                if ($scope.checkedState.indexOf(stateID))
+                //                    $scope.checkedState.push(stateID);
+                $scope.sessionPoP.forEach(function (item) {
+                    if (item.stateID == stateID) {
+                        if ($scope.selectedPoPs.indexOf(item.PoPID) == -1) {
+                            // $scope.selectedPoPs.push({ id: item.PoPID, type: item.popType });
+                            $scope.selectedPoPs.push(item.PoPID);
+                        }
+                        if ($scope.selectedCases.indexOf(item.caseID) == -1) {
+                            $scope.selectedCases.push(item.caseID);
+                            $scope.selecedCaseValidCd.push(item.caseValidCd);
+                        }
+                    }
+
+                });
+                $scope.checkedVal = true;
+            }
+
+            if ($(this).attr('id').indexOf("chkCity") > -1) {
+                var cityId = $(this).attr('id').replace('chkCity', '');
+                //                if ($scope.checkedCity.indexOf(cityId))
+                //                    $scope.checkedCity.push(cityId);
+                $scope.sessionPoP.forEach(function (item) {
+                    if (item.parentID == cityId) {
+                        if ($scope.selectedPoPs.indexOf(item.PoPID) == -1) {
+                            //  $scope.selectedPoPs.push({ id: item.PoPID, type: item.popType });
+                            $scope.selectedPoPs.push(item.PoPID);
+                        }
+                        if ($scope.selectedCases.indexOf(item.caseID) == -1) {
+                            $scope.selectedCases.push(item.caseID);
+                            $scope.selecedCaseValidCd.push(item.caseValidCd);
+                        }
+                    }
+
+                });
+                $scope.checkedVal = true;
+            }
+
+            if ($(this).attr('id').indexOf("chkPoP") > -1) {
+                var caseID = $(this).attr('cases');
+                var PoPID = $(this).attr('id').replace('chkPoP', '');
+                var caseValidCd = $(this).attr('caseValidCd');
+                if ($scope.selectedPoPs.indexOf(PoPID) == -1) {
+                    // $scope.selectedPoPs.push({ id: item.PoPID, type: item.popType });
+                    $scope.selectedPoPs.push(PoPID);
+                }
+                if ($scope.selectedCases.indexOf(caseID) == -1) {
+                    $scope.selectedCases.push(caseID);
+                    $scope.selecedCaseValidCd.push(caseValidCd);
+                }
+                $scope.checkedVal = true;
+            }
+        });
+
+        if ($scope.selectedPoPs.length != 0) {
+            $("#saveContinue").prop('disabled', false);
+        } else {
+            $("#saveContinue").prop('disabled', true);
+        }
+        $('.pageLoaderOverlay').hide();
+    });
+
+    $scope.$on('saveSelection', function (event, args) {
+        $scope.checkedCountry = [];
+        $scope.checkedState = [];
+        $scope.checkedCity = [];
+
+
+        $scope.sessionPlatform.forEach(function (item) {
+            if ($scope.selectedCases.indexOf(item.caseID) != -1) {
+                $scope.selectedPlatform.push(item.capmanPlatformID);
+            }
+        });
+
+        MCUParam.setSelectedCase($scope.selectedCases);
+        MCUParam.setSelectedPoP($scope.selectedPoPs);
+        MCUParam.setSelectedPlatform($scope.selectedPlatform);
+        MCUParam.setselecedCaseValidCd($scope.selecedCaseValidCd);
+    });
+
+    //    $scope.writeSavedCaseDetails = function () {
+    //        $scope.EthernetCntrl = MCUParam.getScope('EthernetCntrl');
+
+    //        $scope.bindCasetoObject();
+    //    }
+
+    //    $scope.savedCaseDetails = [];
+    //    $scope.bindCasetoObject = function () {
+
+    //    }
+
+    //    $scope.$on('getSavedCase', function (event, args) {
+    //        $scope.CaseAvailtxt = args.casePortValidity.CaseAvailtxt;
+    //        $scope.CaseAvailID = args.casePortValidity.CaseAvailID;
+    //        $scope.caseValidID = args.casePortValidity.caseValidID;
+    //        $scope.caseValidText = args.casePortValidity.caseValidText;
+    //        $scope.portAvailID = args.casePortValidity.portAvailID;
+    //        $scope.portAvailText = args.casePortValidity.portAvailText;
+    //        $scope.portValidID = args.casePortValidity.portValidID;
+    //        $scope.portValidText = args.casePortValidity.portValidText;
+    //        $scope.leadTime = args.casePortValidity.leadTime;
+
+    //        $scope.writeSavedCaseDetails();
+    //    });
+
+
+    function getNameByID(obj, key, value) {
+        return obj.key = value;
+    }
+    $scope.lstCountry = [];
+    $scope.filterCountry = function () {
+        if ($scope.modRegion != undefined && $scope.modRegion != '' && $scope.modRegion != null) {
+            $(".showallcountry").hide();
+            $("." + $scope.modRegion.RegionID).show();
+        } else {
+            $(".showallcountry").show();
+        }
+        //            $scope.lstCountry = $.grep($scope.tempCountry, function (e) { return e.parentID == $scope.modRegion.RegionID });
+        //        else
+        //            $scope.lstCountry = $scope.tempCountry;
+
+        //  $scope.writeCountry($scope.lstCountry);
+    }
+
+
+
+    $scope.loadTree = function (parent, selectionstate, key, type, strChecked) {
+        $('.pageLoaderOverlay').show();
+        //to reset region dropdown
+        $scope.modRegion = [];
+        EthernetMCUHelper.getRegionTree($scope.productID, $scope.subProductID, parent, selectionstate, key,
+      type, strChecked, 0).success(function (data) {
+
+          //  $scope.TreeContents = data.d;
+          $scope.lstRegion = data.d.lstRegion;
+          $('#ddlreg').select2({});
+          // $scope.tempCountry = data.d.lstCountry;
+          $scope.lstCountry = data.d.lstCountry;
+          $scope.sessionState = data.d.lstState;
+          $scope.sessionCity = data.d.lstCity;
+          $scope.sessionPoP = data.d.lstPoP;
+          $scope.sessionPlatform = data.d.lstPlatform;
+
+          // $scope.writeCountry($scope.tempCountry);
+
+          $('.pageLoaderOverlay').hide();
+
+      }).error(function () {
+          console.log("Load tree data failed");
+          $('.pageLoaderOverlay').hide();
+      });
+    }
+
+
+    $scope.loadTree(0, 1, 0, 0, 0);
+
+    $scope.writeCountry = function (lstCountry) {
+        var div = "wTreeStyle";
+        var html = "";
+
+        lstCountry.forEach(function (item) {
+            html += "<li><input id='ChkCountry" + item.CountryID + "' type='checkbox'/> &nbsp;";
+            html += "<img src='image/closefolder.gif' class='imgcloseall' alt='' id='countryfolderImage" + item.CountryID + "' ng-click=loadChild(" + item.CountryID + ",'" + item.Type + "')>&nbsp;" + item.CountryName;
+            html += " <div id='countryChild" + item.CountryID + "' class='collapseall'></div></li>";
+        });
+        // html += "</ul>";
+
+        var temp = $compile(html)($scope);
+        $("." + div + "").html(temp);
+
+    }
+
+
+
+    //this function will be called on click of city, and bind pop and platform into child div
+    $scope.loadChildOnCity = function (cityID) {
+        var imgtagID = "cityfolderImage" + cityID;
+        var folderIcon = toggleFolderImage(imgtagID);
+        var childDiv = "cityChild" + cityID;
+        //$("#chkCity" + cityID).prop("checked")
+        if (folderIcon == openFolderIcon) {
+            if ($("#" + childDiv + "").html() == '') {
+                var html = "<ul>";
+                var networkPlatform = '';
+                $scope.sessionPoP.forEach(function (item) {
+                    if (cityID == item.parentID) {
+                        $scope.sessionPlatform.forEach(function (itemPlatform) {
+                            if (item.caseID == itemPlatform.caseID) {
+                                networkPlatform = itemPlatform.capmanPlatformName + ",";
+                            }
+                        });
+                        networkPlatform = networkPlatform.slice(0, -1);
+
+                        if ($("#chkCity" + cityID).prop("checked")) {
+                            if (item.caseValidCd == 0)
+                                html += "<li><input id='chkPoP" + item.PoPID + "' type='checkbox' checked='checked' cases='" + item.caseID + "' caseValidCd='" + item.caseValidCd + "' /> <span>" + item.PoPName + "(" + networkPlatform + ")" + "</span><div id='PoPChild" + item.PoPID + "'></div></li>";
+                            else {
+                                html += "<li><input id='chkPoP" + item.PoPID + "' type='checkbox' checked='checked' cases='" + item.caseID + "' caseValidCd='" + item.caseValidCd + "'/> <span class='text-green'>" + item.PoPName + "(" + networkPlatform + ")" + "</span><div id='PoPChild" + item.PoPID + "'></div></li>";
+                            }
+                        }
+                        else {
+                            if (item.caseValidCd == 0)
+                                html += "<li><input id='chkPoP" + item.PoPID + "' type='checkbox' cases='" + item.caseID + "' caseValidCd='" + item.caseValidCd + "'/> <span>" + item.PoPName + "(" + networkPlatform + ")" + "</span><div id='PoPChild" + item.PoPID + "'></div></li>";
+                            else {
+                                html += "<li><input id='chkPoP" + item.PoPID + "' type='checkbox' cases='" + item.caseID + "' caseValidCd='" + item.caseValidCd + "'/> <span class='text-green'>" + item.PoPName + "(" + networkPlatform + ")" + "</span><div id='PoPChild" + item.PoPID + "'></div></li>";
+                            }
+                        }
+                    }
+                });
+                html += "</ul>";
+                var temp = $compile(html)($scope);
+                $("#" + childDiv + "").html(temp);
+            } else {
+                $("#" + childDiv + "").show();
+            }
+
+        } else {
+            //  $("#" + childDiv + "").empty();
+            $("#" + childDiv + "").hide();
+        }
+    }
+
+
+
+    //this function will be used to bund city list from tree
+    $scope.bindCitytoTree = function (parentID, parentDiv) {
+        var childID = parentDiv + parentID;
+
+        if (parentDiv == "stateChild") {
+            var imgtagID = "statefolderImage" + parentID;
+            var folderIcon = toggleFolderImage(imgtagID);
+            if (folderIcon == openFolderIcon) {
+                if ($("#" + childID + "").html() == '') {
+                    var html = "<ul>";
+                    $scope.sessionCity.forEach(function (item) {
+                        if (parentID == item.parentID && item.statProvinceFlag == 1) {
+
+                            if ($("#chkState" + parentID).prop("checked")) {
+                                html += "<li><input id='chkCity" + item.CityID + "' type='checkbox' checked='checked'/>&nbsp;" +
+                        " <img src='image/closefolder.gif' alt='' id='cityfolderImage" + item.CityID + "' ng-click='loadChildOnCity(" + item.CityID + ")'/>&nbsp;"
+                        + item.CityName + "<div id='cityChild" + item.CityID + "'></div></li>";
+                            } else {
+                                html += "<li><input id='chkCity" + item.CityID + "' type='checkbox'/>&nbsp;" +
+                        " <img src='image/closefolder.gif' alt='' id='cityfolderImage" + item.CityID + "' ng-click='loadChildOnCity(" + item.CityID + ")'/>&nbsp;"
+                        + item.CityName + "<div id='cityChild" + item.CityID + "'></div></li>";
+                            }
+
+
+                        }
+                    });
+                    html += "</ul>";
+                    var temp = $compile(html)($scope);
+                    $("#" + childID + "").html(temp);
+                } else {
+                    $("#" + childID + "").show();
+                }
+            } else {
+                // clearChildDiv(childID);
+                $("#" + childID + "").hide();
+            }
+        } else {
+            var html = "<ul>";
+            $scope.sessionCity.forEach(function (item) {
+                if (parentID == item.parentID && item.statProvinceFlag == 0) {
+
+                    if ($("#ChkCountry" + parentID).prop("checked")) {
+                        html += "<li><input id='chkCity" + item.CityID + "' type='checkbox' checked='checked' />&nbsp;" +
+                        "<img src='image/closefolder.gif' alt='' id='cityfolderImage" + item.CityID + "' ng-click='loadChildOnCity(" + item.CityID + ")'/>&nbsp;"
+                        + item.CityName + "<div id='cityChild" + item.CityID + "'></div></li>";
+                    } else {
+                        html += "<li><input id='chkCity" + item.CityID + "' type='checkbox'/>&nbsp;" +
+                        "<img src='image/closefolder.gif' alt='' id='cityfolderImage" + item.CityID + "' ng-click='loadChildOnCity(" + item.CityID + ")'/>&nbsp;"
+                        + item.CityName + "<div id='cityChild" + item.CityID + "'></div></li>";
+                    }
+                }
+            });
+            html += "</ul>";
+            var temp = $compile(html)($scope);
+            $("#" + childID + "").html(temp);
+        }
+    }
+
+    //this function will be called on click of country
+    $scope.loadChild = function (countryID, type, folderClicked) {
+        var childID = "countryChild" + countryID;
+        //folder should be toggled
+        var imgtagID = "countryfolderImage" + countryID;
+
+        var folderIcon = toggleFolderImage(imgtagID);
+
+        //if ($("#ChkCountry" + countryID).prop("checked")) {
+        if (folderIcon == openFolderIcon) {
+            if ($("#" + childID + "").html() == '') {
+                var treeCity = [];
+                var html = "<ul >";
+                if (type == "Ci") {
+                    $scope.bindCitytoTree(countryID, 'countryChild');
+                } else {
+                    $scope.sessionState.forEach(function (item) {
+                        if (countryID == item.parentID) {
+
+                            if ($("#ChkCountry" + countryID).prop("checked")) {
+                                html += "<li><input id='chkState" + item.stateID + "' type='checkbox' checked='checked'/>&nbsp;" +
+                        "<img src='image/closefolder.gif' alt='' id='statefolderImage" + item.stateID + "' ng-click=\"bindCitytoTree(" + item.stateID + ",'stateChild')\"/>&nbsp;"
+                         + item.stateName + "<div id='stateChild" + item.stateID + "'></div></li>";
+                            }
+                            else {
+                                html += "<li><input id='chkState" + item.stateID + "' type='checkbox'/>&nbsp" +
+                        "<img src='image/closefolder.gif' alt='' id='statefolderImage" + item.stateID + "' ng-click=\"bindCitytoTree(" + item.stateID + ",'stateChild')\"/>&nbsp;"
+                         + item.stateName + "<div id='stateChild" + item.stateID + "'></div></li>";
+                            }
+                        }
+                    });
+                    html += "</ul>";
+                    var temp = $compile(html)($scope);
+                    $("#" + childID + "").html(temp);
+                }
+            } else {
+                $("#" + childID + "").show();
+            }
+        } else {
+            $("#" + childID + "").hide();
+            // clearChildDiv(childID);
+        }
+    }
+
+
+});
+
+function clearChildDiv(divID) {
+    $("#" + divID + "").empty();
+}
+
+function toggleFolderImage(imgID) {
+    var src = ($("#" + imgID).attr('src') == "image/closefolder.gif")
+            ? "image/openfolder.gif"
+            : "image/closefolder.gif";
+    $("#" + imgID).attr('src', src);
+    return src;
+}
+
+
+app.factory('EthernetMCUHelper', function ($http) {
+    return {
+
+        getSessionData: function () {
+            return $http.post('MCU.aspx/LoadMCUSession', { data: {} })
+            .error(function (error) {
+                console.log(error);
+            });
+        },
+
+        getRegionTree: function (ProductCd, SubProductCd, parent, selectionstate, key, type, strChecked) {
+            return $http.post('GetTreeContent.aspx/GetRegionTree', { 'productCd': ProductCd, 'subProductCd': SubProductCd,
+                'parent': parent, 'selectionstate': selectionstate, 'key': key, 'type': type, 'strChecked': strChecked
+            })
+            .error(function (error) {
+                console.log(error);
+            });
+        }
+
+    }
+});
+
+var checkChildren = function (c) {
+    var childLi = $('ul li input[type="checkbox"]', c.parents('li:eq(0)'));
+
+    if (childLi.length)
+        childLi.prop('checked', c.is(':checked'));
+}
+
+
+var checkParents = function (c) {
+    var parentLi = c.parents('ul:eq(0)').parents('li:eq(0)');
+
+    if (parentLi.length) {
+        var siblingsChecked = parseInt($('input[type="checkbox"]:checked', c.parents('ul:eq(0)')).length),
+                        rootCheckbox = parentLi.find('input[type="checkbox"]:eq(0)')
+                    ;
+
+
+        var id = c.attr('id');
+        var divid = $("#" + id).closest("div")[0].id;
+        if (divid != '') {
+            var all_checkboxes = $('#' + divid + ' input[type="checkbox"]');
+        }
+
+        if (c.is(':checked') && (all_checkboxes.length === all_checkboxes.filter(":checked").length))
+            rootCheckbox.prop('checked', true)
+        else
+            rootCheckbox.prop('checked', false);
+
+        checkParents(rootCheckbox);
+    }
+}
+
+

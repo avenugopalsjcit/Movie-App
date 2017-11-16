@@ -1,0 +1,147 @@
+﻿    <style type="text/css">
+        .bootbox .modal-content
+        {
+            margin-top: 30%;
+        }
+    </style>
+    <div ng-controller="AdminDSLCaseCtrl">    
+        <!-- <div class="row">                            
+                <div ng-show="!CountryAccessCaseDetails">                    
+                    <h4>
+                        View Case Reference (Country Level)
+                    </h4>                    
+                </div>
+                <div id="CountryAccessCaseList" ng-show="!CountryAccessCaseDetails" style="width: 50%;
+                    margin-right: auto; margin-left: auto;">
+                    <table ng-table="CountryAccessCases" class="table table-striped">
+                        <tr ng-repeat="case in $data">                        
+                            <td data-title="'Region - Country'" filter="{ Region: 'text'}" sortable="'Region'"
+                                class="Arrow" style="width: 30%">
+                                <a data-target="#divCaseEdit" data-toggle="modal" ng-click="OpenPopUp(case)">
+                                    {{case.Region}} - {{case.CountryName}}</a>
+                            </td>                            
+                            <td data-title="'Valid / Invalid'" filter="{ Validity: 'text'}" sortable="'Validity'"
+                                style="width: 10%" class="Arrow">
+                                {{case.Validity}}
+                            </td>
+                            <td data-title="'Details'" style="width: 10%">
+                                <a ng-click="ShowCaseDetails(case.CountryName,case.CaseAvailability,case.Validity,case.CaseId, case.CountryId)"
+                                    style="color: Blue; font-weight: bold;">Details</a>                                
+                            </td>                            
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <div ui-view ng-show="CountryAccessCaseDetails" style="float: left;">
+                    </div>                    
+                </div>            
+        </div>-->
+        <!--<div tabindex="-1" class="modal fade in modalalign" id="divCaseEdit" role="dialog"
+            aria-hidden="true" aria-labelledby="myModalLabel">
+            <div class="vertical-alignment-helper">
+                <div class="modal-dialog vertical-align-center">-->
+        <!-- <div class="modal-content" style="width: 600px">
+                        <div class="modal-header" style="padding: 0px 0px 0px 0px;">
+                            <button class="close" type="button" data-dismiss="modal" style="margin: 15px 15px 15px 15px;">
+                                <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                            </button>-->
+        <!-- <div class="row text-left Arrow " style="padding-left: 40px">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">-->
+        <!--<h3>
+                                Edit Case Reference(Country Level)
+                            </h3>-->
+        <!--</div>
+                            </div>-->
+        <!--</div>-->
+        <div class="row" style="padding-left: 20px">
+            <h3>
+                Edit Case Reference(Country Level)
+            </h3>
+            <div class="container">
+                <div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="panel-body" style="height: 100px; overflow: auto;">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-1 control-label" for="" style="font-size: 11px; text-align: left;">
+                                            Availability
+                                        </label>
+                                        <div class="col-sm-3" id="divCaseAvailability">
+                                            <select id="ddlCaseAvailability" ng-model="modCaseAvailability" ng-options="case.CaseAvailCd as case.CaseAvailDesc for case in CaseAvailability"
+                                                style="width: 200px;">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                        <p class="col-sm-2 control-label" style="text-align: left">
+                                            <a ng-click="ShowCaseDetails()" style="color: Blue; font-weight: bold; text-decoration: underline;">Details</a>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-1 control-label" for="" style="font-size: 11px; text-align: left;">
+                                            Valid
+                                        </label>
+                                        <div class="col-sm-3">
+                                            <input type="checkbox" name="chk" ng-model="CaseValidity" id="checkallid" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <p>
+                    <b>For Product Owners, The Delete operation results in the case being marked "INVALID".</b></p>
+                <div class="modal-footer">
+                    <div>
+                        <table style="width: 100%;">
+                            <tr>
+                                <th>
+                                    Created By
+                                </th>
+                                <th>
+                                    Created Date
+                                </th>
+                                <th>
+                                    Updated By
+                                </th>
+                                <th>
+                                    Updated Date
+                                </th>
+                            </tr>
+                            <tr style="text-align: left;">
+                                <td style="width: 25%">
+                                    {{CreatedBy}}
+                                </td>
+                                <td style="width: 25%">
+                                    {{CreatedDate}}
+                                </td>
+                                <td style="width: 25%">
+                                    {{UpdatedBy}}
+                                </td>
+                                <td style="width: 25%">
+                                    {{UpdatedDate}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <input type="button" class="btn btn-default btn-sm " ng-click="UpdateCase()" value="Update" />
+                    <input type="button" class="btn btn-default btn-sm" ng-click="DeleteCase()" value="Delete" />
+                    <input type="button" class="btn btn-default btn-sm" ng-click="ResetCase()" value="Reset" />
+ <!--                   <button id="btnCaseUpdate" class="btn btn-default" type="button" data-dismiss="modal">
+                        Close</button>-->
+                </div>
+            </div>
+            <!--</div>-->
+            <!--</div>
+            </div>
+        </div>-->
+        </div>        
+        </div>
+      <!--  <div ui-view ng-show="CountryAccessCaseDetails" style="float: left;">
+        </div>  -->      
+        <!--  <div class="pageLoaderOverlay">
+    </div>-->
+

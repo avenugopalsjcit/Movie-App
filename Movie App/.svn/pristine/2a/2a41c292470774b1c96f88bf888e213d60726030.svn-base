@@ -1,0 +1,67 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+   public class DistributorCompaniesDAL
+    {
+
+
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        public DataTable GetAdminDistributorCompanies(string Level)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+            if (Level == "Dist")
+            {
+                str = @"select dist_name as name, dist_short_name as short, dist_id as id 
+			 from csu_distributor where dist_id <> 0 and dist_valid_cd =1 order by name" ;
+            }
+            else
+            {
+
+                str = @"  select operation_name as name, 'None' as short, operation_id as id  
+			 from csu_operation where operation_id <> 0 and operation_valid_cd in (0,1) order by name";
+            }
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+        public DataTable EditAdminDistributorCompanies(string Level,string Id )
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+            if (Level == "Dist")
+            {
+                str = @"select dist_name as name, dist_short_name as short, dist_id as id, dist_valid_cd as valid,  
+				to_char(created_dt) as created_dt, to_char(updated_dt) as updated_dt
+				 from csu_distributor where dist_id = " + Id;
+            }
+            else
+            {
+
+                str = @"  select operation_name as name, '' as short, operation_id as id, operation_valid_cd as valid,  
+				to_char(created_dt) as created_dt, to_char(updated_dt) as updated_dt  
+				from csu_operation where operation_id = " + Id;
+            }
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+    }
+}

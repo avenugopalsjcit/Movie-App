@@ -1,0 +1,31 @@
+﻿
+
+
+app.controller('Controllers.SubProductCtrl', function ($scope, NgTableParams) {
+    var self = this;
+
+    var productOwner = [{ Name: "AC VPN ENCORE#1" },
+{ Name: "AC VPN ENCORE#2" },
+{ Name: "AC VPN ENCORE#3" },
+{ Name: "AC VPN ENCORE#4" },
+{ Name: "AC VPN ENCORE#5" },
+{ Name: "AC VPN ENCORE#6" },
+{ Name: "AC VPN ENCORE#7" },
+    { Name: "AC VPN ENCORE#8" },
+    { Name: "AC VPN ENCORE#9" },
+    { Name: "AC VPN ENCORE#10" },
+    { Name: "AC VPN ENCORE#11" },
+    { Name: "AC VPN ENCORE#12" },
+    { Name: "AC VPN ENCORE#13" }
+];
+    self.tableParams = new NgTableParams({},
+         { dataset: productOwner });
+
+    $(".js-example-basic-single").select2();
+    $(".clsddlProducttype").select2(
+            {
+                placeholder: "Select a State",
+                allowClear: true
+
+            });
+});

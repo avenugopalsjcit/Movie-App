@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL
+{
+    // public SCAdminDAL.ProductDefinationDAL pDefinations;
+    public class ProductDefinationBAL
+    {
+        #region Servicetypes
+        public static DataTable getSeviceTypes()
+        {
+            return SCAdminDAL.ProductDefinationDAL.getSeviceTypes();
+        }
+
+        public static int InsertSeviceTypes(string Userid, Servicetype service, int UpdateId = 0, int InsertId = 0)
+        {
+            return SCAdminDAL.ProductDefinationDAL.InsertSeviceTypes(Userid,service, UpdateId, InsertId );
+        }
+
+        public static string DeleteServiceType(int Id)
+        {
+            return SCAdminDAL.ProductDefinationDAL.DeleteServiceType(Id);
+        }
+        #endregion
+
+
+        #region Product
+        public static DataSet getProducts()
+        {
+            return SCAdminDAL.ProductDefinationDAL.getProducts();
+        }
+
+        public static string AddProduct(Products product)
+        {
+            return SCAdminDAL.ProductDefinationDAL.AddProduct(product);
+        }
+        #endregion
+
+    }
+}

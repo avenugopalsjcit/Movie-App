@@ -1,0 +1,82 @@
+﻿<div ng-controller="NotesAuditReportCtrl" class="container">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                Notes Audit Information
+            </h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            
+                <!--<h4 style="text-align:left">Notes Audit Information</h4>-->
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label cus-text-left" for="ServiceType">
+                            Service Type
+                        </label>
+                        <div class="col-sm-3" style="margin-left:-50px" id="divServiceType">
+                            <select id="Select1" ng-model="modServiceType" ng-change="GetProducts()" ng-options="item as item for item in ServiceTypes"
+                                style="width: 90%;">
+                                <option value="">-- Select Service Type --</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label cus-text-left" ng-show="modServiceType!='' && modServiceType != null"
+                            for="">
+                            Product
+                        </label>
+                        <div class="col-sm-3" id="ProductDiv" style="margin-left:-70px">
+                            <select id="Select2" ng-show="modServiceType!='' && modServiceType != null" ng-model="modProduct"
+                                ng-change="GetNotesAuditReport()" ng-options="product.ProductId as product.ProductName for product in Products"
+                                style="width: 90%;">
+                                <option value="">-- Select Product --</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-2" ng-show="NotesshowExport">
+                            <input type="button" class=" btn btn-primary" ng-click="ExportNotesReport()" value="Download To Excel" />
+                        </div>
+                        
+                    </div>
+                </div>
+                <div ng-show="NotesAuditData.length==0 && DisplayMessage" class="alert alert-danger Arrow"
+                    role="alert">
+                    No Notes Audit Info present.
+                </div>
+            <div class="row Arrow" ng-hide="NotesAuditData.length==0">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xs-12">
+                    <p >
+                        <b>{{NotesAuditDataLength}} Notes for {{ServiceName}}.</b> </p>
+                </div>
+            </div>
+                <div ng-show="NotesAuditData.length!=0">
+                    <table ng-table="NotesAuditData" class="table table-striped" show-filter="true" width="500px">
+                        <tr ng-repeat="notes in $data">
+                            <td data-title="'ID'" filter="{ NoteId: 'text'}" sortable="'NoteId'" class="Arrow">
+                                {{notes.NoteId}}
+                            </td>
+                            <td data-title="'Title'" filter="{ NoteTitle: 'text'}" sortable="'NoteTitle'"
+                                class="Arrow">
+                                {{notes.NoteTitle}}
+                            </td>
+                            <td data-title="'Created by / Date (GMT) '" filter="{ CreatedBy: 'text'}" sortable="'CreatedBy'"
+                                class="Arrow">
+                                {{notes.CreatedBy}}<br />
+                                 {{notes.CreatedDate}}
+                            </td>
+                           
+                            <td data-title="'Updated by / Date (GMT)'" filter="{ UpdatedBy: 'text'}" sortable="'UpdatedBy'"
+                                class="Arrow">
+                                {{notes.UpdatedBy}}<br />
+                                 {{notes.UpdatedDate}}
+                            </td>
+                            
+                        </tr>
+                    </table>
+                </div>
+                <div class="pageLoaderOverlay">
+                </div>
+          
+        </div>
+    </div>
+    <iframe id="csvDownloadFrame" style="display:none;"></iframe>
+</div>

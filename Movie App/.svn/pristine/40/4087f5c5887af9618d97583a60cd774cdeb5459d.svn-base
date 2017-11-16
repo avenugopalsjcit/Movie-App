@@ -1,0 +1,185 @@
+﻿
+app.controller("FileUploadCntrl", ["$scope", "NgTableParams", "UploadFileHistory", "fileUploadFactory", "$rootScope", "$http", function ($scope, NgTableParams, UploadFileHistory, fileUploadFactory, $rootScope, $http) {
+
+    $(".pageLoaderOverlay").show();
+
+    UploadFileHistory.GetUploadedData().success(function (data) {
+
+        $(".pageLoaderOverlay").hide();
+        $scope.FileHistoryTable = new NgTableParams({}, { 'dataset': data.d });
+        $scope.tablelength = data.d.length;
+
+    }).error(function (error) {
+        $(".pageLoaderOverlay").hide();
+        alert("Problem ocurred while Uploading the FileHistoryRecords" + error);
+    });
+    //File Select event 
+    $scope.selectFileforUpload = function (file) {
+        $scope.SelectedFileForUpload = file[0];
+    }
+
+    $scope.Reset = function () {
+        $("#divmyFiles").hide();
+        $("#divFileDescription").hide();
+      //  $scope.myFile.files = null;
+        $scope.FileDescription = "";
+        var control = $("#myFile");
+        control.replaceWith(control = control.clone(true));
+    }
+
+
+    $scope.DeleteFileHistory = function (user) {
+
+        ApprovalID = user.ApprovalID;
+        FileName = user.FileName;
+        Title = user.Title;
+        bootbox.confirm({
+            "className": "my-custom-class",
+            message: "Are you sure to delete File <b>" + FileName + "</b> and Title <b>" + Title + "</b>",
+            callback: function (result) {
+                if (result) {
+                    $(".pageLoaderOverlay").show();
+                    $http.post("FileUploads.aspx/DeleteFileRecord", { "ApprovalID": ApprovalID }).success(function (data) {
+                        UploadFileHistory.GetUploadedData().success(function (data) {
+                            //bootbox.alert({ "className": "my-custom-class", message: "File deleted successfully" });
+                            $scope.tablelength = data.d.length;
+                            $scope.FileHistoryTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert({ "className": "my-custom-class", message: "File deleted successfully" });
+                            //$scope.Bootstrap.Success("File deleted successfully");
+                        })
+                    });
+
+                }
+            }
+        });
+
+    }
+
+    //Save File
+    $scope.uploadFile = function () {
+
+        $scope.userForm1.$setPristine();
+        $('#divmyFiles').hide();
+        $('#divFileDescription').hide();
+        var filePath = $('#myFile').val();
+        var fileExtension = $scope.myFile;
+        var substring = "exe";
+
+        var ext = $('#myFile').val().split('.').pop().toLowerCase();
+
+        if ($.inArray(ext, ['exe']) == -1) {
+
+            if (filePath != "") {
+                if ($scope.FileDescription != "" && $scope.FileDescription != undefined) {
+                    $(".pageLoaderOverlay").show();
+                    fileUploadFactory.fileUploadservice($scope.myFile, $scope.FileDescription, $rootScope.User_Id).success(function (d) {
+
+                        UploadFileHistory.GetUploadedData().success(function (data) {
+                            $scope.FileHistoryTable = new NgTableParams({}, { 'dataset': data.d });
+                            $(".pageLoaderOverlay").hide();
+                            bootbox.alert({ "className": "my-custom-class", message: "File uploaded successfully" });
+                           // $scope.Bootstrap.Success("File uploaded successfully");
+                        });
+
+                        $scope.myFile.files = null;
+                        $scope.FileDescription = "";
+
+                        var control = $("#myFile");
+                        control.replaceWith(control = control.clone(true));
+                        // 
+                    }, function (e) {
+
+                        // alert(e);
+                    });
+                }
+                else {
+                    $('#divFileDescription').show();
+                }
+            }
+            else {
+                if (filePath == "") {
+                    if ($scope.FileDescription == "" && $scope.FileDescription == undefined) {
+                        $('#divFileDescription').show();
+                    }
+                    $('#divmyFiles').show();
+                }
+                if ($scope.FileDescription == "" && $scope.FileDescription == undefined) {
+                    $('#divFileDescription').show();
+                }
+            }
+        }
+        else {
+            $(".pageLoaderOverlay").hide();
+            bootbox.alert("File with extension .exe cannot be uploaded");
+        }
+
+    };
+
+
+} ]);
+
+app.factory("UploadFileHistory", ["$http", function ($http) {
+
+    var UploadFileHistory = {};
+
+    UploadFileHistory.GetUploadedData = function () {
+
+        return $http.post("FileUploads.aspx/GetFileUploadRecords", {});
+    }
+
+    return UploadFileHistory;
+} ]);
+
+app.directive('fileModel', ['$parse', function ($parse) {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+            var model = $parse(attrs.fileModel);
+            var modelSetter = model.assign;
+
+            element.bind('change', function () {
+                scope.$apply(function () {
+                    modelSetter(scope, element[0].files[0]);
+                });
+            });
+        }
+    };
+} ]);
+
+
+app.factory('fileUploadFactory', function ($http, $q) { // explained abour controller and service in part 2
+
+    var fileUploadFactory = {};
+    fileUploadFactory.fileUploadservice = function (filedata, description, userid) {
+
+
+        var fileUpload = $("#myFile").get(0);
+        var files = fileUpload.files;
+        var test = new FormData();
+        for (var i = 0; i < files.length; i++) {
+            test.append(files[i].name, files[i]);
+            test.append("Title", description);
+            test.append("UserID", userid);
+        }
+        return $.ajax({
+            url: "UploadHandler.ashx",
+            type: "POST",
+            contentType: false,
+            processData: false,
+            data: test,
+            // dataType: "json",
+            success: function (result) {
+               // bootbox.alert("File uploaded successfully");
+             
+               // alert(result);
+            },
+            error: function (err) {
+              //  alert(err.statusText);
+            }
+        });
+
+    }
+    return fileUploadFactory;
+
+});

@@ -1,0 +1,516 @@
+﻿<div ng-controller="Controller.EthernetCntrl">
+    <div class="panel panel-default mcu-panel Arrow mcu_poplevel">
+        <div class="panel-body" style="padding: 0px">
+            <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 no-padding" id="leftpanel">
+                <div class="panel panel-primary mcu-panel no-padding">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            <span>Case Selection</span>
+                        </div>
+                    </div>
+                    <div class="panel-body overflowScroll" style="height: 350px">
+                        <div ng-include="'Views/Masscaseupdate/mcu_EthernetTree.htm'">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 no-padding">
+                    <div class="panel panel-primary mcu-panel" style="border-right-width: 0px">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                <span style="margin-left:-7px">Case Availability</span>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="height: 155px; padding: 7px">
+                            <select ng-model="modCaseAvail" id="ddlCaseAvail" style="width: 100%;margin-bottom:10px" ng-options="option.AVAIL_DESC for option in lstCaseAvail track by option.AVAIL_CD">
+                            </select>
+                            <br />
+                            <span style="margin-top: 40%">
+                                <button ng-click="addCasePop()" id="caseGo">
+                                    Go</button>
+                                <button id="caseReset" ng-click="ResetCountrySel(0)">
+                                    Reset</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 no-padding">
+                    <div class="panel panel-primary mcu-panel " style="border-left-width: 0px; border-right-width: 0px;">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                <span style="margin-left:-7px">Case Validity</span>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="height: 155px; padding: 7px">
+                            <select ng-model="modValidCase" id="ddlcasevalid" style="margin-bottom:10px" class="autowidth" ng-options="option.text for option in lstValidCase track by option.id">
+                            </select>
+                            <br />
+                            <span>
+                                <input type="radio" name="radioGroup" ng-value="-1" ng-change="ResetCountrySel(1,formData.resetCase)"
+                                    ng-model="formData.resetCase" style="margin: 0px">
+                                All</span><br />
+                            <span>
+                                <input type="radio" name="radioGroup" ng-value="1" ng-change="ResetCountrySel(1,formData.resetCase)"
+                                    ng-model="formData.resetCase" style="margin: 0px">
+                                Valid</span><br />
+                            <span>
+                                <input type="radio" name="radioGroup" ng-value="0" ng-change="ResetCountrySel(1,formData.resetCase)"
+                                    ng-model="formData.resetCase" style="margin: 0px">
+                                Invalid</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 no-padding">
+                    <!-- <div ng-include="'Views/Masscaseupdate/AccessFilterTemplate.htm'">
+                    </div>-->
+                    <div class="panel panel-primary mcu-panel " style="border-left-width: 0px;">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                <span style="margin-left:-16px">Access Filters</span>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="height: 155px; padding: 7px; padding-left: 0px; padding-right: 0px">
+                            <span class="col-xs-4 col-sm-4 col-md-4 col-lg-4 no-padding">Supplier </span>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 ">
+                                <select ng-model="modAccSupp" id="ddlaccsupp" ng-change="getSuppProd()" ng-options="option.suppName for option in lstAccSupp track by option.suppId"
+                                    style="width: 100%;margin-bottom:10px">
+                                </select>
+                            </div>
+                            <span class="col-xs-4 col-sm-4 col-md-4 col-lg-4 no-padding">Supplier Product </span>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 ">
+                                <select ng-model="modSuppProd" ng-change="getSupplier()" id="ddlsupprod" ng-options="option.suppProdName for option in lstAccSuppProd track by option.suppProdID"
+                                    style="width: 100%;margin-bottom:10px">
+                                </select>
+                            </div>
+                            <span class="col-xs-4 col-sm-4 col-md-4 col-lg-4 no-padding">Access Technology </span>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                <select ng-model="modAccTech" id="ddlacctech" ng-change="onAccTypeChange()" ng-options="option.AccTechName for option in lstAccTech track by option.AccTechId"
+                                    style="width: 100%;margin-bottom:10px">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-padding">
+                    <!--<div ng-include="'Views/Masscaseupdate/AccessSpeedTemplate.htm'">
+                    </div>-->
+                    <div class="panel panel-primary mcu-panel no-padding">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                <span>Access Speed(s)</span>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <select style="height: 300px; width: 100%; font-size: 13px!important; font-weight: 100" multiple
+                                ng-model="modAccSpeed" ng-options="option.ACCESSACTUALVAL+' '+option.ACCESSUOM+' / '+option.SUPPLIERNAME+' / '+option.TYPENAME+' / '+option.NAMENAME
+         for option in lstAccSpeed track by option.ACCESSID+option.SUPPLIERID+option.TYPEID+option.NAMEID" style="width: 100%">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 no-padding" id="rightpanel">
+                <div class="panel panel-primary mcu-panel no-padding">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            <span>Port Speed(s)</span>
+                        </div>
+                    </div>
+                    <div class="panel-body small-padding-panel">
+                        <select style="height: 185px; width: 100%; margin-bottom: 0px" class="small-font"
+                            ng-change="onPortSpeedSelect()" ng-model="modportspeed" multiple="multiple" ng-options="concateField(option.PSPEED_ACT_VAL,option.PSPEED_UOM) for option in lstPortspeed | orderBy:'PSPEED_NUM_VAL' track by option.PSPEED_ID">
+                        </select>
+                    </div>
+                </div>
+                <div class="panel panel-primary mcu-panel no-padding">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            <span>Port Availability</span>
+                        </div>
+                    </div>
+                    <div class="panel-body small-padding-panel">
+                        <select ng-model="modportavail" id="ddlPortAvail" style="width: 100%; margin-bottom: 0px" ng-options="option.AVAIL_DESC for option in lstCaseAvail track by option.AVAIL_CD">
+                        </select>
+                    </div>
+                </div>
+                <div class="panel panel-primary mcu-panel no-padding">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            Port Validity
+                        </div>
+                    </div>
+                    <div class="panel-body small-padding-panel">
+                        <select ng-model="modvalidport" id="portvalidity" style="width: 100%; margin-bottom: 0px" ng-options="option.text for option in lstValidCase track by option.id">
+                        </select>
+                    </div>
+                </div>
+                <div class="panel panel-primary mcu-panel no-padding">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            <span>Port Speed Lead Time</span>
+                        </div>
+                    </div>
+                    <div class="panel-body small-padding-panel">
+                        <input type="text" title="Please enter numbers only" ng-model="modportspeedleadtime" style="width: 100%; margin-bottom: 10px" numeric-only/>
+                        <span>
+                            <button ng-click="addPortSpeed()" id="portadd" ng-enable="modportspeed.length!=0">
+                                Add</button>
+                            <button id="portReset" ng-click="onportreset($event)" ng-disabled="modportspeed==undefined || modportspeed==''">
+                                Reset</button>
+                        </span>
+                    </div>
+                </div>
+                <div class="panel panel-primary mcu-panel">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            Characteristic Type
+                        </div>
+                    </div>
+                    <div class="panel-body small-padding-panel">
+                        <select style="width: 100%" multiple size="9" ng-model="modSelectedchar" 
+                        ng-options="option.CHAR_TYPE_NAME for option in lstCharecteristics track by option.CHAR_TYPE_ID">
+                        </select>
+                        <span>
+                            <button ng-click="addSelectedChar()" id="charAdd">
+                                Add</button>
+                            <button ng-click="resetCharBtn()" ng-disabled="modSelectedchar==undefined || modSelectedchar==''">
+                                Reset</button>
+                        </span>
+                    </div>
+                </div>
+                <div class="panel panel-primary mcu-panel">
+                    <div class="panel-heading mcu-panel-heading-height">
+                        <div class="panel-title">
+                            Characteristics
+                        </div>
+                    </div>
+                    <div class="panel-body small-padding-panel  overflowScroll" style="height: 246px">
+                        <div id="selectedChar">
+                        </div>
+                        <div style="color:Red" ng-show="displayparentportnote ">'Note: Globally turned off parent speeds are disabled for user selection.'</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 small-padding-panel" id="savecontinuepanel">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: Green" title="Pops coloured green indicate that a valid case exists for that pop.">
+                    Valid Case</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: Black"
+                        title="Pops coloured black indicate that an invalid case exists for that pop.If a Port-Access combination is coloured black it indicates that the combination exists for the case selected."
+                        class="">Invalid Case</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="lblNoCase"
+                            style="color: Red" title="Pops coloured red indicate that a case does not exist for that pop.If a Port-Access combination is coloured red it indicates that the combination does not exist for the case selected."
+                            class="lbltxtred">Case Doesn't Exist</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>
+                    <button ng-click="writeSavedCases()"
+                        id="saveContinue" ng-enable="enableSaveButton">Save and Continue</button></span>
+            </div>
+            <div id='saveddetailspanel' class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-padding"
+                style="overflow: scroll; height: 300px">
+                <table class="table table-bordered table-striped tblSavedDetails" width="100%">
+                    <tr>
+                        <th ng-if="showPortSpeed || showPortAccessSpeed || savedCharList.length>0">
+                        </th>
+                        <th>
+                            Region
+                        </th>
+                        <th>
+                            Country
+                        </th>
+                        <th>
+                            City (State)
+                        </th>
+                        <th>
+                            PoP
+                        </th>
+                        <th>
+                            Platform
+                        </th>
+                        <th>
+                            Case Validity
+                        </th>
+                        <th>
+                            Case Availability
+                        </th>
+                        <th>
+                            Port Availability
+                        </th>
+                        <th>
+                            Port Validity
+                        </th>
+                        <th>
+                            Lead Time
+                        </th>
+                        <th ng-if="showPortAccessSpeed">
+                            Create Exception
+                        </th>
+                        <th ng-if="showPortAccessSpeed">
+                            Remove Exception
+                        </th>
+                    </tr>
+                    <tr ng-repeat="item in savedCaseDetails">
+                        <td ng-show="showPortSpeed || showPortAccessSpeed || showCharecteristics" class="popoverRootTd">
+                            <button ng-click="openInnerTabe(item.popID,$index)" id="iconSymbol{{$index}}{{item.popID}}">+</button>
+                           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-padding popoverDiv" id="innerTable{{$index}}{{item.popID}}" style="display: none;border:0px">
+                            <div class=" panel panel-primary mcu-panel no-padding overflowScroll col-xs-6 col-sm-6 col-md-6 col-lg-6" style="height: 200px;">
+                                <div class="panel-heading mcu-panel-heading-height">
+                                    <div class="panel-title">
+                                        {{innerTableHeading}}
+                                    </div>
+                                </div>
+                                <div class="panel-body small-padding-panel">
+                                    <div ng-show="showPortSpeed">
+                                        <span ng-repeat="itemPort in portListByPoP">{{itemPort.CharName}}<br />
+                                        </span>
+                                    </div>
+                                    <div ng-show="showPortAccessSpeed">
+                                        <span ng-repeat="itemPortAccess in portAccessJson"><span
+                                            style="color: Red" ng-if="!itemPortAccess.validCombo">{{itemPortAccess.portSpeedName}}
+                                            - {{itemPortAccess.AccessActualValue}}-{{itemPortAccess.SupplierName}}-{{itemPortAccess.AccessTypeName}}-{{itemPortAccess.SupplierNameName}}
+                                            <br />
+                                        </span><span ng-if="itemPortAccess.validCombo">{{itemPortAccess.portSpeedName}} - {{itemPortAccess.AccessActualValue}}-{{itemPortAccess.SupplierName}}-{{itemPortAccess.AccessTypeName}}-{{itemPortAccess.SupplierNameName}}
+                                            <br />
+                                        </span></span>
+                                    </div>
+                                  
+                                </div>
+                            </div>
+                              <div ng-show="showSavedCharecteristics" class="col-xs-6 col-sm-6 col-md-6 col-lg-6 panel panel-primary mcu-panel no-padding" style="height: 200px;">
+                                        <div class="panel-heading mcu-panel-heading-height overflowScroll">
+                                    <div class="panel-title">
+                                        Charecteristics
+                                    </div>
+                                </div>
+                                       <div class="panel-body small-padding-panel">
+                                        <table class="table table-bordered" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        Characteristic
+                                                    </th>
+                                                    <th>
+                                                        Validity
+                                                    </th>
+                                                    <th>
+                                                        Value
+                                                    </th>
+                                                    <th>
+                                                        Availability
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in savedCharforCase">
+                                                    <td>
+                                                        {{item.CharName}}
+                                                    </td>
+                                                    <td>
+                                                        {{item.ValidText}}
+                                                    </td>
+                                                    <td>
+                                                        {{item.CharValue}}
+                                                    </td>
+                                                    <td>
+                                                        {{item.CharAvailText}}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                           </div>
+                           
+                           
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{ item.regionName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.countryName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.cityName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.popName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.platformName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.CaseAvailtxt}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.caseValidText}}
+                        </td>
+                        <td id="PortAvail0" ng-style="set_color(item.caseValidCD)">
+                            {{item.portAvailText}}
+                        </td>
+                        <td id="PortValidity0" ng-style="set_color(item.caseValidCD)">
+                            {{item.portValidText}}
+                        </td>
+                        <td id="LeadTimeList0" ng-style="set_color(item.caseValidCD)">
+                            {{item.leadTime}}
+                        </td>
+                        <td ng-if="showPortAccessSpeed">
+                            <input type="checkbox" ng-model="item.IsCaseIdExists" id="createException{{item.caseID}}"
+                                country="createExcountry{{item.countryID}}" />
+                        </td>
+                        <td ng-if="showPortAccessSpeed">
+                            <input type="checkbox" ng-model="removeException" id="removeException{{item.caseID}}"
+                                country="removeExcountry{{item.countryID}}" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <button id="processChanges" style="margin-left: 25%" title="Processes the selections you have made"
+                class="button" ng-click="processChanges()">
+                Process Changes</button>
+                 <div id='FinalSelectedGrid' class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-padding"
+                style="display:none">
+                <label>Case To Update</label>
+                <table class="table table-bordered table-striped tblSavedDetails" width="100%">
+                    <tr>
+                        <th ng-if="showPortSpeed || showPortAccessSpeed || savedCharList.length>0">
+                        </th>
+                        <th>
+                            Region
+                        </th>
+                        <th>
+                            Country
+                        </th>
+                        <th>
+                            City (State)
+                        </th>
+                        <th>
+                            PoP
+                        </th>
+                        <th>
+                            Platform
+                        </th>
+                        <th>
+                            Case Validity
+                        </th>
+                        <th>
+                            Case Availability
+                        </th>
+                        <th>
+                            Port Availability
+                        </th>
+                        <th>
+                            Port Validity
+                        </th>
+                        <th>
+                            Lead Time
+                        </th>
+                    </tr>
+                    <tr ng-repeat="item in savedCaseDetails">
+                        <td ng-show="showPortSpeed || showPortAccessSpeed || savedCharList.length>0" class="popoverRootTd">
+                            <button ng-click="openInnerTabe1(item.popID,$index)" id="iconSymbol1{{$index}}{{item.popID}}">+</button>
+                           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-padding popoverDiv" id="innerTable1{{$index}}{{item.popID}}" 
+                                style="display: none;border:0px">
+                            <div class="panel panel-primary mcu-panel no-padding overflowScroll col-xs-6 col-sm-6 col-md-6 col-lg-6"  style="height: 200px;">
+                                <div class="panel-heading mcu-panel-heading-height">
+                                    <div class="panel-title">
+                                        {{innerTableHeading}}
+                                    </div>
+                                </div>
+                                <div class="panel-body small-padding-panel ">
+                                    <div ng-show="showPortSpeed">
+                                        <span ng-repeat="itemPort in portListByPoP">{{itemPort.CharName}}<br />
+                                        </span>
+                                    </div>
+         
+                                    <div ng-show="showPortAccessSpeed">
+                                        <span ng-repeat="itemPortAccess in portAccessJson">
+                                        <span ng-if="itemPortAccess.validCombo">{{itemPortAccess.portSpeedName}} - {{itemPortAccess.AccessActualValue}}-{{itemPortAccess.SupplierName}}-{{itemPortAccess.AccessTypeName}}-{{itemPortAccess.SupplierNameName}}
+                                            <br />
+                                        </span>
+                                        </span>
+                                         <span ng-repeat="iteminvalidport in InvalidPortSpeed">
+                                        {{iteminvalidport}}<br />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                             <div ng-show="showSavedCharecteristics" class="col-xs-6 col-sm-6 col-md-6 col-lg-6 panel panel-primary mcu-panel no-padding" style="height: 200px;">
+                                        <div class="panel-heading mcu-panel-heading-height overflowScroll">
+                                    <div class="panel-title">
+                                        Charecteristics
+                                    </div>
+                                </div>
+                                       <div class="panel-body small-padding-panel">
+                                        <table class="table table-bordered" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        Characteristic
+                                                    </th>
+                                                    <th>
+                                                        Validity
+                                                    </th>
+                                                    <th>
+                                                        Value
+                                                    </th>
+                                                    <th>
+                                                        Availability
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in savedCharforCase">
+                                                    <td>
+                                                        {{item.CharName}}
+                                                    </td>
+                                                    <td>
+                                                        {{item.ValidText}}
+                                                    </td>
+                                                    <td>
+                                                        {{item.CharValue}}
+                                                    </td>
+                                                    <td>
+                                                        {{item.CharAvailText}}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                            </div>
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{ item.regionName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.countryName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.cityName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.popName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.platformName}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.CaseAvailtxt}}
+                        </td>
+                        <td ng-style="set_color(item.caseValidCD)">
+                            {{item.caseValidText}}
+                        </td>
+                        <td id="Td1" ng-style="set_color(item.caseValidCD)">
+                            {{item.portAvailText}}
+                        </td>
+                        <td id="Td2" ng-style="set_color(item.caseValidCD)">
+                            {{item.portValidText}}
+                        </td>
+                        <td id="Td3" ng-style="set_color(item.caseValidCD)">
+                            {{item.leadTime}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <button style="margin-left: 20%; display: none" class="button" id="updatecase" ng-click="onUpdateCases()">
+                Update</button>&nbsp;&nbsp;
+            <button id="cancelcase" style="display: none" class="button" ng-click="onCancelCases()">
+                Cancel</button>
+        </div>
+    </div>
+</div>

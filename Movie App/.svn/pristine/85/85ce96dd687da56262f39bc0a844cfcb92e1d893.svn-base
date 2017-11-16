@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SCAdminDAL;
+using System.Data;
+using AutoMapper;
+
+namespace SCAdminBAL
+{ 
+    public class CPEOnlyCaseDefBAL
+    {
+        public List<CPEOnlyProductDetails> GetCPEOnlyPorductCaseDetails(string CaseId)
+        {
+            CPEOnlyCaseDefDAL dal = new CPEOnlyCaseDefDAL();
+            DataTable dtCases = dal.GetCPEOnlyPorductCaseDetails(CaseId).Tables[0];
+            List<CPEOnlyProductDetails> lstCountryAccessCases = new List<CPEOnlyProductDetails>();            
+            foreach (DataRow dr in dtCases.Rows)
+            {
+                CPEOnlyProductDetails CountryAccessCases = new CPEOnlyProductDetails();
+                CountryAccessCases.ProductName = Convert.ToString(dr["PRODUCT_NAME"]);
+                CountryAccessCases.OptionMatrixId = Convert.ToInt32(dr["OPTION_MATRIX_ID"]);
+                CountryAccessCases.CharTypeId = Convert.ToInt32(dr["CHAR_TYPE_ID"]);
+                CountryAccessCases.CharId = Convert.ToInt32(dr["CHAR_ID"]);
+                CountryAccessCases.CharTypeName = Convert.ToString(dr["CHAR_TYPE_NAME"]);
+                CountryAccessCases.CharName = Convert.ToString(dr["CHAR_NAME"]);
+                CountryAccessCases.CharActualValue = Convert.ToString(dr["CHAR_ACTUAL_VALUE"]);
+                CountryAccessCases.CharUnitOfMeasure = Convert.ToString(dr["CHAR_UNIT_OF_MEASURE"]);
+                CountryAccessCases.CharValue = Convert.ToString(dr["CHAR_VALUE"]);
+                CountryAccessCases.CharTypeValCount = Convert.ToInt32(dr["CHAR_TYPE_VALUE_COUNT"]);
+                CountryAccessCases.CharAvailCD = Convert.ToInt32(dr["CHAR_AVAIL_CD"]);
+                
+                CountryAccessCases.CharValue2 = Convert.ToString(dr["CHAR_VALUE_2"]);
+                CountryAccessCases.CharAVailDate = Convert.ToString(dr["CHAR_AVAIL_DT"]);
+                CountryAccessCases.CharValue1 = Convert.ToString(dr["CHAR_VALUE1"]);
+                CountryAccessCases.CharDetailValidCd = Convert.ToBoolean(dr["CASE_DETAIL_VALID_CD"]);
+                if (!(dr["CHAR_NUM_VALUE"] is DBNull))
+                {
+                    CountryAccessCases.CharNumValue = Convert.ToInt32(dr["CHAR_NUM_VALUE"]);
+                }
+                else
+                {
+                    CountryAccessCases.CharNumValue = 0;
+                }                
+                CountryAccessCases.CpeProductMap = Convert.ToInt32(dr["CPE_PRODUCT_MAP"]);
+                CountryAccessCases.Availability = Convert.ToString(dr["Availability"]);
+                lstCountryAccessCases.Add(CountryAccessCases);
+            }
+            return lstCountryAccessCases;
+        }
+    }
+}

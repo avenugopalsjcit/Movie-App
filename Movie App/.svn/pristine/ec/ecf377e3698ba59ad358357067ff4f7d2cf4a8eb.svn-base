@@ -1,0 +1,111 @@
+﻿
+
+app.controller('Controllers.DefineProductCtrl', function ($scope, NgTableParams) {
+    $(".clsdefineproduct").select2();
+    $(".clsCharastricType").select2();
+    $(".clsdefinesubproduct").select2();
+    $("#selectAccessTechId").select2();
+    $("#ddlAccTypes").select2();
+    var self = this;
+    var data6 = [{ Name: "	AC VPN ENCORE PopLevel#1	" },
+{ Name: "	AC VPN ENCORE PopLevel#2	" },
+{ Name: "	AC VPN ENCORE PopLevel#3	" },
+{ Name: "	AC VPN ENCORE PopLevel#4	" },
+{ Name: "	AC VPN ENCORE PopLevel#5	" },
+{ Name: "	AC VPN ENCORE PopLevel#6	" },
+{ Name: "	AC VPN ENCORE PopLevel#7	" },
+{ Name: "	AC VPN ENCORE PopLevel#8	" },
+{ Name: "	AC VPN ENCORE PopLevel#9	" },
+{ Name: "	AC VPN ENCORE PopLevel#10	" },
+{ Name: "	AC VPN ENCORE PopLevel#11	" },
+{ Name: "	AC VPN ENCORE PopLevel#12	" },
+{ Name: "	AC VPN ENCORE PopLevel#13	" },
+{ Name: "	AC VPN ENCORE PopLevel#14	" },
+{ Name: "	AC VPN ENCORE PopLevel#15	" },
+{ Name: "	AC VPN ENCORE PopLevel#16" },
+{ Name: "	AC VPN ENCORE PopLevel#17	" },
+{ Name: "	AC VPN ENCORE PopLevel#18	" },
+{ Name: "	AC VPN ENCORE PopLevel#19	" },
+{ Name: "	AC VPN ENCORE PopLevel#20	" },
+{ Name: "	AC VPN ENCORE PopLevel#21	" },
+
+];
+    self.tableParams = new NgTableParams({},
+         { dataset: data6 });
+})
+
+
+
+app.controller('Controllers.DefinecountryProductCtrl', function ($scope, NgTableParams) {
+ 
+    var self = this;
+    var data7 = [{ Name: "	AC VPN ENCORE CountryLevel#1	" },
+{ Name: "	AC VPN ENCORE CountryLevel#2	" },
+{ Name: "	AC VPN ENCORE CountryLevel#3	" },
+{ Name: "	AC VPN ENCORE CountryLevel#4	" },
+{ Name: "	AC VPN ENCORE CountryLevel#5	" },
+{ Name: "	AC VPN ENCORE CountryLevel#6	" },
+{ Name: "	AC VPN ENCORE CountryLevel#7	" },
+{ Name: "	AC VPN ENCORE CountryLevel#8	" },
+{ Name: "	AC VPN ENCORE CountryLevel#9	" },
+{ Name: "	AC VPN ENCORE CountryLevel#10	" },
+{ Name: "	AC VPN ENCORE CountryLevel#11	" },
+{ Name: "	AC VPN ENCORE CountryLevel#12	" },
+{ Name: "	AC VPN ENCORE CountryLevel#13	" },
+{ Name: "	AC VPN ENCORE CountryLevel#14	" },
+{ Name: "	AC VPN ENCORE CountryLevel#15	" },
+{ Name: "	AC VPN ENCORE CountryLevel#16" },
+{ Name: "	AC VPN ENCORE CountryLevel#17	" },
+{ Name: "	AC VPN ENCORE CountryLevel#18	" },
+{ Name: "	AC VPN ENCORE CountryLevel#19	" },
+{ Name: "	AC VPN ENCORE CountryLevel#20	" },
+{ Name: "	AC VPN ENCORE CountryLevel#21	" },
+
+];
+    self.tableParams = new NgTableParams({},
+         { dataset: data7 });
+})
+
+
+
+
+
+
+//app.controller('definePopProductlevelCtrl',function($scope, NgTableParams){
+
+//});
+
+
+
+
+//app.controller('defineCountryProductlevelCtrl', function ($scope, NgTableParams) {
+//    var self = this;
+//    var data6 = [{ Name: "	AC VPN ENCORE PopLevel#1	" },
+//{ Name: "	AC VPN ENCORE PopLevel#2	" },
+//{ Name: "	AC VPN ENCORE PopLevel#3	" },
+//{ Name: "	AC VPN ENCORE PopLevel#4	" },
+//{ Name: "	AC VPN ENCORE PopLevel#5	" },
+//{ Name: "	AC VPN ENCORE PopLevel#6	" },
+//{ Name: "	AC VPN ENCORE PopLevel#7	" },
+//{ Name: "	AC VPN ENCORE PopLevel#8	" },
+//{ Name: "	AC VPN ENCORE PopLevel#9	" },
+//{ Name: "	AC VPN ENCORE PopLevel#10	" },
+//{ Name: "	AC VPN ENCORE PopLevel#11	" },
+//{ Name: "	AC VPN ENCORE PopLevel#12	" },
+//{ Name: "	AC VPN ENCORE PopLevel#13	" },
+//{ Name: "	AC VPN ENCORE PopLevel#14	" },
+//{ Name: "	AC VPN ENCORE PopLevel#15	" },
+//{ Name: "	AC VPN ENCORE PopLevel#16" },
+//{ Name: "	AC VPN ENCORE PopLevel#17	" },
+//{ Name: "	AC VPN ENCORE PopLevel#18	" },
+//{ Name: "	AC VPN ENCORE PopLevel#19	" },
+//{ Name: "	AC VPN ENCORE PopLevel#20	" },
+//{ Name: "	AC VPN ENCORE PopLevel#21	" },
+
+//];
+//    self.tableParams = new NgTableParams({},
+//         { dataset: data6 });
+//});
+
+
+

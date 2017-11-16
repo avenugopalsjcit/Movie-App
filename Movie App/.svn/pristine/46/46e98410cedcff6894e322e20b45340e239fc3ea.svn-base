@@ -1,0 +1,68 @@
+﻿app.controller("productCtrl", function ($scope, $http, $rootScope) {
+
+
+
+    // $("#selectsingle").select2();
+    // $scope.OrgData = $scope.ServiceTypes;
+
+    $scope.OrgData = {};
+    $('.pageLoaderOverlay').show();
+    $http.post('ProductDefination.aspx/getProducts', {}).success(function (data) {
+        $('.pageLoaderOverlay').hide();
+        $scope.ServiceTypes = angular.fromJson(data.d).getProducts;
+        angular.copy($scope.ServiceTypes, $scope.OrgData);
+        $(".clsddlProducttype").select2();
+    }).error(function () { })
+
+    $scope.pageLoad = false;
+
+    $scope.ResetProducts = function (ServiceTypes) {
+        $scope.ServiceTypes = {};
+        $scope.Product = {};
+        $scope.ServiceTypes = $scope.OrgData;
+
+    }
+
+
+    $scope.AddProduct = function (Product) {
+
+        var Product_PARENT_PRODUCT_CD, Product_ALIAS_ID, PRODUCT_VALID_CD, DISPLAY_LEAD_TIME, ACCESS_METHOD_REQUIRED, EFM_REQUIRED;
+        Product_PARENT_PRODUCT_CD = Product.PARENT_PRODUCT_CD == undefined ? 0 : Product.PARENT_PRODUCT_CD;
+        Product.PARENT_PRODUCT_CD = Product_PARENT_PRODUCT_CD;
+
+        Product_ALIAS_ID = Product.ALIAS_ID == undefined ? 0 : Product.ALIAS_ID;
+        Product.ALIAS_ID = Product_ALIAS_ID;
+
+        PRODUCT_VALID_CD = Product.PRODUCT_VALID_CD == undefined ? 0 : (Product.PRODUCT_VALID_CD == true ? 1 : 0);
+        Product.PRODUCT_VALID_CD = PRODUCT_VALID_CD;
+
+        DISPLAY_LEAD_TIME = Product.DISPLAY_LEAD_TIME == undefined ? 0 : (Product.DISPLAY_LEAD_TIME == true ? 1 : 0);
+        Product.DISPLAY_LEAD_TIME = DISPLAY_LEAD_TIME;
+
+        ACCESS_METHOD_REQUIRED = Product.ACCESS_METHOD_REQUIRED == undefined ? 0 : (Product.ACCESS_METHOD_REQUIRED == true ? 1 : 0);
+        Product.ACCESS_METHOD_REQUIRED = ACCESS_METHOD_REQUIRED;
+
+        EFM_REQUIRED = Product.EFM_REQUIRED == undefined ? 0 : (Product.EFM_REQUIRED == true ? 1 : 0);
+        Product.EFM_REQUIRED = EFM_REQUIRED;
+
+        Product.CREATED_EMP_ID = $rootScope.User_Id;
+        Product.UPDATED_EMP_ID = $rootScope.User_Id;
+
+        console.log(Product);
+
+        $http.post('ProductDefination.aspx/AddProduct', { 'Product': Product }).success(function (data) {
+            console.log(data);
+        }).error(function (data) { console.log(data); });
+    }
+
+
+
+
+
+
+
+
+
+
+
+});

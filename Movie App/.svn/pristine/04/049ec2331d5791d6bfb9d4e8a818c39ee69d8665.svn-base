@@ -1,0 +1,141 @@
+﻿using System;
+using System.Linq;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+using System.Globalization;
+
+namespace SCAdminDAL
+{
+  public  class AdminDocumentationDAL
+    {
+
+        OracleDataAdapter dad;
+
+        DataSet rsPopChars = new DataSet();
+        DataSet rsCharacteristics = new DataSet();
+        DataTable dt = new DataTable();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        public DataTable GetGridAdminDocumentation(string AccessLevel, string user_id)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+            if (AccessLevel == "1")
+            {
+                str = @"select distinct d.product_cd,d.product_loc_level_cd,d.document_id, d.document_title, d.document_url, d.document_desc from CSU_DOCUMENTATION d order by upper(d.document_title) ";
+            }
+            else
+            {
+
+                str = @"  select distinct d.product_cd,d.document_id, d.document_title, d.document_url, d.document_desc from CSU_DOCUMENTATION d,
+                         csu_user_product_owner cs where cs.product_cd = d.product_cd and 
+	                     cs.emp_id = '" + user_id + "'and cs.Product_Owner_Status_cd = " + 1 + " order by upper(d.document_title); ";
+            }
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+
+        public DataTable GetProductsDocumentation(string AccessLevel, string user_id)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+
+            string str = string.Empty;
+            if (AccessLevel == "1")
+            {
+                str = @"  Select p.product_cd,   p.product_name from CSU_PRODUCT p order by p.product_name ";
+            }
+            else
+            {
+
+                str = @"  Select p.product_cd,  p.product_name  from CSU_PRODUCT p  ,
+                            csu_user_product_owner cs where cs.product_cd = d.product_cd and 
+	                         cs.emp_id = '" + user_id + "'and cs.Product_Owner_Status_cd = " + 1 + "  order by p.product_name ; ";
+            }
+
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+
+            return objGetDataFromDB.GetDataTable(str.ToString());
+
+        }
+
+        public int AdminDocumentationInsert(int DocumentId,int ProductId,int ProductLevelCd, string DocumentTitle, string DocumentURL, string DocumentDesc, string User_id)
+        {
+            
+           
+            int id = Convert.ToInt32(DocumentId);
+
+            string str = @" Insert into csu_documentation
+                           (
+                        document_id, 
+                          product_cd, 
+                        product_loc_level_cd, 
+                        document_title, 
+                        document_url, 
+                        document_desc, 
+                        created_emp_id, 
+                         created_dt, 
+                        updated_emp_id, 
+                        updated_dt 
+                         )
+                           VALUES 
+                        (" + id + "," + ProductId + " ," + ProductLevelCd + ",'" + 
+                           DocumentTitle + "','" + DocumentURL + "','" + DocumentDesc 
+                           + "'," + User_id + ",sysdate,"+User_id+",sysdate)";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+
+        public int AdminDocumentationUpdate(int ProductId, int ProductLevelCd, string DocumentTitle,string DocumentURL,string DocumentDesc,int User_id,int DocumentId)
+        {
+
+            int validbool = 0;
+          
+            int id = Convert.ToInt32(DocumentId);  
+            string str = @"    Update csu_documentation set 
+            product_cd = " + ProductId +",product_loc_level_cd = "+ProductLevelCd+
+            ", document_title = '"+DocumentTitle+"', document_url = '"+DocumentURL+
+            "',document_desc = '"+DocumentDesc+"',updated_emp_id = '"+User_id+"', updated_dt = sysdate WHERE document_id ="+ id;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+
+        public int AdminDocumentationDelete(string strAvailCd)
+        {
+
+            string str = @" Delete from csu_documentation
+	 WHERE document_id =  " + strAvailCd;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            oConn.Open();
+            int status = cmd.ExecuteNonQuery();
+            oConn.Close();
+            return status;
+        }
+        public int MaxDocCD()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"Select CSU_DOCUMENT_ID_S.NEXTVAL  from DUAL ";
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str));
+        }
+        public int productLevelCD(int ProductId)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            string str = @"select product_loc_level_cd 
+	                        from csu_product 
+	                         where product_cd ="+ ProductId;
+            OracleCommand cmd = new OracleCommand(str.ToString(), oConn);
+            return Convert.ToInt32(objGetDataFromDB.GetSingleRowFromDB(str));
+        }
+    }
+}

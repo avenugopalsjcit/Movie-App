@@ -1,0 +1,19 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="UserAccess.aspx.cs" Inherits="SCAdmin.UserAccess" %>
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title></title>
+    <link href="BootStrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="BootStrap/css/styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body ng-app="appUserAccess">
+    <div ng-controller="UserAccessCntrl">
+       
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+    <script src="Scripts/angular.js" type="text/javascript"></script>
+   
+   
+</body>
+</html>

@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCAdmin", "SCAdmin\SCAdmin.csproj", "{9C7D760F-5A60-4020-ADF0-E5883CC95DF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCAdminBAL", "SCAdminBAL\SCAdminBAL.csproj", "{7C072E36-AAEC-4EFF-897E-7C858F9A7CCB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCAdminDAL", "SCAdminDAL\SCAdminDAL.csproj", "{9522E003-582B-4AF5-A959-AE5D8C0F254E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C7D760F-5A60-4020-ADF0-E5883CC95DF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C7D760F-5A60-4020-ADF0-E5883CC95DF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C7D760F-5A60-4020-ADF0-E5883CC95DF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C7D760F-5A60-4020-ADF0-E5883CC95DF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C072E36-AAEC-4EFF-897E-7C858F9A7CCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C072E36-AAEC-4EFF-897E-7C858F9A7CCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C072E36-AAEC-4EFF-897E-7C858F9A7CCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C072E36-AAEC-4EFF-897E-7C858F9A7CCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9522E003-582B-4AF5-A959-AE5D8C0F254E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9522E003-582B-4AF5-A959-AE5D8C0F254E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9522E003-582B-4AF5-A959-AE5D8C0F254E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9522E003-582B-4AF5-A959-AE5D8C0F254E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

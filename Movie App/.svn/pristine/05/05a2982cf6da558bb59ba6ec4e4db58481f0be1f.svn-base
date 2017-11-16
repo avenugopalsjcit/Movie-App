@@ -1,0 +1,524 @@
+
+
+#region Imported Namespaces
+using System;
+using System.Data;
+using System.Configuration;
+using System.Web;
+
+#endregion
+namespace SCAdminBAL.MCU
+{
+    /// <summary>
+    /// Summary description for CaseData
+    /// </summary>
+    [Serializable]
+    //1.5 starts
+    //public class CaseData
+    public class CaseData : ICloneable
+    //1.5 ends
+    {
+        #region Private Variables
+
+        private int _ACCESS_PRODUCT_TYPE_ID = -1;
+        private String _ACCESS_SUPPLIER_NAME_ID = String.Empty;
+        private int _ACCESS_SUPPLIER_CHAR_ID = -1;
+        private String _ACCESS_SUPPLIER_CHAR_NAME = String.Empty;
+        private int _ACCESS_SPEED_CHAR_ID = -1;
+        private int _ACCESS_SUPPLIER_COUNTRY_FLAG = -1;
+        private int _CASE_ID = -1;
+        private int _CASE_AVAIL_CD = -1;
+        private int _PRODUCT_CD = -1;
+        private int _SUBPRODUCT_CD = -1;
+        private int _BUNDLED_UNBUNDLED_FLAG = -1;
+        private String _CREATED_EMP_ID = String.Empty;
+        private Int32 _CASE_VALID_CD = -1;
+        private DateTime _CREATED_DT;
+        private string _UPDATED_EMP_ID = String.Empty;
+        private DateTime _UPDATED_DT;
+        private Int32 _STATE_PROVINCE_ID = -1;
+        private int _HAS_CASE = 0;
+        private Popsite _PopSite = new Popsite();
+        // 1.1 Add begins
+        //  private PortSpeed _PortSpeed = new PortSpeed();
+        // 1.1 Add ends
+        private String _AVAIL_TEXT = String.Empty;
+        //1.3 Add begins
+        private String _LEAD_TIME = String.Empty;
+        private Int32 _PortAvail = -1;
+        private Int32 _AccessAvail = -1;
+        private Int32 _PortValid = -1;
+        private City _CitySite = new City();
+        //1.3 ends
+        //1.4 
+        private Country _CountrySite = new Country();
+        //1.4 ends
+        //  private Chars _Chars = new Chars();
+        //1.5 starts
+        //required only for product ACCESS
+        //   private AccessSuppChar _SpeedSupp = new AccessSuppChar();
+        //1.5 ends
+        //1.6 begins
+        private String _STATE_PROVINCE_NAME = String.Empty;
+
+        //Added by Vikas : R32 changes    
+        private string _CARRIER_NAME = String.Empty;
+        private string _PORT_AVAILABILITY_NAME = String.Empty;
+        private string _VALID_PORT_NAME = String.Empty;
+        private Int32 _CARRIER = -1;
+        private Int32 _PORT_AVAILABILITY = -1;
+        private Int32 _VALID_PORT = -1;
+        //END : R32 changes
+        //1.6 ends
+        #endregion
+
+        #region Constructor
+        public CaseData()
+        {
+        }
+        #endregion
+
+        #region Public Properties
+
+        public String AccessSupplierCharName
+        {
+            get
+            {
+                return _ACCESS_SUPPLIER_CHAR_NAME;
+            }
+            set
+            {
+                _ACCESS_SUPPLIER_CHAR_NAME = value;
+            }
+        }
+
+        //1.5 starts
+        //public AccessSuppChar SpeedSupp
+        //{
+        //    get 
+        //    {
+        //        return _SpeedSupp;
+        //    }
+        //    set
+        //    {
+        //        _SpeedSupp = value;
+        //    }
+        //}
+        ////1.5 ends
+        //public Chars Charecteristics
+        //{
+        //    get
+        //    {
+        //        return _Chars;
+        //    }
+        //    set
+        //    {
+        //        _Chars = value;
+        //    }
+        //}
+        public Country CountrySite
+        {
+            get
+            {
+                return _CountrySite;
+            }
+            set
+            {
+                _CountrySite = value;
+            }
+        }
+        public City CitySite
+        {
+            get
+            {
+                return _CitySite;
+            }
+            set
+            {
+                _CitySite = value;
+            }
+        }
+        public Int32 PortValid
+        {
+            get
+            {
+                return _PortValid;
+            }
+            set
+            {
+                _PortValid = value;
+            }
+        }
+
+        public Int32 PortAvail
+        {
+            get
+            {
+                return _PortAvail;
+            }
+            set
+            {
+                _PortAvail = value;
+            }
+        }
+        public Int32 AccessAvail
+        {
+            get
+            {
+                return _AccessAvail;
+            }
+            set
+            {
+                _AccessAvail = value;
+            }
+        }
+
+        public String LeadTime
+        {
+            get
+            {
+                return _LEAD_TIME;
+            }
+            set
+            {
+                _LEAD_TIME = value;
+            }
+        }
+
+        public String CharAvailText
+        {
+            get
+            {
+                return _AVAIL_TEXT;
+            }
+            set
+            {
+                _AVAIL_TEXT = value;
+            }
+        }
+
+        // 1.1 Add begins
+        //public PortSpeed PortSpeeds
+        //{
+        //    get
+        //    {
+        //        return _PortSpeed;
+        //    }
+        //    set
+        //    {
+        //        _PortSpeed = value;
+        //    }
+        //}
+
+
+        public int HasCase
+        {
+            get
+            {
+                return _HAS_CASE;
+            }
+            set
+            {
+                _HAS_CASE = value;
+            }
+        }
+        public int AccessProductTyprId
+        {
+            get
+            {
+                return _ACCESS_PRODUCT_TYPE_ID;
+            }
+            set
+            {
+                _ACCESS_PRODUCT_TYPE_ID = value;
+            }
+        }
+
+        public String ACCESS_SUPPLIER_NAME_ID
+        {
+            get
+            {
+                return _ACCESS_SUPPLIER_NAME_ID;
+            }
+            set
+            {
+                _ACCESS_SUPPLIER_NAME_ID = value;
+            }
+        }
+
+        public int CaseId
+        {
+            get
+            {
+                return _CASE_ID;
+            }
+            set
+            {
+                _CASE_ID = value;
+            }
+        }
+
+
+        public int CaseAvailCd
+        {
+            get
+            {
+                return _CASE_AVAIL_CD;
+            }
+            set
+            {
+                _CASE_AVAIL_CD = value;
+            }
+        }
+
+        public int ProductCd
+        {
+            get
+            {
+                return _PRODUCT_CD;
+            }
+            set
+            {
+                _PRODUCT_CD = value;
+            }
+        }
+
+        public Popsite Pop
+        {
+            get
+            {
+                return _PopSite;
+            }
+            set
+            {
+                _PopSite = value;
+            }
+        }
+
+        public int SubProductCd
+        {
+            get
+            {
+                return _SUBPRODUCT_CD;
+            }
+            set
+            {
+                _SUBPRODUCT_CD = value;
+            }
+        }
+
+        public int BundledUnbumdledFlag
+        {
+            get
+            {
+                return _BUNDLED_UNBUNDLED_FLAG;
+            }
+            set
+            {
+                _BUNDLED_UNBUNDLED_FLAG = value;
+            }
+        }
+
+
+        public String CreatedEmpId
+        {
+            get
+            {
+                return _CREATED_EMP_ID;
+            }
+            set
+            {
+                _CREATED_EMP_ID = value;
+            }
+        }
+
+        public int CaseValidCd
+        {
+            get
+            {
+                return _CASE_VALID_CD;
+            }
+            set
+            {
+                _CASE_VALID_CD = value;
+            }
+        }
+
+        public DateTime CreatedDt
+        {
+            get
+            {
+                return _CREATED_DT;
+            }
+            set
+            {
+                _CREATED_DT = value;
+            }
+        }
+
+        public String UpdatedEmpId
+        {
+            get
+            {
+                return _UPDATED_EMP_ID;
+            }
+            set
+            {
+                _UPDATED_EMP_ID = value;
+            }
+        }
+
+        public DateTime UpdatedDt
+        {
+            get
+            {
+                return _UPDATED_DT;
+            }
+            set
+            {
+                _UPDATED_DT = value;
+            }
+        }
+
+        public Int32 StateProvinceId
+        {
+            get
+            {
+                return _STATE_PROVINCE_ID;
+            }
+            set
+            {
+                _STATE_PROVINCE_ID = value;
+            }
+        }
+
+        public int AccessSupplierCharId
+        {
+            get
+            {
+                return _ACCESS_SUPPLIER_CHAR_ID;
+            }
+            set
+            {
+                _ACCESS_SUPPLIER_CHAR_ID = value;
+            }
+        }
+
+        public int AccessSpeedCharId
+        {
+            get
+            {
+                return _ACCESS_SPEED_CHAR_ID;
+            }
+            set
+            {
+                _ACCESS_SPEED_CHAR_ID = value;
+            }
+        }
+
+        public int AccessSupplierCountryFlag
+        {
+            get
+            {
+                return _ACCESS_SUPPLIER_COUNTRY_FLAG;
+            }
+            set
+            {
+                _ACCESS_SUPPLIER_COUNTRY_FLAG = value;
+            }
+        }
+        //1.6 begins
+        public String Statename
+        {
+            get
+            {
+                return _STATE_PROVINCE_NAME;
+            }
+            set
+            {
+                _STATE_PROVINCE_NAME = value;
+            }
+        }
+        //1.6 ends
+
+        //Added by Vikas : R32 changes    
+        public Int32 Carrier
+        {
+            get
+            {
+                return _CARRIER;
+            }
+            set
+            {
+                _CARRIER = value;
+            }
+        }
+        public Int32 PortAvailability
+        {
+            get
+            {
+                return _PORT_AVAILABILITY;
+            }
+            set
+            {
+                _PORT_AVAILABILITY = value;
+            }
+        }
+        public Int32 validPort
+        {
+            get
+            {
+                return _VALID_PORT;
+            }
+            set
+            {
+                _VALID_PORT = value;
+            }
+        }
+        public string CarrierName
+        {
+            get
+            {
+                return _CARRIER_NAME;
+            }
+            set
+            {
+                _CARRIER_NAME = value;
+            }
+        }
+        public string PortAvailabilityName
+        {
+            get
+            {
+                return _PORT_AVAILABILITY_NAME;
+            }
+            set
+            {
+                _PORT_AVAILABILITY_NAME = value;
+            }
+        }
+        public string ValidPortName
+        {
+            get
+            {
+                return _VALID_PORT_NAME;
+            }
+            set
+            {
+                _VALID_PORT_NAME = value;
+            }
+        }
+        //END : R32 changes
+        #endregion
+        //1.5 starts
+        #region Public Methods
+        public Object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+        #endregion
+        //1.5 ENDS
+    }
+
+
+}

@@ -1,0 +1,310 @@
+﻿
+var PoPLevelModule = angular.module("PoPLevelMod", []);
+
+PoPLevelModule.controller("EditPoPLevelCaseCtrl", function ($scope, $http, PopCharacteristics, CaseCharacteristics, AvailDescfactory, ParentPortSpeedFactory) {
+    $(".pageLoaderOverlay").show();
+    $scope.CaseID = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('CaseID').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.Countryid = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('countryid').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.Availability = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('Availability').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.ProdName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('ProdName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.RegName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('RegName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.CountName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('CountName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.CityName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('CityName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.POPName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('POPName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.Valid = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('Valid').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.POPCode = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('POPCode').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.NetworkName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('NetworkName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.ProductID = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('ProductID').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    $scope.HubSiteID = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('HubSiteID').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+
+    $scope.ChildRowCount = 0;
+    $scope.ParentRowCount = 0;
+
+    if ($scope.Valid == "1") {
+        $scope.ValidStatus = "[Y]";
+    }
+    else {
+        $scope.ValidStatus = "[N]";
+    }
+
+    PopCharacteristics.GetPoPCharValues($scope.HubSiteID, $scope.ProductID).success(function (data) {
+        $scope.POPCharacteristicsData = data.d;
+    });
+    $scope.CaseAvailability = [];
+    $scope.CaseValue = [];
+    $scope.CharIDValues = [];
+    $scope.txtPortSpeedLeadTime = [];
+    $scope.CharTypeIds = [];
+    $scope.ProductTypeIDs = [];
+    $scope.AccessSupplierNameIDs = [];
+    $scope.AccessSupplierIDs = [];
+    $scope.OldPortSpeedLeadTime = [];
+    $scope.OldCaseValue = [];
+    $scope.CaseValidIds = [];
+    $scope.AccessSpeedIds = [];
+    $scope.OptionMatrixIDs = [];
+    $scope.CaseValidVal = [];
+    $scope.ShowAll = 0;
+
+    CaseCharacteristics.GeCharValues($scope.CaseID, $scope.ShowAll, "", "", "", $scope.ProductID, $scope.HubSiteID).success(function (data) {
+
+        $scope.CaseCharDetails = data.d.lstCaseDetails;
+        if (data.d.lstCaseDetails.length > 0) {
+            $scope.CaseCharData = data.d.lstCaseDetails[0].charDet;
+            $scope.CharTypeName = data.d.lstCaseDetails[0].charDet[0].CharTypeName;
+            $scope.CaseChar = data.d.lstCaseDetails[0].charDet[0].OptionMatrixId;
+            $scope.isMultiple = data.d.lstCaseDetails[0].charDet[0].isMultiple;
+        }
+        var index = 0;
+        $scope.AccessTypeList = data.d.lstAccessType;
+        $scope.SuppliersList = data.d.lstSupplier;
+        $scope.SupplierProductNameList = data.d.lstSupplierProductName;
+        $(".pageLoaderOverlay").hide();
+        data.d.lstCaseDetails.forEach(function (item) {
+            if (index > 0) {
+
+                $scope.CaseAvailability.push(item.CharAvailId);
+                $scope.CharIDValues.push(item.CharID);
+                $scope.CaseValue.push(item.CaseValue);
+                $scope.OldCaseValue.push(item.CaseValue);
+                $scope.CharTypeIds.push(item.CharTypeId);
+                $scope.ProductTypeIDs.push(item.ProductTypeID);
+                $scope.AccessSupplierNameIDs.push(item.AccessSupplierNameID);
+                $scope.AccessSupplierIDs.push(item.AccessSupplierID);
+                $scope.txtPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                $scope.OldPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                $scope.AccessSpeedIds.push(item.AccessSpeed);
+                $scope.CaseValidIds.push(item.CaseValid);
+                $scope.OptionMatrixIDs.push(item.OptionMatrixID);
+                $scope.CaseValidVal.push(item.CaseValid);
+                $scope.ChildRowCount = $scope.ChildRowCount + 1;
+            }
+            index = index + 1;
+        });
+
+    });
+
+    AvailDescfactory.GetAvailDesc().success(function (data) {
+
+        $scope.CaseAvailDescData = data.d;
+    });
+    $scope.ParentProductID = 0;
+
+    $scope.ParentCharID = [];
+    $scope.ParentOptionMatrixID = [];
+    $scope.ParentProductTypeID = [];
+    $scope.ParentAccessSpeed = [];
+    $scope.ParentAccessSupplierID = [];
+    $scope.ParentAccessSupplierNameID = [];
+    $scope.CaseValidValue = [];
+    $scope.CharTypeID = [];
+    $scope.AvailValue = [];
+
+    $http.post("../SingleCase.aspx/GetParentProduct", { 'ProductID': $scope.ProductID }).success(function (data) {
+
+        if (data.d > 0) {
+            $scope.ParentProductID = data.d;
+            ParentPortSpeedFactory.GetParentPortSpeeds($scope.HubSiteID, 0, $scope.CaseID, $scope.ParentProductID, $scope.ProductID).success(function (data) {
+
+                data.d.forEach(function (temp) {
+                    temp.lsMapping.forEach(function (item) {
+
+                        $scope.ParentCharID.push(item.CharID);
+                        $scope.ParentOptionMatrixID.push(item.OptionMatrixID);
+                        $scope.ParentProductTypeID.push(item.ProductTypeID);
+                        $scope.ParentAccessSpeed.push(item.AccessSpeed);
+                        $scope.ParentAccessSupplierID.push(item.AccessSupplierID);
+                        $scope.ParentAccessSupplierNameID.push(item.AccessSupplierNameID);
+                        $scope.CaseValidValue.push(item.Valid);
+                        $scope.CharTypeID.push(item.CharTypeID);
+                        $scope.AvailValue.push(item.AvailValue);
+                        $scope.ParentRowCount = $scope.ParentRowCount + 1;
+                    });
+                });
+                $scope.ParentSpeed = data.d;
+            });
+        }
+    });
+
+
+    $scope.ShowAll = function () {
+        $scope.ShowAll = 1;
+        $scope.ChildRowCount = 0;
+        $(".pageLoaderOverlay").show();
+        CaseCharacteristics.GeCharValues($scope.CaseID, $scope.ShowAll, "", "", "", $scope.ProductID, $scope.HubSiteID).success(function (data) {
+
+            $scope.CaseAvailability = [];
+            $scope.CaseValue = [];
+            $scope.txtPortSpeedLeadTime = [];
+            $scope.CaseCharDetails = data.d.lstCaseDetails;
+            if (data.d.lstCaseDetails.length > 0) {
+                $scope.CaseCharData = data.d.lstCaseDetails[0].charDet;
+                $scope.CharTypeName = data.d.lstCaseDetails[0].charDet[0].CharTypeName;
+                $scope.CaseChar = data.d.lstCaseDetails[0].charDet[0].OptionMatrixId;
+                $scope.isMultiple = data.d.lstCaseDetails[0].charDet[0].isMultiple;
+            }
+            var index = 0;
+            $(".pageLoaderOverlay").hide();
+            data.d.lstCaseDetails.forEach(function (item) {
+
+                if (index > 0) {
+                    $scope.CaseAvailability.push(item.CharAvailId);
+                    $scope.CharIDValues.push(item.CharID);
+                    $scope.CaseValue.push(item.CaseValue);
+                    $scope.OldCaseValue.push(item.CaseValue);
+                    $scope.CharTypeIds.push(item.CharTypeId);
+                    $scope.ProductTypeIDs.push(item.ProductTypeID);
+                    $scope.AccessSupplierNameIDs.push(item.AccessSupplierNameID);
+                    $scope.AccessSupplierIDs.push(item.AccessSupplierID);
+                    $scope.txtPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                    $scope.OldPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                    $scope.AccessSpeedIds.push(item.AccessSpeed);
+                    $scope.CaseValidIds.push(item.CaseValid);
+                    $scope.OptionMatrixIDs.push(item.OptionMatrixID);
+                    $scope.CaseValidVal.push(item.CaseValid);
+                    $scope.ChildRowCount = $scope.ChildRowCount + 1;
+                }
+                index = index + 1;
+            });
+
+        });
+
+    }
+
+    $scope.UpdateCaseDetails = function () {
+
+        debugger;
+        $scope.ChildCaseDetails = [];
+        $scope.ParentCaseDetails = [];
+        $(".pageLoaderOverlay").show();
+        $scope.CharIDValues.forEach(function (item, index) {
+            $scope.ChildCaseDetails.push({ 'CaseID': "'" + $scope.CaseID + "'", 'UserID': '607980620', 'CharID': "'" + item + "'", 'AccessSpeedID': "'" + $scope.AccessSpeedIds[index] + "'", 'AccessTypeID': "'" + $scope.ProductTypeIDs[index] + "'", 'AccessSupplierNameID': "'" + $scope.AccessSupplierNameIDs[index] + "'", 'AccessSupplierID': "'" + $scope.AccessSupplierIDs[index] + "'", 'AvailValue': "'" + $scope.CaseAvailability[index] + "'", 'CharTypeID': "'" + $scope.CharTypeIds[index] + "'", 'CaseValidVal': "'" + $scope.CaseValidVal[index] + "'", 'CaseValue': "'" + $scope.CaseValue[index] + "'", 'PortSpeedLeadTime': "'" + $scope.txtPortSpeedLeadTime[index] + "'", 'OptionMatrixID': "'" + $scope.OptionMatrixIDs[index] + "'" });
+        });
+        var childCases = JSON.stringify($scope.ChildCaseDetails);
+
+
+        $scope.ParentCharID.forEach(function (item, index) {
+            $scope.ParentCaseDetails.push({ 'CaseID': "'" + $scope.CaseID + "'", 'UserID': '607980620', 'CharID': "'" + item + "'", 'AccessSpeedID': "'" + $scope.ParentAccessSpeed[index] + "'", 'ProductTypeID': "'" + $scope.ParentProductTypeID[index] + "'", 'AccessSupplierNameID': "'" + $scope.ParentAccessSupplierNameID[index] + "'", 'AccessSupplierID': "'" + $scope.ParentAccessSupplierID[index] + "'", 'OptionMatrixID': "'" + $scope.ParentOptionMatrixID[index] + "'", 'CaseValidValue': "'" + $scope.CaseValidValue[index] + "'", 'CharTypeID': "'" + $scope.CharTypeID[index] + "'", 'AvailValue': "'" + $scope.AvailValue[index] + "'" });
+        });
+        var ParentCases = JSON.stringify($scope.ParentCaseDetails);
+
+
+        $http.post("../SingleCase.aspx/UpdateCaseDetails", { 'ChildCaseDetails': childCases, 'ParentCaeDetails': ParentCases, 'ChildCount': $scope.ChildRowCount, 'ParentCount': $scope.ParentRowCount }).success(function (data) {
+            if (data.d == 1) {
+                alert("Data saved successfully");
+            }
+            else {
+                alert("Case details not saved successfully");
+            }
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+    $scope.GetDataByFilters = function (AccessTypeData, SupplierData, SupplierProductNameData) {
+        $scope.ShowAll = 1;
+        $scope.RowCount = 0;
+        var AccessTypeIds = "", SupplierIds = "", SupplierProductNameIds = "";
+        if (!angular.isUndefined(AccessTypeData)) {
+            AccessTypeIds = AccessTypeData.join()
+        }
+        if (!angular.isUndefined(SupplierData)) {
+            SupplierIds = SupplierData.join()
+        }
+
+        if (!angular.isUndefined(SupplierProductNameData)) {
+            SupplierProductNameIds = SupplierProductNameData.join()
+        }
+        $(".pageLoaderOverlay").show();
+        CaseCharacteristics.GeCharValues($scope.CaseID, $scope.ShowAll, SupplierIds, AccessTypeIds, SupplierProductNameIds, $scope.ProductID, $scope.HubSiteID).success(function (data) {
+
+            $scope.CaseAvailability = [];
+            $scope.CaseValue = [];
+            $scope.txtPortSpeedLeadTime = [];
+            $scope.CaseCharDetails = data.d.lstCaseDetails;
+            if (data.d.lstCaseDetails.length > 0) {
+                $scope.CaseCharData = data.d.lstCaseDetails[0].charDet;
+                $scope.CharTypeName = data.d.lstCaseDetails[0].charDet[0].CharTypeName;
+                $scope.CaseChar = data.d.lstCaseDetails[0].charDet[0].OptionMatrixId;
+                $scope.isMultiple = data.d.lstCaseDetails[0].charDet[0].isMultiple;
+            }
+            var index = 0;
+            $(".pageLoaderOverlay").hide();
+            data.d.lstCaseDetails.forEach(function (item) {
+                if (index > 0) {
+                    $scope.CaseAvailability.push(item.CharAvailId);
+                    $scope.CharIDValues.push(item.CharID);
+                    $scope.CaseValue.push(item.CaseValue);
+                    $scope.OldCaseValue.push(item.CaseValue);
+                    $scope.CharTypeIds.push(item.CharTypeId);
+                    $scope.ProductTypeIDs.push(item.ProductTypeID);
+                    $scope.AccessSupplierNameIDs.push(item.AccessSupplierNameID);
+                    $scope.AccessSupplierIDs.push(item.AccessSupplierID);
+                    $scope.txtPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                    $scope.OldPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                    $scope.AccessSpeedIds.push(item.AccessSpeed);
+                    $scope.CaseValidIds.push(item.CaseValid);
+                    $scope.OptionMatrixIDs.push(item.OptionMatrixID);
+                    $scope.CaseValidVal.push(item.CaseValid);
+                    $scope.ChildRowCount = $scope.ChildRowCount + 1;
+                }
+                index = index + 1;
+            });
+
+        });
+
+    }
+
+});
+
+
+PoPLevelModule.factory('PopCharacteristics', function ($http) {
+
+    var PopCharacteristics = {};
+
+    PopCharacteristics.GetPoPCharValues = function (HubSiteID, ProductID) {
+
+        return $http.post('../SingleCase.aspx/GetPoPCharValues', { 'HubSiteID': HubSiteID, 'ProductID': ProductID });
+    }
+
+    return PopCharacteristics;
+});
+
+
+PoPLevelModule.factory('CaseCharacteristics', function ($http) {
+
+    var CaseCharacteristics = {};
+
+    CaseCharacteristics.GeCharValues = function (CaseID, ShowAll, Supplier, AccessType, SupplierProduct, ProductID, HubSiteID) {
+
+        return $http.post('../SingleCase.aspx/GetCaseCharValues', { 'CaseID': CaseID, 'ShowAll': ShowAll, 'SupplierIds': Supplier, 'AccessTypeIds': AccessType, 'SupplierProductNameIds': SupplierProduct, 'ProductID': ProductID, 'HubSiteID': HubSiteID });
+    }
+
+    return CaseCharacteristics;
+});
+
+
+PoPLevelModule.factory('AvailDescfactory', function ($http) {
+
+    var AvailDescfactory = {};
+
+    AvailDescfactory.GetAvailDesc = function () {
+
+        return $http.post('../SingleCase.aspx/GetAvailDesc', {});
+    }
+
+    return AvailDescfactory;
+});
+
+
+PoPLevelModule.factory('ParentPortSpeedFactory', function ($http) {
+
+    var ParentPortSpeedFactory = {};
+
+    ParentPortSpeedFactory.GetParentPortSpeeds = function (HubSiteID, NetworkID, CaseID, ParentID, ProductID) {
+
+        return $http.post('../SingleCase.aspx/GetParentPortSpeeds', { 'HubSiteID': 28462, 'NetworkID': 0, 'CaseID': 1100227, 'ParentID': 21, 'ProductID': 76 });
+    }
+
+    return ParentPortSpeedFactory;
+});
+

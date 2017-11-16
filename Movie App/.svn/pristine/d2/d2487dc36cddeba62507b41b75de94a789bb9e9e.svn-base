@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+   public class AdminNotesBAL
+    {
+       private AdminNotesDAL objSRD = new AdminNotesDAL();
+       public List<Notes> GetGridAdminAddress()
+       {
+
+
+           List<Notes> lstOrg = new List<Notes>();
+           DataTable dtGridDistributor = objSRD.GetGridAdminAddressDAL();
+
+
+
+
+
+
+
+           foreach (DataRow dr in dtGridDistributor.Rows)
+           {
+               Notes objOrg = new Notes();
+
+               objOrg.ServiceTypeDesc = Convert.ToString(dr["Service_Type_Desc"]);
+               objOrg.ProductName = Convert.ToString(dr["product_name"]);
+               objOrg.ProductCD = Convert.ToInt32(dr["Product_cd"]);
+               objOrg.ProductLocLevelCD = Convert.ToInt32(dr["Product_Loc_Level_cd"]);
+               //objOrg.AvailValidCd = Convert.ToInt32(dr["AVAIL_CD"]);
+               lstOrg.Add(objOrg);
+           }
+
+
+           return lstOrg;
+       }
+    }
+}

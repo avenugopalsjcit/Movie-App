@@ -1,0 +1,42 @@
+﻿
+<div ng-controller="AdminBtgfrCtrl">
+<div >
+                       
+                        <div id="Div6">
+                         <div class="row text-left Arrow ">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                                 BT GFR 
+                            </h3>
+                        </div>
+                    </div>
+                           
+                        
+                    
+                        
+                            
+
+                              <table ng-table="usersTable" id="tblAvailability" show-filter="true"  class="table table-striped Arrow">
+                                <tr ng-repeat="category in $data">
+                                       <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                                        <td data-title="' BT GFR Code'" filter="{ 'btgfr': 'text' }"  sortable="'btgfr'" class="Arrow">
+                                            {{category.btgfr}}
+                                        </td>
+                                        <td data-title="' Description'"  filter="{ 'description': 'text' }" sortable="'description'" class="Arrow">
+                                            {{category.description}}
+                                        </td>
+                                      
+                                        
+                                    </tr>
+                                   
+                                </table>
+                            
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+                     <div class="pageLoaderOverlay">
+    </div>
+</div>

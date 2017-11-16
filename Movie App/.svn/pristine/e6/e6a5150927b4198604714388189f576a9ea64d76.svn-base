@@ -1,0 +1,30 @@
+﻿  <div class="panel panel-primary mcu-panel " style="border-left-width: 0px;">
+                        <div class="panel-heading mcu-panel-heading-height">
+                            <div class="panel-title">
+                                <span>Access Filters</span>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="height: 155px; padding: 7px; padding-left: 0px; padding-right: 0px">
+                            <span class="col-xs-4 col-sm-4 col-md-4 col-lg-4 no-padding">Supplier </span>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 ">
+                                <select ng-model="modAccSupp" 
+                                ng-options="option.suppName for option in lstAccSupp track by option.suppId" style="width: 100%">
+                                    <option value="">--All--</option>
+                                </select>
+                            </div>
+                            <span class="col-xs-4 col-sm-4 col-md-4 col-lg-4 no-padding">Supplier Product </span>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 ">
+                                <select ng-model="modSuppProd"
+                                 ng-options="option.suppProdName for option in lstAccSuppProd track by option.suppProdID" style="width: 100%">
+                                    <option value="">--All--</option>
+                                </select>
+                            </div>
+                            <span class="col-xs-4 col-sm-4 col-md-4 col-lg-4 no-padding">Access Technology </span>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                <select ng-model="modAccTech" 
+                                ng-options="option.AccTechName for option in lstAccTech track by option.AccTechId" style="width: 100%">
+                                    <option value="">--All--</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>

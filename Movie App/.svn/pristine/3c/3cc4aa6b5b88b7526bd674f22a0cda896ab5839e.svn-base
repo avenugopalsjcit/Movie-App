@@ -1,0 +1,272 @@
+﻿
+    <div >
+        
+            <div id="divAnnouncements"  ng-controller="GlossaryCtrl" >
+         
+               <div >
+                       
+                        <div id="Div6">
+                          <div class="row text-left Arrow ">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <h3>
+                               Admin Glossary
+                            </h3>
+                        </div>
+                    </div>
+                          
+                        <div class="col-md-12"  >
+                       
+                        <button class="btn btn-default btn-sm pull-right" id="Addbtn" data-toggle="modal" data-target="#basicModal" ng-click="addNewTask()" >Add Glossary</button>
+                         </div>
+                        
+                            
+
+                              <table ng-table="usersTable" id="tblAvailability"  class="table table-striped Arrow">
+                                <tr ng-repeat="category in $data">
+                                       <!-- <td class="Arrow">
+                                            <input type="checkbox" name="check1" id="chekid" />
+                                        </td>-->
+                                        <td data-title="' Term Name'"  sortable="'AvailabilityDesc'" class="Arrow">
+                                            {{category.TermName}}
+                                        </td>
+                                        <td data-title="' Product Name'"  sortable="'AvailabilityDesc'" class="Arrow">
+                                            {{category.ProductName}}
+                                        </td>
+                                        <td data-title="' Edit'">
+                                        <button class="btn btn-default btn-sm" id="Editbtn" data-toggle="modal" ng-click="EditRecord(category)" data-target="#basicModal" ><span class="glyphicon glyphicon-pencil"></span></button>
+                                        </td>
+                                        <td data-title="' Delete'">
+                                        <button value="Delete" class="btn btn-sm btn-danger" id="AnnouncementId" ng-click="DeleteAdminAvail(category)" class="chkAnnounmence" > <span class="glyphicon glyphicon-trash"></span></button></span>
+                                    </td>
+                                        
+                                    </tr>
+                                   
+                                </table>
+                            
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+
+               
+
+                   
+               
+            <!--   <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true" style="background: transparent; box-shadow: none;   border-style: none;  display: block; width: 900px;  margin-left: 0px; margin-right: 0px; padding-left: 0px; padding-right: 0px;" >-->
+              <div class="modal fade" id="basicModal" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" >
+                <div class="modal-content">
+                   <div class="modal-header" ng-show="Reset==0">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add  Glossary</h4>
+                    </div>
+                                        <div class="modal-header" ng-show="Reset==1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Edit  Glossary</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" name="Glossaryform" novalidate>
+                        
+                        <div class="control-group" ng-show="Reset==1" >
+                            <label class="control-label" for="inputtitle" >
+                                Product</label>
+                            <div class="controls" >
+                               <label class="control-label" for="inputtitle" ng-model="GlossaryProduct">{{GlossaryProduct}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="control-group"  ng-show="Reset==1">
+                            <label class="control-label" for="inputtitle" >
+                                Term</label>
+                            <div class="controls" >
+                               <label class="control-label" for="inputtitle" ng-model="lblGlossaryTerm">{{lblGlossaryTerm}}                                </label>
+                            </div>
+                        </div>
+                        <div class="control-group" ng-show="Reset==0">
+                            <label class="control-label" for="inputtitle" >
+                                Term<span style="color:Red">*</span></label></label>
+                            <div class="controls" >
+                                <input type="text" id="inputTerm" ng-change="checkidcall()" style="font-weight:normal" ng-model="GlossaryTerm" placeholder="Term"  required>
+                            </div>
+                            <div>
+                                <p style="margin-left: 132px; color: Red" ng-show="Glossaryform.inputTerm.$invalid && !Glossaryform.inputTerm.$pristine"
+                                    class="help-block">
+                                    Please Enter Term.</p>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="inputDescription" >
+                                Description<span style="color:Red">*</span></label></label>
+                            <div class="controls" >
+                                 <input type="text" id="Descriptionid" ng-change="checkidcall()" style="font-weight:normal" ng-model="GlossaryDesc" placeholder="Description"   required>
+                            </div>
+                             <div>
+                                <p style="margin-left: 132px; color: Red"  ng-show="Glossaryform.Descriptionid.$invalid && !Glossaryform.Descriptionid.$pristine"
+                                    class="help-block">
+                                    Please Enter Term.</p>
+                            </div>
+                        </div>
+
+                        <div ng-show="Reset==1">
+                    
+                    
+                              <table ng-show="Reset==1" id="Table2"  class="table table-striped Arrow">
+                              <tbody >
+                              <thead>
+                              <tr>
+                              <th style="background-color:transparent;color:Black">
+                              Created by
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Created Date
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Updated by
+                              </th>
+                              <th style="background-color:transparent;color:Black">
+                              Date Last Updated
+                              </th>
+                              </tr>
+                              </thead>
+                                <tr ng-repeat="category2 in usersTable2">
+                                
+                                       
+                                      <td    class="Arrow">
+                                            {{category2.CREATED_EMP_ID}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.CREATED_DT}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.UPDATED_EMP_ID}}
+                                        </td>
+                                         <td    class="Arrow">
+                                            {{category2.UPDATED_DT}}
+                                        </td>
+                                    </tr>
+                                   </tbody>
+                                </table>
+                    </div>
+
+
+
+<div class="form-horizontal" ng-show="Reset==0">
+<div class="form-group">
+<label for="" class="col-sm-1">&nbsp;</label>
+<div class="col-sm-5">
+    <table  ng-table="usersTable1" id="tblAvailability"  class="table table-striped Arrow">
+        <tr ng-repeat="category in usersTable1">
+            <td class="Arrow">
+                <input type="checkbox" name="check1" ng-click="checkidcall()" id="checkid" class="chkcls" required/>
+                <div>
+                    <p style="margin-left: 132px; color: Red" ng-show="Glossaryform.checkid.$invalid && !Glossaryform.checkid.$pristine"
+                        class="help-block">
+                        Please Select Product.</p>
+                </div>
+            </td>
+            <td data-title="' Product Title'" sortable="'DocumentTitle'" class="Arrow">
+                {{category.ProductName}}
+            </td>
+        </tr>
+    </table>
+    </div>
+    <label for="" class="col-sm-1">&nbsp;</label>
+    <div class="col-sm-5">
+        <table  ng-table="usersTable2" id="tblAvailability"  class="table table-striped Arrow">
+            <tr ng-repeat="category in usersTable2">
+                <td class="Arrow">
+                    <input type="checkbox" ng-click="checkid1call()" name="check1" id="checkid1"   class="chkcls1" required/>
+                    <div>
+                    <p style="margin-left: 132px; color: Red" ng-show="Glossaryform.checkid1.$invalid && !Glossaryform.checkid1.$pristine"
+                        class="help-block">
+                        Please Select Product.</p>
+                </div>
+                </td>
+                <td data-title="' Product Title'" sortable="'DocumentTitle'" class="Arrow">
+                    {{category.ProductName}}
+                </td>
+               
+            </tr>
+        </table>
+    </div>
+ <div class="col-sm-2" >
+
+ </div>
+
+</div>
+</div>
+                        </form>
+                    </div>
+                    <div>
+                    
+                    
+                    </div>
+
+                     <div class="modal-footer" style="background-color:none">
+                   
+                        <button type="button" id="Resetbtn" ng-show="Reset==1" class="btn btn-default"  ng-click="ResetRecord()">
+                            Reset</button>
+                        
+                           <button type="button" id="closebtn" data-dismiss="modal"  class="btn btn-default"  >
+                            Close </button>
+                        <button type="button" id="submitbtn" class="btn btn-primary" ng-show="Reset==0" data-dismiss="modal"     disabled="disabled"  ng-click="SaveAdminAvail()">
+                            Submit</button>
+                             <button type="button" id="updatebtn" class="btn btn-primary" ng-show="Reset==1"  data-dismiss="modal"   ng-disabled="Glossaryform.$invalid"  ng-click="UpdateAdminAvail(DocumentId)">
+                            Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+               
+
+               </div>
+               
+            </div>
+            
+       
+        
+        
+        
+    </div>
+    
+  
+    
+    <div class="pageLoaderOverlay">
+    </div>
+    
+    <div>
+        
+    
+   
+       
+
+         <script type="text/javascript">
+       
+
+        $(document).ready(function () {
+
+
+            if ($("#Glossaryform input:checkbox:checked").length > 0) {
+                    // any one is checked
+
+                $('#submitbtn').removeAttr('disabled');
+                   
+
+                }
+                });
+                </script>
+  
+
+    </div>
+
+  
+
+

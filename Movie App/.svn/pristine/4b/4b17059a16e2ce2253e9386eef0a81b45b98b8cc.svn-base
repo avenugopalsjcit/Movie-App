@@ -1,0 +1,889 @@
+﻿
+app.controller('distributorProductMappingCtrl', function ($scope, $http, NgTableParams, $rootScope, GetProductMappingfactory) {
+    var initialbtgfrvalue = [];
+    var initialproductvalue = [];
+    var finalproductvalue = [];
+    var self = this;
+    
+
+
+
+
+    
+    GetProductMappingfactory.GetProducts().success(function (data) {
+        
+
+        $scope.DistributorData = new NgTableParams({}, { 'dataset': data.d.DistributorData });
+        $scope.tableParams = new NgTableParams({
+            sorting: {
+
+            }
+        }, {
+            getData: function ($defer, params) {
+                $defer.resolve($filter('orderBy')($scope.DistributorData, params.orderBy()));
+            }
+        });
+        
+        $scope.BtgfrData = new NgTableParams({}, { 'dataset': data.d.BtgfrData });
+        $scope.tableParams = new NgTableParams({
+            sorting: {
+
+            }
+        }, {
+            getData: function ($defer, params) {
+                $defer.resolve($filter('orderBy')($scope.BtgfrData, params.orderBy()));
+            }
+        });
+        
+        $scope.OrgData = new NgTableParams({}, { 'dataset': data.d.OrgData });
+        $scope.tableParams = new NgTableParams({
+            sorting: {
+                UserName: 'asc'
+            }
+        }, {
+            getData: function ($defer, params) {
+                $defer.resolve($filter('orderBy')($scope.OrgData, params.orderBy()));
+            }
+        });
+    });
+
+
+    $scope.GetProductMappingList = function () {
+        $("#ddtab1distributors").select2(
+                    {
+                    });
+        $("#ddproductstab1").select2(
+                    {
+                    });
+        $(".pageLoaderOverlay").show();
+        $scope.TabName = "Distributor";
+
+        $http.post("ProductMapping.aspx/ProductMappingDetails", { 'TabName': $scope.TabName, 'ProductID': $scope.CPEProductitem }).success(function (data) {
+
+            
+            $scope.DistributorData = new NgTableParams({}, { 'dataset': data.d.DistributorData });
+
+
+
+
+        });
+        $(".pageLoaderOverlay").hide();
+        
+    }
+
+
+    $scope.showorgtab = function () {
+        $("#ddtab1distributors").select2(
+                    {
+                    });
+        $("#ddproductstab1").select2(
+                    {
+                    });
+        $("#ddproducttab3").select2(
+                    {
+                    });
+        $("#ddorgtab3").select2(
+                    {
+                    }); 
+        $("#ddporgtab3check2").select2(
+                    {
+                    });
+        $("#ddproducttab3check2").select2(
+                    {
+                    });
+    }
+
+    $scope.showbtgfrtab = function () {
+        
+
+        $(".pageLoaderOverlay").show();
+        $scope.TabName = "BTGFR";
+
+        $('#divBtgfr').attr('style', 'min-height:130px');
+        $("#ddlProduct").select2(
+                    {
+                    });
+        $("#idAssignedBTGFR").select2(
+                    {
+                    });
+
+        $("#ddallbtfgr").select2(
+                    {
+                    });
+
+        $("#idProductBasedOnBTGFR").select2(
+                    {
+                    });
+
+
+
+
+
+
+
+        $('#tblbtgfr').attr('style', 'display:block');
+        $('.ng-table-pager').hide();
+
+        $http.post("ProductMapping.aspx/ProductNamesdd", { 'TabName': $scope.TabName }).success(function (data) {
+
+
+            $scope.cpeproduct = data.d.BtgfrData;
+            $(".pageLoaderOverlay").hide();
+
+
+        });
+
+        $http.post("ProductMapping.aspx/BTGFRNamesdd", { 'TabName': $scope.TabName }).success(function (data) {
+
+
+
+            $scope.AllBTGFRName = data.d.BtgfrData;
+
+
+           
+
+
+        });
+
+       
+    }
+
+    $scope.showbtgfrproductmapping = function () {
+        $('#divmappendunmappedtab2').attr('style', 'display:none;');
+        $('#btnupdate').attr('style', 'display:none;');
+        $scope.TabName = "BTGFR";
+        $scope.BTGFRName = [];
+        
+        $(".pageLoaderOverlay").show();
+        $http.post("ProductMapping.aspx/ProductMappingDetails", { 'TabName': $scope.TabName, 'ProductID': $scope.CPEProductitem }).success(function (data) {
+
+
+
+
+            $scope.BtgfrData = new NgTableParams({}, { 'dataset': data.d.BtgfrData });
+            if (data.d.BtgfrData != null && data.d.BtgfrData.length != 0) {
+                data.d.BtgfrData.forEach(function (item) {
+                    if (item.BTGFRName == undefined) {
+                        $scope.BTGFRName.push("None");
+                    }
+                    else {
+                        $scope.BTGFRName.push(item.BTGFRName);
+                    }
+
+                });
+
+            }
+
+            $('.ng-table-pager').show();
+            if ($('#s2id_ddlProduct .select2-choice .select2-chosen').text() != "--Select--") {
+                $('#btngo').removeAttr('disabled');
+            }
+            else {
+                $('#btngo').attr('disabled', 'disabled');
+            }
+            $(".pageLoaderOverlay").hide();
+
+        });
+    }
+
+    $scope.showproductbasedonbtgfr = function () {
+        
+        $(".pageLoaderOverlay").show();
+        $('#divmappendunmappedtab2').attr('style', 'display:none;');
+        $('#btnupdate').attr('style', 'display:none;');
+        $scope.TabName = "BTGFR";
+        $scope.btgfrproduct = [];
+        
+        $http.post("ProductMapping.aspx/Productbasedonbtgfr", { 'TabName': $scope.TabName, 'BTGFRID': $scope.AllBTGFR }).success(function (data) {
+
+         
+
+
+            $scope.BtgfrData = new NgTableParams({}, { 'dataset': data.d.BtgfrData });
+            if (data.d.BtgfrData != null && data.d.BtgfrData.length != 0) {
+                data.d.BtgfrData.forEach(function (item) {
+                    if (item.ProductName == undefined) {
+                        $scope.btgfrproduct.push("None");
+                    }
+                    else {
+                        $scope.btgfrproduct.push(item.ProductName);
+                    }
+
+                });
+
+            }
+
+            $('.ng-table-pager').show();
+            if ($('#s2id_ddallbtfgr .select2-choice .select2-chosen').text() != "--Select--") {
+                $('#btngo1').removeAttr('disabled');
+            }
+            else {
+                $('#btngo1').attr('disabled', 'disabled');
+            }
+
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+
+
+    //Mapping and Unmapping code fior BTGFR starts from here
+    $scope.Showassignedandunssignedvalues = function () {
+        $(".pageLoaderOverlay").show();
+        
+        $scope.TabName = "BTGFR";
+        $scope.btgfrproduct = [];
+        
+
+        if ($("#other").is(":checked") == true) {
+
+            $http.post("ProductMapping.aspx/UnassignProductbasedonbtgfr", { 'TabName': $scope.TabName, 'BTGFRID': $scope.AllBTGFR }).success(function (data) {
+
+
+
+
+                $scope.BtgfrData = data.d.BtgfrData;
+                initialproductvalue = angular.copy($scope.BtgfrData);
+
+
+                $('.ng-table-pager').show();
+
+            });
+            $http.post("ProductMapping.aspx/AssignProductbasedonbtgfr", { 'TabName': $scope.TabName, 'BTGFRID': $scope.AllBTGFR }).success(function (data) {
+
+
+
+
+                $scope.BtgfrDataMapped = data.d.BtgfrData;
+
+
+                $('.ng-table-pager').show();
+
+
+            });
+
+        }
+
+        if ($("#first").is(":checked") == true) {
+            $(".pageLoaderOverlay").show();
+            $http.post("ProductMapping.aspx/Unassignbtfgrbasedonproduct", { 'TabName': $scope.TabName, 'ProductID': $scope.CPEProductitem }).success(function (data) {
+
+
+
+
+                $scope.UnassignedBtgfrDataBasedonproduct = data.d.BtgfrData;
+
+
+                $('.ng-table-pager').show();
+
+
+            });
+            $http.post("ProductMapping.aspx/Assignbtfgrbasedonproduct", { 'TabName': $scope.TabName, 'ProductID': $scope.CPEProductitem }).success(function (data) {
+
+
+
+
+                $scope.assignedBtgfrDataBasedonproduct = data.d.BtgfrData;
+
+
+                $('.ng-table-pager').show();
+
+            });
+
+        }
+
+        $('#divmappendunmappedtab2').attr('style', 'display:block;');
+        $('#btnupdate').attr('style', 'display:block;');
+        $(".pageLoaderOverlay").hide();
+
+
+    }
+    $scope.showdiv = function () {
+        
+        $('#s2id_ddlProduct .select2-choice .select2-chosen').html('--Select--');
+        $('#s2id_ddallbtfgr .select2-choice .select2-chosen').html('--Select--');
+        $('#divmappendunmappedtab2').attr('style', 'display:none;');
+        $('#btnupdate').attr('style', 'display:none;');
+    }
+    //Ends Here For BTGFR mapping and unmapping
+
+    //update code starts here for BTGFR//
+
+    $scope.Update = function () {
+        
+
+        if ($("#first").is(":checked") == true) {
+            var list = "";
+            var ProductID = $scope.CPEProductitem;
+            $("#mapBlock1 li").each(function (index) {
+                list += $(this).children('p').text() + ",";
+            });
+
+            GetProductMappingfactory.InsertBTGFRMapping(ProductID, list, $rootScope.User_Id).success(function (data) {
+                if (data.d > 0) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            }).error(function (error) {
+
+
+                $(".pageLoaderOverlay").hide();
+            });
+        };
+
+        if ($("#other").is(":checked") == true) {
+            
+            var list = "";
+            var BTGFRID = $scope.AllBTGFR;
+            $("#mapBlock li").each(function (index) {
+                list += $(this).children('p').text() + ",";
+            });
+
+            GetProductMappingfactory.InsertBTGFRMapping_ProductBasedOnBTGFR(BTGFRID, list, $rootScope.User_Id).success(function (data) {
+                if (data.d > 0) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            }).error(function (error) {
+
+
+                $(".pageLoaderOverlay").hide();
+            });
+        };
+    }
+    //ends here
+
+
+
+    //Mapping and Unmapping code fior DIST starts from here
+    $scope.Showassignedandunssigneddistprodvalues = function () {
+
+        
+        $scope.TabName = "Distributor";
+        $scope.distributorproduct = [];
+        
+
+        if ($("#rdbothertab1").is(":checked") == true) {
+
+            $http.post("ProductMapping.aspx/UnassignProductbasedondistributor", { 'TabName': $scope.TabName, 'DistributorID': $scope.Distributoritem }).success(function (data) {
+
+
+                
+
+                $scope.DistributorData = data.d.BtgfrData;
+
+
+
+                $('.ng-table-pager').show();
+
+            });
+            $http.post("ProductMapping.aspx/AssignProductbasedondistributor", { 'TabName': $scope.TabName, 'DistributorID': $scope.Distributoritem }).success(function (data) {
+
+
+                
+
+                $scope.DistributorDataMapped = data.d.BtgfrData;
+
+
+                $('.ng-table-pager').show();
+                $(".pageLoaderOverlay").hide();
+
+            });
+
+        }
+
+        if ($("#rdbfirsttab1").is(":checked") == true) {
+            $(".pageLoaderOverlay").show();
+            $http.post("ProductMapping.aspx/Unassigndistributorbasedonproduct", { 'TabName': $scope.TabName, 'ProductID': $scope.CPEProductitem }).success(function (data) {
+
+                
+
+
+                $scope.UnassigndistributorDataBasedonproduct = data.d.BtgfrData;
+
+
+                $('.ng-table-pager').show();
+
+
+            });
+            $http.post("ProductMapping.aspx/Assigndistributorbasedonproduct", { 'TabName': $scope.TabName, 'ProductID': $scope.CPEProductitem }).success(function (data) {
+
+                $(".pageLoaderOverlay").hide();
+                
+
+                $scope.assigndistributorDataBasedonproduct = data.d.BtgfrData;
+
+
+                $('.ng-table-pager').show();
+                $(".pageLoaderOverlay").hide();
+            });
+
+        }
+
+        $('#divdistmappedunmapped').attr('style', 'display:block;');
+        $('#btnupdatetab1').attr('style', 'display:block;');
+
+
+
+    }
+
+    //Ends Here For Distributor mapping and unmapping
+
+    //update code starts here for Distributor//
+
+    $scope.Updatetab1 = function () {
+        
+        $(".pageLoaderOverlay").show();
+
+        if ($("#rdbfirsttab1").is(":checked") == true) {
+            var list = "";
+            var ProductID = $scope.CPEProductitem;
+            $("#mapblockdist li").each(function (index) {
+                list += $(this).children('p').text() + ",";
+            });
+
+            GetProductMappingfactory.InsertDistributorProductMapping(ProductID, list, $rootScope.User_Id).success(function (data) {
+                if (data.d > 0) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            }).error(function (error) {
+
+
+                $(".pageLoaderOverlay").hide();
+            });
+        };
+
+        if ($("#rdbothertab1").is(":checked") == true) {
+            
+            var list = "";
+            var DistributorID = $scope.Distributoritem;
+            $("#mapblockprod li").each(function (index) {
+                list += $(this).children('p').text() + ",";
+            });
+
+            GetProductMappingfactory.InsertDistributorProductMapping_ProductBasedOnDistributor(DistributorID, list, $rootScope.User_Id).success(function (data) {
+                if (data.d > 0) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            }).error(function (error) {
+
+
+                $(".pageLoaderOverlay").hide();
+            });
+        };
+    }
+    //ends here
+
+    //Mapping and Unmapping code for ORG starts from here
+    $scope.Showassignedandunssignedvaluestab3 = function () {
+
+        
+        $scope.TabName = "ORG";
+        $scope.btgfrproduct = [];
+        
+
+        if ($("#rdbothertab3").is(":checked") == true) {
+
+            $http.post("ProductMapping.aspx/UnassignProductbasedonorg", { 'TabName': $scope.TabName, 'ORGID': $scope.AllORG }).success(function (data) {
+
+
+
+
+                $scope.OrganisationData = data.d.BtgfrData;
+
+
+
+                $('.ng-table-pager').show();
+
+            });
+            $http.post("ProductMapping.aspx/AssignProductbasedonorg", { 'TabName': $scope.TabName, 'ORGID': $scope.AllORG }).success(function (data) {
+
+
+
+
+                $scope.OrganisationDataMapped = data.d.BtgfrData;
+
+
+                $('.ng-table-pager').show();
+                $(".pageLoaderOverlay").hide();
+
+            });
+
+        }
+
+        if ($("#rdbfirsttab3").is(":checked") == true) {
+            $(".pageLoaderOverlay").show();
+            $http.post("ProductMapping.aspx/Unassignorgbasedonproduct", { 'TabName': $scope.TabName, 'ProductID': $scope.CPEProductitem }).success(function (data) {
+
+
+
+
+                $scope.Unassignorgbasedonproduct = data.d.BtgfrData;
+
+
+                $('.ng-table-pager').show();
+
+
+            });
+            $http.post("ProductMapping.aspx/Assignorgbasedonproduct", { 'TabName': $scope.TabName, 'ProductID': $scope.CPEProductitem }).success(function (data) {
+
+                $(".pageLoaderOverlay").hide();
+
+
+                $scope.assignedorgDataBasedonproduct = data.d.BtgfrData;
+
+
+                $('.ng-table-pager').show();
+                $(".pageLoaderOverlay").hide();
+            });
+
+        }
+
+        $('#divmappedunmappedtab3').attr('style', 'display:block;');
+        $('#Btnupdatetab3').attr('style', 'display:block;');
+
+
+    }
+
+    //Ends Here For ORG mapping and unmapping
+
+
+    //update code starts here for ORG//
+
+    $scope.Updatetab3 = function () {
+        
+
+        if ($("#rdbfirsttab3").is(":checked") == true) {
+            var list = "";
+            var ProductID = $scope.CPEProductitem;
+            $("#mapBlockorg li").each(function (index) {
+                list += $(this).children('p').text() + ",";
+            });
+
+            GetProductMappingfactory.InsertORGMapping(ProductID, list, $rootScope.User_Id).success(function (data) {
+                if (data.d > 0) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            }).error(function (error) {
+
+
+                $(".pageLoaderOverlay").hide();
+            });
+        };
+
+        if ($("#rdbothertab3").is(":checked") == true) {
+            
+            var list = "";
+            var ORGID = $scope.AllORG;
+            $("#mapBlockproduct li").each(function (index) {
+                list += $(this).children('p').text() + ",";
+            });
+
+            GetProductMappingfactory.InsertORGMapping_ProductBasedOnORG(ORGID, list, $rootScope.User_Id).success(function (data) {
+                if (data.d > 0) {
+                    $(".pageLoaderOverlay").hide();
+                }
+            }).error(function (error) {
+
+
+                $(".pageLoaderOverlay").hide();
+            });
+        };
+    }
+    //ends here
+
+
+    $scope.showtab1productsdd = function () {
+        $("#ddtab1distributors").select2(
+                    {
+                    });
+        $("#ddproductstab1").select2(
+                    {
+                    });
+        $(".pageLoaderOverlay").show();
+        
+
+
+        $('#s2id_ddproductstab1 .select2-choice .select2-chosen').text('--Select--')
+
+
+
+        $('#divdistmappedunmapped').attr('style', 'display:none;');
+        $('#btnupdatetab1').attr('style', 'display:none;');
+
+        
+
+
+        $http.post("ProductMapping.aspx/ProductNamesdd", { 'TabName': "Distributor" }).success(function (data) {
+
+
+            $scope.cpeproduct = data.d.BtgfrData;
+
+            $(".pageLoaderOverlay").hide();
+        });
+
+    }
+
+    $scope.showdistributorbasedonproduct = function () {
+        
+        $('#divdistmappedunmapped').attr('style', 'display:none;');
+        $('#btnupdatetab1').attr('style', 'display:none;');
+        $(".pageLoaderOverlay").show();
+        if ($('#s2id_ddproductstab1 .select2-choice .select2-chosen').text() != "--Select--") {
+            $http.post("ProductMapping.aspx/DistributorsBasedOnProductdd", { 'TabName': "Distributor", 'ProductID': $scope.CPEProductitem }).success(function (data) {
+                $scope.Distributor = [];
+                $scope.DistributorName = [];
+
+                if (data.d.BtgfrData != null && data.d.BtgfrData.length != 0) {
+                    data.d.BtgfrData.forEach(function (item) {
+                        if (item.DistributorName == undefined) {
+                            $scope.DistributorName.push("None");
+                        }
+                        else {
+                            $scope.DistributorName.push(item.DistributorName);
+                        }
+
+                    });
+
+
+                }
+
+
+                $('#btngotab1').removeAttr('disabled');
+
+
+
+            });
+
+        }
+        else {
+
+            $('#btngotab1').attr('disabled', 'disabled');
+        }
+        $(".pageLoaderOverlay").hide();
+    }
+
+    $scope.showorgbasedonproducts = function () {
+        
+        $('#divmappedunmappedtab3').attr('style', 'display:none');
+        $('#Btnupdatetab3').attr('style', 'display:none'); 
+        $(".pageLoaderOverlay").show();
+        $http.post("ProductMapping.aspx/OrgBasedOnProductdd", { 'TabName': "ORG", 'ProductID': $scope.CPEProductitem }).success(function (data) {
+            $scope.ORG = [];
+            $scope.OrganisationName = [];
+
+            if (data.d.BtgfrData != null && data.d.BtgfrData.length != 0) {
+                data.d.BtgfrData.forEach(function (item) {
+                    if (item.OrganisationName == undefined) {
+                        $scope.OrganisationName.push("None");
+                    }
+                    else {
+                        $scope.OrganisationName.push(item.OrganisationName);
+                    }
+
+                });
+
+            }
+            if ($('#s2id_ddproducttab3 .select2-choice .select2-chosen').text() != "--Select--") {
+                $('#btngotab3').removeAttr('disabled');
+            }
+            else {
+                $('#btngotab3').attr('disabled', 'disabled');
+            }
+            $(".pageLoaderOverlay").hide();
+        });
+
+
+    }
+
+
+
+    $scope.showtab1distributorssdd = function () {
+        $(".pageLoaderOverlay").show();
+
+
+
+
+        $('#divdistmappedunmapped').attr('style', 'display:none;');
+        $('#btnupdatetab1').attr('style', 'display:none;');
+
+
+        $("#dddistributortab1check2").select2(
+                    {
+                    });
+
+        $("#ddproducttab1check2").select2(
+                    {
+                    });
+
+        
+        $http.post("ProductMapping.aspx/DistributorsNamesdd", { 'TabName': "Distributor" }).success(function (data) {
+
+
+            $scope.Distributor = data.d.BtgfrData;
+
+            $(".pageLoaderOverlay").hide();
+        });
+
+    }
+
+    $scope.showtab3orgdd = function () {
+        $(".pageLoaderOverlay").show();
+        $('#divmappedunmappedtab3').attr('style', 'display:none');
+        $('#Btnupdatetab3').attr('style', 'display:none'); 
+        
+        $http.post("ProductMapping.aspx/OrganisationNamesdd", { 'TabName': "Distributor" }).success(function (data) {
+
+
+            $scope.OrganisationName = data.d.BtgfrData;
+            $(".pageLoaderOverlay").hide();
+          
+        });
+        
+    }
+
+    $scope.showProductsBasedOnDistributordd = function () {
+        
+        $('#divdistmappedunmapped').attr('style', 'display:none;');
+        $('#btnupdatetab1').attr('style', 'display:none;');
+        $(".pageLoaderOverlay").show();
+        $http.post("ProductMapping.aspx/ProductsBasedOnDistributordd", { 'TabName': "Distributor", 'DistributorID': $scope.Distributoritem }).success(function (data) {
+
+            $scope.ProductName = [];
+
+            if (data.d.BtgfrData != null && data.d.BtgfrData.length != 0) {
+                data.d.BtgfrData.forEach(function (item) {
+                    if (item.ProductName == undefined) {
+                        $scope.ProductName.push("None");
+                    }
+                    else {
+                        $scope.ProductName.push(item.ProductName);
+                    }
+
+                });
+
+            }
+            if ($('#s2id_dddistributortab1check2 .select2-choice .select2-chosen').text() != "--Select--") {
+                $('#btngo1tab1').removeAttr('disabled');
+            }
+            else {
+                $('#btngo1tab1').attr('disabled', 'disabled');
+            }
+            $(".pageLoaderOverlay").hide();
+        });
+
+    }
+
+    $scope.showproductbasedonorg = function () {
+        
+        $('#divmappedunmappedtab3').attr('style', 'display:none');
+        $('#Btnupdatetab3').attr('style', 'display:none'); 
+        $(".pageLoaderOverlay").show();
+        $http.post("ProductMapping.aspx/ProductsBasedOnORGdd", { 'TabName': "ORG", 'ORGID': $scope.AllORG }).success(function (data) {
+
+            $scope.ProductBasedOnORG = [];
+
+            if (data.d.BtgfrData != null && data.d.BtgfrData.length != 0) {
+                data.d.BtgfrData.forEach(function (item) {
+                    if (item.ProductName == undefined) {
+                        $scope.ProductBasedOnORG.push("None");
+                    }
+                    else {
+                        $scope.ProductBasedOnORG.push(item.ProductName);
+                    }
+
+                });
+
+            }
+
+            $(".pageLoaderOverlay").hide();
+        });
+
+    }
+
+});
+
+
+
+
+
+app.factory('GetProductMappingfactory', function ($http) {
+ 
+    var GetProductMappingfactory = {};
+    GetProductMappingfactory.GetProducts = function () {
+        var TabName = "Distributor";
+        var CPEProductitem = "";
+        return $http.post("ProductMapping.aspx/ProductMappingDetails", { 'TabName': TabName, 'ProductID': CPEProductitem });
+    }
+
+    GetProductMappingfactory.InsertBTGFRMapping = function (ProductID, list, User_id) {
+        
+        
+      
+
+        if (list != "") {
+            list = list.substring(0, list.length - 1);
+        }
+        return $http.post('ProductMapping.aspx/SaveBTGFRMapping', { 'ProductID': ProductID, 'list': list, 'User_id': User_id });
+    }
+
+    GetProductMappingfactory.InsertBTGFRMapping_ProductBasedOnBTGFR = function (BTGFRID, list, User_id) {
+        
+   
+        // return $http.post('GlobalReference.aspx/SaveUnitsOfMapping', { 'CharTypeID': CharTypeID, });
+
+        if (list != "") {
+            list = list.substring(0, list.length - 1);
+        }
+        return $http.post('ProductMapping.aspx/SaveBTGFRMapping_ProductBasedOnBTGFR', { 'BTGFRID': BTGFRID, 'list': list, 'User_id': User_id });
+    }
+
+    GetProductMappingfactory.InsertDistributorProductMapping = function (ProductID, list, User_id) {
+        
+     
+
+
+        if (list != "") {
+            list = list.substring(0, list.length - 1);
+        }
+        return $http.post('ProductMapping.aspx/SaveDistributorProductMapping', { 'ProductID': ProductID, 'list': list, 'User_id': User_id });
+    }
+
+    GetProductMappingfactory.InsertDistributorProductMapping_ProductBasedOnDistributor = function (DistributorID, list, User_id) {
+        
+       
+        // return $http.post('GlobalReference.aspx/SaveUnitsOfMapping', { 'CharTypeID': CharTypeID, });
+
+        if (list != "") {
+            list = list.substring(0, list.length - 1);
+        }
+        return $http.post('ProductMapping.aspx/SaveDistributorProductMapping_ProductBasedOnDistributor', { 'DistributorID': DistributorID, 'list': list, 'User_id': User_id });
+    }
+
+
+
+    GetProductMappingfactory.InsertORGMapping = function (ProductID, list, User_id) {
+        
+        
+
+
+        if (list != "") {
+            list = list.substring(0, list.length - 1);
+        }
+        return $http.post('ProductMapping.aspx/SaveORGMapping', { 'ProductID': ProductID, 'list': list, 'User_id': User_id });
+    }
+
+    GetProductMappingfactory.InsertORGMapping_ProductBasedOnORG = function (ORGID, list, User_id) {
+        
+       
+        // return $http.post('GlobalReference.aspx/SaveUnitsOfMapping', { 'CharTypeID': CharTypeID, });
+
+        if (list != "") {
+            list = list.substring(0, list.length - 1);
+        }
+        return $http.post('ProductMapping.aspx/SaveORGMapping_ProductBasedOnORG', { 'ORGID': ORGID, 'list': list, 'User_id': User_id });
+    }
+    
+    return GetProductMappingfactory;
+});
+
+
+

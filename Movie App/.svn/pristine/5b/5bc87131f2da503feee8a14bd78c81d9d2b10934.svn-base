@@ -1,0 +1,53 @@
+﻿
+namespace SCAdminBAL
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using SCAdminDAL;
+    using System.Data;
+
+    public class ProductOwnerBAL
+    {
+        ProductOwnerDAL objProductOwnerDAL = new ProductOwnerDAL();
+        public List<ProductOwnerDetails> GetProductOwnersDetails()
+        {
+            
+            DataTable dtUserStatusDetails = objProductOwnerDAL.GetProductOwnersDetails();
+            List<ProductOwnerDetails> lstProductOwnerDetails = new List<ProductOwnerDetails>();
+            var lstProductDetails = (from DataRow dRow in dtUserStatusDetails.Rows
+                                                select new { ProductId = Convert.ToInt32(dRow["product_cd"]), ProductName = Convert.ToString(dRow["product_name"]) }).Distinct().ToList();
+            lstProductOwnerDetails = lstProductDetails.Select(a => new ProductOwnerDetails { ProductId = a.ProductId, ProductName = a.ProductName }).ToList();
+            var lstProdOwnerDeatils = (from DataRow dRow in dtUserStatusDetails.Rows
+                                       select new { ProductId = Convert.ToInt32(dRow["product_cd"]), ProductName = Convert.ToString(dRow["product_name"]), EmployeeId = (!(dRow["emp_id"] is DBNull) ? Convert.ToString(dRow["emp_id"]) : ""), UserName = (!(dRow["user_name"] is DBNull) ? Convert.ToString(dRow["user_name"]) : ""), PrimaryCD = (!(dRow["primary_cd"] is DBNull) ? Convert.ToInt32(dRow["primary_cd"]) : 0),
+Email = (!(dRow["user_email_id"] is DBNull) ? Convert.ToString(dRow["user_email_id"]) : ""),
+FullName = (!(dRow["FullName"] is DBNull) ? Convert.ToString(dRow["FullName"]) : "")
+                                       }).Distinct().ToList();
+            foreach (ProductOwnerDetails dr in lstProductOwnerDetails)
+            {
+                List<ProductOwner> lstProductOwner = lstProdOwnerDeatils.Where(a => a.ProductId == dr.ProductId).Select(a => new ProductOwner { EmployeeId = a.EmployeeId, UserName = a.UserName, PrimaryCD = a.PrimaryCD, Email = a.Email, FullName = a.FullName }).ToList();
+                dr.Owners = lstProductOwner;
+                if (lstProductOwner.Where(a => a.PrimaryCD == 1).FirstOrDefault() != null)
+                {
+                    dr.CurrentPrimaryContact = lstProductOwner.Where(a => a.PrimaryCD == 1).FirstOrDefault().UserName;
+                    dr.CurrentPrimaryContactID = lstProductOwner.Where(a => a.PrimaryCD == 1).FirstOrDefault().EmployeeId;
+                    dr.CurrentEmailID = lstProductOwner.Where(a => a.PrimaryCD == 1).FirstOrDefault().Email;
+                    dr.EmployeeId = lstProductOwner.Where(a => a.PrimaryCD == 1).FirstOrDefault().EmployeeId;
+                }
+            }           
+            return lstProductOwnerDetails;
+        }
+
+     
+        public int UpdateProductOwnerDetails(int ProductCode, string CurrentProductOwner, string OldProductOwner)
+        {
+            int updateProdOwnerDetails = objProductOwnerDAL.UpdateProductOwnerDetails(ProductCode, CurrentProductOwner, OldProductOwner);
+
+             return 1;
+
+            //objProductOwnerDAL.UpdateProductOwnerDetails(ProductCode, CurrentProductOwner, OldProductOwner, ProductOwners);
+        }
+
+    }
+}

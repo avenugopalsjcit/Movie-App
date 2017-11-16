@@ -1,0 +1,44 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using SCAdminBAL;
+using System.Web.Services;
+
+namespace SCSearch.Admin
+{
+    public partial class ProductAccurateAdmin : System.Web.UI.Page
+    {
+        public static ProductOwnerBAL objProductOwnerBAL = new ProductOwnerBAL();
+
+        [WebMethod]
+        public static int PostCurrentUserDetails(int ProductId, string CurrentProductOwner, string OldProductOwner)
+        {
+
+            objProductOwnerBAL.UpdateProductOwnerDetails(ProductId, CurrentProductOwner, OldProductOwner);
+            return 1;
+
+        }
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        [WebMethod]
+        public static List<ProductOwnerDetails> GetProductOwnerDetails()
+        {
+            return objProductOwnerBAL.GetProductOwnersDetails();
+        }
+
+
+
+       
+
+
+
+
+    }
+}

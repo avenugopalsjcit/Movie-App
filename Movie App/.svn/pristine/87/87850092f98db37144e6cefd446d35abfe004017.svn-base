@@ -1,0 +1,184 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+  public  class MapUnitofMeasureBAL
+    {
+
+      private MapUnitofMeasureDAL objSRD = new MapUnitofMeasureDAL();
+
+      public List<MapUnitofMeasure> GetGridMapUOMDetails()
+        {
+            List<MapUnitofMeasure> lstOrg = new List<MapUnitofMeasure>();
+            DataTable dtGridDistributor = objSRD.GetGridMapUOMDetails();
+          
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                MapUnitofMeasure objOrg = new MapUnitofMeasure();
+
+                objOrg.CharTypeName = Convert.ToString(dr["char_type_name"]);
+
+                objOrg.CharTypeId = Convert.ToInt32(dr["char_type_id"]);
+                lstOrg.Add(objOrg);  
+            }
+
+
+            return lstOrg;
+        }
+      
+      public List<MapUnitofMeasure> GetListBoxMapUOMDetails(string CharTypeId)
+        {
+            List<MapUnitofMeasure> lstOrg = new List<MapUnitofMeasure>();
+            DataTable dtGridDistributor = objSRD.GetListBoxMapUOMDetails(CharTypeId);
+          
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                MapUnitofMeasure objOrg = new MapUnitofMeasure();
+
+                objOrg.UOMName = Convert.ToString(dr["uom_name"]);
+
+                objOrg.UOMId = Convert.ToInt32(dr["uom_id"]);
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+      public List<MapUnitofMeasure> GetUOMSubsetMapUOMDetails(string CharTypeId, string UOMId)
+        {
+            List<MapUnitofMeasure> lstOrg = new List<MapUnitofMeasure>();
+            DataTable dtGridDistributor = objSRD.GetUOMSubsetMapUOMDetails(CharTypeId, UOMId);
+          
+            foreach (DataRow dr in dtGridDistributor.Rows)
+            {
+                MapUnitofMeasure objOrg = new MapUnitofMeasure();
+
+                objOrg.UOMSubsetId = Convert.ToInt32(dr["uom_subset_id"]);
+
+                objOrg.UOMName = Convert.ToString(dr["uom_name"]);
+                lstOrg.Add(objOrg);
+            }
+
+
+            return lstOrg;
+        }
+
+      public List<MapUnitofMeasure> GetDropdownMapUOMDetails(string CharTypeId)
+      {
+          List<MapUnitofMeasure> lstOrg = new List<MapUnitofMeasure>();
+          DataTable dtGridDistributor = objSRD.GetDropDownMapUOMDetails(CharTypeId);
+
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              MapUnitofMeasure objOrg = new MapUnitofMeasure();
+
+              objOrg.UOMName = Convert.ToString(dr["uom_name"]);
+
+              objOrg.UOMId = Convert.ToInt32(dr["uom_id"]);
+              lstOrg.Add(objOrg);
+          }
+
+
+          return lstOrg;
+      }
+
+      public int  AdminMapUOMDelete(string UOMSubsetId)
+      {
+
+          return objSRD.AdminMapUOMDelete(UOMSubsetId);
+          
+      }
+
+      public int GetMaxMapUOM()
+      {
+          //AvailabilityGrid objOrg = new AvailabilityGrid();
+          return objSRD.GetGridMapUOMMAXDetails();
+
+      }
+      public List<MapUnitofMeasure> PopupGridAdminMapUOM(string UOMId, string CharTypeId)
+      {
+
+          List<MapUnitofMeasure> lstOrg = new List<MapUnitofMeasure>();
+          DataTable dtGridDistributor = objSRD.AdminMapUOMPopupGrid(UOMId, CharTypeId);
+          
+          foreach (DataRow dr in dtGridDistributor.Rows)
+          {
+              MapUnitofMeasure objOrg = new MapUnitofMeasure();
+              //var options = { timeZone: 'UTC', timeZoneName: 'short' };
+              //  console.log(date.toLocaleTimeString('en-US', options));
+              if (dr["CREATED_DT"] != DBNull.Value)
+              {
+                  DateTime currentDate = Convert.ToDateTime(dr["CREATED_DT"]);
+                  objOrg.CREATED_DT = currentDate.ToString("dd-MMM-yyyy HH:mm");
+              }
+              if (dr["UPDATED_DT"] != DBNull.Value)
+              {
+                  DateTime updatedDate = Convert.ToDateTime(dr["UPDATED_DT"]);
+                  objOrg.UPDATED_DT = updatedDate.ToString("dd-MMM-yyyy HH:mm");
+              }
+
+              objOrg.CREATED_EMP_ID = Convert.ToString(dr["CREATED_EMP_ID"]);
+
+              objOrg.UPDATED_EMP_ID = Convert.ToString(dr["UPDATED_EMP_ID"]);
+
+              lstOrg.Add(objOrg);
+
+          }
+          return lstOrg;
+      }
+
+
+      public int InsertAdminMapUOM(string UOMSubsetId, string CharTypeId, string UOMId, string User_id)
+      {
+
+          int count = objSRD.AdminMapMapUOMInsert(UOMSubsetId, CharTypeId, UOMId, User_id);
+
+
+
+          return count;
+      }
+      public lstUnitOfMeasure GetUnitOfMeasures(string CharTypeId)
+      {
+
+          List<MapUnitofMeasure> lstMappedUnits = new List<MapUnitofMeasure>();
+          List<MapUnitofMeasure> lstUnMappedUnits = new List<MapUnitofMeasure>();
+          lstUnitOfMeasure lstData = new lstUnitOfMeasure();
+
+          DataTable dtlist = objSRD.GetDropDownMapUOMDetails(CharTypeId);
+        
+          foreach (DataRow dr in dtlist.Rows)
+          {
+              MapUnitofMeasure objMap = new MapUnitofMeasure();
+              objMap.UOMName = Convert.ToString(dr["uom_name"]);
+              objMap.UOMId = Convert.ToInt32(dr["uom_id"]);
+              lstMappedUnits.Add(objMap);
+          }
+
+          DataTable dtunMaplist = objSRD.GetUnMapUOMDetails(CharTypeId);
+         
+          foreach (DataRow dr in dtunMaplist.Rows)
+          {
+              MapUnitofMeasure objMap1 = new MapUnitofMeasure();
+              objMap1.UOMName = Convert.ToString(dr["uom_name"]);
+              objMap1.UOMId = Convert.ToInt32(dr["uom_id"]);
+              lstUnMappedUnits.Add(objMap1);
+          }
+          lstData.MapUnitofMeasureList = lstMappedUnits;
+          lstData.UnMapUnitofMeasureList = lstUnMappedUnits;
+          return lstData;
+      }
+
+
+      public int SaveUnitsOfMapping(int CharTypeId, string MapList, string User_id)
+      {
+          int count;
+          count = objSRD.SaveUnitsOfMapping(CharTypeId, MapList, User_id);
+          return count;
+      }
+    }
+}

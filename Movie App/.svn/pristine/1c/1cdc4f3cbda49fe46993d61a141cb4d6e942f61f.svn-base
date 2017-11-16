@@ -1,0 +1,278 @@
+﻿app.controller("Controller.MCUCntrl", function ($scope, $rootScope, $location, $state, MCUHelper, MCUParam) {
+    $rootScope.userID = "607963746";
+    var MCUSession = {};
+    $('.pageLoaderOverlay').show();
+    $scope.showAccessRadionButton = false;
+
+
+    MCUHelper.getProductList($rootScope.userID).success(function (data) {
+        //        $scope.PoPCaseProductList = data.d.PoPLevelCase;
+        //        $scope.CountryCaseProductList = data.d.CountryLevelCases;
+        $scope.lstProduct = JSON.parse(data.d);
+        $("#ddlProduct").select2({});
+        $('.pageLoaderOverlay').hide();
+    });
+
+    //    $scope.$on('setAccessType', function (event, args) {
+    //        // $scope.loadTree(0, args.resetCase.caseValidity, 0, 0, 0);
+    //        $scope.accessType = args.accessRadio.accessType;
+    //    });
+
+
+    $scope.showAccessLevel = function () {
+        if ($scope.modProduct == null)
+            return;
+        $scope.accessType = "2";
+        $('.pageLoaderOverlay').show();
+        $scope.showAccessRadionButton = false;
+        if ($scope.modProduct != undefined && $scope.modProduct.PRODUCT_CD != '') {
+
+            MCUHelper.getValidAccessType($scope.modProduct.PRODUCT_CD).success(function (data) {
+                $scope.validAccessType = JSON.parse(data.d);
+                $scope.validAccessType.forEach(function (item) {
+                    if (item.PARENT_ACCESS_TYPE_NAME == 'hVPN' || item.PARENT_ACCESS_TYPE_NAME == 'VSAT') {
+                        $scope.showAccessRadionButton = true;
+                    }
+                });
+
+                if (!$scope.showAccessRadionButton) {
+                    $scope.accessType = 0;
+                    $scope.GotoEthernetMCU();
+                } else {
+                    $('.pageLoaderOverlay').hide();
+                }
+
+            }).error(function () { console.log('valid access_type call failed'); })
+        }
+    }
+
+
+
+
+    $scope.GotoEthernetMCU = function () {
+        $('.pageLoaderOverlay').show();
+        var productID = $scope.modProduct.PRODUCT_CD;
+        MCUParam.setProductId(productID);
+        MCUParam.setSubProductId(-1);
+        MCUHelper.getMCUSessionData(productID, -1, $scope.accessType).success(function (data) {
+            MCUSession = data.d;
+            MCUParam.setMCUSession(MCUSession);
+            redicttoMCUHome(MCUSession);
+        }).error(function () {
+            console.log('Error to load MCU session');
+            $('.pageLoaderOverlay').hide();
+        });
+    }
+
+    function redicttoMCUHome(MCUSession) {
+        switch (MCUSession.LocLevel) {
+            case 1: bootbox.alert("Mass Case Update does not handle region level products.");
+                break;
+            case 2: if (MCUSession.Mode == 1) {
+                    // $location.path("/Default_HVPN.aspx");
+                    $("#CountryLevel").trigger("click");
+                    $('.pageLoaderOverlay').hide();
+                }
+                else {
+                    //$location.path("Default_Country_No_Port.aspx");
+                    $('.pageLoaderOverlay').hide();
+                    $("#CityLevel").trigger("click");
+                }
+                break;
+            case 3:
+                switch (MCUSession.ProductCd) {
+                    case 63:
+                        $('.pageLoaderOverlay').hide();
+                        $("#CityLevel").trigger("click");
+                        break;
+                    default:
+                        //  $location.path("Default_City_No_Port.aspx");
+                        $('.pageLoaderOverlay').hide();
+                        $("#CityLevel").trigger("click");
+                        break;
+                }
+                break;
+            case 4:
+                switch (MCUSession.Multipoint) {
+                    case 1:
+                        if (MCUSession.AllPOPFlag == 0) {
+                            // $location.path("Default_Bandwidth.aspx");
+                            $('.pageLoaderOverlay').hide();
+                            $("#Multipop").trigger("click");
+                        }
+                        else {
+                            // $location.path("Default_Bandwidth_AllCities.aspx");
+                            $('.pageLoaderOverlay').hide();
+                            $("#Multipop").trigger("click");
+
+                        }
+                        break;
+                    default:
+                        switch (MCUSession.ProductCd) {
+                            case 25:
+                                // $location.path("Default_Access.aspx");
+
+                                $("#MCUAccess").trigger("click");
+                                $('.pageLoaderOverlay').hide();
+                                break;
+                            default:
+                                if (MCUSession.Mode == 1) {
+                                    // $location.path("Default_HVPN.aspx");
+                                    $location.path("/MCU/CountryLevel").search({ productId: MCUSession.ProductCd });
+                                    //                                    $("#CountryLevel").trigger("click");
+                                }
+                                else {
+                                    $location.path("/MCU/Poplevel").search({ productId: MCUSession.ProductCd });
+                                    // $("#poplevellink").trigger("click");
+
+
+
+                                    //  $scope.ethernetTemplate = 'Views/Masscaseupdate/mcu_ethernet_parent.htm';
+                                }
+                                break;
+                        }
+                        break;
+                }
+                break;
+        }
+    }
+});
+
+app.factory('MCUHelper', function ($http) {
+    return {
+        getProductList: function (UserID) {
+            return $http.post('MCU.aspx/getLoadOwnerProducts', { 'UserID': UserID });
+        },
+
+        getMCUSessionData: function (productId, subProductId, mode) {
+            return $http.post('MCU.aspx/populateSession', { 'productID': productId, 'subProductID': subProductId, 'mode': mode });
+        },
+
+        getPortCaseAvail: function () {
+            return $http.post('MCU.aspx/getAvailability', { data: {} });
+        },
+
+        getPortSpeedData: function (productId, subProductId) {
+            return $http.post('MCU.aspx/GetPortSpeedData', { 'ProductCd': productId, 'SubproductCd': subProductId });
+        },
+        GetHVPNPortSpeed: function (productId, subProductId, country, selectedState, popList, caseList) {
+            return $http.post('MCU.aspx/GetHVPNPortSpeed', { 'productId': productId, 'subproductId': subProductId, 'country': country, 'selectedState': selectedState, 'popList': popList, 'caseList': caseList });
+        },
+        getAccessFilterData: function (SelectedCases, SelectedPops, SelectedPortSpeeds, ProdCd, SubProdCd) {
+            return $http.post('MCU.aspx/GetAccessFilterData', { 'SelectedCases': SelectedCases,
+                'SelectedPops': SelectedPops, 'SelectedPortSpeeds': SelectedPortSpeeds,
+                'ProdCd': ProdCd, 'SubProdCd': SubProdCd
+            });
+        },
+
+        getAccessSpeed: function (Caselist, PopList, PortSpeedList, ProductCd, SubProductCd, accessSuppID, SuppProd, AccType, type) {
+            return $http.post('MCU.aspx/getAccessSpeed', { 'Caselist': Caselist, 'PopList': PopList, 'PortSpeedList': PortSpeedList,
+                'ProductCd': ProductCd, 'SubProductCd': SubProductCd, 'accessSuppID': accessSuppID,
+                'SuppProd': SuppProd, 'AccType': AccType, 'type': type
+            });
+        },
+
+        GetCharectristic: function (productId, subProductId) {
+            return $http.post('MCU.aspx/GetCharectristic', { 'ProductCd': productId, 'SubproductCd': subProductId });
+        },
+
+        getAccessSupplier: function (selectedPop) {
+            return $http.post('MCU.aspx/getAccessSupplier', { 'selectedPop': selectedPop });
+        },
+
+        getParentPortSpeed: function (aiPopSelected, aiPlatforms, iProductCd, subProductId) {
+            return $http.post('MCU.aspx/getParentPortSpeed', { 'aiPopSelected': aiPopSelected, 'aiPlatforms': aiPlatforms, 'iProductCd': iProductCd, 'subProductId': subProductId })
+            .success(function (data) { alert(data.d); })
+            .error(function () {
+                alert('error');
+            });
+        },
+
+        updateCases: function (param) {
+            return $http.post('MCU.aspx/UpdateCases', { 'param': param });
+        },
+
+        getValidAccessType: function (productID) {
+            return $http.post('MCU.aspx/getValidAccessType', { 'productID': productID });
+        },
+        CaseIdExists: function (caseIDs) {
+            return $http.post('MCU.aspx/CaseIdExists', { 'caseIDs': caseIDs });
+        },
+
+        Save: function (caseID, popId, caseValidCD, caseAvailCd, oportspeed, oAccessSuppChar, oCharecteristics) {
+            return $http.post('MCU.aspx/save', { 'caseID': caseID, 'popId': popId, 'caseValidCD': caseValidCD,
+                'caseAvailCd': caseAvailCd, 'oportspeed': oportspeed, 'oAccessSuppChar': oAccessSuppChar
+            });
+        }
+    }
+});
+
+app.factory('MCUParam', function () {
+    var productId = '';
+    var subProductId = '';
+    var selectedCases = '';
+    var selecedPoP = '';
+    var selectedPlatform = '';
+    var selecedCaseValidCd = '';
+    var MCUSession = '';
+    var savedCaseDetails = '';
+    var mem = {};
+    return {
+        getProductId: function () {
+            return productId;
+        },
+        setProductId: function (param) {
+            productId = parseInt(param);
+        },
+        getSubProductId: function () {
+            return subProductId;
+        },
+        setSubProductId: function (param) {
+            subProductId = parseInt(param);
+        },
+        getSelectedCase: function () {
+            return selectedCases;
+        },
+        setSelectedCase: function (param) {
+            selectedCases = param;
+        },
+        getSelectedPoP: function () {
+            return selecedPoP;
+        },
+        setSelectedPoP: function (param) {
+            selecedPoP = param;
+        },
+        setSelectedPlatform: function (param) {
+            selectedPlatform = param;
+        },
+        getSelectedPlatform: function () {
+            return selectedPlatform;
+        },
+        setselecedCaseValidCd: function (param) {
+            selecedCaseValidCd = param;
+        },
+        getselecedCaseValidCd: function () {
+            return selecedCaseValidCd;
+        },
+        getMCUSession: function () {
+            return MCUSession;
+        },
+        setMCUSession: function (param) {
+            MCUSession = param;
+        },
+        getSavedCaseDetails: function () {
+            return savedCaseDetails;
+        },
+        setSavedCaseDetails: function (param) {
+            savedCaseDetails = param;
+        },
+        storeScope: function (key, value) {
+            mem[key] = value;
+        },
+        getScope: function (key) {
+            return mem[key];
+        }
+
+
+    }
+});

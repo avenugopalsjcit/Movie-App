@@ -1,0 +1,31 @@
+﻿
+app.factory('CountryDetailsfactory', function ($http) {
+    var CountryDetailsfactory = {};
+
+    CountryDetailsfactory.GetCountryAvailabiltiyData = function () {
+        return $http.post("CpeCountryAvailibity.aspx/GetCountryDetails", {})
+
+    }
+
+    return CountryDetailsfactory;
+});
+
+app.controller("CpeCountryAvailableCntrl", ["$scope", "CountryDetailsfactory", "NgTableParams", "$rootScope", function ($scope, CountryDetailsfactory, NgTableParams, $rootScope) {
+
+    $(".pageLoaderOverlay").show();
+    CountryDetailsfactory.GetCountryAvailabiltiyData().success(function (data) {
+        $(".pageLoaderOverlay").hide();
+       
+        $scope.CpeCountryAvailability = new NgTableParams({}, { 'dataset': data.d });
+       
+        
+        
+    })
+                    .error(function (error) {
+                        alert("Problem occured while loading CountryData; " + error);
+                        $(".pageLoaderOverlay").hide();
+                    });
+
+
+
+} ]);

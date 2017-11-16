@@ -1,0 +1,220 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+
+namespace SCAdminBAL.GlobalReferences
+{
+   public class AdminNotesBAL
+    {
+       private AdminNotesDAL objSRD = new AdminNotesDAL();
+       private GlobalReferenceDAL objDAL = new GlobalReferenceDAL();
+       private GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+       public List<Notes> GetGridAdminAddress()
+       {
+
+
+           List<Notes> lstOrg = new List<Notes>();
+           DataTable dtGridDistributor = objSRD.GetGridAdminAddressDAL();
+
+
+
+
+
+
+
+           foreach (DataRow dr in dtGridDistributor.Rows)
+           {
+               Notes objOrg = new Notes();
+
+               objOrg.ServiceTypeDesc = Convert.ToString(dr["Service_Type_Desc"]);
+               objOrg.ProductName = Convert.ToString(dr["product_name"]);
+               objOrg.ProductCD = Convert.ToInt32(dr["Product_cd"]);
+               objOrg.ProductLocLevelCD = Convert.ToInt32(dr["Product_Loc_Level_cd"]);
+               //objOrg.AvailValidCd = Convert.ToInt32(dr["AVAIL_CD"]);
+               lstOrg.Add(objOrg);
+           }
+
+
+           return lstOrg;
+       }
+
+       public List<Notes> GetProducts(int curr_state, int userId, int accessLevel, string sLdapGFR, int sBtGfrCodes, int sSegregationCodes, int sMPLSCapOnlyPO)
+       {
+           List<Notes> lstNotes = new List<Notes>();
+           DataTable dtNotes = objDAL.GetProducts(curr_state, userId, accessLevel, sLdapGFR, sBtGfrCodes, sSegregationCodes, sMPLSCapOnlyPO);
+           if (dtNotes != null)
+           {
+               foreach (DataRow dr in dtNotes.Rows)
+               {
+                   Notes notes = new Notes();
+                   notes.ProductCD = Convert.ToInt32(dr["product_cd"]);
+                   notes.ProductName = Convert.ToString(dr["product_name"]);
+                   lstNotes.Add(notes);
+               }
+           }
+           return lstNotes;
+       }
+
+       public List<Region> GetRegions(int productId)
+       {
+           List<Region> lstRegions = new List<Region>();
+           DataTable dtRegions = objDAL.GetRegions(productId);
+           if (dtRegions != null)
+           {
+               foreach (DataRow dr in dtRegions.Rows)
+               {
+                   Region regions = new Region();
+                   regions.RegionID = Convert.ToInt32(dr["region_id"]);
+                   regions.RegionName = Convert.ToString(dr["region_name"]);
+                   lstRegions.Add(regions);
+               }
+           }
+           return lstRegions;
+       }
+
+       public List<Country> GetCountries(int productId)
+       {
+           List<Country> lstCountries = new List<Country>();
+           DataTable dtCountries = objDAL.GetCountries(productId);
+           if (dtCountries != null)
+           {
+               foreach (DataRow dr in dtCountries.Rows)
+               {
+                   Country countries = new Country();
+                   countries.CountryID = Convert.ToInt32(dr["country_id"]);
+                   countries.CountryName = Convert.ToString(dr["country_name"]);
+                   lstCountries.Add(countries);
+               }
+           }
+           return lstCountries;
+       }
+
+       public List<city> GetCities(int productId, int countryId)
+       {
+           List<city> lstCities = new List<city>();
+           DataTable dtCities = objDAL.GetCities(productId, countryId);
+           if (dtCities != null)
+           {
+               foreach (DataRow dr in dtCities.Rows)
+               {
+                   city objCities = new city();
+                   objCities.Cityid = Convert.ToInt32(dr["city_id"]);
+                   objCities.CityName =Convert.ToString(dr["state_province_name"]) + "-" + Convert.ToString(dr["city_name"]);
+                   lstCities.Add(objCities);
+               }
+           }
+           return lstCities;
+       }
+
+       public List<NotesGridData> GetNotesGridData(int Criteria, int productId, int regionId, int countryId, int cityId, int rowNum)
+       {
+           List<NotesGridData> lstNotesGrid = new List<NotesGridData>();
+           DataTable dtNotesGrid = objDAL.GetNotesGridData(Criteria, productId, regionId, countryId, cityId,rowNum);
+           StringBuilder strQuery = new StringBuilder();
+           if (dtNotesGrid != null)
+           {
+               foreach (DataRow dr in dtNotesGrid.Rows)
+               {
+                   NotesGridData objNotesGrid = new NotesGridData();
+                   if (Convert.ToString(dr["CREATEDBY"]) == "")
+                   {
+                       objNotesGrid.Owner = "UNKNOWN";
+                   }
+                   else
+                   {
+                       objNotesGrid.Owner = Convert.ToString(dr["CREATEDBY"]);
+                   }
+                   if (Convert.ToString(dr["UPDATEDBY"]) == "")
+                   {
+                       objNotesGrid.UpdatedByEmp = "UNKNOWN";
+                   }
+                   else
+                   {
+                       objNotesGrid.UpdatedByEmp = Convert.ToString(dr["UPDATEDBY"]);
+                   }
+                   objNotesGrid.NoteId = Convert.ToString(dr["NOTE_ID"]);
+                   objNotesGrid.CreatedDate = Convert.ToDateTime(dr["CREATED_DT"]).ToString("dd-MMM-yyyy hh:24");
+                   objNotesGrid.UpdatedDate = Convert.ToDateTime(dr["UPDATED_DT"]).ToString("dd-MMM-yyyy hh:24"); 
+                   objNotesGrid.Priority = Convert.ToString(dr["note_priority_desc"]);
+                   objNotesGrid.Category = Convert.ToString(dr["note_category_desc"]);
+                   objNotesGrid.PriorityId = Convert.ToString(dr["note_priority_cd"]);
+                   objNotesGrid.CategoryId = Convert.ToString(dr["note_category_cd"]);
+                   objNotesGrid.Title = Convert.ToString(dr["note_title"]);
+                   objNotesGrid.Description = Convert.ToString(dr["CAST(NOTE_CONTENTASVARCHAR2(3999))"]);
+                   if (!(dr["note_eff_beg_date"] is DBNull))
+                   {
+                       objNotesGrid.BeginDate = Convert.ToDateTime(dr["note_eff_beg_date"]).ToString("dd-MMM-yyyy");
+                   }
+                   if (!(dr["note_eff_end_date"] is DBNull))
+                   {
+                       objNotesGrid.EndDate = Convert.ToDateTime(dr["note_eff_end_date"]).ToString("dd-MMM-yyyy");
+                   }
+                   lstNotesGrid.Add(objNotesGrid);
+               }
+           }
+           return lstNotesGrid;
+       }
+
+       public List<NotePriority> GetNotePriority()
+       {
+           List<NotePriority> lstNotePriority = new List<NotePriority>();
+           DataTable dtNotePriority = objDAL.GetNotePriority();
+           if (dtNotePriority != null)
+           {
+               foreach (DataRow dr in dtNotePriority.Rows)
+               {
+                   NotePriority objNotePriority = new NotePriority();
+                   objNotePriority.priorityId = Convert.ToString(dr["note_priority_cd"]);
+                   objNotePriority.priorityName = Convert.ToString(dr["note_priority_desc"]);
+                   lstNotePriority.Add(objNotePriority);
+               }
+           }
+           return lstNotePriority;
+       }
+
+       public List<NoteCategory> GetNoteCategory()
+       {
+           List<NoteCategory> lstNoteCategory = new List<NoteCategory>();
+           DataTable dtNoteCategory = objDAL.GetNoteCategory();
+           if (dtNoteCategory != null)
+           {
+               foreach (DataRow dr in dtNoteCategory.Rows)
+               {
+                   NoteCategory objNoteCategory = new NoteCategory();
+                   objNoteCategory.categoryId = Convert.ToString(dr["note_category_cd"]);
+                   objNoteCategory.categoryName = Convert.ToString(dr["note_category_desc"]);
+                   lstNoteCategory.Add(objNoteCategory);
+               }
+           }
+           return lstNoteCategory;
+       }
+
+       public int AddNewNote(int Criteria, int productId, int regionId, int countryId, int cityId, string title, string category, string priority, string BegDate, string EndDate, string userId, string description)
+       {
+           return objDAL.AddNewNote(Criteria,productId, regionId,countryId, cityId, title, category, priority, BegDate, EndDate, userId, description);
+       }
+
+       public string GetUserName(string userId)
+       {
+           return objDAL.GetUserName(userId);
+       }
+
+       public int UpdateNote(int Criteria, int productId, int regionId, int countryId, int cityId, string title, string category, string priority, string BegDate, string EndDate, string userId, long noteId, string description)
+       {
+           return objDAL.UpdateNote(Criteria, productId, regionId, countryId, cityId, title, category, priority, BegDate, EndDate, userId, noteId, description);
+       }
+
+       public int DeleteNote(string noteId)
+       {
+           return objDAL.DeleteNote(noteId);
+       }
+       public string GetEmpName(int empId)
+       {
+           return objDAL.GetEmpName(empId);
+       }
+      
+    }
+}

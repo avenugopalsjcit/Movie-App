@@ -1,0 +1,258 @@
+﻿<style>
+    input[type='button']
+    {
+        width: 100px !important;
+    }
+    .clsddlProducttype
+    {
+        width: 250px;
+    }
+    
+    
+    .formproduct > tbody > tr > td
+    {
+        padding: 0px 34px 14px 3px !important;
+    }
+    
+    
+    
+    .formproduct > tbody > tr > td:nth-child(3n+3)
+    {
+        /*color: #ccc;*/
+        margin-left: 28px !important;
+        position: absolute;
+    }
+    
+    
+    .innertable > tbody > tr > td:nth-child(2n+2)
+    {
+        /*color: #ccc;*/
+        margin-left: 182px !important;
+        position: absolute;
+    }
+    .innertable > tbody > tr > td
+    {
+        padding-bottom: 30px;
+    }
+    
+    .formproduct > tbody > tr > td:nth-child(4n+4)
+    {
+        /*color: #ccc;*/
+        margin-left: 27em !important;
+        position: absolute;
+    }
+    
+    #Mapping_Interfaces > tbody > tr > td > select
+    {
+        width: 40em;
+        margin-bottom: 2px;
+        padding-top: 0px;
+        height: 14em;
+    }
+    #Mapping_Interfaces > tbody > tr > td
+    {
+        vertical-align: top;
+        text-align: center;
+    }
+    
+    
+    
+    
+    table > thead > tr > th
+    {
+        text-align: center;
+        cursor: default;
+    }
+    
+    #addNewProductModal select + span
+    {
+        color: Red;
+    }
+</style>
+<div ng-controller="productCtrl">
+    <div class="form-horizontal col-md-12" style="padding-bottom: 18px">
+        <div class="container" style="margin-left: 0px">
+            <div class="col-md-2" style="margin-left: -27px;">
+                <h3 style="margin-left: 0em;">
+                    <span style="cursor: default">Product</span></h3>
+            </div>
+            <div class="" style="margin-left: 79em;">
+                <a data-target="#addNewProductModal" data-toggle="modal" class="btn btn-primary btn-sm"
+                    ng-click="ResetProducts(ServiceTypes)">Add Product</a>
+            </div>
+        </div>
+    </div>
+    <div tabindex="-1" class="modal fade in modalalign" id="addNewProductModal" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" style="width: 75%">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" type="button" data-dismiss="modal">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Add New Product Reference
+                        </h4>
+                    </div>
+                    <div class="container">
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Product Type&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-5">
+                                    <select class="clsddlProducttype" name="lstProductType" ng-model="Product.PRODUCT_TYPE"
+                                        ng-options="item.PRODUCT_TYPE as item.PRODUCT_DESC for item in ServiceTypes.CSU_PRODUCT_TYPE">
+                                        <span ng-show="pageLoad" ng-if="Product.PRODUCT_TYPE==null||Product.PRODUCT_TYPE==undefined">
+                                            Please Select Product Type</span>
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label  col-md-5">
+                                    Country is only required for National Products&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-5">
+                                    <select class="clsddlProducttype" name="lstCountryId" ng-model="Product.COUNTRY_CD"
+                                        ng-options="item.COUNTRY_ID as item.COUNTRY_NAME for item in ServiceTypes.CSU_COUNTRY">
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Service Type&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-5">
+                                    <select class="clsddlProducttype" name="lstServiceType" ng-model="Product.SERVICE_TYPE_CD"
+                                        ng-options=" item.SERVICE_TYPE_CD as item.SERVICE_TYPE_DESC for item in ServiceTypes.CSU_REF_SERVICE_TYPE">
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Location Level&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-5">
+                                    <select class="clsddlProducttype" ng-model="Product.PRODUCT_LOC_LEVEL_CD" name="lstProductLocLevel"
+                                        ng-options="item.PRODUCT_LOC_LEVEL_CD as item.PRODUCT_LOC_LEVEL_DESC for item in ServiceTypes.CSU_REF_PRODUCT_LOC_LEVEL">
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Abbreviation (Don't use spaces)&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-7">
+                                    <input type="text" class="form-control" ng-model="Product.PRODUCT_ABBR" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Name&nbsp;<span style="color: Red">*</span></label>
+                                <div class="col-md-7">
+                                    <textarea cols="45" name="txtProductName" ng-model="Product.PRODUCT_NAME" style="width: 245px"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Parent Product</label>
+                                <div class="col-md-7">
+                                    <select class="clsddlProducttype" name="lstParentProductId" ng-model="Product.PARENT_PRODUCT_CD"
+                                        ng-options="item.PARENT_PRODUCT_CD as item.PRODUCT_NAME for item in ServiceTypes.CSU_PRODUCT">
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Capman Platform</label>
+                                <div class="col-md-5">
+                                    <select id="lstCapmanPlatformId" ng-model="Product.capman_platform_id" ng-options="item.CAPMAN_PLATFORM_ID as item.CAPMAN_PLATFORM_NAME for item in ServiceTypes.CAPMAN_PLATFORMS"
+                                        multiple size="9" name="lstCapmanPlatformId" style="width: 246px">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Alias Id</label>
+                                <div class="col-md-5">
+                                    <select class="clsddlProducttype" name="lstParentProductId" ng-model="Product.ALIAS_ID"
+                                        ng-options="item.ALIAS_ID as item.PRODUCT_NAME for item in ServiceTypes.CSU_PRODUCT">
+                                        <option value="">&nbsp;&nbsp;--Select--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Valid</label>
+                                <div class="col-md-7">
+                                    <input type="checkbox" ng-model="Product.PRODUCT_VALID_CD" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Display Lead Time</label>
+                                <div class="col-md-7">
+                                    <input type="checkbox" ng-model="Product.DISPLAY_LEAD_TIME" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    Access Method Required
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="checkbox" ng-model="Product.ACCESS_METHOD_REQUIRED" />
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="inputDescription" class="control-label col-md-5">
+                                    EFM Valid
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="checkbox" ng-model="Product.EFM_REQUIRED" />
+                                </div>
+                            </div>
+                            <br />
+                            <br />
+                            <div class="form-horizontal" style="padding-left: 3%">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click="AddProduct(Product,Product.PARENT_PRODUCT_CD,Product.ALIAS_ID,Product.PRODUCT_VALID_CD,Product.DISPLAY_LEAD_TIME,Product.ACCESS_METHOD_REQUIRED,Product.EFM_REQUIRED)" />-->
+                        <input type="button" class="btn btn-sm btn-primary" value="Save" ng-click="AddProduct(Product)"
+                            data-dismiss="modal" />
+                        <input type="button" class="btn btn-sm btn-primary" value="Reset" />
+                        <button class="btn btn-default" type="button" data-dismiss="modal">
+                            Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div>
+    <table>
+    
+    </table>
+    
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="pageLoaderOverlay" style="display: none">
+    </div>
+</div>

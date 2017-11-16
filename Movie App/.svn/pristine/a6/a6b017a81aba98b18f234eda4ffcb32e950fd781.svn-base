@@ -1,0 +1,50 @@
+﻿<div ng-controller="Controllers.PrimaryProductOwnerCntrl" class="container">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                Primary Product Owner
+            </h3>
+        </div>
+    </div>
+    <table ng-table="ProductAccurateAdminMapping" class="table table-striped" show-filter="true">
+       <!-- <tr>
+            <th class="Arrow">
+                Product
+            </th>
+            <th class="Arrow">
+                Product Owners
+            </th>
+             <th class="Arrow">
+                Current Primary Contact - Email
+            </th>
+            <th class="Arrow">
+                Current Primary Contact
+            </th>
+        </tr>-->
+        <tr ng-repeat="x in $data" >
+            <td class="Arrow" title="'Product'" sortable="'ProductName'"  filter="{ 'ProductName': 'text' }">
+                {{ x.ProductName }}
+            </td>
+            
+            <td  title="'Product Owners'" class="Arrow">
+                 <input type="hidden"  class="hdnemailid"  ng-bind="Emailid[$index]" />
+                <select class="ddlProductOwnerscls" id="ddlProductOwners{{x.ProductId}}" ng-options="owner.EmployeeId as owner.FullName for owner in x.Owners "
+                    ng-model="x.EmployeeId" ng-change="ddlProductOwnersChange(x.ProductId, x.EmployeeId,
+                              x.CurrentPrimaryContactID,{{$index}}, Emailid[$index])" >
+                    <option></option>
+                </select>
+
+            </td>
+           
+              <td class="Arrow CurrentEmailID{{$index}}" title="'Current Primary Contact - Email'" sortable="'CurrentEmailID'"  filter="{ 'CurrentEmailID': 'text' }">
+                <u><a href="mailto:{{x.CurrentEmailID}}">{{ x.CurrentEmailID }}</a></u>
+            </td>
+            <td class="Arrow CurrentPrimaryContact{{$index}}" title="'Current Primary Contact'" sortable="'CurrentPrimaryContact'"  filter="{ 'CurrentPrimaryContact': 'text' }">
+                {{ x.CurrentPrimaryContact }}
+            </td>
+        </tr>
+    </table>
+   
+    <div class="pageLoaderOverlay">
+    </div>
+</div>

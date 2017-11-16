@@ -1,0 +1,26 @@
+﻿<div ng-controller="Controller.MCU_HVPN_TreeView" class="no-padding">
+ <style>
+ ul
+{
+    list-style-type: none;
+}
+</style>
+    
+
+    <select ng-change="filterCountry()" style="width:16%" id="ddlRegion" ng-model="modRegion" ng-options="option.REGION_NAME for option in lstRegion track by option.REGION_ID">
+        <option value="">All Regions</option>
+    </select>
+
+  
+   <ul class='wTreeStyle checktree-root'  style="margin-left:0px">
+       <li ng-repeat="item in lstCountry | orderBy:'PARENTID' track by $index" class="{{item.PARENTID}} showallcountry">
+            <input id='ChkCountry{{item.COUNTRY_ID}}' type='checkbox' ng-click="savePopIDbyCounytry($event)"/> 
+            <img src="image/closefolder.gif" class="imgcloseall" alt="" id="countryfolderImage{{item.COUNTRY_ID}}" ng-click="loadChild(item.COUNTRY_ID,item.TYPE)"/>
+
+            {{item.COUNTRY_NAME}}
+            <div id="countryChild{{item.COUNTRY_ID}}" class="collapseall"></div>
+              
+        </li>
+    </ul>
+
+</div>

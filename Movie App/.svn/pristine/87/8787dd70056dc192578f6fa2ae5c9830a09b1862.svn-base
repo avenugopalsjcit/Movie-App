@@ -1,0 +1,122 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Services;
+using SCAdminBAL;
+using System.Data;
+using System.Web.Script.Serialization;
+
+
+namespace SCAdmin
+{
+    public partial class CpeBundles : System.Web.UI.Page
+    {
+
+
+        public static CPEBundlesBAL objCPEBundlesBAL = new CPEBundlesBAL();
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+
+
+        [WebMethod]
+        public static List<CPEBundles> GetCPEProducts()
+        {
+            return objCPEBundlesBAL.GetCPEProducts();
+          
+        }
+
+        [WebMethod]
+        public static List<CPEBundles> GetCPERegion()
+        {
+            return objCPEBundlesBAL.GetCPERegion();
+
+        }
+
+
+        [WebMethod]
+        public static List<CPEBundles> GetCPECountry(int RegionID)
+        {
+            return objCPEBundlesBAL.GetCPECountry(RegionID);
+
+        }
+
+        [WebMethod]
+        public static List<CPEBundles> GetCPERouter(int ProductID, int RegionID, int CountryID)
+        {
+            return objCPEBundlesBAL.GetCPERouter(ProductID, RegionID, CountryID);
+
+        }
+        [WebMethod]
+        public static List<CPEBundles> GetCPEBundle(int ProductID, int RegionID, int CountryID)
+        {
+            return objCPEBundlesBAL.GetCPEBundle(ProductID, RegionID, CountryID);
+
+        }
+
+        [WebMethod]
+        public static List<CPEBundles1> GetCPEBundleTableDetails(int ProductID, int RegionID, int CountryID, List<string> RouterNamedd, List<string> BundleNamedd)
+        {
+            return objCPEBundlesBAL.GetCPEBundleTableDetails(ProductID, RegionID, CountryID, RouterNamedd, BundleNamedd);
+
+        }
+
+        [WebMethod]
+        public static List<CPEBundles> GetCPEBundleTableDetails_UpdateBundleValidity(int ProductID, int RegionID, int CountryID, List<string> RouterNamedd, List<string> BundleNamedd)
+        {
+            return objCPEBundlesBAL.GetCPEBundleTableDetails_UpdateBundleValidity(ProductID, RegionID, CountryID, RouterNamedd, BundleNamedd);
+
+        }
+
+       
+
+
+        [WebMethod]
+        public static int UpdateCPEBundleValidity(string BundleNameValues,string Userid)
+        {
+            return objCPEBundlesBAL.UpdateCPEBundleValidity(BundleNameValues, Userid);
+
+        }
+        [WebMethod]
+        public static int UpdateCPEBundleValidity1(string BundleNameValuesUnchecked, string Userid)
+        {
+            return objCPEBundlesBAL.UpdateCPEBundleValidity1(BundleNameValuesUnchecked, Userid);
+
+        }
+
+        [WebMethod]
+        public static List<CPEBundles> GetCPEBundleTableDetails2(int ProductID)
+        {
+            return objCPEBundlesBAL.GetCPEBundleTableDetails2(ProductID);
+
+        }
+
+        [WebMethod]
+        public static List<CPEBundles> GetCPEBundleTableDetails3(int ProductID)
+        {
+            return objCPEBundlesBAL.GetCPEBundleTableDetails3(ProductID);
+
+        }
+
+        [WebMethod]
+        public static List<CPEBundles> GetCPEBundleTableDetails4(int ProductID)
+        {
+            return objCPEBundlesBAL.GetCPEBundleTableDetails4(ProductID);
+
+        }
+
+        [WebMethod]
+        public static List<CPEBundles> GetCPEBundleTableDetails5(int ProductID)
+        {
+            return objCPEBundlesBAL.GetCPEBundleTableDetails5(ProductID);
+
+        }
+
+    }
+}

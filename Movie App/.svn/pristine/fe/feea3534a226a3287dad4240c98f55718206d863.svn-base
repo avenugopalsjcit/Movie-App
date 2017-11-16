@@ -1,0 +1,300 @@
+﻿app.controller('PortToAccessSpeedCtrl', ['$scope', '$rootScope', 'AdminPortToAccessSpeedFactory', 'NgTableParams', function ($scope, $rootScope, AdminPortToAccessSpeedFactory, NgTableParams) {
+    $scope.StartRowNumMap = 0;
+    $scope.EndRowNumMap = 100;
+
+    $scope.StartRowNumUnMap = 0;
+    $scope.EndRowNumUnMap = 100;
+
+    $scope.StartHVPNRowNumMap = 0;
+    $scope.EndHVPNRowNumMap = 100;
+
+    $scope.StartHVPNRowNumUnMap = 0;
+    $scope.EndHVPNRowNumUnMap = 100;
+
+    $scope.TotalMapcount = -1;
+    $scope.TotalUnMapcount = -1;
+    $('.pageLoaderOverlay').show();
+    document.getElementById('hdnUserID').value = $rootScope.User_Id;
+    AdminPortToAccessSpeedFactory.GetPortdropdownDetails().success(function (data) {
+        $scope.PortSpeedsList = data.d.PortSpeedsList;
+        $scope.HVPNPortSpeedsList = data.d.HVPNPortSpeedsList;
+        $scope.C_HVPN_PORT_SPEED_id = data.d.C_HVPN_PORT_SPEED_id;
+        $scope.C_ACCESS_SPEED_DOWN_UP_id = data.d.C_ACCESS_SPEED_DOWN_UP_id;
+        $('.pageLoaderOverlay').hide();
+        $("#PortSpeedModel").select2({});
+        $("#HVPNPortSpeedModel").select2({});
+
+    }).error(function (error) {
+
+        // alert("Problem occured while Loading Supplier Types" + error);
+        $(".pageLoaderOverlay").hide();
+    });
+
+    $scope.GetPortDetails = function (PortSpeedModel, type) {
+
+        var CHAR_ID = PortSpeedModel.CHAR_ID;
+        $scope.Char_idGlobal = PortSpeedModel.CHAR_ID;
+        document.getElementById('hdnPortID').value = PortSpeedModel.CHAR_ID;
+        document.getElementById('hdnPortID_combined').value = PortSpeedModel.CHAR_ID_combined;
+        var CHAR_TYPE_ID = PortSpeedModel.CHAR_TYPE_ID;
+        $scope.CHAR_TYPE_IDGlobal = PortSpeedModel.CHAR_TYPE_ID;
+        var Portspeed_Name = PortSpeedModel.CHAR_NAME;
+        $scope.CHAR_NAMEGlobal = PortSpeedModel.CHAR_NAME;
+
+        AdminPortToAccessSpeedFactory.GetPortAccessSpeedDetails(CHAR_ID, CHAR_TYPE_ID, Portspeed_Name, $scope.C_HVPN_PORT_SPEED_id, $scope.C_ACCESS_SPEED_DOWN_UP_id, type).success(function (data) {
+            if (type == 'NORMAL') {
+                if (data.d.length != 0) {
+                    $scope.PortToAccessSpeedData = true;
+                }
+                else {
+
+                    $scope.PortToAccessSpeedData = false;
+                }
+                $scope.PortToAccessSpeedTable = new NgTableParams({}, { 'dataset': data.d });
+                $scope.tableParams = new NgTableParams({
+                    sorting: {
+                        // ReportCD: 'dsc'
+                    }
+                }, {
+                    getData: function ($defer, params) {
+                        $defer.resolve($filter('orderBy')($scope.PortToAccessSpeedTable, params.orderBy()));
+                    }
+                });
+            }
+            else {
+                if (data.d.length != 0) {
+                    $scope.PortToAccessSpeedUpDownData = true;
+                }
+                else {
+
+                    $scope.PortToAccessSpeedUpDownData = false;
+                }
+                $scope.PortToAccessSpeedUpDownDataTable = new NgTableParams({}, { 'dataset': data.d });
+                $scope.tableParams = new NgTableParams({
+                    sorting: {
+                        // ReportCD: 'dsc'
+                    }
+                }, {
+                    getData: function ($defer, params) {
+                        $defer.resolve($filter('orderBy')($scope.PortToAccessSpeedUpDownDataTable, params.orderBy()));
+                    }
+                });
+            }
+            $('.pageLoaderOverlay').hide();
+
+
+        }).error(function (error) {
+
+            // alert("Problem occured while Loading Supplier Types" + error);
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+
+    $scope.UpdateParent = function (PortSpeedModel, type) {
+        $scope.StartRowNumMap = 0;
+        $scope.EndRowNumMap = 100;
+
+        $scope.StartRowNumUnMap = 0;
+        $scope.EndRowNumUnMap = 100;
+
+        $scope.StartHVPNRowNumMap = 0;
+        $scope.EndHVPNRowNumMap = 100;
+
+        $scope.StartHVPNRowNumUnMap = 0;
+        $scope.EndHVPNRowNumUnMap = 100;
+        AdminPortToAccessSpeedFactory.GetPortAccessSpeedDetails($scope.Char_idGlobal, CHAR_TYPE_IDGlobal, CHAR_NAMEGlobal, $scope.C_HVPN_PORT_SPEED_id, $scope.C_ACCESS_SPEED_DOWN_UP_id, $scope.TabType).success(function (data) {
+            if ($scope.TabType == 'NORMAL') {
+                if (data.d.length != 0) {
+                    $scope.PortToAccessSpeedData = true;
+                }
+                else {
+
+                    $scope.PortToAccessSpeedData = false;
+                }
+                $scope.PortToAccessSpeedTable = new NgTableParams({}, { 'dataset': data.d });
+                
+            }
+            else {
+                if (data.d.length != 0) {
+                    $scope.PortToAccessSpeedUpDownData = true;
+                }
+                else {
+
+                    $scope.PortToAccessSpeedUpDownData = false;
+                }
+                $scope.PortToAccessSpeedUpDownDataTable = new NgTableParams({}, { 'dataset': data.d });
+               
+            }
+            $('.pageLoaderOverlay').hide();
+            $("#editPortSpeedtoAccessSpeedMappingModal").modal('hide');
+
+        }).error(function (error) {
+
+            // alert("Problem occured while Loading Supplier Types" + error);
+            $(".pageLoaderOverlay").hide();
+        });
+
+    }
+    $scope.OpenEditPortSpeedPopUp = function (PortSpeedModel, type) {
+
+        $scope.CHAR_IDMap = PortSpeedModel.CHAR_ID;
+        $scope.CHAR_TYPE_IDMap = PortSpeedModel.CHAR_TYPE_ID;
+        $scope.Portspeed_NameMap = PortSpeedModel.CHAR_NAME;
+        $scope.TabType = type;
+        $("#editPortSpeedtoAccessSpeedMappingModal").modal('show');
+        AdminPortToAccessSpeedFactory.LoadPortAccessSpeedForEdit($scope.CHAR_IDMap, $scope.CHAR_TYPE_IDMap, $scope.Portspeed_NameMap, $scope.C_HVPN_PORT_SPEED_id, $scope.C_ACCESS_SPEED_DOWN_UP_id, type, $scope.StartRowNumMap, $scope.EndRowNumMap, $scope.StartRowNumUnMap, $scope.EndRowNumUnMap, $scope.TotalMapcount, $scope.TotalUnMapcount).success(function (data) {
+            $scope.TotalMapcount = data.d.TotalMapcount;
+            $scope.TotalUnMapcount = data.d.TotalUnMapcount;
+            if (type == 'NORMAL') {
+
+                $scope.StartRowNumMap = data.d.StartRowNumMap;
+                $scope.EndRowNumMap = data.d.EndRowNumMap;
+
+                $scope.StartRowNumUnMap = data.d.StartRowNumUnMap;
+                $scope.EndRowNumUnMap = data.d.EndRowNumUnMap;
+
+            }
+            else {
+                $scope.StartHVPNRowNum = data.d.startRowNum;
+                $scope.EndHVPNRowNum = data.d.endRowNum;
+            }
+            $scope.MappedPortSpeed = data.d.PortSpeedsList;
+            $scope.UnMappedPortSpeed = data.d.HVPNPortSpeedsList;
+            $('.pageLoaderOverlay').hide();
+
+        }).error(function (error) {
+            $(".pageLoaderOverlay").hide();
+        });
+    }
+
+    $(function () {
+
+        $('#DivUnMap').scroll(function () {
+
+            if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                if ($scope.TotalMapcount >= $scope.EndRowNumMap || $scope.TotalUnMapcount >= $scope.EndRowNumUnMap) {
+                    AdminPortToAccessSpeedFactory.LoadPortAccessSpeedForEdit($scope.CHAR_IDMap, $scope.CHAR_TYPE_IDMap, $scope.Portspeed_NameMap, $scope.C_HVPN_PORT_SPEED_id, $scope.C_ACCESS_SPEED_DOWN_UP_id, $scope.TabType, $scope.StartRowNumMap, $scope.EndRowNumMap, $scope.StartRowNumUnMap, $scope.EndRowNumUnMap, $scope.TotalMapcount, $scope.TotalUnMapcount).success(function (data) {
+
+                        if ($scope.TabType == 'NORMAL') {
+                            if (data.d.PortSpeedsList.length > 0) {
+                                $scope.tempData = data.d.PortSpeedsList;
+                                $scope.tempData.forEach(function (item) {
+
+                                    $scope.MappedPortSpeed.push(item);
+                                });
+                                $scope.StartRowNumMap = data.d.StartRowNumMap;
+                                $scope.EndRowNumMap = data.d.EndRowNumUnMap;
+                            }
+                            if (data.d.HVPNPortSpeedsList.length > 0) {
+                                $scope.tempData = data.d.HVPNPortSpeedsList;
+                                $scope.tempData.forEach(function (item) {
+
+                                    $scope.UnMappedPortSpeed.push(item);
+                                });
+                                $scope.StartRowNumUnMap = data.d.StartRowNumUnMap;
+                                $scope.EndRowNumUnMap = data.d.EndRowNumUnMap;
+                            }
+                            $('.pageLoaderOverlay').hide();
+
+                        }
+                        else {
+                            if (data.d.PortSpeedsList.length > 0) {
+                                $scope.tempData = data.d.PortSpeedsList;
+                                $scope.tempData.forEach(function (item) {
+
+                                    $scope.MappedPortSpeed.push(item);
+                                });
+                                $scope.StartRowNumMap = data.d.startRowNum;
+                                $scope.EndRowNumMap = data.d.endRowNum;
+                            }
+                            if (data.d.HVPNPortSpeedsList.length > 0) {
+                                $scope.tempData = data.d.HVPNPortSpeedsList;
+                                $scope.tempData.forEach(function (item) {
+
+                                    $scope.UnMappedPortSpeed.push(item);
+                                });
+                                $scope.StartRowNumUnMap = data.d.startRowNum;
+                                $scope.EndRowNumUnMap = data.d.endRowNum;
+                            }
+                            $('.pageLoaderOverlay').hide();
+                        }
+
+                    }).error(function (error) {
+                        $(".pageLoaderOverlay").hide();
+                    });
+                }
+            }
+        });
+    });
+
+} ]);
+
+app.factory('AdminPortToAccessSpeedFactory', function ($http) {
+    var AdminPortToAccessSpeedFactory = {};
+    AdminPortToAccessSpeedFactory.GetPortToAccessSpeed = function (type) {
+
+        return $http.post("GlobalReference.aspx/GetPortToAccessSpeed", { 'myFormval': type });
+    }
+
+    AdminPortToAccessSpeedFactory.GetPortdropdownDetails = function () {
+
+        return $http.post("GlobalReference.aspx/GetPortSpeeds", {});
+    }
+
+    AdminPortToAccessSpeedFactory.GetPortAccessSpeedDetails = function (char_id, Char_Type_id, Portspeed_Name, C_HVPN_PORT_SPEED_id, C_ACCESS_SPEED_DOWN_UP_id, type) {
+
+        return $http.post("GlobalReference.aspx/GetPortAccessSpeedDetails", { 'char_id': char_id, 'Char_Type_id': Char_Type_id, 'Portspeed_Name': Portspeed_Name, 'C_HVPN_PORT_SPEED_id': C_HVPN_PORT_SPEED_id, 'C_ACCESS_SPEED_DOWN_UP_id': C_ACCESS_SPEED_DOWN_UP_id, 'type': type });
+    }
+    AdminPortToAccessSpeedFactory.LoadPortAccessSpeedForEdit = function (char_id, Char_Type_id, Portspeed_Name, C_HVPN_PORT_SPEED_id, C_ACCESS_SPEED_DOWN_UP_id, type, StartRowNumMap,EndRowNumMap,StartRowNumUnMap,EndRowNumUnMap,TotalMapcount,TotalUnMapcount ) {
+
+        return $http.post("GlobalReference.aspx/LoadPortAccessSpeedForEdit", { 'char_id': char_id, 'Char_Type_id': Char_Type_id, 'Portspeed_Name': Portspeed_Name, 'C_HVPN_PORT_SPEED_id': C_HVPN_PORT_SPEED_id, 'C_ACCESS_SPEED_DOWN_UP_id': C_ACCESS_SPEED_DOWN_UP_id, 'type': type, 'StartRowNumMap': StartRowNumMap, 'EndRowNumMap': EndRowNumMap, 'StartRowNumUnMap': StartRowNumUnMap, 'EndRowNumUnMap': EndRowNumUnMap,'TotalMapcount':TotalMapcount,'TotalUnMapcount':TotalUnMapcount });
+    }
+    
+    return AdminPortToAccessSpeedFactory;
+});
+
+function savePortdata(charIDs, SourceID, TargetID) {
+    $(".pageLoaderOverlay").show();
+    var pPortId = document.getElementById('hdnPortID').value;
+    var pPortIdcombined= document.getElementById('hdnPortID_combined').value
+    var userID = document.getElementById('hdnUserID').value
+   
+    if (charIDs != "") {
+        charIDs = charIDs.substring(0, charIDs.length - 1);
+
+//        var PoPIDs = [];
+        var editUrl="";
+//        PoPIDs = PoPTypeIDs.split(',');
+        //SourceID = SourceID.toString().replace(',', '');
+        if (TargetID == 'DivMap') {
+        editUrl="GlobalReference.aspx/InsertPortToAccessSpeedMapping";
+        }
+        else if (TargetID == 'DivUnMap') {
+            editUrl = "GlobalReference.aspx/DeletePortToAccessSpeedMapping";
+        }
+        $.ajax({
+            url: editUrl,
+            type: "POST",
+            async: true,
+            contentType: 'application/json; charset=utf-8',
+
+            //        contentType: false,
+            //        processData: false,
+            data: JSON.stringify({ pPortId: parseInt(pPortId), charIDs: charIDs,  userID: userID }),
+            dataType: 'json',
+            // dataType: "json",
+            success: function (data) {
+
+                $(".pageLoaderOverlay").hide();
+                bootbox.alert("Items De-Assigned successfully");
+
+                // alert(result);
+            },
+            error: function (err) {
+                //  alert(err.statusText);
+            }
+        });
+    } 
+    return true;
+}

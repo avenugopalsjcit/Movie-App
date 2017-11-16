@@ -1,0 +1,346 @@
+﻿
+namespace SCAdminBAL
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Data;
+    using SCAdminDAL;
+    
+
+    public class UsersBAL
+    {
+        UsersDAL objUsersDAL = new UsersDAL();
+        public List<UserStatus> GetUserStatus(int UserStatusId = -1)
+        {
+            DataTable dtUserStatusDetails = objUsersDAL.GetTabledata(UserStatusId, "UserStatus");
+            List<UserStatus> lstUserStatus = new List<UserStatus>();
+            foreach (DataRow dr in dtUserStatusDetails.Rows)
+            {
+                UserStatus objUserStatus = new UserStatus();
+                objUserStatus.UserStatusId = Convert.ToInt32(dr["USER_STATUS_CD"]);
+                objUserStatus.UserStatusDesc = Convert.ToString(dr["USER_STATUS_CD_DESC"]);
+
+                objUserStatus.UpdatedBy = Convert.ToString(dr["Updated_By"]);
+                objUserStatus.CreatedBy = Convert.ToString(dr["Created_By"]);
+                objUserStatus.UpdatedDate = Convert.ToString(dr["Updated_dt"]);
+                objUserStatus.CreatedDate = Convert.ToString(dr["Created_dt"]);
+
+                lstUserStatus.Add(objUserStatus);
+            }
+            return lstUserStatus;
+        }
+
+        public int CreateUserStatus(int UserStatusId, string UserStatusDesc, string User_id)
+        {
+            int status = objUsersDAL.CreateTableRecord(UserStatusId, UserStatusDesc, User_id, "UserStatus");
+            return status;
+        }
+
+        public int UpdateUserStatus(int UserStatusId, string UserStatusDesc, string User_id)
+        {
+            int status = objUsersDAL.UpdateTableRecord(UserStatusId, UserStatusDesc, User_id, "UserStatus");
+            return status;
+        }
+
+        public int DeleteUserStatus(int UserStatusId)
+        {
+            int status = objUsersDAL.DeleteTableRecord(UserStatusId, "UserStatus");
+            return status;
+        }
+
+        public List<UserCategory> GetUserCategory(int UserCategoryId = -1)
+        {
+            DataTable dtUserCategoryDetails = objUsersDAL.GetTabledata(UserCategoryId, "UserCategory");
+            List<UserCategory> lstUserCategory = new List<UserCategory>();
+            foreach (DataRow dr in dtUserCategoryDetails.Rows)
+            {
+                UserCategory objUserCategory = new UserCategory();
+                objUserCategory.UserCategoryId = Convert.ToInt32(dr["USER_CATEGORY_CD"]);
+                objUserCategory.UserCategoryDesc = Convert.ToString(dr["USER_CATEGORY_DESC"]);
+
+                objUserCategory.UpdatedBy = Convert.ToString(dr["Updated_By"]);
+                objUserCategory.CreatedBy = Convert.ToString(dr["Created_By"]);
+                objUserCategory.UpdatedDate = Convert.ToString(dr["Updated_dt"]);
+                objUserCategory.CreatedDate = Convert.ToString(dr["Created_dt"]);
+
+                lstUserCategory.Add(objUserCategory);
+            }
+            return lstUserCategory;
+        }
+
+
+       /* public List<UserAccessData> FetchUserAccessData()
+        {
+
+            DataSet dsuserAccess = objUsersDAL.GetUserAccessData();
+            List<UserAccessData> lstUserData = new List<UserAccessData>();
+
+            string EmpIds = "";
+            DataSet dsproductaccess = null;
+            if (CategoryID == 2)
+            {
+                foreach (DataRow dr in dsuserAccess.Tables[0].Rows)
+                {
+                    if (dr["User_Category_cd"].ToString() == "2")
+                    {
+                        EmpIds = string.IsNullOrEmpty(EmpIds) ? "'" + dr["EMP_ID"].ToString() + "'" : EmpIds + ",'" + dr["EMP_ID"].ToString() + "'";
+                    }
+                }
+
+
+                if (EmpIds != "")
+                    dsproductaccess = objUsersDAL.GetProductOwnerProducts(EmpIds);
+            }
+
+            foreach (DataRow dr in dsuserAccess.Tables[0].Rows)
+            {
+                UserAccessData objUserAccess = new UserAccessData();
+
+                objUserAccess.EmpID = Convert.ToString(dr["EMP_ID"]);
+                objUserAccess.UserName = Convert.ToString(dr["USER_NAME"]);
+                objUserAccess.UserCategoryDesc = Convert.ToString(dr["USER_CATEGORY_DESC"]);
+                objUserAccess.UserCategoryCD = Convert.ToString(dr["USER_CATEGORY_CD"]);
+                objUserAccess.UserEmail = Convert.ToInt32(string.IsNullOrEmpty(dr["USER_EMAIL"].ToString()) ? 0 : Convert.ToInt32(dr["USER_EMAIL"].ToString()));
+                objUserAccess.UserStatusId = Convert.ToInt32(dr["USER_STATUS_CD"]);
+                objUserAccess.UserStatusDesc = Convert.ToString(dr["user_status_cd_desc"]);
+
+                if (dr["User_Category_cd"].ToString() == "2")
+                {
+                    if (dsproductaccess != null && dsproductaccess.Tables.Count > 0 && dsproductaccess.Tables[0].Rows.Count > 0)
+                    {
+                        List<ProductAccessOwner> pao = new List<ProductAccessOwner>();
+                        objUserAccess.lstProducts = pao;
+                        var prods = dsproductaccess.Tables[0].AsEnumerable().Where(t => t.Field<string>("EMP_ID") == dr["EMP_ID"].ToString()).Select(t => new { ProductName = t.Field<string>("Product_Name"), PrimaryCD = t.Field<short>("Primary_CD") });
+                        foreach (var item in prods)
+                        {
+
+                            objUserAccess.lstProducts.Add(new ProductAccessOwner() { PrimaryCD = item.PrimaryCD, ProductName = item.ProductName });
+                        }
+                        //objUserAccess.ProductName=prods.
+                    }
+                }
+
+                lstUserData.Add(objUserAccess);
+
+            }
+
+            return lstUserData;
+
+        }*/
+
+        public lstUserAccessData FetchUserAccessData()
+        {
+
+            DataSet dsuserAccess = objUsersDAL.GetUserAccessData();
+            List<UserAccessData> lstSuperAdmin = new List<UserAccessData>();
+            List<UserAccessData> lstProductOwner = new List<UserAccessData>();
+            List<UserAccessData> lstEndUser = new List<UserAccessData>();
+            lstUserAccessData lstData = new lstUserAccessData();
+            string EmpIds = "";
+            foreach (DataRow dr in dsuserAccess.Tables[0].Rows)
+            {
+                if (dr["User_Category_cd"].ToString() == "2")
+                {
+                    EmpIds = string.IsNullOrEmpty(EmpIds) ? "'" + dr["EMP_ID"].ToString() + "'" : EmpIds + ",'" + dr["EMP_ID"].ToString() + "'";
+                }
+            }
+            DataSet dsproductaccess = null;
+            if (EmpIds != "")
+                dsproductaccess = objUsersDAL.GetProductOwnerProducts(EmpIds);
+
+            foreach (DataRow dr in dsuserAccess.Tables[0].Rows)
+            {
+                UserAccessData objUserAccess = new UserAccessData();
+
+                objUserAccess.EmpID = Convert.ToString(dr["EMP_ID"]);
+                objUserAccess.UserName = Convert.ToString(dr["USER_NAME"]);
+                objUserAccess.UserCategoryDesc = Convert.ToString(dr["USER_CATEGORY_DESC"]);
+                objUserAccess.UserCategoryCD = Convert.ToString(dr["USER_CATEGORY_CD"]);
+                objUserAccess.UserEmail = Convert.ToInt32(string.IsNullOrEmpty(dr["USER_EMAIL"].ToString()) ? 0 : Convert.ToInt32(dr["USER_EMAIL"].ToString()));
+                objUserAccess.UserStatusId = Convert.ToInt32(dr["USER_STATUS_CD"]);
+                objUserAccess.UserStatusDesc = Convert.ToString(dr["user_status_cd_desc"]);
+                objUserAccess.UserEmailID = Convert.ToString(dr["User_Email_id"]);
+                objUserAccess.LastLoginDate = Convert.ToString(dr["LAST_LOG_DATE"]);
+
+                if (dr["User_Category_cd"].ToString() == "2")
+                {
+                    if (dsproductaccess != null && dsproductaccess.Tables.Count > 0 && dsproductaccess.Tables[0].Rows.Count > 0)
+                    {
+                        List<ProductAccessOwner> pao = new List<ProductAccessOwner>();
+                        objUserAccess.lstProducts = pao;
+                        var prods = dsproductaccess.Tables[0].AsEnumerable().Where(t => t.Field<string>("EMP_ID") == dr["EMP_ID"].ToString()).Select(t => new { ProductName = t.Field<string>("Product_Name"), ProductID = t.Field<short>("Primary_CD") });
+                        foreach (var item in prods)
+                        {
+
+                            objUserAccess.lstProducts.Add(new ProductAccessOwner() { PrimaryCD = item.ProductID, ProductName = item.ProductName });
+                        }
+                        //objUserAccess.ProductName=prods.
+                    }
+                }
+
+                if (dr["User_Category_cd"].ToString() == "1")
+                {
+                    lstSuperAdmin.Add(objUserAccess);
+                }
+                else if (dr["User_Category_cd"].ToString() == "2")
+                {
+                    lstProductOwner.Add(objUserAccess);
+                }
+                else if (dr["User_Category_cd"].ToString() == "3")
+                {
+                    lstEndUser.Add(objUserAccess);
+                }
+
+            }
+            lstData.SuperAdminData = lstSuperAdmin;
+            lstData.ProductOwnerData = lstProductOwner;
+            lstData.EndUserData = lstEndUser;
+            return lstData;
+
+        }
+
+        public List<ProductAccessOwner> FetchProductOwnerProducts(string EmpID)
+        {
+
+            DataSet dsproductaccess = objUsersDAL.GetProductOwnerProducts(EmpID);
+            List<ProductAccessOwner> lstProductAccessOwner = new List<ProductAccessOwner>();
+            foreach (DataRow dr in dsproductaccess.Tables[0].Rows)
+            {
+               
+                    ProductAccessOwner objprodowner = new ProductAccessOwner();
+                    objprodowner.ProductName = Convert.ToString(dr["Product_Name"]);
+                    objprodowner.PrimaryCD = Convert.ToInt16(dr["Primary_CD"]);
+                    lstProductAccessOwner.Add(objprodowner);
+                
+            }
+            return lstProductAccessOwner;
+        }
+
+
+        public int CreateUserCategory(int UserCategoryId, string UserCategoryDesc, string User_id)
+        {
+            int status = objUsersDAL.CreateTableRecord(UserCategoryId, UserCategoryDesc, User_id, "UserCategory");
+            return status;
+        }
+
+        public List<UserAccessData> FetchUserCategories()
+        {
+            DataSet dsusercatagory = objUsersDAL.GetUserCategories();
+            List<UserAccessData> lstuserAccData = new List<UserAccessData>();
+            foreach (DataRow dr in dsusercatagory.Tables[0].Rows)
+            {
+                UserAccessData objUserAccData = new UserAccessData();
+                objUserAccData.UserCategoryCD = Convert.ToString(dr["USER_CATEGORY_CD"]);
+                objUserAccData.UserCategoryDesc = Convert.ToString(dr["USER_CATEGORY_DESC"]);
+                lstuserAccData.Add(objUserAccData);
+            }
+
+            return lstuserAccData;
+        }
+
+
+        public List<UserStatus> FetchUserStatus()
+        {
+            DataSet dsuserstatus = objUsersDAL.GetUserStatusDetails();
+            List<UserStatus> lstuserstatus = new List<UserStatus>();
+            foreach (DataRow dr in dsuserstatus.Tables[0].Rows)
+            {
+                UserStatus objUS = new UserStatus();
+                objUS.UserStatusId = Convert.ToInt32(dr["USER_STATUS_CD"]);
+                objUS.UserStatusDesc = Convert.ToString(dr["USER_STATUS_CD_DESC"]);
+                lstuserstatus.Add(objUS);
+            }
+            return lstuserstatus;
+        }
+        public int UpdateUserCategory(int UserCategoryId, string UserCategoryDesc, string User_id)
+        {
+            int status = objUsersDAL.UpdateTableRecord(UserCategoryId, UserCategoryDesc, User_id, "UserCategory");
+            return status;
+        }
+
+        public int DeleteUserCategory(int UserCategoryId)
+        {
+            int status = objUsersDAL.DeleteTableRecord(UserCategoryId, "UserCategory");
+            return status;
+        }
+
+        public int DeleteUserAccess(string EmpId)
+        {
+            int status = objUsersDAL.DeleteUserAccess(EmpId);
+            return status;
+        }
+
+
+        public int UpdateUserAccess(int catId, string UsrStatcd, string UsrEmail, string UsrId, string EmpId)
+        {
+            int status = objUsersDAL.UpdateUserAccess(catId,UsrStatcd,UsrEmail,UsrId,EmpId);
+            return status;
+        }
+
+        public List<ProductOwnerStatus> GetProductOwnerStatus(int ProductOwnerStatusId = -1)
+        {
+            DataTable dtProductOwnerStatusDetails = objUsersDAL.GetTabledata(ProductOwnerStatusId, "ProductOwnerStatus");
+            List<ProductOwnerStatus> lstProductOwnerStatus = new List<ProductOwnerStatus>();
+            foreach (DataRow dr in dtProductOwnerStatusDetails.Rows)
+            {
+                ProductOwnerStatus objProductOwnerStatus = new ProductOwnerStatus();
+                objProductOwnerStatus.ProductOwnerStatusId = Convert.ToInt32(dr["PRODUCT_OWNER_STATUS_CD"]);
+                objProductOwnerStatus.ProductOwnerStatusDesc = Convert.ToString(dr["PRODUCT_OWNER_STATUS_DESC"]);
+
+                objProductOwnerStatus.UpdatedBy = Convert.ToString(dr["Updated_By"]);
+                objProductOwnerStatus.CreatedBy = Convert.ToString(dr["Created_By"]);
+                objProductOwnerStatus.UpdatedDate = Convert.ToString(dr["Updated_dt"]);
+                objProductOwnerStatus.CreatedDate = Convert.ToString(dr["Created_dt"]);
+
+                lstProductOwnerStatus.Add(objProductOwnerStatus);
+            }
+            return lstProductOwnerStatus;
+        }
+
+        public int CreateProductOwnerStatus(int ProductOwnerStatusId, string ProductOwnerStatusDesc, string User_id)
+        {
+            int status = objUsersDAL.CreateTableRecord(ProductOwnerStatusId, ProductOwnerStatusDesc, User_id, "ProductOwnerStatus");
+            return status;
+        }
+
+        public int UpdateProductOwnerStatus(int ProductOwnerStatusId, string ProductOwnerStatusDesc, string User_id)
+        {
+            int status = objUsersDAL.UpdateTableRecord(ProductOwnerStatusId, ProductOwnerStatusDesc, User_id, "ProductOwnerStatus");
+            return status;
+        }
+
+        public int DeleteProductOwnerStatus(int ProductOwnerStatusId)
+        {
+            int status = objUsersDAL.DeleteTableRecord(ProductOwnerStatusId, "ProductOwnerStatus");
+            return status;
+        }
+
+        public List<Product> GetProducts(string EmpID)
+        {
+            DataSet dsProducts = objUsersDAL.GetProducts(EmpID);
+            List<Product> lstProducts = new List<Product>();
+            if (dsProducts != null && dsProducts.Tables.Count > 0 && dsProducts.Tables[0].Rows.Count > 0)
+            {
+                var prodLst = dsProducts.Tables[0].AsEnumerable().Select(t => new { ProductID = t.Field<int>("ProductID"), ProductName = t.Field<string>("ProductName"), ProductAssigned = t.Field<decimal>("ProductAssigned") });
+                foreach (var item in prodLst)
+                {
+                    lstProducts.Add(new Product() { ProductID = item.ProductID, ProductName = item.ProductName,ProductAssigned=item.ProductAssigned });
+                }
+
+            }
+            return lstProducts;
+        }
+
+        public int SaveProductOwner(int ProductID, int EmpID, int CreatedBy, int UpdatedBy, int ProductOwnerStatusID)
+        {
+            return objUsersDAL.SaveProductOwner(ProductID, EmpID, CreatedBy, UpdatedBy, ProductOwnerStatusID);
+        }
+
+        public int ResetProductOwner(int EmpID)
+        {
+            return objUsersDAL.ResetProductOwner(EmpID);
+        }
+    }
+}

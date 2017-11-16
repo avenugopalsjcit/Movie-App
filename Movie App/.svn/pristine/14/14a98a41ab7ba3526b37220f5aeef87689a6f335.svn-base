@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <div ng-controller="CaseAuditReportCtrl" class="container">
+
+<div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                Case Audit Information
+            </h3>
+        </div>
+    </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">                
+                    <div class="">
+                       <!-- <h4 style="text-align: left">
+                            Case Audit Information</h4>-->
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label cus-text-left" for="" >
+                                    Service Type
+                                </label>
+                                <div class="col-sm-3" style="margin-left:-50px">
+                                    <select id="Select1" ng-model="modServiceType" ng-change="GetProducts()" ng-options="item as item for item in ServiceTypes"
+                                         style="width:90%;">
+                                         <option value="">  -- Select Service Type --</option>
+                                    </select>
+                                </div>
+                                <label class="col-sm-2 control-label cus-text-left" ng-show="modServiceType!='' && modServiceType != null" for="" >
+                                    Product
+                                </label>
+                                <div class="col-sm-3" id="ProductDiv" style="margin-left:-70px">
+                                    <select id="Select2" ng-model="modProduct" ng-show="modServiceType!='' && modServiceType != null" ng-change="GetCaseAuditReport()" ng-options="product.ProductId as product.ProductName for product in Products" style="width:90%;">
+                                        <option value="">  -- Select Product --</option>
+                                    </select>
+                                </div>
+<!--                            <div class="form-group">
+                                <div class="col-sm-3">
+                                </div>
+                                <label for="" class="col-sm-2 control-label">
+                                    &nbsp;</label>
+                               <!-- <input type="button" ng-click="ExportToExcel()" value="Export" />
+                            </div>-->
+                            </div>
+                        </div>
+                        <div ng-show="CaseAuditData.length==0 && DisplayMessage" class="alert alert-danger Arrow"
+                            role="alert">
+                            No Case Audit Info present.
+                        </div>
+
+                        <div ng-show="CaseAuditData.length!=0">
+                            <table ng-table="CaseAuditData" class="table table-striped" id="CaseAuditDataTbl">
+                                <tr ng-repeat="user in $data">
+                                    <td data-title="'Case id'" filter="{ CaseId: 'text'}" sortable="'CaseId'" class="Arrow">
+                                        <!--<a href="CaseDetailAuditTeportCtrl.htm/{{user.CaseId}}"> {{user.CaseId}}</a> -->
+                                        <!--<a href="#/CaseDetailAuditReport?CaseId={{user.CaseId}}&&modServiceType={{modServiceType}}&&modProduct={{Product}}&&CountryName={{user.CountryName}}" target="_blank" style="color: Blue;
+                                            font-weight: bold;"><span>{{user.CaseId}}</span> </a>-->
+                                              <a data-target="#divshowData" ng-click="OpenPopup(user.CountryName,user.CaseId)" data-toggle="modal" style="color: Blue;font-weight: bold;">{{user.CaseId}}
+                            </a>
+                                    </td>
+                                    <td data-title="'Country'" filter="{ CountryName: 'text'}" sortable="'CountryName'"
+                                        class="Arrow">
+                                        {{user.CountryName}}
+                                    </td>
+                                    <td data-title="'City / PoP'" filter="{ CityPOPName: 'text'}" sortable="'CityPOPName'"
+                                        class="Arrow">
+                                        {{user.CityPOPName}}
+                                    </td>
+                                    <td data-title="'Sub-product'" filter="{ SubProduct: 'text'}" sortable="'SubProduct'"
+                                        class="Arrow" ng-show="modProduct == '58'">
+                                        {{user.SubProduct}}
+                                    </td>
+                                    <td data-title="'Carrier'" filter="{ Carrier: 'text'}" sortable="'Carrier'" class="Arrow"
+                                        ng-show="modProduct == '58'">
+                                        {{user.Carrier}}
+                                    </td>
+                                    <td data-title="'Port Speed'" filter="{ PortSpeed: 'text'}" sortable="'PortSpeed'"
+                                        class="Arrow" ng-show="modProduct == '58'">
+                                        {{user.PortSpeed}}
+                                    </td>
+                                    <td data-title="'Created User'" filter="{ CreatedBy: 'text'}" sortable="'CreatedBy'"
+                                        class="Arrow">
+                                        {{user.CreatedBy}}
+                                    </td>
+                                    <td data-title="'Created On'" filter="{ CreatedDate: 'text'}" sortable="'CreatedDate'"
+                                        class="Arrow">
+                                        {{user.CreatedDate}}
+                                    </td>
+                                    <td data-title="'Updated User'" filter="{ UpdatedBy: 'text'}" sortable="'UpdatedBy'"
+                                        class="Arrow">
+                                        {{user.UpdatedBy}}
+                                    </td>
+                                    <td data-title="'Updated On'" filter="{ UpdatedDate: 'text'}" sortable="'UpdatedDate'"
+                                        class="Arrow">
+                                        {{user.UpdatedDate}}
+                                    </td>
+                                    <td data-title="'Valid / Invalid'" filter="{ Validity: 'text'}" sortable="'Validity'"
+                                        class="Arrow">
+                                        {{user.Validity}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                    </div>                
+            </div>
+        </div>
+             <div tabindex="-1" class="modal fade in modalalign" id="divshowData" role="dialog"
+        aria-hidden="true" aria-labelledby="myModalLabel">
+               <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center" >
+                <div class="modal-content" style="width: 1000px">
+                 <div class="modal-header" style="padding:0px 0px 0px 0px;"> <button class="close" type="button" data-dismiss="modal" style="margin:15px 15px 15px 15px;">
+                            <span aria-hidden="true">×</span><span class="sr-only">Close</span>
+                        </button>
+                          
+<div class="row text-left Arrow " style="padding-left:40px">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+               Case Detail Audit Information for <span style="font-size:10pt"> / {{modServiceType}} /  {{Product}} / {{CountryName}} / {{CaseId}} </span>
+            </h3>
+        </div>
+    </div>
+                        </div>
+                 <div class="container">
+                        <div>
+                         <div class="row" style="padding-left: 10px">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">                
+                    <div class="panel-body" style="height:810px;overflow:auto;">
+                        <!--<h4 style="text-align: center">
+                            Case Detail Audit Information</h4>-->
+                            <table ng-table="CaseDetailAuditData" class="table table-striped">                
+                    <tr ng-repeat="user in $data">           
+            <td data-title="'Char Type'" filter="{ CharTypeName: 'text'}" sortable="'CharTypeName'" class="Arrow">
+                {{user.CharTypeName}}
+            </td>
+            
+            <td data-title="'Char Name'" filter="{ CharName: 'text'}" sortable="'CharName'" class="Arrow">
+                {{user.CharName}}
+            </td>                  
+
+            <td data-title="'Created User'" filter="{ CreatedBy: 'text'}" sortable="'CreatedBy'" class="Arrow">
+                {{user.CreatedBy}}
+            </td>
+           
+            <td data-title="'Created On'" filter="{ CreatedDate: 'text'}" sortable="'CreatedDate'" class="Arrow">
+                {{user.CreatedDate}}
+            </td>
+           
+            <td data-title="'Updated User'" filter="{ UpdatedBy: 'text'}" sortable="'UpdatedBy'" class="Arrow">
+                {{user.UpdatedBy}}
+            </td>
+            
+            <td data-title="'Updated On'" filter="{ UpdatedDate: 'text'}" sortable="'UpdatedDate'" class="Arrow">
+                {{user.UpdatedDate}}
+            </td>
+
+             <td data-title="'Valid / Invalid'" filter="{ Validity: 'text'}" sortable="'Validity'" class="Arrow">
+                {{user.Validity}}
+            </td>
+            </tr>
+            </table>
+                    </div>                
+            </div>
+        </div>
+                        </div>
+</div> </div> </div> </div>     </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+</body>
+</html>

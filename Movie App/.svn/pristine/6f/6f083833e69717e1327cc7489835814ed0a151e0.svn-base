@@ -1,0 +1,1 @@
+﻿<%@ WebHandler Language="C#" CodeBehind="Downloadhandler.ashx.cs" Class="SCAdmin.Downloadhandler" %>

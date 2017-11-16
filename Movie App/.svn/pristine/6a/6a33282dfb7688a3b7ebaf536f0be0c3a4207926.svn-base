@@ -1,0 +1,947 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using SCAdminDAL;
+using System.Text.RegularExpressions;
+
+namespace SCAdminBAL
+{
+    public class ReportsBAL
+    {
+        Reports objReports = new Reports();
+
+        public List<UsageReports> GetMonthlyUsageReport(string criteria)
+        {
+            DataTable dtReports;
+            List<UsageReports> lstReports = new List<UsageReports>();
+            using (dtReports = objReports.GetMonthlyUsageReport(criteria))
+            {
+                if (criteria == "1")
+                {
+                    foreach (DataRow dr in dtReports.Rows)
+                    {
+                        UsageReports objUsageReports = new UsageReports();
+                        objUsageReports.Month = Convert.ToString(dr["BIGDT"]);
+                        objUsageReports.Count = Convert.ToInt32(dr["INUM"]);
+                        lstReports.Add(objUsageReports);
+                    }
+                }
+                else if (criteria == "2")
+                {
+                    foreach (DataRow dr in dtReports.Rows)
+                    {
+                        UsageReports objUsageReports = new UsageReports();
+                        objUsageReports.Month = Convert.ToString(dr["BIGDT"]);
+                        objUsageReports.Description = Convert.ToString(dr["DESCRIPTION"]);
+                        objUsageReports.Product = Convert.ToString(dr["PRODUCT_NAME"]);
+                        objUsageReports.Count = Convert.ToInt32(dr["INUM"]);
+                        lstReports.Add(objUsageReports);
+                    }
+                }
+                else if (criteria == "3")
+                {
+                    foreach (DataRow dr in dtReports.Rows)
+                    {
+                        UsageReports objUsageReports = new UsageReports();
+                        objUsageReports.Month = Convert.ToString(dr["BIGDT"]);
+                        objUsageReports.Description = Convert.ToString(dr["DESCRIPTION"]);
+                        objUsageReports.Product = Convert.ToString(dr["PRODUCT_NAME"]);
+                        objUsageReports.Count = Convert.ToInt32(dr["INUM"]);
+                        lstReports.Add(objUsageReports);
+                    }
+                }
+                else if (criteria == "4")
+                {
+                    foreach (DataRow dr in dtReports.Rows)
+                    {
+                        UsageReports objUsageReports = new UsageReports();
+                        objUsageReports.Month = Convert.ToString(dr["BIGDT"]);
+                        objUsageReports.Description = Convert.ToString(dr["DESCRIPTION"]);
+                        objUsageReports.Product = Convert.ToString(dr["PRODUCT_NAME"]);
+                        objUsageReports.Count = Convert.ToInt32(dr["INUM"]);
+                        lstReports.Add(objUsageReports);
+                    }
+                }
+                else if (criteria == "5")
+                {
+                    foreach (DataRow dr in dtReports.Rows)
+                    {
+                        UsageReports objUsageReports = new UsageReports();
+                        objUsageReports.Month = Convert.ToString(dr["BIGDT"]);
+                        objUsageReports.Description = Convert.ToString(dr["DESCRIPTION"]);
+                        objUsageReports.Product = Convert.ToString(dr["PRODUCT_NAME"]);
+                        objUsageReports.Count = Convert.ToInt32(dr["INUM"]);
+                        lstReports.Add(objUsageReports);
+                    }
+                }
+            }
+            return lstReports;
+        }
+
+        public List<string> GetWeeklyStartAndEndDates()
+        {
+            return objReports.GetWeeklyStartAndEndDates();
+        }
+
+        public WeeklyReport GetWeeklyUsageReport(string[] weeklyReport)
+        {
+            WeeklyReport obj = new WeeklyReport();
+            obj.WeeklyReports = new List<WeeklyReports>();
+            string[] date = null;
+
+            for (int i = weeklyReport.Length - 1; i >= 0; i--)
+            {
+
+                if (weeklyReport != null)
+                {
+                    date = Regex.Split(weeklyReport[i], " - ");
+                }
+                DataTable dtWeeklyReport = objReports.GetWeeklyUsageReport(weeklyReport[i]);
+                if (dtWeeklyReport != null)
+                {
+                    foreach (DataRow dr in dtWeeklyReport.Rows)
+                    {
+                        WeeklyReports ObjWeeklyReport = new WeeklyReports();
+                        ObjWeeklyReport.date = Convert.ToString(dr["HIT_DATE"]);
+                        ObjWeeklyReport.count = Convert.ToInt32(dr["HIT_COUNT"]);
+                        obj.totalCount += Convert.ToInt32(dr["HIT_COUNT"]);
+                        obj.startDate = date[0];
+                        obj.endDate = date[1];
+                        obj.WeeklyReports.Add(ObjWeeklyReport);
+                    }
+                }
+            }
+            return obj;
+        }
+
+        public List<ServiceTypeProductMap> FetchProdAndSubProd()
+        {
+            List<ServiceTypeProductMap> lstServiceTypeProduct = new List<ServiceTypeProductMap>();
+            DataTable dtServiceTypeProduct = objReports.FetchProdAndSubProd();
+            if (dtServiceTypeProduct != null)
+            {
+                foreach (DataRow dr in dtServiceTypeProduct.Rows)
+                {
+                    ServiceTypeProductMap ServiceTypeProduct = new ServiceTypeProductMap();
+                    ServiceTypeProduct.ServiceType = Convert.ToString(dr["Service_Type_desc"]);
+                    ServiceTypeProduct.ProductAbbr = Convert.ToString(dr["Product_Abbr"]);
+                    ServiceTypeProduct.ProductId = Convert.ToString(dr["Product_cd"]);
+                    ServiceTypeProduct.ProductName = Convert.ToString(dr["Product_name"]);
+                    lstServiceTypeProduct.Add(ServiceTypeProduct);
+                }
+            }
+            return lstServiceTypeProduct;
+        }
+
+        public List<ServiceTypeProductMap> FetchServiceTypeAndProducts(string Report)
+        {
+            List<ServiceTypeProductMap> lstServiceTypeProduct = new List<ServiceTypeProductMap>();
+            DataTable dtServiceTypeProduct = objReports.FetchServiceTypeAndProducts(Report);
+            if (dtServiceTypeProduct != null)
+            {
+                foreach (DataRow dr in dtServiceTypeProduct.Rows)
+                {
+                    ServiceTypeProductMap ServiceTypeProduct = new ServiceTypeProductMap();
+                    ServiceTypeProduct.ServiceType = Convert.ToString(dr["Service_Type_desc"]);
+                    ServiceTypeProduct.ProductAbbr = Convert.ToString(dr["Product_Abbr"]);
+                    ServiceTypeProduct.ProductId = Convert.ToString(dr["Product_cd"]);
+                    ServiceTypeProduct.ProductName = Convert.ToString(dr["Product_name"]);
+                    lstServiceTypeProduct.Add(ServiceTypeProduct);
+                }
+            }
+            return lstServiceTypeProduct;
+        }
+
+        public List<NotesAuditInfo> GetNotesAuditReport(int productCode)
+        {
+            List<NotesAuditInfo> lstNotesAuditInfo = new List<NotesAuditInfo>();
+            DataTable dtNotesAuditInfo = objReports.GetNotesAuditReport(productCode);
+            if (dtNotesAuditInfo != null)
+            {
+                foreach (DataRow dr in dtNotesAuditInfo.Rows)
+                {
+                    NotesAuditInfo notesAuditInfo = new NotesAuditInfo();
+                    notesAuditInfo.NoteId = Convert.ToString(dr["Note_id"]);
+                    notesAuditInfo.NoteTitle = Convert.ToString(dr["Note_Title"]);
+                    notesAuditInfo.CreatedBy = Convert.ToString(dr["CraetedBy"]);
+                    notesAuditInfo.CreatedDate = Convert.ToString(dr["CreatedDate"]);
+                    notesAuditInfo.UpdatedBy = Convert.ToString(dr["UpdatedBy"]);
+                    notesAuditInfo.UpdatedDate = Convert.ToString(dr["UpdatedDate"]);
+                    lstNotesAuditInfo.Add(notesAuditInfo);
+                }
+            }
+            return lstNotesAuditInfo;
+        }
+
+        public List<CaseAuditInfo> FetchCaseAuditReport(string productCode)
+        {
+            List<CaseAuditInfo> lstCaseAuditInfo = new List<CaseAuditInfo>();
+            DataTable dtCaseAuditInfo = objReports.FetchCaseAuditReport(productCode);
+            if (dtCaseAuditInfo != null)
+            {
+                foreach (DataRow dr in dtCaseAuditInfo.Rows)
+                {
+                    CaseAuditInfo caseAuditInfo = new CaseAuditInfo();
+                    caseAuditInfo.CaseId = Convert.ToString(dr["Case_id"]);
+                    caseAuditInfo.CountryName = Convert.ToString(dr["country_name"]);
+                    caseAuditInfo.CityPOPName = Convert.ToString(dr["city_name"]) + "-" + Convert.ToString(dr["hub_site_Name"]);
+                    if (productCode == "58")
+                    {
+                        caseAuditInfo.SubProduct = Convert.ToString(dr["subproduct_abbr"]);
+                        caseAuditInfo.Carrier = Convert.ToString(dr["subproduct_abbr"]);
+                        caseAuditInfo.PortSpeed = Convert.ToString(dr["subproduct_abbr"]);
+                    }
+                    caseAuditInfo.CreatedBy = Convert.ToString(dr["Created_user"]);
+                    caseAuditInfo.CreatedDate = Convert.ToString(dr["created_dt"]);
+                    caseAuditInfo.UpdatedBy = Convert.ToString(dr["Updated_user"]);
+                    caseAuditInfo.UpdatedDate = Convert.ToString(dr["updated_dt"]);
+                    caseAuditInfo.Validity = Convert.ToString(dr["case_valid_cd"]) == "0" ? "Invalid" : "Valid";
+
+                    lstCaseAuditInfo.Add(caseAuditInfo);
+                }
+            }
+            return lstCaseAuditInfo;
+        }
+
+
+        public List<CaseDetailsAuditInfo> FetchCaseDetailAuditReport(string caseID)
+        {
+            List<CaseDetailsAuditInfo> lstCaseDetailsAuditInfo = new List<CaseDetailsAuditInfo>();
+            DataTable dtCaseDetailsAuditInfo = objReports.FetchCaseDetailAuditReport(caseID);
+            if (dtCaseDetailsAuditInfo != null)
+            {
+                foreach (DataRow dr in dtCaseDetailsAuditInfo.Rows)
+                {
+                    CaseDetailsAuditInfo caseDetailsAuditInfo = new CaseDetailsAuditInfo();
+                    caseDetailsAuditInfo.CharTypeName = Convert.ToString(dr["char_type_name"]);
+                    caseDetailsAuditInfo.CharName = Convert.ToString(dr["char_name"]);                         
+                    caseDetailsAuditInfo.CreatedBy = Convert.ToString(dr["Created_user"]);
+                    caseDetailsAuditInfo.CreatedDate = Convert.ToString(dr["created_dt"]);
+                    caseDetailsAuditInfo.UpdatedBy = Convert.ToString(dr["Updated_user"]);
+                    caseDetailsAuditInfo.UpdatedDate = Convert.ToString(dr["updated_dt"]);
+                    caseDetailsAuditInfo.Validity = Convert.ToString(dr["case_detail_valid_cd"]) == "0" ? "Invalid" : "Valid";
+
+                    lstCaseDetailsAuditInfo.Add(caseDetailsAuditInfo);
+                }
+            }
+            return lstCaseDetailsAuditInfo;
+        }
+
+
+
+        public DataTable FetchCountries()
+        {
+            SCAdminDAL.Reports report = new SCAdminDAL.Reports();
+            return report.FetchCountries();
+        }
+
+
+        public DataTable FetchAccesByReportByCountryId(int CountryId)
+        {
+            SCAdminDAL.Reports report = new SCAdminDAL.Reports();
+            return report.FetchColHeadAndValues(CountryId);
+
+        }
+
+        public List<ProductDetails> FetchProducts(int userid, bool issuperuser)
+        {
+            List<ProductDetails> lstProductDetails = new List<ProductDetails>();
+            DataTable dtsubproductValues = objReports.FetchProducts(userid, issuperuser);
+            if (dtsubproductValues != null)
+            {
+                foreach (DataRow dr in dtsubproductValues.Rows)
+                {
+                    ProductDetails objProductDetails = new ProductDetails();
+                    objProductDetails.ProductName = Convert.ToString(dr["product_name"]);
+                    objProductDetails.ProductId = Convert.ToInt32(dr["product_cd"]);
+                    lstProductDetails.Add(objProductDetails);
+                }
+            }
+            return lstProductDetails;
+
+        }
+        public List<SubProductDetails> FetchSubProducts(int productid)
+        {
+            List<SubProductDetails> lstSubProductDetails = new List<SubProductDetails>();
+            DataTable dtsubproductValues = objReports.FetchSubProducts(productid);
+            if (dtsubproductValues != null)
+            {
+                foreach (DataRow dr in dtsubproductValues.Rows)
+                {
+                    SubProductDetails objSubProductDetails = new SubProductDetails();
+                    objSubProductDetails.SubProductName = Convert.ToString(dr["subproduct_name"]);
+                    objSubProductDetails.SubProductId = Convert.ToInt32(dr["subproduct_cd"]);
+                    lstSubProductDetails.Add(objSubProductDetails);
+                }
+            }
+            return lstSubProductDetails;
+        }
+        public List<CountryRestrictionDropDown> FetchCountriesByProduct(int productid)
+        {
+            List<CountryRestrictionDropDown> lstCountry = new List<CountryRestrictionDropDown>();
+            DataTable dtCountries = objReports.FetchCountriesByProduct(productid);
+            if (dtCountries != null)
+            {
+                foreach (DataRow dr in dtCountries.Rows)
+                {
+                    CountryRestrictionDropDown objCountries = new CountryRestrictionDropDown();
+                    objCountries.CountryName = Convert.ToString(dr["country_name"]);
+                    objCountries.CountryId = Convert.ToInt32(dr["country_id"]);
+                    lstCountry.Add(objCountries);
+                }
+            }
+            return lstCountry;
+        }
+
+        public List<SupplierRestrictionDropDown> FetchAccessSuppliers(int countryid)
+        {
+            List<SupplierRestrictionDropDown> lstSuppliers = new List<SupplierRestrictionDropDown>();
+            DataTable dtSuppliers = objReports.FetchAccessSuppliers(countryid);
+            if (dtSuppliers != null)
+            {
+                foreach (DataRow dr in dtSuppliers.Rows)
+                {
+                    SupplierRestrictionDropDown objSuppliers = new SupplierRestrictionDropDown();
+                    objSuppliers.SupplierName = Convert.ToString(dr["supplier_name"]);
+                    objSuppliers.SupplierId = Convert.ToInt32(dr["ACCESS_SUPPLIER_CHAR_ID"]);
+                    lstSuppliers.Add(objSuppliers);
+                }
+            }
+            return lstSuppliers;
+        }
+
+        public List<AccessSpeed> FetchAccessSpeeds(int countryid, string[] supplierid)
+        {
+            List<AccessSpeed> lstAccessSpeed = new List<AccessSpeed>();
+            DataTable dtAccessSpeed = objReports.FetchAccessSpeeds(countryid, supplierid);
+            if (dtAccessSpeed != null)
+            {
+                foreach (DataRow dr in dtAccessSpeed.Rows)
+                {
+                    AccessSpeed objAccessSpeed = new AccessSpeed();
+                    objAccessSpeed.AccessSpeedId = Convert.ToInt32(dr["char_id"]);
+                    objAccessSpeed.AccessSpeedValue = Convert.ToString(dr["char_actual_value"] + " " + dr["CHAR_UNIT_OF_MEASURE"]);
+                    lstAccessSpeed.Add(objAccessSpeed);
+                }
+            }
+            return lstAccessSpeed;
+        }
+
+        public List<InterfaceTypes> FetchInterfaceTypes(int countryid, string[] supplierid, string[] accessSpeedId)
+        {
+            List<InterfaceTypes> lstInterfaceType = new List<InterfaceTypes>();
+            DataTable dtInterfaceType = objReports.FetchInterfaceTypes(countryid, supplierid, accessSpeedId);
+            if (dtInterfaceType != null)
+            {
+                foreach (DataRow dr in dtInterfaceType.Rows)
+                {
+                    InterfaceTypes objInterfaceType = new InterfaceTypes();
+                    objInterfaceType.InterfaceId = Convert.ToInt32(dr["d_interface_id"]);
+                    objInterfaceType.InterfaceType = Convert.ToString(dr["d_interface_name"]);
+                    lstInterfaceType.Add(objInterfaceType);
+                }
+            }
+            return lstInterfaceType;
+        }
+
+        public List<AccessReportData> GetAccessReportData(int countryid, string[] supplierid, string[] accessSpeedId, string[] InterfaceType)
+        {
+            List<AccessReportData> lstaccessReportData = new List<AccessReportData>();
+            DataTable dtAccessReportData = objReports.GetAccessReportData(countryid, supplierid, accessSpeedId, InterfaceType);
+            if (dtAccessReportData != null)
+            {
+                foreach (DataRow dr in dtAccessReportData.Rows)
+                {
+                    AccessReportData objAccessReport = new AccessReportData();
+                    objAccessReport.Country = Convert.ToString(dr["country_name"]);
+                    objAccessReport.CityPop = Convert.ToString(dr["CITY_NAME"] + " - " + dr["HUB_SITE_NAME"]);
+                    objAccessReport.Supplier = Convert.ToString(dr["supplier_name"]);
+                    objAccessReport.Speed = "<font color=" + "'green'" + ">" + Convert.ToString(dr["SPEED_VALUE"] + "" + dr["SPEED_UNIT_MEASURE"] + " - " + dr["ACCESS_TYPE"] + " - " + dr["SUPPLIER_PROD_NAME"]) + "</font>";
+                    objAccessReport.DisplayInterface = Convert.ToString(dr["Display_Interfaces"]);
+                    objAccessReport.Support = Convert.ToString(dr["Support"]);
+                    objAccessReport.Resiliency = Convert.ToString(dr["Resiliency"]);
+                    lstaccessReportData.Add(objAccessReport);
+                }
+            }
+            return lstaccessReportData;
+        }
+
+        public List<CityPOPDetails> FetchCityPOPSData(int countryid, int productid, int subproductid)
+        {
+            List<CityPOPDetails> lstCityPopDetails = new List<CityPOPDetails>();
+            DataTable dtCityPOPDetails = objReports.FetchCityPOPSData(countryid, productid, subproductid);
+            if (dtCityPOPDetails != null)
+            {
+                foreach (DataRow dr in dtCityPOPDetails.Rows)
+                {
+                    CityPOPDetails objCityPOPDetails = new CityPOPDetails();
+                    objCityPOPDetails.Country = Convert.ToString(dr["Country"]);
+                    objCityPOPDetails.CityPop = Convert.ToString(dr["City-Pop"]);
+                    objCityPOPDetails.Speed = Convert.ToString(dr["Access_Speed"]);
+                    lstCityPopDetails.Add(objCityPOPDetails);
+                }
+            }
+            return lstCityPopDetails;
+        }
+
+        public List<ProductDetails> GetStandardReportProducts()
+        {
+            List<ProductDetails> lstProductDetails = new List<ProductDetails>();
+            DataTable dtProductDetails = objReports.GetStandardReportProducts();
+            if (dtProductDetails != null)
+            {
+                foreach (DataRow dr in dtProductDetails.Rows)
+                {
+                    ProductDetails objProductDetails = new ProductDetails();
+                    objProductDetails.ProductName = Convert.ToString(dr["product_name"]);
+                    objProductDetails.ProductId = Convert.ToInt32(dr["product_cd"]);
+                    lstProductDetails.Add(objProductDetails);
+                }
+            }
+            return lstProductDetails;
+        }
+
+        public List<SubProductDetails> GetStandardReportSubProducts(int productId)
+        {
+            List<SubProductDetails> lstSubProductDetails = new List<SubProductDetails>();
+            DataTable dtSubProductDetails = objReports.GetStandardReportSubProducts(productId);
+            if (dtSubProductDetails != null)
+            {
+                foreach (DataRow dr in dtSubProductDetails.Rows)
+                {
+                    SubProductDetails objSubProductDetails = new SubProductDetails();
+                    objSubProductDetails.SubProductName = Convert.ToString(dr["subproduct_name"]);
+                    objSubProductDetails.SubProductId = Convert.ToInt32(dr["subproduct_cd"]);
+                    lstSubProductDetails.Add(objSubProductDetails);
+                }
+            }
+            return lstSubProductDetails;
+        }
+
+        public List<ReportStandardDetials> GetStandardReportName(int productId, int subProductId)
+        {
+            List<ReportStandardDetials> lstReportDetails = new List<ReportStandardDetials>();
+            DataTable dtReportDetails = objReports.GetStandardReportName(productId, subProductId);
+            if (dtReportDetails != null)
+            {
+                foreach (DataRow dr in dtReportDetails.Rows)
+                {
+                    ReportStandardDetials objReportDetials = new ReportStandardDetials();
+                    objReportDetials.ReportName = Convert.ToString(dr["report_desc"]);
+                    objReportDetials.ReportId = Convert.ToInt32(dr["report_cd"]);
+                    lstReportDetails.Add(objReportDetials);
+                }
+            }
+            return lstReportDetails;
+        }
+
+        public List<StandardColumnsData> GetStandardColumnsData(int reportId)
+        {
+            List<StandardColumnsData> lstStandardColumnsData = new List<StandardColumnsData>();
+            DataTable dtStandardColumnsData = objReports.GetStandardColumnsData(reportId);
+            if (dtStandardColumnsData != null)
+            {
+                foreach (DataRow dr in dtStandardColumnsData.Rows)
+                {
+                    StandardColumnsData objStandardColumnsData = new StandardColumnsData();
+                    objStandardColumnsData.ColumnHeader = Convert.ToString(dr["column_header"]);
+                    objStandardColumnsData.ColumnWidth = Convert.ToString(dr["column_width"]);
+                    objStandardColumnsData.DisplayOrder = Convert.ToString(dr["order_cd"]);
+                    objStandardColumnsData.valid = Convert.ToInt32(dr["valid_cd"]);
+                    lstStandardColumnsData.Add(objStandardColumnsData);
+                }
+            }
+            return lstStandardColumnsData;
+        }
+
+        public List<POPCharacteristicsData> GetPOPCharacteristicsData(int productId, int subProductId)
+        {
+            List<POPCharacteristicsData> lstPOPCharacteristicsData = new List<POPCharacteristicsData>();
+            DataTable dtPOPCharacteristicsData = objReports.GetPOPCharacteristicsData(productId, subProductId);
+            if (dtPOPCharacteristicsData != null)
+            {
+                foreach (DataRow dr in dtPOPCharacteristicsData.Rows)
+                {
+                    POPCharacteristicsData objPOPCharacteristicsData = new POPCharacteristicsData();
+                    objPOPCharacteristicsData.ColumnHeader = Convert.ToString(dr["column_header_1"]);
+                    objPOPCharacteristicsData.Width = Convert.ToString(dr["report_col_width"]);
+                    objPOPCharacteristicsData.DisplayOrder = Convert.ToString(dr["report_col_order"]);
+                    objPOPCharacteristicsData.Characteristics = Convert.ToString(dr["char_name"]);
+                    objPOPCharacteristicsData.charId = Convert.ToInt32(dr["char_id"]);
+                    objPOPCharacteristicsData.columnValid = Convert.ToInt32(dr["column_valid_cd"]);
+                    objPOPCharacteristicsData.ColumnHeader2 = Convert.ToString(dr["column_header_2"]);
+                    objPOPCharacteristicsData.ColumnHeader3 = Convert.ToString(dr["column_header_3"]);
+                    lstPOPCharacteristicsData.Add(objPOPCharacteristicsData);
+                }
+            }
+            return lstPOPCharacteristicsData;
+        }
+        public List<lstProductReportsDetails> FetchStandardProductList(string userType, int userid, string strServiceType)
+        {
+            List<lstProductReportsDetails> lstProductDetails = new List<lstProductReportsDetails>();
+            DataSet dsproductValues = objReports.FetchStandardProductList(userType, userid, strServiceType);
+            DataSet dsReportdetails = objReports.GetReportsDetailsList();
+            foreach (DataRow dr in dsproductValues.Tables[0].Rows)
+            {
+                lstProductReportsDetails objReport = new lstProductReportsDetails();
+
+                objReport.ProductId = Convert.ToInt32(dr["product_cd"]);
+                objReport.ProductName = Convert.ToString(dr["product_name"]);
+
+               
+
+                List<ReportDetails> objR = new List<ReportDetails>();
+                objReport.lstReports = objR;
+
+                var reports = dsReportdetails.Tables[0].AsEnumerable().Where(t => t.Field<int>("product_cd") == Convert.ToInt32(dr["product_cd"].ToString())).Select(t => new { ReportCD = t.Field<decimal>("report_cd"), reportDescription = t.Field<string>("report_desc"), reportLocLevelCD = t.Field<decimal>("report_loc_level_cd"), reportPathDesc = t.Field<string>("report_path_desc"), reportValidCD = t.Field<decimal>("report_valid_cd"), reportAbbr = t.Field<string>("report_abbr") });
+               
+               foreach (var item in reports)
+                {
+                    bool checkval = false;
+                    if (item.reportValidCD == 1)
+                    {
+                        checkval = true;
+                    }
+
+                    objReport.lstReports.Add(new ReportDetails() { ReportCD = Convert.ToInt32(item.ReportCD), reportDescription = item.reportDescription, reportLocLevelCD = Convert.ToInt32(item.reportLocLevelCD), reportPathDesc = item.reportPathDesc, reportValidCD = checkval, reportAbbr = item.reportAbbr });
+                }
+
+                lstProductDetails.Add(objReport);
+            }
+
+            return lstProductDetails;
+
+        }
+
+        public List<lstProductReportsDetails> GetProductList(int userid, string isUserType)
+        {
+            List<lstProductReportsDetails> lstProductDetails = new List<lstProductReportsDetails>();
+            DataSet dsproductValues = objReports.GetStandardProductList(userid, isUserType);
+          //  DataSet dsReportdetails = objReports.GetReportsDetailsList();
+            foreach (DataRow dr in dsproductValues.Tables[0].Rows)
+            {
+                lstProductReportsDetails objReport = new lstProductReportsDetails();
+
+                objReport.ProductId = Convert.ToInt32(dr["product_cd"]);
+                objReport.ProductName = Convert.ToString(dr["product_name"]);
+
+                lstProductDetails.Add(objReport);
+            }
+
+            return lstProductDetails;
+
+        }
+
+        public IOrderedEnumerable<ProductReportDetails> GetStandardReportsDetails(string userid, string userType)
+        {
+            //string strServiceType
+            List<ProductReportDetails> lstProductDetails = new List<ProductReportDetails>();
+            DataSet dsproductValues = objReports.GetStandardReportsDetails(Convert.ToString(userid),userType);
+            foreach (DataRow dr in dsproductValues.Tables[0].Rows)
+            {
+                ProductReportDetails objReport = new ProductReportDetails();
+                objReport.ReportCD = Convert.ToInt32(dr["report_cd"].ToString());
+                objReport.ProductId = Convert.ToInt32(dr["product_cd"].ToString());
+                objReport.ProductName = Convert.ToString(dr["product_name"].ToString());
+                if (dr["subproduct_cd"].ToString() != string.Empty)
+                {
+                    objReport.SubProductId = Convert.ToInt32(dr["subproduct_cd"].ToString());
+                }
+                if ( dr["subproduct_name"].ToString() != string.Empty)
+                {
+                    objReport.SubProductName = Convert.ToString(dr["subproduct_name"].ToString());
+                }
+                objReport.reportLocLevelCD = Convert.ToInt32(dr["report_loc_level_cd"].ToString());
+                objReport.reportDescription = Convert.ToString(dr["report_desc"].ToString());
+                objReport.reportPathDesc = Convert.ToString(dr["report_path_desc"].ToString());
+                bool checkval = false;
+                objReport.reportValidCD = checkval;
+                if (dr["report_valid_cd"].ToString() != string.Empty)
+                {
+                    if (Convert.ToInt32(dr["report_valid_cd"].ToString()) == 1)
+                    {
+                        checkval = true;
+                        objReport.reportValidCD = checkval;
+                    }
+                    
+                }
+
+                objReport.reportAbbr = Convert.ToString(dr["report_abbr"].ToString());
+
+                lstProductDetails.Add(objReport);
+            }
+            return lstProductDetails.OrderByDescending(x => x.ReportCD);
+
+        }
+        public List<lstSubProductDetails> GetSubProductList(int ProductID, string userType, string userid, string strServiceType)
+        {
+            List<lstSubProductDetails> lstsubProductlist = new List<lstSubProductDetails>();
+            DataSet dsproductValues = objReports.GetSubProductList(ProductID, userType, Convert.ToString(userid));
+           // DataSet dsReportdetails = objReports.GetSubProductReportsList(ProductID);
+            foreach (DataRow dr in dsproductValues.Tables[0].Rows)
+            {
+                lstSubProductDetails objReport = new lstSubProductDetails();
+
+                objReport.SubProductId = Convert.ToInt32(dr["subproduct_cd"]);
+                objReport.SubProductName = Convert.ToString(dr["subproduct_name"]);
+               //var data= dr["subproduct_cd"].GetType();
+               // List<ReportDetails> objR = new List<ReportDetails>();
+               // objReport.lstSubReports = objR;
+                //var reports = dsReportdetails.Tables[0].AsEnumerable().Where(t => t.Field<int?>("subproduct_cd") == Convert.ToInt32(dr["subproduct_cd"].ToString())).Select(t => new { ReportCD = t.Field<decimal>("report_cd"), reportDescription = t.Field<string>("report_desc"), reportLocLevelCD = t.Field<decimal>("report_loc_level_cd"), reportPathDesc = t.Field<string>("report_path_desc"), reportValidCD = t.Field<decimal>("report_valid_cd"), reportAbbr = t.Field<string>("report_abbr") });
+
+                //foreach (var item in reports)
+                //{
+                //    bool checkval = false;
+                //    if (item.reportValidCD == 1)
+                //    {
+                //        checkval = true;
+                //    }
+
+                //    objReport.lstSubReports.Add(new ReportDetails() { ReportCD = Convert.ToInt32(item.ReportCD), reportDescription = item.reportDescription, reportLocLevelCD = Convert.ToInt32(item.reportLocLevelCD), reportPathDesc = item.reportPathDesc, reportValidCD = checkval, reportAbbr = item.reportAbbr });
+                //}
+
+                lstsubProductlist.Add(objReport);
+            }
+
+            return lstsubProductlist;
+
+        }
+        public List<ReportDetails> GetProductReportList(int ProductID)
+        {
+            DataSet dsReportdetails = objReports.GetProductReportsDetailsList(ProductID);
+            List<ReportDetails> lstReportDetails = new List<ReportDetails>();
+            foreach (DataRow dr in dsReportdetails.Tables[0].Rows)
+            {
+                ReportDetails objReport = new ReportDetails();
+                objReport.productCD = Convert.ToInt32(dr["product_cd"]);
+                objReport.ReportCD = Convert.ToInt32(dr["report_cd"]);
+                objReport.reportDescription = Convert.ToString(dr["report_desc"]);
+
+                objReport.reportLocLevelCD = Convert.ToInt32(dr["report_loc_level_cd"]);
+                objReport.reportPathDesc = (string.IsNullOrEmpty(dr["report_path_desc"].ToString())) ? string.Empty : Convert.ToString(dr["report_path_desc"]);
+                objReport.reportValidCD = Convert.ToBoolean(dr["report_valid_cd"]);
+                objReport.reportAbbr = (string.IsNullOrEmpty(dr["report_abbr"].ToString())) ? string.Empty : Convert.ToString(dr["report_abbr"]);
+                lstReportDetails.Add(objReport);
+            }
+
+            return lstReportDetails;
+        }
+
+
+        public ProductReportDetails AddNewReportDetails(int ProdID, string ProdDescription, string Abbreviation, bool ValidCheck, string userID, int? subProductID)
+        {
+            ProductReportDetails objReport = new ProductReportDetails();
+            //objReport = null;
+            int result = objReports.AddNewReportDetails(ProdID, ProdDescription, Abbreviation, ValidCheck, userID, subProductID);
+            if (result > 0)
+            {
+                DataSet dsresult = objReports.refreshStandardReportsDetails(result);
+                foreach (DataRow dr in dsresult.Tables[0].Rows)
+                {
+                    
+                    objReport.ReportCD = Convert.ToInt32(dr["report_cd"].ToString());
+                    objReport.ProductId = Convert.ToInt32(dr["product_cd"].ToString());
+                    objReport.ProductName = Convert.ToString(dr["product_name"].ToString());
+                    if (dr["subproduct_cd"].ToString() != string.Empty)
+                    {
+                        objReport.SubProductId = Convert.ToInt32(dr["subproduct_cd"].ToString());
+                    }
+                    if (dr["subproduct_name"].ToString() != string.Empty)
+                    {
+                        objReport.SubProductName = Convert.ToString(dr["subproduct_name"].ToString());
+                    }
+                    objReport.reportLocLevelCD = Convert.ToInt32(dr["report_loc_level_cd"].ToString());
+                    objReport.reportDescription = Convert.ToString(dr["report_desc"].ToString());
+                    objReport.reportPathDesc = Convert.ToString(dr["report_path_desc"].ToString());
+                    bool checkval = false;
+                    objReport.reportValidCD = checkval;
+                    if (dr["report_valid_cd"].ToString() != string.Empty)
+                    {
+                        if (Convert.ToInt32(dr["report_valid_cd"].ToString()) == 1)
+                        {
+                            checkval = true;
+                            objReport.reportValidCD = checkval;
+                        }
+
+                    }
+
+                    objReport.reportAbbr = Convert.ToString(dr["report_abbr"].ToString());
+
+                }
+            }
+
+            return objReport;
+        }
+        public int UpdateReportDetails(int ReportCD, int ProdID, string ProdDescription, string Abbreviation, bool ValidCheck, string userID, int?  subProductID)
+        {
+            int result = objReports.UpdateReportDetails(ReportCD, ProdID, ProdDescription, Abbreviation, ValidCheck, userID,subProductID);
+
+            return result;
+        }
+        public int DeleteReportDetails(int ReportCD)
+        {
+            int result = objReports.DeleteReportDetails(ReportCD);
+
+            return result;
+        }
+
+        public List<CharacteristicsData> GetCharacteristicsData(int productId)
+        {
+            List<CharacteristicsData> lstCharacteristicsData = new List<CharacteristicsData>();
+            DataTable dtCharacteristicsData = objReports.GetCharacteristicsData(productId);
+            if (dtCharacteristicsData != null)
+            {
+                foreach (DataRow dr in dtCharacteristicsData.Rows)
+                {
+                    CharacteristicsData objCharacteristicsData = new CharacteristicsData();
+                    objCharacteristicsData.CharId = Convert.ToInt32(dr["char_id"]);
+                    objCharacteristicsData.CharName = Convert.ToString(dr["char_name"]);
+                    objCharacteristicsData.OptionMatrixId = Convert.ToString(dr["option_matrix_id"]);
+                    lstCharacteristicsData.Add(objCharacteristicsData);
+                }
+            }
+            return lstCharacteristicsData;
+        }
+
+        public int AddNewReportColumn(int productId, int subProductId, int reportId, string strCharId, string strOptionMatrixId, string strColumnHeader1, string strColumnHeader2, string strColumnHeader3, string strColumnValidCd, string strProductMappedId, string userId)
+        {
+            return objReports.AddNewReportColumn(productId, subProductId, reportId, strCharId, strOptionMatrixId, strColumnHeader1, strColumnHeader2, strColumnHeader3, strColumnValidCd, strProductMappedId, userId);
+        }
+
+        public List<ColumnWidthData> GetEditColumnWidthData(int productId, int subProductId)
+        {
+            List<ColumnWidthData> lstColumnWidthData = new List<ColumnWidthData>();
+            DataTable dtColumnWidthData = objReports.GetEditColumnWidthData(productId, subProductId);
+            if (dtColumnWidthData != null)
+            {
+                foreach (DataRow dr in dtColumnWidthData.Rows)
+                {
+                    ColumnWidthData objColumnWidthData = new ColumnWidthData();
+                    objColumnWidthData.ColumnName = Convert.ToString(dr["column_name"]);
+                    objColumnWidthData.Width = Convert.ToString(dr["column_width"]);
+                    lstColumnWidthData.Add(objColumnWidthData);
+                }
+            }
+            return lstColumnWidthData;
+        }
+
+        public List<MappedProducts> GetMappedProduct(int productId)
+        {
+            List<MappedProducts> lstMappedProduct = new List<MappedProducts>();
+            DataTable dtMappedProduct = objReports.GetMappedProduct(productId);
+            if (dtMappedProduct != null)
+            {
+                foreach (DataRow dr in dtMappedProduct.Rows)
+                {
+                    MappedProducts objMappedProduct = new MappedProducts();
+                    objMappedProduct.MappedProduct = Convert.ToInt32(dr["cpe_product_map"]);
+                    lstMappedProduct.Add(objMappedProduct);
+                }
+            }
+            return lstMappedProduct;
+        }
+
+        public List<CharIdDetails> GetCharID(int productId, int mappedProduct)
+        {
+            List<CharIdDetails> lstCharIdDetails = new List<CharIdDetails>();
+            DataTable dtCharIdDetails = objReports.GetCharID(productId, mappedProduct);
+            if (dtCharIdDetails != null)
+            {
+                foreach (DataRow dr in dtCharIdDetails.Rows)
+                {
+                    CharIdDetails objCharIdDetails = new CharIdDetails();
+                    objCharIdDetails.CharId = Convert.ToString(dr["char_id"]);
+                    lstCharIdDetails.Add(objCharIdDetails);
+                }
+            }
+            return lstCharIdDetails;
+        }
+
+        public List<CPEMaintenanceOptions> GetCPEMaintenanceOptionsTab(int productId, string charId)
+        {
+            List<CPEMaintenanceOptions> lstCPEMaintenanceOptions = new List<CPEMaintenanceOptions>();
+            DataTable dtCPEMaintenanceOptions = objReports.GetCPEMaintenanceOptionsTab(productId, charId);
+            if (dtCPEMaintenanceOptions != null)
+            {
+                foreach (DataRow dr in dtCPEMaintenanceOptions.Rows)
+                {
+                    CPEMaintenanceOptions objCPEMaintenanceOptions = new CPEMaintenanceOptions();
+                    objCPEMaintenanceOptions.ColumnName = Convert.ToString(dr["column_name"]);
+                    objCPEMaintenanceOptions.IncludeInStandardRep = Convert.ToString(dr["valid_cd"]);
+                    objCPEMaintenanceOptions.Width = Convert.ToString(dr["column_width"]);
+                    lstCPEMaintenanceOptions.Add(objCPEMaintenanceOptions);
+                }
+            }
+            return lstCPEMaintenanceOptions;
+        }
+
+        public List<CPEMaintenanceOptions> GetCPERouterBundlesTab(int productId)
+        {
+            List<CPEMaintenanceOptions> lstCPEMaintenanceOptions = new List<CPEMaintenanceOptions>();
+            DataTable dtCPERouterBundlesTab = objReports.GetCPERouterBundlesTab(productId);
+            if (dtCPERouterBundlesTab != null)
+            {
+                foreach (DataRow dr in dtCPERouterBundlesTab.Rows)
+                {
+                    CPEMaintenanceOptions objCPEMaintenanceOptions = new CPEMaintenanceOptions();
+                    objCPEMaintenanceOptions.ColumnName = Convert.ToString(dr["column_name"]);
+                    objCPEMaintenanceOptions.IncludeInStandardRep = Convert.ToString(dr["valid_cd"]);
+                    objCPEMaintenanceOptions.Width = Convert.ToString(dr["column_width"]);
+                    lstCPEMaintenanceOptions.Add(objCPEMaintenanceOptions);
+                }
+            }
+            return lstCPEMaintenanceOptions;
+        }
+
+        public int UpdateStandardReportColumnWidthInSpeedTabs(int productId, int subProductId, string columnWidth)
+        {
+            return objReports.UpdateStandardReportColumnWidthInSpeedTabs(productId, subProductId, columnWidth);
+        }
+
+        public int UpdateColumnsInCPEDataTabs(int productId, string CPERouterWidth, string CPEMaintenanceWidth, string validRouterCd, string validMaintenanceCd)
+        {
+            return objReports.UpdateColumnsInCPEDataTabs(productId, CPERouterWidth, CPEMaintenanceWidth, validRouterCd, validMaintenanceCd);
+        }
+
+        public List<ColumnReferenceData> GetReportColumnReferenceData(int productId, int reportId)
+        {
+            List<ColumnReferenceData> lstColumnReferenceData = new List<ColumnReferenceData>();
+            DataTable dtColumnReferenceData = objReports.GetReportColumnReferenceData(productId, reportId);
+            if (dtColumnReferenceData != null)
+            {
+                foreach (DataRow dr in dtColumnReferenceData.Rows)
+                {
+                    ColumnReferenceData objColumnReferenceData = new ColumnReferenceData();
+                    objColumnReferenceData.ColumnHeader = Convert.ToString(dr["column_header_1"]);
+                    objColumnReferenceData.Characteristics = Convert.ToString(dr["char_name"]);
+                    objColumnReferenceData.Width = Convert.ToString(dr["column_width"]);
+                    objColumnReferenceData.DisplayOrder = Convert.ToString(dr["order_cd"]);
+                    objColumnReferenceData.charId = Convert.ToInt32(dr["char_id"]);
+                    objColumnReferenceData.columnValid = Convert.ToInt32(dr["column_valid_cd"]);
+                    objColumnReferenceData.ColumnHeader2 = Convert.ToString(dr["column_header_2"]);
+                    objColumnReferenceData.ColumnHeader3 = Convert.ToString(dr["column_header_3"]);
+                    lstColumnReferenceData.Add(objColumnReferenceData);
+                }
+            }
+            return lstColumnReferenceData;
+
+        }
+
+        public int UpdatePOPChar(int productId, int subProductId, string strPOPChar, string strColumnHeader1, string strColumnHeader2, string strColumnHeader3, int ColumnValidCd)
+        {
+            return objReports.UpdatePOPChar(productId, subProductId, strPOPChar, strColumnHeader1, strColumnHeader2, strColumnHeader3, ColumnValidCd);
+        }
+        public int UpdateChar(int productId, int subProductId, int reportId, string strChar, int charTypeId, string strColumnHeader1, string strColumnHeader2, string strColumnHeader3, string strColumnValidCd, string userId, string strProductMappedId, int orderCd)
+        {
+            return objReports.UpdateChar(productId, subProductId, reportId, strChar, charTypeId, strColumnHeader1, strColumnHeader2, strColumnHeader3, strColumnValidCd, userId, strProductMappedId,orderCd);
+        }
+
+        public int DeleteChar(int reportId, int orderCd)
+        {
+            return objReports.DeleteChar(reportId, orderCd);
+        }
+        public int UpdateDefineStandardData(int productId, int subProductId, int reportId, string standardColHeader, string standardColWidth, string StandardValid, string StandardDisplayOrder, string ColRefWidth, string ColRefDisplayOrder, string ColPOPWidth, string ColPOPDisplayOrder, string WrapTextData, string SLAData, string userId)
+        {
+            return objReports.UpdateDefineStandardData(productId, subProductId, reportId, standardColHeader, standardColWidth, StandardValid, StandardDisplayOrder, ColRefWidth, ColRefDisplayOrder, ColPOPWidth, ColPOPDisplayOrder, WrapTextData, SLAData, userId);
+        }
+
+        public List<SLAAttributeData> GetdisplaySLAAttributesForProduct(int productId, int subProductId, int reportId)
+        {
+            List<SLAAttributeData> lstSLAAttributeData = new List<SLAAttributeData>();
+            DataTable dtSLAAttributeData = objReports.GetdisplaySLAAttributesForProduct(productId,subProductId,reportId);
+            if (dtSLAAttributeData != null)
+            {
+                foreach (DataRow dr in dtSLAAttributeData.Rows)
+                {
+                    SLAAttributeData objSLAAttributeData = new SLAAttributeData();
+                    objSLAAttributeData.ServiceName = Convert.ToString(dr["SLA_COLUMN_NAME"]);
+                    objSLAAttributeData.Width = Convert.ToString(dr["SLA_COLUMN_WIDTH"]);
+                    objSLAAttributeData.SLAColumnCd = Convert.ToString(dr["SLA_COLUMN_CD"]);
+                    lstSLAAttributeData.Add(objSLAAttributeData);
+                }
+            }
+            return lstSLAAttributeData;
+        }
+
+        public List<UpdatedDateDetail> GetUpdatedDateDetails(int productId)
+        {
+            List<UpdatedDateDetail> lstUpdatedDateDetail = new List<UpdatedDateDetail>();
+            DataTable dtUpdatedDateDetail = objReports.GetUpdatedDateDetails(productId);
+            if (dtUpdatedDateDetail != null)
+            {
+                foreach (DataRow dr in dtUpdatedDateDetail.Rows)
+                {
+                    UpdatedDateDetail objUpdatedDateDetail = new UpdatedDateDetail();
+                    objUpdatedDateDetail.CreatedBy = Convert.ToString(dr["CreatedBy"]);
+                    objUpdatedDateDetail.CreatedDate = Convert.ToString(dr["CreatedDate"]);
+                    objUpdatedDateDetail.UpdatedBy = Convert.ToString(dr["UpdatedBy"]);
+                    objUpdatedDateDetail.UpdatedDate = Convert.ToString(dr["UpdatedDate"]);
+                    lstUpdatedDateDetail.Add(objUpdatedDateDetail);
+                }
+            }
+            return lstUpdatedDateDetail;
+        }
+
+        public List<UpdatedDateDetail> GetUpdatedDateDetailsForCharData(int productId, int reportId, int orderCd)
+        {
+            List<UpdatedDateDetail> lstUpdatedDateDetail = new List<UpdatedDateDetail>();
+            DataTable dtUpdatedDateDetail = objReports.GetUpdatedDateDetailsForCharData(productId, reportId, orderCd);
+            if (dtUpdatedDateDetail != null)
+            {
+                foreach (DataRow dr in dtUpdatedDateDetail.Rows)
+                {
+                    UpdatedDateDetail objUpdatedDateDetail = new UpdatedDateDetail();
+                    objUpdatedDateDetail.CreatedBy = Convert.ToString(dr["CreatedBy"]);
+                    objUpdatedDateDetail.CreatedDate = Convert.ToString(dr["CreatedDate"]);
+                    objUpdatedDateDetail.UpdatedBy = Convert.ToString(dr["UpdatedBy"]);
+                    objUpdatedDateDetail.UpdatedDate = Convert.ToString(dr["UpdatedDate"]);
+                    lstUpdatedDateDetail.Add(objUpdatedDateDetail);
+                }
+            }
+            return lstUpdatedDateDetail;
+        }
+
+        public int SaveSLAAttributeData(int productId, string colAssuranceWidth, string colDeliveryWidth, string SLAAssuranceColCd, string SLADeliveryColCd, string userId)
+        {
+            return objReports.SaveSLAAttributeData(productId, colAssuranceWidth, colDeliveryWidth, SLAAssuranceColCd, SLADeliveryColCd, userId);
+        }
+
+        public int UpdateSLAFlag(int productId, int reportId, int subProductId, int SLAFlag)
+        {
+            return objReports.UpdateSLAFlag(productId, reportId, subProductId, SLAFlag);
+        }
+
+        public List<UpdatedDateDetail> GetSLAUpdatedDateDetails(int productId)
+        {
+            List<UpdatedDateDetail> lstUpdatedDateDetail = new List<UpdatedDateDetail>();
+            DataTable dtUpdatedDateDetail = objReports.GetSLAUpdatedDateDetails(productId);
+            if (dtUpdatedDateDetail != null)
+            {
+                foreach (DataRow dr in dtUpdatedDateDetail.Rows)
+                {
+                    UpdatedDateDetail objUpdatedDateDetail = new UpdatedDateDetail();
+                    objUpdatedDateDetail.CreatedBy = Convert.ToString(dr["CreatedBy"]);
+                    objUpdatedDateDetail.CreatedDate = Convert.ToString(dr["CreatedDate"]);
+                    objUpdatedDateDetail.UpdatedBy = Convert.ToString(dr["UpdatedBy"]);
+                    objUpdatedDateDetail.UpdatedDate = Convert.ToString(dr["UpdatedDate"]);
+                    lstUpdatedDateDetail.Add(objUpdatedDateDetail);
+                }
+            }
+            return lstUpdatedDateDetail;
+        }
+
+        public int GetDisplaySLAInformation(int productId, int subProductId)
+        {
+            return objReports.GetDisplaySLAInformation(productId, subProductId);
+        }
+
+        public int GetShowSLAFlag(int productId, int reportId, int subProductId)
+        {
+            return objReports.GetShowSLAFlag(productId, reportId, subProductId);
+        }
+
+    }
+
+}

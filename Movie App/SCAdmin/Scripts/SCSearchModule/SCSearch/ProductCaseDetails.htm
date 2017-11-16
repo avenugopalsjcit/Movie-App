@@ -1,0 +1,720 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body ng-app="appModule">
+    <!--<h1>
+        Product Case Details</h1>-->
+    <div ng-controller='ProductCaseCntrl'>
+        <table id="tblMenu" width="50%">
+            <tr>
+                <td>
+                    <!--<a ng-click="GetEthernetData()" href="#">Ethernet/Leased Line</a>-->
+                    <input type="button" ng-click="GetEthernetData()" value="Ethernet/Leased Line" />
+                </td>
+                <td>
+                    <input type="button" ng-click="GetHVPNData()" value="HVPN" />
+                    <!--<a ng-click="GetHVPNData()" href="/ProductCase">HVPN</a>-->
+                    <input type="hidden" id="hdnHVPNLoaded" value="0" ng-model="HVPNLoaded" />
+                </td>
+                <td>
+                    <input type="button" ng-click="GetDSLData()" value="DSL" />
+                    <!-- <a ng-click="GetDSLData()" href="#">DSL</a>-->
+                    <input type="hidden" id="Hidden1" value="0" ng-model="DSLLoaded" />
+                </td>
+                <td>
+                    <input type="button" ng-click="GetVSATData()" value="VSAT" />
+                    <!--<a ng-click="GetVSATData()" href="#">VSAT</a>-->
+                    <input type="hidden" id="Hidden2" value="0" ng-model="VSATLoaded" />
+                </td>
+            </tr>
+        </table>
+        <div id="divEthernet" style="display: none">
+            <table id="tblProductDetails">
+                <tr>
+                    <td class="style1">
+                        <fieldset id="1">
+                            <legend><b>Product Details</b></legend>
+                            <table>
+                                <tr>
+                                    <td>
+                                        Service Available :
+                                    </td>
+                                    <td>
+                                        <label>
+                                            {{ServiceAvailable}}</label>
+                                    </td>
+                                    <!-- <td>
+                                        <div id="cpeinformation">
+                                            &nbsp;&nbsp;&nbsp <a class="btn-link" data-toggle="modal" data-target="#mymodal"
+                                                ng-click="openCpeInformationpopup()">View Cpe Information</a>
+                                            <div class="modal fade" id="mymodal" role="dialog">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal">
+                                                                &times;</button>
+                                                            <h4 class="modal-title" id="myModalLabel">
+                                                                CPE Bundle Details
+                                                            </h4>
+                                                        </div>
+                                                        <div class="modal-body" id="content">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>-->
+                                </tr>
+                                <tr>
+                                    <td>
+                                        POP Code :
+                                    </td>
+                                    <td>
+                                        <label>
+                                            {{PopCode}}</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Network Name :
+                                    </td>
+                                    <td>
+                                        <label>
+                                            {{NetworkName}}</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Support Resilient Only Pop :
+                                    </td>
+                                    <td>
+                                        <label>
+                                            {{ResilientPop}}</label>
+                                    </td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </td>
+                </tr>
+            </table>
+            <table id="tblPopCharacteristics">
+                <tr>
+                    <td class="style1">
+                        <fieldset id="Fieldset1">
+                            <legend><b>Pop Characteristics</b></legend>
+                            <table>
+                                <tr ng-repeat="pc in PopCharData">
+                                    <td>
+                                        {{pc.CharName}}
+                                    </td>
+                                    <td>
+                                        {{pc.CharValue}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </td>
+                </tr>
+            </table>
+            <div id="divChars">
+            </div>
+            <table>
+                <tr id='trParent' style="display: none">
+                    <td>
+                        Access Supplier
+                    </td>
+                    <td>
+                        <select ng-model="ParentAccessSupplier" id="AccessSupplier">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='suppData in AccessSupplierData' value="{{suppData.AccessSupplierID}}">
+                                {{suppData.AccessSupplierName}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        Port Speed
+                    </td>
+                    <td>
+                        <select multiple size="5" ng-model="ParentPortSpeedData" id="PortSpeed">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='pSpeed in PortSpeedData' value="{{pSpeed.PortSpeedID}}">{{pSpeed.PortSpeedName}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="button" value="GO" ng-click="GetParentPortSpeeds()" />
+                    </td>
+                </tr>
+                <tr id='trChild' style="display: none">
+                    <td>
+                        Parent Access Supplier
+                    </td>
+                    <td>
+                        <select id="ParentAccessSupplier" ng-model="ChildAccessSupplier">
+                            <option value="1">--- Select ---</option>
+                            <option ng-repeat='CAccesssupp in ChildAccSuppdata' value="{{CAccesssupp.AccessSupplierID}}">
+                                {{CAccesssupp.AccessSupplierName}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        Parent Port Speed
+                    </td>
+                    <td>
+                        <select id="ParentPortSpeed" multiple size="5" ng-model="ChildPortSpeed">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='cSpeed in ChildPortSpeedData' value="{{cSpeed.PortSpeedID}}">{{cSpeed.PortSpeedName}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        CPE Suppliers:&nbsp;
+                    </td>
+                    <td>
+                        <select id="cpesuppliers" ng-init="CPESuppliers = options[0]" ng-model="CPESuppliers">
+                            <option ng-repeat='objsupp in CpeSupplierData' value="{{objsupp.supplierID}}">{{objsupp.SupplierName}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="button" value="GO" ng-click="GeChildPortSpeeds()" />
+                    </td>
+                </tr>
+            </table>
+            <div id="tblParentSpeeds" style="display: none">
+                <table border='1'>
+                    <tr>
+                        <td>
+                            <b>Port Speed</b>
+                        </td>
+                        <td>
+                            <b>Port Speed Availability</b>
+                        </td>
+                        <td>
+                            <b>Access Speed</b>
+                        </td>
+                        <td>
+                            <b>Access Technology</b>
+                        </td>
+                        <td>
+                            <b>Access Supplier Name
+                                <br>
+                                Supplier Product Name<br>
+                                /BT Internal SLA Information</b>
+                        </td>
+                        <td>
+                            <b>Service Type</b>
+                        </td>
+                        <td>
+                            <b>Access Speed Availability</b>
+                        </td>
+                        <td>
+                            <b>Ordering Status</b>
+                        </td>
+                        <td>
+                            <b>Interface</b>
+                        </td>
+                        <td>
+                            <b>Framing</b>
+                        </td>
+                        <td>
+                            <b>Connector</b>
+                        </td>
+                    </tr>
+                    <tr ng-repeat='psData in ParentPortSpeedGridData'>
+                        <td>
+                            {{psData.PortSpeeds}}
+                        </td>
+                        <td>
+                            {{psData.PortSpeedAvailability}}
+                        </td>
+                        <td>
+                            {{psData.AccessSpeed}}
+                        </td>
+                        <td>
+                            {{psData.AccessTechnology}}
+                        </td>
+                        <td>
+                            {{psData.SupplierProductName}}<br />
+                            <a href='SLAInformation.asp?slaproduct={{psData.AccessSupplierNameID}}&speed={{psData.AccessSpeedCharID}}&speeduom={{psData.ASpeedUOM}}&sSupplier={{psData.AccessSupplierCharID}}&AccTypename={{psData.AccessProductTypeID}}'>
+                                {{psData.SupplierProductName1}}</a>
+                        </td>
+                        <td>
+                            {{psData.ServiceType}}
+                        </td>
+                        <td>
+                            {{psData.AccessSpeedAvailability}}
+                        </td>
+                        <td>
+                            <a href='product/dispACCESSdetails.asp?Product=25&Region={{psData.RegionID}}&Country={{psData.CountryID}}&Site=0&ChosenSupplier={{psData.AccessSupplierCharID}}'>
+                                {{psData.OrderingStatus}}</a>
+                        </td>
+                        <td>
+                            {{psData.Interface}}
+                        </td>
+                        <td>
+                            {{psData.Framing}}
+                        </td>
+                        <td>
+                            {{psData.Connecter}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div ng-controller="HVPNCntrl" id="divHVPN" style="display: none">
+            <table>
+                <tr>
+                    <td>
+                        <b>BT Package/VSAT</b>
+                    </td>
+                    <td>
+                        <select ng-model="BTPackage" id="ddlBTPackage">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='packageData in BTPackageData' value="{{packageData.PackageID}}">{{packageData.PackageName}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <b>Access Supplier</b>
+                    </td>
+                    <td>
+                        <select ng-model="HVPNAccessSupplier" ng-change="GetPortSpeedData()" id="ddlhvpnAccSupplier">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='accSupplier in HVPNAccessSuppliersData' value="{{accSupplier.supplierID}}">
+                                {{accSupplier.SupplierName}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <b>HVPN/VSAT Port Speed</b>
+                    </td>
+                    <td>
+                        <select ng-model="HVPNPortSpeed" ng-change="GetHVPNPortTypes()" id="ddlHVPNPortSpeed">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='ps in HVPNPortSpeedData' value="{{ps.PortSpeedID}}">{{ps.PortSpeed}}</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>
+                        {{TunnelingNote}}
+                    </td>
+                </tr>
+            </table>
+            <table id="tblHVPNData" border="1">
+                <tr>
+                    <td class="bodyTextBold" nowrap>
+                        BT Package
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Access Type
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Port Speed (Down/Up)
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Availability
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Access Speed (Down/Up)
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Interface
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Framing Structure
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Connector
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Access Availability Status
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Contention Ratio
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Supplier
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Supplier Product/BT Internal SLA
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        Service Lead Time
+                    </td>
+                    <td align="center" class="bodyTextBold" nowrap>
+                        GPOP InterConnect
+                    </td>
+                    <td class="bodyTextBold" nowrap>
+                        CPE
+                    </td>
+                </tr>
+                <tr ng-repeat='ps in HVPNPortTypeData'>
+                    <td>
+                        {{ps.PackageName}}
+                    </td>
+                    <td>
+                        {{ps.AccessType}}
+                    </td>
+                    <td>
+                        {{ps.PortSpeed}}
+                    </td>
+                    <td>
+                        {{ps.Availability}}
+                    </td>
+                    <td>
+                        {{ps.AccessSpeed}}
+                    </td>
+                    <td>
+                        {{ps.Interface}}
+                    </td>
+                    <td>
+                        {{ps.FramingStructure}}
+                    </td>
+                    <td>
+                        {{ps.Connector}}
+                    </td>
+                    <td>
+                        {{ps.AccessAvailabilityStatus}}
+                    </td>
+                    <td>
+                        {{ps.ContentionRatio}}
+                    </td>
+                    <td>
+                        {{ps.Supplier}}
+                    </td>
+                    <td>
+                        {{ps.SupplierProductBTInternalSLA}}
+                    </td>
+                    <td>
+                        {{ps.ServiceLeadTime}}
+                    </td>
+                    <td>
+                        {{ps.POP}}
+                    </td>
+                    <td>
+                        {{ps.CPE}}
+                    </td>
+                </tr>
+            </table>
+            <table border='1'>
+                <tr>
+                    <td>
+                        <b>Router</b>
+                    </td>
+                    <td>
+                        <b>Access Technology</b>
+                    </td>
+                    <td>
+                        <b>Bundle</b>
+                    </td>
+                    <td>
+                        <b>Expected Date for ORDER</b>
+                    </td>
+                    <td>
+                        <b>Quotable Start Date</b>
+                    </td>
+                    <td>
+                        <b>EOQ</b>
+                    </td>
+                    <td>
+                        <b>EOL</b>
+                    </td>
+                    <td>
+                        <b>EOS</b>
+                    </td>
+                    <td>
+                        <b>SmartServiceAvailability</b>
+                    </td>
+                </tr>
+                <tr ng-repeat="item1 in BundleProductsData">
+                    <td>
+                        {{ item1.Router}}
+                    </td>
+                    <td>
+                        {{item1.AccessTechnology}}
+                    </td>
+                    <td>
+                        {{item1.Bundle }} &nbsp; <a href='DispCPE_Dsl_Parts.asp?LLevel=0&bundle={{item1.BundleID}}&country={{CountryID}}'>
+                            Parts</a>
+                    </td>
+                    <td>
+                        {{ item1.ExpectedDate}}
+                    </td>
+                    <td>
+                        {{item1.QuotableStartDate}}
+                    </td>
+                    <td>
+                        {{item1.EOQ}}
+                    </td>
+                    <td>
+                        {{item1.EOL}}
+                    </td>
+                    <td>
+                        {{item1.EOS}}
+                    </td>
+                    <td>
+                        {{item1.SmartServiceAvailability}}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="divDSL" ng-controller="DSLCntrl" style="display: none">
+            <table>
+                <tr>
+                    <td>
+                        <b>BT Package</b>
+                    </td>
+                    <td>
+                        <select ng-model="DSLBTPackage" ng-change="GetDSLAccessSuppliers()">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='packageData in DSLBTPackageData' value="{{packageData.PackageID}}">
+                                {{packageData.PackageName}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <b>Access Supplier</b>
+                    </td>
+                    <td>
+                        <select ng-model="DSLAccessSupplier" id="Select4">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='accSupplier in DSLAccessSuppliersData' value="{{accSupplier.supplierID}}">
+                                {{accSupplier.SupplierName}}</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <div id="divDSLData">
+                <table border='1'>
+                    <tr>
+                        <td>
+                            <b>DSL Package</b>
+                        </td>
+                        <td>
+                            <b>DSL Type</b>
+                        </td>
+                        <td>
+                            <b>Speed(Down/Up)</b>
+                        </td>
+                        <td>
+                            <b>Interface</b>
+                        </td>
+                        <td>
+                            <b>Framing Structure</b>
+                        </td>
+                        <td>
+                            <b>Connector</b>
+                        </td>
+                        <td>
+                            <b>Contention Ratio</b>
+                        </td>
+                        <td>
+                            <b>Supplier</b>
+                        </td>
+                        <td>
+                            <b>Supplier Product/SLA</b>
+                        </td>
+                        <td>
+                            <b>Availability</b>
+                        </td>
+                        <td>
+                            <b>Contracted Lead Time</b>
+                        </td>
+                        <td>
+                            <b>Interconnect Design</b>
+                        </td>
+                        <td>
+                            <b>End to End Lead Time(Contracted + Local Loop)</b>
+                        </td>
+                        <td>
+                            <b>GPOP Interconnect</b>
+                        </td>
+                        <td>
+                            <b>TIR Value</b>
+                        </td>
+                        <td>
+                            <b>EF Supported Speeds</b>
+                        </td>
+                        <td>
+                            <b>CPE</b>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="item1 in DSLData">
+                        <td>
+                            {{item1.PackageName}}
+                        </td>
+                        <td>
+                            {{item1.DSLType}}
+                        </td>
+                        <td>
+                            {{item1.DSLSpeed}}
+                        </td>
+                        <td>
+                            {{item1.Interface}}
+                        </td>
+                        <td>
+                            {{item1.FramingStructure}}
+                        </td>
+                        <td>
+                            {{item1.Connector}}
+                        </td>
+                        <td>
+                            {{item1.ContentionRatio}}
+                        </td>
+                        <td>
+                            {{item1.Supplier}}
+                        </td>
+                        <td>
+                            {{item1.SupplierProductSLA}}
+                        </td>
+                        <td>
+                            {{item1.AvailableDesc}}
+                        </td>
+                        <td>
+                            {{item1.ContractedLeadTime}}
+                        </td>
+                        <td>
+                            {{item1.InterconnectDesign}}
+                        </td>
+                        <td>
+                            {{item1.EndToEndLeadTime}}
+                        </td>
+                        <td>
+                            {{item1.GPOP}}
+                        </td>
+                        <td>
+                            {{item1.TIRValue}}
+                        </td>
+                        <td>
+                            {{item1.EFSupportedSpeeds}}
+                        </td>
+                        <td>
+                            {{item1.CPE}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+         <div ng-controller="VSATCntrl" id="divvsat" style="display: none">
+            <table>
+                <tr>
+                    <td>
+                        <b>Access Supplier</b>
+                    </td>
+                    <td>
+                        <select ng-model="VSATAccSupplier" id="Select3">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='accSupplier in VSATAccessSuppliersData' value="{{accSupplier.VSATAccessSupplierID}}">
+                                {{accSupplier.VSATAccessSupplier}}</option>
+                        </select>
+                    </td>
+                    <td>
+                        <b>Port Speed</b>
+                    </td>
+                    <td>
+                        <select ng-model="VSATPortSpeed" ng-change="GetVSATAttributes()" id="ddlVSATPortSpeed">
+                            <option value="0">--- Select ---</option>
+                            <option ng-repeat='ps in VSATPortSpeedData' value="{{ps.PortSpeedID}}">{{ps.PortSpeed}}</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <table border="1">
+                <tr>
+                    <td class="bodyTextBold">
+                        Access Type
+                    </td>
+                    <td class="bodyTextBold">
+                        Port Speed (Down/Up)
+                    </td>
+                    <td class="bodyTextBold">
+                        Availability
+                    </td>
+                    <td class="bodyTextBold">
+                        Access Speed (Down/Up)
+                    </td>
+                    <td class="bodyTextBold">
+                        Interface
+                    </td>
+                    <td class="bodyTextBold">
+                        Framing Structure
+                    </td>
+                    <td class="bodyTextBold">
+                        Connector
+                    </td>
+                    <td class="bodyTextBold">
+                        Access Availability Status
+                    </td>
+                    <td class="bodyTextBold">
+                        Contention Ratio
+                    </td>
+                    <td class="bodyTextBold">
+                        Supplier
+                    </td>
+                    <td class="bodyTextBold">
+                        Supplier Product/BT Internal SLA
+                    </td>
+                    <td class="bodyTextBold">
+                        Service Lead Time
+                    </td>
+                    <td align="center" class="bodyTextBold">
+                        POP
+                    </td>
+                    <td class="bodyTextBold">
+                        CPE
+                    </td>
+                    <td class="bodyTextBold">
+                        VSAT Supply Type
+                    </td>
+                </tr>
+                <tr ng-repeat='vs in VSATPortSpeedTypeData'>
+                    <td>
+                        {{vs.AccessType}}
+                    </td>
+                    <td>
+                        {{vs.PortSpeed}}
+                    </td>
+                    <td>
+                        {{vs.Availability}}
+                    </td>
+                    <td>
+                        {{vs.AccessSpeed}}
+                    </td>
+                    <td>
+                        {{vs.Interface}}
+                    </td>
+                    <td>
+                        {{vs.FramingStructure}}
+                    </td>
+                    <td>
+                        {{vs.Connector}}
+                    </td>
+                    <td>
+                        {{vs.AvailableDesc}}
+                    </td>
+                    <td>
+                        {{vs.ContentionRatio}}
+                    </td>
+                    <td>
+                        {{vs.Supplier}}
+                    </td>
+                    <td>
+                        {{vs.SupplierProductBTInternalSLA}}
+                    </td>
+                    <td>
+                        {{vs.ServiceLeadTime}}
+                    </td>
+                    <td>
+                        {{vs.POP}}
+                    </td>
+                    <td>
+                        {{vs.CPE}}
+                    </td>
+                    <td>
+                        {{vs.VSATSupplyType}}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

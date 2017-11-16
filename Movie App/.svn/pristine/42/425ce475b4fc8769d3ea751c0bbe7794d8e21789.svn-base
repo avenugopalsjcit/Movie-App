@@ -1,0 +1,62 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+namespace SCAdminDAL
+{
+   public class CpeLeadTimeDAL
+    {
+        private StringBuilder strQuery = new StringBuilder();
+        private GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+        OracleConnection oConn = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+        public DataTable GetAllSupplier()
+        {
+            try
+            {
+                strQuery.Clear();
+                strQuery.Append("SELECT char_name, char_id FROM csu_ref_valid_char x WHERE x.char_type_id = 925");
+                strQuery.Append(" AND x.char_id IN (SELECT DISTINCT a.supplier_char_id FROM  csu_cpe_country_suppliers a");
+                strQuery.Append(" where upper(a.INSTALLER_FLAG)='Y' ");
+                strQuery.Append(" and upper(data_report(a.country_id,a.supplier_char_id,0,0))<>'NOT AVAILABLE' )");
+                strQuery.Append("  order by char_id");
+
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            }
+            catch (Exception ex) { throw ex; }
+        }
+
+        public DataTable BindAllSupplier()
+        {
+            try
+            {
+                strQuery.Clear();
+                strQuery.Append(" select DISTINCT x.CHAR_NAME,x.char_id, ctry.country_name,  ctry.country_id,supp.manufacturer_name,");
+                strQuery.Append(" supp.cpe_lead_time,supp.cpe_lead_time_status, TO_CHAR(supp.EOC_DATE,'DD-MON-YYYY') EOC, ");
+                strQuery.Append("  TO_CHAR(supp.EOM_DATE,'DD-MON-YYYY') EOM,( CASE  WHEN TRUNC(supp.EOM_DATE) < TRUNC(sysdate) ");
+                strQuery.Append("  THEN 'Red' ELSE 'Black' END) AS Passed, cmap.supp_type, ");
+                
+                strQuery.Append("  upper(data_report(ctry.country_id,supplier_char_id,0,0)) cpe_availability, supp.cpe_cease_leadtime, ");
+                strQuery.Append(" supp.cpe_cease_leadtime_status from CSU_COUNTRY CTRY, CSU_CPE_COUNTRY_SUPPLIERS SUPP, csu_ref_valid_char x ,  csu_cpe_cntry_supp cmap  ");
+                strQuery.Append(" where  CTRY.COUNTRY_ID = SUPP.COUNTRY_ID  and SUPP.SUPPLIER_CHAR_ID=X.CHAR_ID and X.CHAR_TYPE_ID = 925 ");
+                strQuery.Append(" and UPPER(SUPP.INSTALLER_FLAG) = 'Y' ");
+                strQuery.Append(" and UPPER(DATA_REPORT(SUPP.COUNTRY_ID,SUPP.SUPPLIER_CHAR_ID,0,0))<>'NOT AVAILABLE' ");
+                strQuery.Append(" AND upper(data_report(ctry.country_id,supplier_char_id,0,0))<>'NOT AVAILABLE' ");
+                strQuery.Append(" AND supplier_char_id  = supplier_char_id  ");
+                strQuery.Append(" And cmap.Supplier_Id   = Supplier_Char_Id ");
+                strQuery.Append(" And Cmap.Country_Id = Ctry.Country_Id ");
+                strQuery.Append(" And Cmap.Product_Id = Supp.Product_Cd ");
+                strQuery.Append(" ORDER BY country_name,   x.char_name ");
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+
+            }
+
+            catch (Exception ex) { throw ex; }
+
+        }
+    }
+}

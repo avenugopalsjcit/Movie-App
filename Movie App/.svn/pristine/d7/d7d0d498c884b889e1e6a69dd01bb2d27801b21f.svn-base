@@ -1,0 +1,1034 @@
+﻿
+
+app.controller("EditPoPLevelCaseCtrl", function ($scope, $http, $filter, PopCharacteristics, CaseCharacteristics, AvailDescfactory, NetworkFactory, ParentPortSpeedFactory, $stateParams, $location, UserDetailsFactory, $timeout, $rootScope, NgTableParams) {
+    $(".pageLoaderOverlay").show();
+    //    $scope.CaseID = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('CaseID').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.Countryid = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('countryid').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.Availability = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('Availability').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.ProdName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('ProdName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.RegName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('RegName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.CountName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('CountName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.CityName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('CityName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.POPName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('POPName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.Valid = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('Valid').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.POPCode = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('POPCode').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.NetworkName = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('NetworkName').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.ProductID = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('ProductID').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+    //    $scope.HubSiteID = unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape('HubSiteID').replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+
+    //    
+
+
+
+    $scope.CaseID = $stateParams.CaseID;
+    $scope.Countryid = $stateParams.CountryID;
+    $scope.Availability = $stateParams.Availability;
+    $scope.ProdName = $stateParams.ProdName;
+    $scope.RegName = $stateParams.RegName;
+    $scope.CountName = $stateParams.CountName;
+    $scope.CityName = $stateParams.CityName;
+    $scope.POPName = $stateParams.POPName;
+    $scope.Valid = $stateParams.Valid;
+    $scope.POPCode = $stateParams.POPCode;
+    $scope.NetworkName = $stateParams.NetworkName;
+    $scope.ProductID = $stateParams.ProductID;
+    $scope.HubSiteID = $stateParams.HubSiteID;
+    $scope.ParentPortSpeedNoData = 0;
+    $scope.SubProductID = $stateParams.SubProductID;
+
+    $scope.TempAvailID = 0;
+    $scope.TempAvailName = '';
+    AvailDescfactory.GetAvailDesc().success(function (data) {
+
+        $scope.CaseAvailDescData = data.d;
+
+        if (data.d.length > 0) {
+            $scope.TempAvailID = data.d[0].AvailID;
+            $scope.TempAvailName = data.d[0].AvailDesc;
+        }
+        if ($scope.Availability == '' || angular.isUndefined($scope.Availability)) {
+            AvailDescfactory.GetCaseAvail($scope.CaseID).success(function (data1) {
+
+                angular.forEach(data.d, function (item) {
+                    if (item.AvailID == data1.d) {
+                        $scope.Availability = item.AvailDesc;
+                    }
+                });
+
+            });
+        }
+    });
+
+    UserDetailsFactory.GetCaseUpdatedDetails($scope.CaseID, 2).success(function (data) {
+
+        $scope.CreatedBy = data.d.CreatedBy;
+        $scope.CreatedDate = data.d.CreatedDate;
+        $scope.UpdatedBy = data.d.UpdatedBy;
+        $scope.UpdatedDate = data.d.UpdatedDate;
+    });
+
+    if ($scope.HubSiteID > 0) {
+        if ($scope.POPCode == '' || angular.isUndefined($scope.POPCode)) {
+
+            PopCharacteristics.GetPopChars($scope.HubSiteID, $scope.Product, $scope.CaseID).success(function (data) {
+
+                angular.forEach(data.d, function (item) {
+
+                    if (item.CharName == "POP_PLATFORM_CODE") {
+                        $scope.isPoPCode = 1;
+                        $scope.POPCode = item.CharValue;
+                    }
+
+                    if (item.CharName == "NETWORK_COLOUR") {
+                        $scope.isPoPColor = 1;
+                        $scope.POPColour = item.CharValue;
+                    }
+                });
+
+            });
+        }
+    }
+
+    if ($scope.NetworkName == '' || angular.isUndefined($scope.NetworkName)) {
+
+        NetworkFactory.GetNetworkDetails($scope.CaseID).success(function (data) {
+
+            $scope.NetworkName = data.d;
+
+        });
+    }
+
+
+
+
+
+
+    $scope.ChildRowCount = 0;
+    $scope.ParentRowCount = 0;
+
+    if ($scope.Valid == "1") {
+        $scope.ValidStatus = "[Y]";
+    }
+    else {
+        $scope.ValidStatus = "[N]";
+    }
+
+    if ($scope.HubSiteID > 0) {
+        PopCharacteristics.GetPoPCharValues($scope.HubSiteID, $scope.ProductID).success(function (data) {
+
+            $scope.POPCharacteristicsData = data.d;
+        });
+    }
+
+
+    $scope.ParentProductID = 0;
+
+    $scope.ParentCharID = [];
+    $scope.ParentOptionMatrixID = [];
+    $scope.ParentProductTypeID = [];
+    $scope.ParentAccessSpeed = [];
+    $scope.ParentAccessSupplierID = [];
+    $scope.ParentAccessSupplierNameID = [];
+    $scope.CaseValidValue = [];
+    $scope.CharTypeID = [];
+    $scope.AvailValue = [];
+    $scope.LoadParentPortSpeedData = 0;
+    //debugger;
+    $http.post("SingleCase.aspx/GetParentProduct", { 'ProductID': $scope.ProductID }).success(function (data) {
+        //debugger;
+        if (data.d > 0) {
+            //////debugger;
+            $scope.ParentProductID = data.d;
+            //debugger;
+            ParentPortSpeedFactory.GetParentPortSpeeds($scope.HubSiteID, 0, $scope.CaseID, $scope.ParentProductID, $scope.ProductID, "", "", "", "", "").success(function (data) {
+
+                if (data.d != null) {
+
+                    $scope.ParentAccessTypeList = data.d.lstAccessType;
+                    $scope.ParentSuppliersList = data.d.lstSupplier;
+                    $scope.ParentSupplierProductNameList = data.d.lstSupplierProductName;
+                    $scope.ParentPortSpeedList = data.d.lstPortSpeed;
+                    $scope.ParentAccessSpeedList = data.d.lstAccessSpeed;
+
+                    $scope.ParentPortSpeedNoData = 0;
+                    //                    debugger;
+                    //                    data.d.lstCaseDetails.forEach(function (temp) {
+
+                    //                        temp.lsMapping.forEach(function (item) {
+
+                    //                            $scope.ParentCharID.push(item.CharID);
+                    //                            $scope.ParentOptionMatrixID.push(item.OptionMatrixID);
+                    //                            $scope.ParentProductTypeID.push(item.ProductTypeID);
+                    //                            $scope.ParentAccessSpeed.push(item.AccessSpeed);
+                    //                            $scope.ParentAccessSupplierID.push(item.AccessSupplierID);
+                    //                            $scope.ParentAccessSupplierNameID.push(item.AccessSupplierNameID);
+                    //                            $scope.CaseValidValue.push(item.isChecked);
+                    //                            $scope.CharTypeID.push(item.CharTypeID);
+                    //                            $scope.AvailValue.push(item.AvailValue);
+                    //                            $scope.ParentRowCount = $scope.ParentRowCount + 1;
+                    //                        });
+
+
+                    //                    });
+
+                    //                    //$scope.ParentSpeed = new NgTableParams({}, { 'dataset': data.d });
+                    //                    ////debugger;
+                    //                    $scope.PageIndex1 = 0;
+                    //                    $scope.ParentSpeedData = data.d.lstCaseDetails;
+                    //                    $scope.ParentSpeed = new NgTableParams({}, { total: $scope.ParentSpeedData.length, getData:
+                    //                            function ($defer, params) {
+                    //                                $scope.PageIndex1 = (params.page() - 1) * params.count();
+                    //                                $scope.data = params.sorting() ? $filter('orderBy')($scope.ParentSpeedData, params.orderBy()) : $scope.ParentSpeedData;
+                    //                                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                    //                                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                    //                                $defer.resolve($scope.data);
+                    //                            }
+                    //                    });
+                    $("#tblParentSpeed tr th:nth-child(3)").find('span').html("<th style='width:200px'>Availablity</th><th style='width:500px'>Value</th><th style='width:50px;padding-left: 30px;'>Valid</th>");
+                    $("#tblParentSpeed tr th:nth-child(4)").hide();
+                    $("#tblParentSpeed tr th:nth-child(5)").hide();
+                    $("#tblParentSpeed tr th:nth-child(6)").hide();
+
+
+                    ParentCharsLoaded = 1;
+                    if (CharsLoaded == 1 && ParentCharsLoaded == 1) {
+                        $(".pageLoaderOverlay").hide();
+                    }
+
+                }
+                else {
+                    ParentCharsLoaded = 1;
+                    if (CharsLoaded == 1 && ParentCharsLoaded == 1) {
+                        $(".pageLoaderOverlay").hide();
+                    }
+
+                    $scope.ParentPortSpeedNoData = 1;
+                }
+            });
+        }
+        else {
+            //debugger;
+            ParentCharsLoaded = 1;
+            if (CharsLoaded == 1 && ParentCharsLoaded == 1) {
+                $(".pageLoaderOverlay").hide();
+            }
+
+            $scope.ParentPortSpeedNoData = 1;
+        }
+    });
+
+
+    $scope.CaseAvailability = [];
+    $scope.CaseValue = [];
+    $scope.CharIDValues = [];
+    $scope.txtPortSpeedLeadTime = [];
+    $scope.CharTypeIds = [];
+    $scope.ProductTypeIDs = [];
+    $scope.AccessSupplierNameIDs = [];
+    $scope.AccessSupplierIDs = [];
+    $scope.OldPortSpeedLeadTime = [];
+    $scope.OldCaseValue = [];
+    $scope.CaseValidIds = [];
+    $scope.AccessSpeedIds = [];
+    $scope.OptionMatrixIDs = [];
+    $scope.CaseValidVal = [];
+    $scope.ShowAll = 0;
+
+    if ($scope.HubSiteID == '' || angular.isUndefined($scope.HubSiteID) || $scope.HubSiteID == null) {
+
+        $scope.HubSiteID = 0;
+    }
+
+    var CharsLoaded = 0, ParentCharsLoaded = 0;
+    //debugger;
+    CaseCharacteristics.GeCharValues($scope.CaseID, $scope.ShowAll, "", "", "", $scope.ProductID, $scope.HubSiteID, "", "").success(function (data) {
+
+        //$scope.CaseCharDetails = data.d.lstCaseDetails;
+        $scope.CaseCharDetails1 = [];
+        //$scope.CaseCharDetails = new NgTableParams({}, { 'dataset': data.d.lstCaseDetails });
+
+        //debugger;
+        var index = 0, index1 = 1;
+        $scope.AccessTypeList = data.d.lstAccessType;
+        $scope.SuppliersList = data.d.lstSupplier;
+        $scope.SupplierProductNameList = data.d.lstSupplierProductName;
+
+        $scope.PortSpeedList = data.d.lstPortSpeed;
+        $scope.AccessSpeedList = data.d.lstAccessSpeed;
+
+        if (data.d.lstCaseDetails.length == 1) {
+            CharsLoaded = 1;
+            if (CharsLoaded == 1 && ParentCharsLoaded == 1) {
+                $(".pageLoaderOverlay").hide();
+            }
+            return;
+        }
+        // //debugger;
+        if (data.d.lstCaseDetails.length > 0) {
+
+            $scope.CaseCharData = data.d.lstCaseDetails[0].charDet;
+            if (data.d.lstCaseDetails[0].charDet.length > 0) {
+                $scope.CharTypeName = data.d.lstCaseDetails[0].charDet[0].CharTypeName;
+                
+                $scope.CaseChar = data.d.lstCaseDetails[0].charDet[0].SelectedValue;
+                $scope.isMultiple = data.d.lstCaseDetails[0].charDet[0].isMultiple;
+
+                $("#ddlCaseChar1").select2({});
+                $('#divCharTypeName .select2-chosen').html(data.d.lstCaseDetails[0].charDet[0].SelectedText);
+            }
+            //$('.uiselect1').select2({});
+
+        }
+
+        var availList = [];
+        //debugger;
+        data.d.lstCaseDetails.forEach(function (item) {
+            //debugger;
+            if (index > 0) {
+                $scope.CaseCharDetails1.push(item);
+                $scope.CaseAvailability.push(item.CharAvailId);
+                availList.push(item.CharAvailName);
+
+                $scope.CharIDValues.push(item.CharID);
+
+                if (item.CaseValue != null || item.CaseValue != '') {
+                    $scope.CaseValue.push(item.CaseValue);
+                }
+                else {
+                    $scope.CaseValue.push('');
+                }
+                $scope.OldCaseValue.push(item.CaseValue);
+                $scope.CharTypeIds.push(item.CharTypeId);
+                $scope.ProductTypeIDs.push(item.ProductTypeID);
+                $scope.AccessSupplierNameIDs.push(item.AccessSupplierNameID);
+                $scope.AccessSupplierIDs.push(item.AccessSupplierID);
+                $scope.txtPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                $scope.OldPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                $scope.AccessSpeedIds.push(item.AccessSpeed);
+                $scope.CaseValidIds.push(item.CaseValid);
+                $scope.OptionMatrixIDs.push(item.OptionMatrixID);
+                $scope.CaseValidVal.push(item.CaseValid);
+
+                $scope.ChildRowCount = $scope.ChildRowCount + 1;
+                index1 = index;
+                if (index == data.d.lstCaseDetails.length - 1) {
+                    $timeout(function () {
+                        var availExists = 0;
+                        for (i = 0; i <= index1; i++) {
+
+                            angular.forEach($scope.CaseAvailDescData, function (availItem) {
+                                if (availItem.AvailID == $scope.CaseAvailability[i]) {
+                                    availExists = 1;
+                                }
+                            });
+
+                            $("#ddlAvail" + i).select2({});
+
+                            if (availExists == 1) {
+                                $('#divAvail' + i + ' .select2-chosen').html(availList[i]);
+                            }
+                            else {
+                                $('#divAvail' + i + ' .select2-chosen').html($scope.TempAvailName);
+                                //$scope.CaseAvailability[i] = $scope.TempAvailID;
+                            }
+                            availExists = 0;
+                        }
+                        CharsLoaded = 1;
+                        if (CharsLoaded == 1 && ParentCharsLoaded == 1) {
+                            $(".pageLoaderOverlay").hide();
+                        }
+
+                    }, 3000);
+                }
+            }
+            index = index + 1;
+        });
+        //debugger;
+        $scope.PageIndex = 0;
+        $scope.CaseCharDetails = new NgTableParams({}, { total: $scope.CaseCharDetails1.length, getData:
+                            function ($defer, params) {
+                                $scope.PageIndex = (params.page() - 1) * params.count();
+                                $scope.data = params.sorting() ? $filter('orderBy')($scope.CaseCharDetails1, params.orderBy()) : $scope.CaseCharDetails1;
+                                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                                $defer.resolve($scope.data);
+                                $timeout(function () {
+                                    $(".NumberOnlyText").keypress(function (e) {
+
+                                        if ((e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) || this.value.length >= 4) {
+                                            return false;
+                                        }
+                                    });
+                                    var availExists = 0;
+                                    //debugger;
+                                    for (i = 0; i <= index1; i++) {
+                                        //debugger;
+                                        angular.forEach($scope.CaseAvailDescData, function (availItem) {
+                                            //debugger;
+                                            if (availItem.AvailID == $scope.CaseAvailability[i]) {
+                                                availExists = 1;
+                                            }
+                                        });
+                                        //debugger;
+                                        $("#ddlAvail" + i).select2({});
+
+                                        if (availExists == 1) {
+                                            $('#divAvail' + i + ' .select2-chosen').html(availList[i]);
+                                        }
+                                        else {
+                                            $('#divAvail' + i + ' .select2-chosen').html($scope.TempAvailName);
+                                            //$scope.CaseAvailability[i] = $scope.TempAvailID;
+                                        }
+                                        availExists = 0;
+                                    }
+
+                                }, 100);
+                            }
+        });
+
+    });
+
+
+
+
+
+    $scope.ShowCaseList = function () {
+
+        $location.path('/CaseDefinition/PopCaseList').search({ 'ProductID': $scope.Product, 'SubProductID': $scope.SubProductID, 'RegionID': $scope.Region, 'CountryID': $scope.Country, 'ProductName': $scope.ProductName, 'RegionName': $scope.RegionName, 'CountryName': $scope.CountryName });
+    }
+
+
+
+    $scope.GetAllData = function () {
+        $scope.ShowAll = 1;
+        $scope.ChildRowCount = 0;
+        $(".pageLoaderOverlay").show();
+
+        $scope.CaseAvailability = [];
+        $scope.CaseValue = [];
+        $scope.CharIDValues = [];
+        $scope.txtPortSpeedLeadTime = [];
+        $scope.CharTypeIds = [];
+        $scope.ProductTypeIDs = [];
+        $scope.AccessSupplierNameIDs = [];
+        $scope.AccessSupplierIDs = [];
+        $scope.OldPortSpeedLeadTime = [];
+        $scope.OldCaseValue = [];
+        $scope.CaseValidIds = [];
+        $scope.AccessSpeedIds = [];
+        $scope.OptionMatrixIDs = [];
+        $scope.CaseValidVal = [];
+        $("#ChildFilterValidation").hide();
+        CaseCharacteristics.GeCharValues($scope.CaseID, $scope.ShowAll, "", "", "", $scope.ProductID, $scope.HubSiteID, "", "").success(function (data) {
+            //debugger;
+            $scope.CaseAvailability = [];
+            $scope.CaseValue = [];
+            $scope.txtPortSpeedLeadTime = [];
+            $scope.CaseCharDetails1 = [];
+            //  $scope.CaseCharDetails = data.d.lstCaseDetails;
+            $scope.CaseCharDetails = new NgTableParams({}, { 'dataset': data.d.lstCaseDetails });
+
+            if (data.d.lstCaseDetails.length > 0) {
+                $scope.CaseCharData = data.d.lstCaseDetails[0].charDet;
+                if (data.d.lstCaseDetails[0].charDet.length > 0) {
+                    $scope.CharTypeName = data.d.lstCaseDetails[0].charDet[0].CharTypeName;
+                    $scope.CaseChar = data.d.lstCaseDetails[0].charDet[0].OptionMatrixId;
+                    $scope.isMultiple = data.d.lstCaseDetails[0].charDet[0].isMultiple;
+                }
+            }
+            var index = 0, index1 = 1;
+            var availList = [];
+            //$(".pageLoaderOverlay").hide();
+
+            data.d.lstCaseDetails.forEach(function (item) {
+
+                if (index > 0) {
+                    $scope.CaseCharDetails1.push(item);
+                    $scope.CaseAvailability.push(item.CharAvailId);
+
+                    $scope.CharIDValues.push(item.CharID);
+                    if (item.CaseValue != null) {
+                        $scope.CaseValue.push(item.CaseValue);
+                    }
+                    else {
+                        $scope.CaseValue.push('');
+                    }
+                    $scope.OldCaseValue.push(item.CaseValue);
+                    $scope.CharTypeIds.push(item.CharTypeId);
+                    $scope.ProductTypeIDs.push(item.ProductTypeID);
+                    $scope.AccessSupplierNameIDs.push(item.AccessSupplierNameID);
+                    $scope.AccessSupplierIDs.push(item.AccessSupplierID);
+                    $scope.txtPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                    $scope.OldPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                    $scope.AccessSpeedIds.push(item.AccessSpeed);
+                    $scope.CaseValidIds.push(item.CaseValid);
+                    $scope.OptionMatrixIDs.push(item.OptionMatrixID);
+                    $scope.CaseValidVal.push(item.CaseValid);
+
+                    $scope.ChildRowCount = $scope.ChildRowCount + 1;
+
+                    index1 = index;
+                    if (index == data.d.lstCaseDetails.length - 1) {
+                        var availExists = 0;
+                        $timeout(function () {
+                            for (i = 0; i <= index1; i++) {
+
+                                angular.forEach($scope.CaseAvailDescData, function (availItem) {
+                                    if (availItem.AvailID == $scope.CaseAvailability[i]) {
+                                        availExists = 1;
+                                    }
+                                });
+
+                                $("#ddlAvail" + i).select2({});
+
+                                if (availExists == 1) {
+                                    $('#divAvail' + i + ' .select2-chosen').html(availList[i]);
+                                }
+                                else {
+                                    $('#divAvail' + i + ' .select2-chosen').html($scope.TempAvailName);
+                                    //$scope.CaseAvailability[i] = $scope.TempAvailID;
+                                }
+                                availExists = 0;
+
+                            }
+
+                            $(".pageLoaderOverlay").hide();
+
+                        }, 3000);
+                    }
+                }
+                index = index + 1;
+            });
+
+
+            $scope.PageIndex = 0;
+            $scope.CaseCharDetails = new NgTableParams({}, { total: $scope.CaseCharDetails1.length, getData:
+                            function ($defer, params) {
+                                $scope.PageIndex = (params.page() - 1) * params.count();
+                                $scope.data = params.sorting() ? $filter('orderBy')($scope.CaseCharDetails1, params.orderBy()) : $scope.CaseCharDetails1;
+                                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                                $defer.resolve($scope.data);
+                                $timeout(function () {
+                                    //                                    for (i = 0; i <= index1; i++) {
+
+                                    //                                        $("#ddlAvail" + i).select2({});
+                                    //                                        $('#divAvail' + i + ' .select2-chosen').html(availList[i - 1]);
+
+                                    //                                    }
+                                    $(".NumberOnlyText").keypress(function (e) {
+                                        if ((e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) || this.value.length >= 4) {
+                                            return false;
+                                        }
+                                    });
+                                    var availExists = 0;
+                                    for (i = 0; i <= index1; i++) {
+
+                                        angular.forEach($scope.CaseAvailDescData, function (availItem) {
+                                            if (availItem.AvailID == $scope.CaseAvailability[i]) {
+                                                availExists = 1;
+                                            }
+                                        });
+
+                                        $("#ddlAvail" + i).select2({});
+
+                                        if (availExists == 1) {
+                                            $('#divAvail' + i + ' .select2-chosen').html(availList[i]);
+                                        }
+                                        else {
+                                            $('#divAvail' + i + ' .select2-chosen').html($scope.TempAvailName);
+                                            //$scope.CaseAvailability[i] = $scope.TempAvailID;
+                                        }
+                                        availExists = 0;
+                                    }
+
+                                }, 100);
+                            }
+            });
+
+        });
+
+    }
+
+
+
+    $scope.UpdateCaseDetails = function () {
+
+
+        $scope.ChildCaseDetails = [];
+        $scope.ParentCaseDetails = [];
+        //$(".pageLoaderOverlay").show();
+        //debugger;
+        //$scope.CharIDValues.forEach(function (item, index) {
+        $scope.CaseCharDetails1.forEach(function (item, index) {
+            //$scope.ChildCaseDetails.push({ 'CaseID': "'" + $scope.CaseID + "'", 'UserID': $rootScope.User_Id, 'CharID': "'" + item + "'", 'AccessSpeedID': "'" + $scope.AccessSpeedIds[index] + "'", 'AccessTypeID': "'" + $scope.ProductTypeIDs[index] + "'", 'AccessSupplierNameID': "'" + $scope.AccessSupplierNameIDs[index] + "'", 'AccessSupplierID': "'" + $scope.AccessSupplierIDs[index] + "'", 'AvailValue': "'" + $scope.CaseAvailability[index] + "'", 'CharTypeID': "'" + $scope.CharTypeIds[index] + "'", 'CaseValidVal': "'" + $scope.CaseValidVal[index] + "'", 'CaseValue': "'" + $scope.CaseValue[index] + "'", 'PortSpeedLeadTime': "'" + $scope.txtPortSpeedLeadTime[index] + "'", 'OptionMatrixID': "'" + $scope.OptionMatrixIDs[index] + "'" });
+
+            if (item.CaseValid != $scope.CaseValidVal[index] || item.PortSpeedLeadTime != $scope.txtPortSpeedLeadTime[index] || item.CharAvailId != $scope.CaseAvailability[index] || (item.CaseValue != null && item.CaseValue != $scope.CaseValue[index])) {
+
+                $scope.ChildCaseDetails.push({ 'CaseID': "'" + $scope.CaseID + "'", 'UserID': $rootScope.User_Id, 'CharID': "'" + $scope.CharIDValues[index] + "'", 'AccessSpeedID': "'" + $scope.AccessSpeedIds[index] + "'", 'AccessTypeID': "'" + $scope.ProductTypeIDs[index] + "'", 'AccessSupplierNameID': "'" + $scope.AccessSupplierNameIDs[index] + "'", 'AccessSupplierID': "'" + $scope.AccessSupplierIDs[index] + "'", 'AvailValue': "'" + item.CharAvailId + "'", 'CharTypeID': "'" + $scope.CharTypeIds[index] + "'", 'CaseValidVal': "'" + item.CaseValid + "'", 'CaseValue': "'" + item.CaseValue + "'", 'PortSpeedLeadTime': "'" + item.PortSpeedLeadTime + "'", 'OptionMatrixID': "'" + $scope.OptionMatrixIDs[index] + "'" });
+            }
+        });
+        var childCases = JSON.stringify($scope.ChildCaseDetails);
+
+
+        //$scope.ParentCharID.forEach(function (item, index) {
+        if (!angular.isUndefined($scope.ParentSpeedData)) {
+            var index = 0;
+            $scope.ParentSpeedData.forEach(function (item) {
+                item.lsMapping.forEach(function (item1) {
+
+                    if (item1.isChecked != $scope.CaseValidValue[index]) {
+                        $scope.ParentCaseDetails.push({ 'CaseID': "'" + $scope.CaseID + "'", 'UserID': $rootScope.User_Id, 'CharID': "'" + $scope.ParentCharID[index] + "'", 'AccessSpeedID': "'" + $scope.ParentAccessSpeed[index] + "'", 'ProductTypeID': "'" + $scope.ParentProductTypeID[index] + "'", 'AccessSupplierNameID': "'" + $scope.ParentAccessSupplierNameID[index] + "'", 'AccessSupplierID': "'" + $scope.ParentAccessSupplierID[index] + "'", 'OptionMatrixID': "'" + $scope.ParentOptionMatrixID[index] + "'", 'CaseValidValue': "'" + item1.isChecked + "'", 'CharTypeID': "'" + $scope.CharTypeID[index] + "'", 'AvailValue': "'" + $scope.AvailValue[index] + "'" });
+                    }
+                    index++;
+                });
+            });
+        }
+        var ParentCases = "";
+        if ($scope.ParentCaseDetails.length > 0) {
+            ParentCases = JSON.stringify($scope.ParentCaseDetails)
+        }
+
+        bootbox.confirm("Are you sure to update case details ?", function (result) {
+
+            if (result) {
+                $(".pageLoaderOverlay").show();
+
+                $http.post("SingleCase.aspx/UpdateCaseDetails", { 'ChildCaseDetails': childCases, 'ParentCaeDetails': ParentCases, 'ChildCount': $scope.ChildRowCount, 'ParentCount': $scope.ParentRowCount }).success(function (data) {
+                    if (data.d == 1) {
+
+                        UserDetailsFactory.GetCaseUpdatedDetails($scope.CaseID, 2).success(function (data) {
+
+                            $scope.CreatedBy = data.d.CreatedBy;
+                            $scope.CreatedDate = data.d.CreatedDate;
+                            $scope.UpdatedBy = data.d.UpdatedBy;
+                            $scope.UpdatedDate = data.d.UpdatedDate;
+                            bootbox.alert("Case Details updated Successfully");
+                            $(".pageLoaderOverlay").hide();
+                        });
+
+                    }
+                    else {
+                        bootbox.alert("Case details not saved successfully");
+                        $(".pageLoaderOverlay").hide();
+                    }
+
+                });
+            }
+        });
+    }
+
+    $scope.GetDataByFilters = function (AccessTypeData, SupplierData, SupplierProductNameData, PortSpeedData, AccessSpeedData) {
+        $scope.ShowAll = 0;
+        $scope.RowCount = 0;
+        var AccessTypeIds = "", SupplierIds = "", SupplierProductNameIds = "", PortSpeedIds = "", AccessSpeedIds = "";
+        if (!angular.isUndefined(AccessTypeData)) {
+            AccessTypeIds = AccessTypeData.join()
+        }
+        if (!angular.isUndefined(SupplierData)) {
+            SupplierIds = SupplierData.join()
+        }
+
+        if (!angular.isUndefined(SupplierProductNameData)) {
+            SupplierProductNameIds = SupplierProductNameData.join()
+        }
+
+        if (!angular.isUndefined(PortSpeedData)) {
+            PortSpeedIds = PortSpeedData.join()
+        }
+
+        if (!angular.isUndefined(AccessSpeedData)) {
+            AccessSpeedIds = AccessSpeedData.join()
+        }
+        $("#ChildFilterValidation").hide();
+        if (AccessTypeIds == "" && SupplierIds == "" && SupplierProductNameIds == "" && PortSpeedIds == "" && AccessSpeedIds == "") {
+            $("#ChildFilterValidation").show();
+            return;
+        }
+
+        $(".pageLoaderOverlay").show();
+
+        $scope.CaseAvailability = [];
+        $scope.CaseValue = [];
+        $scope.CharIDValues = [];
+        $scope.txtPortSpeedLeadTime = [];
+        $scope.CharTypeIds = [];
+        $scope.ProductTypeIDs = [];
+        $scope.AccessSupplierNameIDs = [];
+        $scope.AccessSupplierIDs = [];
+        $scope.OldPortSpeedLeadTime = [];
+        $scope.OldCaseValue = [];
+        $scope.CaseValidIds = [];
+        $scope.AccessSpeedIds = [];
+        $scope.OptionMatrixIDs = [];
+        $scope.CaseValidVal = [];
+
+        CaseCharacteristics.GeCharValues($scope.CaseID, $scope.ShowAll, SupplierIds, AccessTypeIds, SupplierProductNameIds, $scope.ProductID, $scope.HubSiteID, PortSpeedIds, AccessSpeedIds).success(function (data) {
+            //debugger;
+            $scope.CaseAvailability = [];
+            $scope.CaseValue = [];
+            $scope.txtPortSpeedLeadTime = [];
+            $scope.CharIDValues = [];
+            $scope.CaseCharDetails1 = [];
+            // $scope.CaseCharDetails = data.d.lstCaseDetails;
+            $scope.CaseCharDetails = new NgTableParams({}, { 'dataset': data.d.lstCaseDetails });
+            if (data.d.lstCaseDetails.length > 0) {
+                $scope.CaseCharData = data.d.lstCaseDetails[0].charDet;
+                if (data.d.lstCaseDetails[0].charDet.length > 0) {
+                    $scope.CharTypeName = data.d.lstCaseDetails[0].charDet[0].CharTypeName;
+                    $scope.CaseChar = data.d.lstCaseDetails[0].charDet[0].OptionMatrixId;
+                    $scope.isMultiple = data.d.lstCaseDetails[0].charDet[0].isMultiple;
+                }
+            }
+            var index = 0, index1 = 1;
+            var availList = [];
+            data.d.lstCaseDetails.forEach(function (item) {
+                if (index > 0) {
+                    $scope.CaseCharDetails1.push(item);
+                    $scope.CaseAvailability.push(item.CharAvailId);
+
+                    $scope.CharIDValues.push(item.CharID);
+                    if (item.CaseValue != null) {
+                        $scope.CaseValue.push(item.CaseValue);
+                    }
+                    else {
+                        $scope.CaseValue.push('');
+                    }
+                    $scope.OldCaseValue.push(item.CaseValue);
+                    $scope.CharTypeIds.push(item.CharTypeId);
+                    $scope.ProductTypeIDs.push(item.ProductTypeID);
+                    $scope.AccessSupplierNameIDs.push(item.AccessSupplierNameID);
+                    $scope.AccessSupplierIDs.push(item.AccessSupplierID);
+                    $scope.txtPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                    $scope.OldPortSpeedLeadTime.push(item.PortSpeedLeadTime);
+                    $scope.AccessSpeedIds.push(item.AccessSpeed);
+                    $scope.CaseValidIds.push(item.CaseValid);
+                    $scope.OptionMatrixIDs.push(item.OptionMatrixID);
+                    $scope.CaseValidVal.push(item.CaseValid);
+                    $scope.ChildRowCount = $scope.ChildRowCount + 1;
+
+                    index1 = index;
+                    if (index == data.d.lstCaseDetails.length - 1) {
+                        var availExists = 0;
+                        $timeout(function () {
+                            for (i = 0; i <= index1; i++) {
+
+                                angular.forEach($scope.CaseAvailDescData, function (availItem) {
+                                    if (availItem.AvailID == $scope.CaseAvailability[i]) {
+                                        availExists = 1;
+                                    }
+                                });
+
+                                $("#ddlAvail" + i).select2({});
+
+                                if (availExists == 1) {
+                                    $('#divAvail' + i + ' .select2-chosen').html(availList[i]);
+                                }
+                                else {
+                                    $('#divAvail' + i + ' .select2-chosen').html($scope.TempAvailName);
+                                    //$scope.CaseAvailability[i] = $scope.TempAvailID;
+                                }
+                                availExists = 0;
+
+                            }
+
+                            $(".pageLoaderOverlay").hide();
+
+                        }, 3000);
+                    }
+
+                }
+                index = index + 1;
+            });
+
+            $scope.PageIndex = 0;
+            $scope.CaseCharDetails = new NgTableParams({}, { total: $scope.CaseCharDetails1.length, getData:
+                            function ($defer, params) {
+                                $scope.PageIndex = (params.page() - 1) * params.count();
+                                $scope.data = params.sorting() ? $filter('orderBy')($scope.CaseCharDetails1, params.orderBy()) : $scope.CaseCharDetails1;
+                                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                                $defer.resolve($scope.data);
+                                $timeout(function () {
+                                    //                                    for (i = 0; i <= index1; i++) {
+
+                                    //                                        $("#ddlAvail" + i).select2({});
+                                    //                                        $('#divAvail' + i + ' .select2-chosen').html(availList[i - 1]);
+
+                                    //                                    }
+
+                                    $(".NumberOnlyText").keypress(function (e) {
+
+                                        if ((e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) || this.value.length >= 4) {
+                                            return false;
+                                        }
+                                    });
+
+                                    var availExists = 0;
+                                    for (i = 0; i <= index1; i++) {
+
+                                        angular.forEach($scope.CaseAvailDescData, function (availItem) {
+                                            if (availItem.AvailID == $scope.CaseAvailability[i]) {
+                                                availExists = 1;
+                                            }
+                                        });
+
+                                        $("#ddlAvail" + i).select2({});
+
+                                        if (availExists == 1) {
+                                            $('#divAvail' + i + ' .select2-chosen').html(availList[i]);
+                                        }
+                                        else {
+                                            $('#divAvail' + i + ' .select2-chosen').html($scope.TempAvailName);
+                                            //$scope.CaseAvailability[i] = $scope.TempAvailID;
+                                        }
+                                        availExists = 0;
+                                    }
+
+                                }, 100);
+                            }
+            });
+
+        });
+
+    }
+
+
+
+    $scope.GetParentAllData = function () {
+
+        $scope.ParentCharID = [];
+        $scope.ParentOptionMatrixID = [];
+        $scope.ParentProductTypeID = [];
+        $scope.ParentAccessSpeed = [];
+        $scope.ParentAccessSupplierID = [];
+        $scope.ParentAccessSupplierNameID = [];
+        $scope.CaseValidValue = [];
+        $scope.CharTypeID = [];
+        $scope.AvailValue = [];
+        $scope.ParentRowCount = 0;
+        $("#spnParentValidation").hide();
+        $(".pageLoaderOverlay").show();
+        ParentPortSpeedFactory.GetParentPortSpeeds($scope.HubSiteID, 0, $scope.CaseID, $scope.ParentProductID, $scope.ProductID, "", "", "", "", "").success(function (data) {
+            //debugger;
+            if (data.d != null) {
+
+                //                $scope.ParentAccessTypeList = data.d.lstAccessType;
+                //                $scope.ParentSuppliersList = data.d.lstSupplier;
+                //                $scope.ParentSupplierProductNameList = data.d.lstSupplierProductName;
+                //                $scope.ParentPortSpeedList = data.d.lstPortSpeed;
+                //                $scope.ParentAccessSpeedList = data.d.lstAccessSpeed;
+
+                $scope.ParentPortSpeedNoData = 0;
+                $scope.LoadParentPortSpeedData = 1;
+                data.d.lstCaseDetails.forEach(function (temp) {
+
+                    temp.lsMapping.forEach(function (item) {
+
+                        $scope.ParentCharID.push(item.CharID);
+                        $scope.ParentOptionMatrixID.push(item.OptionMatrixID);
+                        $scope.ParentProductTypeID.push(item.ProductTypeID);
+                        $scope.ParentAccessSpeed.push(item.AccessSpeed);
+                        $scope.ParentAccessSupplierID.push(item.AccessSupplierID);
+                        $scope.ParentAccessSupplierNameID.push(item.AccessSupplierNameID);
+                        $scope.CaseValidValue.push(item.isChecked);
+                        $scope.CharTypeID.push(item.CharTypeID);
+                        $scope.AvailValue.push(item.AvailValue);
+                        $scope.ParentRowCount = $scope.ParentRowCount + 1;
+                    });
+
+
+                });
+
+                //$scope.ParentSpeed = new NgTableParams({}, { 'dataset': data.d });
+                ////debugger;
+                $scope.PageIndex1 = 0;
+                $scope.ParentSpeedData = data.d.lstCaseDetails;
+                $scope.ParentSpeed = new NgTableParams({}, { total: $scope.ParentSpeedData.length, getData:
+                            function ($defer, params) {
+                                $scope.PageIndex1 = (params.page() - 1) * params.count();
+                                $scope.data = params.sorting() ? $filter('orderBy')($scope.ParentSpeedData, params.orderBy()) : $scope.ParentSpeedData;
+                                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                                $defer.resolve($scope.data);
+                            }
+                });
+                //                $("#tblParentSpeed tr th:nth-child(3)").find('span').html("<th style='width:200px'>Availablity</th><th style='width:500px'>Value</th><th style='width:50px;padding-left: 30px;'>Valid</th>");
+                //                $("#tblParentSpeed tr th:nth-child(4)").hide();
+                //                $("#tblParentSpeed tr th:nth-child(5)").hide();
+                //                $("#tblParentSpeed tr th:nth-child(6)").hide();
+
+
+
+                $(".pageLoaderOverlay").hide();
+
+
+            }
+            else {
+
+                $(".pageLoaderOverlay").hide();
+
+                $scope.ParentPortSpeedNoData = 1;
+            }
+        });
+    }
+
+    $scope.GetParentDataByFilters = function (AccessTypeData, SupplierData, SupplierProductNameData, PortSpeedData, AccessSpeedData) {
+
+
+        var AccessTypeIds = "", SupplierIds = "", SupplierProductNameIds = "", PortSpeedIds = "", AccessSpeedIds = "";
+        if (!angular.isUndefined(AccessTypeData)) {
+            AccessTypeIds = AccessTypeData.join()
+        }
+        if (!angular.isUndefined(SupplierData)) {
+            SupplierIds = SupplierData.join()
+        }
+
+        if (!angular.isUndefined(SupplierProductNameData)) {
+            SupplierProductNameIds = SupplierProductNameData.join()
+        }
+
+        if (!angular.isUndefined(PortSpeedData)) {
+            PortSpeedIds = PortSpeedData.join()
+        }
+
+        if (!angular.isUndefined(AccessSpeedData)) {
+            AccessSpeedIds = AccessSpeedData.join()
+        }
+        $("#spnParentValidation").hide();
+        if (AccessTypeIds == "" && SupplierIds == "" && SupplierProductNameIds == "" && PortSpeedIds == "" && AccessSpeedIds == "") {
+            $("#spnParentValidation").show();
+            return;
+        }
+
+        $(".pageLoaderOverlay").show();
+
+        $scope.ParentCharID = [];
+        $scope.ParentOptionMatrixID = [];
+        $scope.ParentProductTypeID = [];
+        $scope.ParentAccessSpeed = [];
+        $scope.ParentAccessSupplierID = [];
+        $scope.ParentAccessSupplierNameID = [];
+        $scope.CaseValidValue = [];
+        $scope.CharTypeID = [];
+        $scope.AvailValue = [];
+        $scope.ParentRowCount = 0;
+        ParentPortSpeedFactory.GetParentPortSpeeds($scope.HubSiteID, 0, $scope.CaseID, $scope.ParentProductID, $scope.ProductID, SupplierIds, AccessTypeIds, SupplierProductNameIds, PortSpeedIds, AccessSpeedIds).success(function (data) {
+
+            if (data.d != null) {
+
+                //                $scope.ParentAccessTypeList = data.d.lstAccessType;
+                //                $scope.ParentSuppliersList = data.d.lstSupplier;
+                //                $scope.ParentSupplierProductNameList = data.d.lstSupplierProductName;
+                //                $scope.ParentPortSpeedList = data.d.lstPortSpeed;
+                //                $scope.ParentAccessSpeedList = data.d.lstAccessSpeed;
+
+                $scope.ParentPortSpeedNoData = 0;
+                $scope.LoadParentPortSpeedData = 1;
+                data.d.lstCaseDetails.forEach(function (temp) {
+
+                    temp.lsMapping.forEach(function (item) {
+
+                        $scope.ParentCharID.push(item.CharID);
+                        $scope.ParentOptionMatrixID.push(item.OptionMatrixID);
+                        $scope.ParentProductTypeID.push(item.ProductTypeID);
+                        $scope.ParentAccessSpeed.push(item.AccessSpeed);
+                        $scope.ParentAccessSupplierID.push(item.AccessSupplierID);
+                        $scope.ParentAccessSupplierNameID.push(item.AccessSupplierNameID);
+                        $scope.CaseValidValue.push(item.isChecked);
+                        $scope.CharTypeID.push(item.CharTypeID);
+                        $scope.AvailValue.push(item.AvailValue);
+                        $scope.ParentRowCount = $scope.ParentRowCount + 1;
+                    });
+
+
+                });
+
+                //$scope.ParentSpeed = new NgTableParams({}, { 'dataset': data.d });
+                ////debugger;
+                $scope.PageIndex1 = 0;
+                $scope.ParentSpeedData = data.d.lstCaseDetails;
+                $scope.ParentSpeed = new NgTableParams({}, { total: $scope.ParentSpeedData.length, getData:
+                            function ($defer, params) {
+                                $scope.PageIndex1 = (params.page() - 1) * params.count();
+                                $scope.data = params.sorting() ? $filter('orderBy')($scope.ParentSpeedData, params.orderBy()) : $scope.ParentSpeedData;
+                                $scope.data = params.filter() ? $filter('filter')($scope.data, params.filter()) : $scope.data;
+                                $scope.data = $scope.data.slice((params.page() - 1) * params.count(), params.page() * params.count());
+                                $defer.resolve($scope.data);
+                            }
+                });
+                //                $("#tblParentSpeed tr th:nth-child(3)").find('span').html("<th style='width:200px'>Availablity</th><th style='width:500px'>Value</th><th style='width:50px;padding-left: 30px;'>Valid</th>");
+                //                $("#tblParentSpeed tr th:nth-child(4)").hide();
+                //                $("#tblParentSpeed tr th:nth-child(5)").hide();
+                //                $("#tblParentSpeed tr th:nth-child(6)").hide();
+
+
+
+                $(".pageLoaderOverlay").hide();
+
+
+            }
+            else {
+
+                $(".pageLoaderOverlay").hide();
+
+                $scope.ParentPortSpeedNoData = 1;
+            }
+        });
+
+    }
+
+});
+
+
+//app.factory('PopCharacteristics', function ($http) {
+
+//    var PopCharacteristics = {};
+
+//    PopCharacteristics.GetPoPCharValues = function (HubSiteID, ProductID) {
+
+//        return $http.post('../SingleCase.aspx/GetPoPCharValues', { 'HubSiteID': HubSiteID, 'ProductID': ProductID });
+//    }
+
+//    return PopCharacteristics;
+//});
+
+
+app.factory('CaseCharacteristics', function ($http) {
+
+    var CaseCharacteristics = {};
+
+    CaseCharacteristics.GeCharValues = function (CaseID, ShowAll, Supplier, AccessType, SupplierProduct, ProductID, HubSiteID, PortSpeedIds, AccessSpeedIds) {
+
+        return $http.post('SingleCase.aspx/GetCaseCharValues', { 'CaseID': CaseID, 'ShowAll': ShowAll, 'SupplierIds': Supplier, 'AccessTypeIds': AccessType, 'SupplierProductNameIds': SupplierProduct, 'ProductID': ProductID, 'HubSiteID': HubSiteID, 'PortSpeedIds': PortSpeedIds, 'AccessSpeedIds': AccessSpeedIds });
+    }
+
+    return CaseCharacteristics;
+});
+
+
+//app.factory('AvailDescfactory', function ($http) {
+
+//    var AvailDescfactory = {};
+
+//    AvailDescfactory.GetAvailDesc = function () {
+
+//        return $http.post('../SingleCase.aspx/GetAvailDesc', {});
+//    }
+
+//    return AvailDescfactory;
+//});
+
+
+app.factory('ParentPortSpeedFactory', function ($http) {
+
+    var ParentPortSpeedFactory = {};
+
+    ParentPortSpeedFactory.GetParentPortSpeeds = function (HubSiteID, NetworkID, CaseID, ParentID, ProductID, Supplier, AccessType, SupplierProduct, PortSpeedIds, AccessSpeedIds) {
+
+        return $http.post('SingleCase.aspx/GetParentPortSpeeds', { 'HubSiteID': HubSiteID, 'NetworkID': 0, 'CaseID': CaseID, 'ParentID': ParentID, 'ProductID': ProductID, 'Supplier': Supplier, 'AccessType': AccessType, 'SupplierProduct': SupplierProduct, 'PortSpeedIds': PortSpeedIds, 'AccessSpeedIds': AccessSpeedIds });
+    }
+
+    return ParentPortSpeedFactory;
+});
+

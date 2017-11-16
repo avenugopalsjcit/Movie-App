@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <div ng-controller="BatchCaseAuditReportCtrl" class="container">
+<div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+               Batch Case Audit Information
+            </h3>
+        </div>
+    </div>
+        <div class="row" >
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">                
+                    <div class="panel-body">
+                        <!--<h4 style="text-align: left">
+                            Batch Case Audit Information</h4>-->
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label cus-text-left" for="" >
+                                    Service Type
+                                </label>
+                                <div class="col-sm-3" style="margin-left:-50px">
+                                    <select id="Select1" ng-model="modServiceType" ng-change="GetProducts()" ng-options="item as item for item in ServiceTypes"
+                                         style="width:90%;">
+                                        <option value="">  -- Select Service Type --</option>
+                                    </select>
+                                    <span style="display: none; color: Red;" id="spnServiceType" class="Arrow">Please Select
+                                        Service Type</span>
+                                </div>
+                                <label class="col-sm-2 control-label cus-text-left" ng-show="modServiceType!='' && modServiceType != null" for="" >
+                                    Product
+                                </label>
+                                <div class="col-sm-3"  id="ProductDiv" style="margin-left:-70px">
+                                    <select id="Select2" ng-model="modProduct" ng-show="modServiceType!='' && modServiceType != null" ng-change="ProductChange()" ng-options="product.ProductId as product.ProductName for product in Products"
+                                         style="width:90%;">
+                                        <option value="">  -- Select Product --</option>
+                                    </select>
+                                    <span style="display: none; color: Red;" id="spnProduct" class="Arrow">Please Select
+                                        Product</span>
+                                </div>
+                                <div class="col-sm-2" ng-show="showexportbutton">
+                                    <input type="button" class=" btn btn-primary" ng-click="ExportToExcel()" value="Download To Excel" />
+                                </div>
+                               
+                            </div>
+        </div>
+    </div>
+    <div class="pageLoaderOverlay">
+    </div>
+    <style type="text/css">
+.ng-table-pager div
+{
+    margin:20px 0px 20px 0px;
+    }
+</style>
+</body>
+</html>

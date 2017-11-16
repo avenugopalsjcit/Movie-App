@@ -1,0 +1,56 @@
+﻿<div class="container" ng-controller="CpeLeadTimeCntrl">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+               CPE Lead Time & Status
+                                    
+            </h3>
+        </div>
+    </div>
+       <br />
+    <div class="row text-left Arrow">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <p class="red"><span class="color-black">Note : </span>Red color dates are indicating supplier has crossed EoC,EoM date for a given country.</p>
+        </div>
+    </div>
+    <table ng-table="AllSuppliersData" class="table table-striped table-bordered" show-filter="true" >
+        <tr ng-repeat="user in $data">
+            <td data-title="'Country'" filter="{ countryName: 'text'}" sortable="'countryName'" class="Arrow">
+                {{user.countryName}}
+            </td>
+            <td data-title="'Supplier'" filter="{ supplierName: 'text'}" sortable="'supplierName'" class="Arrow">
+                {{user.supplierName}}
+            </td>
+            <td data-title="'Supplier Type'" filter="{ SupplierType: 'text'}" sortable="'SupplierType'" class="Arrow">
+                {{user.SupplierType}}
+            </td>
+            <td data-title="'Manufacturer'" filter="{ manufacturerName: 'text'}" sortable="'manufacturerName'" class="Arrow">
+                {{user.manufacturerName}}
+            </td>
+            <td data-title="'CPE Availability'" filter="{ cpeAvailability: 'text'}" sortable="'cpeAvailability'" class="Arrow">
+                {{user.cpeAvailability}}
+            </td>
+            <td data-title="'CPE Lead Time (Calender Days)'" filter="{ leadTime: 'text'}" sortable="'leadTime'" class="Arrow" style="text-align:right">
+                {{user.leadTime}}
+            </td>
+            <td data-title="'Lead Time Status'" filter="{ leadTimeStatus: 'text'}" sortable="'leadTimeStatus'" class="Arrow">
+                {{user.leadTimeStatus}}
+            </td>
+            <td data-title="'End of Contract Date'" filter="{ endOfContractDate: 'text'}" sortable="'endOfContractDate'" class="Arrow">
+             <span ng-class="{'color-red':user.color === 'red','color-black':user.color==='Black'}">{{user.endOfContractDate}}</span>
+            </td>
+            <td data-title="'End of Migration Date'" filter="{ endOfMigrationDate: 'text'}" sortable="'endOfMigrationDate'" class="Arrow">
+              <span ng-class="{'color-red':user.color === 'red','color-black':user.color==='Black'}"> {{user.endOfMigrationDate}}</span>
+            </td>
+            <td data-title="'CPE Cease Lead Time (Calender Days)'" filter="{ cpeCeaseLeadTime: 'text'}" sortable="'cpeCeaseLeadTime'" class="Arrow" style="text-align:right">
+                {{user.cpeCeaseLeadTime}}
+            </td>
+            <td data-title="'CPE Cease Lead Time Status'" filter="{ cpeCeaseLeadTimeStatus: 'text'}"
+                sortable="'cpeCeaseLeadTimeStatus'" class="Arrow">
+                {{user.cpeCeaseLeadTimeStatus}}
+            </td>
+        </tr>
+    </table>
+    <div class="pageLoaderOverlay">
+</div>
+</div>

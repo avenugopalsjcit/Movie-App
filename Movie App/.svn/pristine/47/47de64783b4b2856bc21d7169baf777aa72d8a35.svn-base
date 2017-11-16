@@ -1,0 +1,37 @@
+﻿<div class="container" ng-controller="CpeCountryAvailableCntrl">
+    <div class="row text-left Arrow ">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3>
+                CPE Country Availability
+            </h3>
+        </div>
+    </div>
+    <br />
+    <table ng-table="CpeCountryAvailability" class="table table-bordered table-striped"
+        show-filter="true">
+        <tr ng-repeat="user in $data">
+            <td data-title="'Country'" filter="{ CountryName: 'text'}" sortable="'CountryName'"
+                class="Arrow">
+                {{user.CountryName}}
+            </td>
+            <td data-title="'Supplier'" filter="{ SupplierName: 'text'}" sortable="'SupplierName'"
+                class="Arrow">
+                {{user.SupplierName}}
+            </td>
+            <td data-title="'Product'" filter="{ ProductName: 'text'}" sortable="'ProductName'"
+                class="Arrow">
+                {{user.ProductName}}
+            </td>
+            <td data-title="'Transaction Type'" filter="{ AvtivityName: 'text'}" sortable="'AvtivityName'"
+                class="Arrow">
+                {{user.AvtivityName}}
+            </td>
+            <td data-title="'CPE Availability'" filter="{ CpeAvailabilityStatus: 'text'}" sortable="'CpeAvailabilityStatus'"
+                class="Arrow">
+                {{user.CpeAvailabilityStatus}}
+            </td>
+        </tr>
+    </table>
+    <div class="pageLoaderOverlay">
+    </div>
+</div>

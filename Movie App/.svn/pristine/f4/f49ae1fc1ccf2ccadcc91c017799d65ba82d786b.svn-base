@@ -1,0 +1,307 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Services;
+using SCAdminBAL;
+using Newtonsoft.Json;
+using System.Data;
+
+namespace SCAdmin
+{
+    public partial class Reports : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        [WebMethod]
+        public static List<ServiceTypeProductMap> GetServiceTypeProductMap(string Report)
+        {
+            ReportsBAL objReportsBAL = new ReportsBAL();
+            return objReportsBAL.FetchServiceTypeAndProducts(Report);
+        }
+        
+
+         [WebMethod]
+        public static List<NotesAuditInfo> GetNotesAuditReport(int productCode)
+        {
+            ReportsBAL objReportsBAL = new ReportsBAL();
+            return objReportsBAL.GetNotesAuditReport(productCode);
+        }
+
+         [WebMethod]
+         public static List<CaseAuditInfo> GetCaseAuditReport(string productCode)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.FetchCaseAuditReport(productCode);
+         }
+
+         [WebMethod]
+         public static List<CaseDetailsAuditInfo> GetCaseDetailsAuditReport(string caseID)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.FetchCaseDetailAuditReport(caseID);
+         }
+
+
+
+
+         [WebMethod]
+         public static string FetchCountries()
+         {
+             SCAdminBAL.ReportsBAL report = new SCAdminBAL.ReportsBAL();
+
+             DataTable FetchCountreis = new DataTable();
+
+             var data = new
+             {
+                 FetchCountreis = report.FetchCountries()
+             };
+             return JsonConvert.SerializeObject(data, Formatting.Indented);
+         }
+
+
+         [WebMethod]
+         public static string FetchAccesByReportByCountryId(int CountryId)
+         {
+             SCAdminBAL.ReportsBAL report = new SCAdminBAL.ReportsBAL();
+
+             DataTable FetchAccesByReportByCountryId = new DataTable();
+             // FetchAccesByReportByCountryId = report.FetchAccesByReportByCountryId(CountryId);
+             var data = new
+             {
+                 FetchAccesByReportByCountryId = report.FetchAccesByReportByCountryId(CountryId)
+             };
+             return JsonConvert.SerializeObject(data, Formatting.Indented);
+         }
+
+         [WebMethod]
+         public static List<ProductDetails> FetchProducts(int userid, bool issuperuser)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.FetchProducts(userid, issuperuser);
+         }
+
+         [WebMethod]
+         public static List<SubProductDetails> FetchSubProducts(int productid)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.FetchSubProducts(productid);
+         }
+
+         [WebMethod]
+         public static List<CountryRestrictionDropDown> FetchCountriesByProduct(int productid)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.FetchCountriesByProduct(productid);
+         }
+
+         [WebMethod]
+         public static List<SupplierRestrictionDropDown> FetchAccessSuppliers(int countryid)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.FetchAccessSuppliers(countryid);
+         }
+
+         [WebMethod]
+         public static List<AccessSpeed> FetchAccessSpeeds(int countryid, string[] supplierid)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.FetchAccessSpeeds(countryid, supplierid);
+         }
+
+         [WebMethod]
+         public static List<InterfaceTypes> FetchInterfaceTypes(int countryid, string[] supplierid, string[] accessSpeedId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.FetchInterfaceTypes(countryid, supplierid, accessSpeedId);
+         }
+
+         [WebMethod]
+         public static List<AccessReportData> GetAccessReportData(int countryid, string[] supplierid, string[] accessSpeedId, string[] InterfaceType)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetAccessReportData(countryid, supplierid, accessSpeedId, InterfaceType);
+         }
+
+         [WebMethod]
+         public static List<CityPOPDetails> FetchCityPOPSData(int countryid, int productid, int subproductid)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.FetchCityPOPSData(countryid, productid, subproductid);
+         }
+
+         [WebMethod]
+         public static List<ProductDetails> GetStandardReportProducts()
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetStandardReportProducts();
+         }
+         [WebMethod]
+         public static List<SubProductDetails> GetStandardReportSubProducts(int productId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetStandardReportSubProducts(productId);
+         }
+         [WebMethod]
+         public static List<ReportStandardDetials> GetStandardReportName(int productId, int subProductId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetStandardReportName(productId, subProductId);
+         }
+         [WebMethod]
+         public static List<StandardColumnsData> GetStandardColumnsData(int reportId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetStandardColumnsData(reportId);
+         }
+
+         [WebMethod]
+         public static List<POPCharacteristicsData> GetPOPCharacteristicsData(int productId, int subProductId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetPOPCharacteristicsData(productId, subProductId);
+         }
+         [WebMethod]
+         public static List<CharacteristicsData> GetCharacteristicsData(int productId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetCharacteristicsData(productId);
+         }
+         [WebMethod]
+         public static int AddNewReportColumn(int productId, int subProductId, int reportId, string strCharId, string strOptionMatrixId, string strColumnHeader1, string strColumnHeader2, string strColumnHeader3, string strColumnValidCd, string strProductMappedId, string userId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.AddNewReportColumn(productId, subProductId, reportId, strCharId, strOptionMatrixId, strColumnHeader1, strColumnHeader2, strColumnHeader3, strColumnValidCd, strProductMappedId, userId);
+         }
+
+         [WebMethod]
+         public static List<ColumnWidthData> GetEditColumnWidthData(int productId, int subProductId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetEditColumnWidthData(productId, subProductId);
+         }
+
+         [WebMethod]
+         public static List<MappedProducts> GetMappedProduct(int productId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetMappedProduct(productId);
+         }
+         [WebMethod]
+         public static List<CharIdDetails> GetCharID(int productId, int mappedProduct)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetCharID(productId, mappedProduct);
+         }
+         [WebMethod]
+         public static List<CPEMaintenanceOptions> GetCPEMaintenanceOptionsTab(int productId, string charId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetCPEMaintenanceOptionsTab(productId, charId);
+         }
+         [WebMethod]
+         public static List<CPEMaintenanceOptions> GetCPERouterBundlesTab(int productId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetCPERouterBundlesTab(productId);
+         }
+         [WebMethod]
+         public static int UpdateStandardReportColumnWidthInSpeedTabs(int productId, int subProductId, string columnWidth)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.UpdateStandardReportColumnWidthInSpeedTabs(productId, subProductId, columnWidth);
+         }
+         [WebMethod]
+         public static int UpdateColumnsInCPEDataTabs(int productId, string CPERouterWidth, string CPEMaintenanceWidth, string validRouterCd, string validMaintenanceCd)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.UpdateColumnsInCPEDataTabs(productId, CPERouterWidth, CPEMaintenanceWidth, validRouterCd, validMaintenanceCd);
+         }
+         [WebMethod]
+         public static List<ColumnReferenceData> GetReportColumnReferenceData(int productId, int reportId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetReportColumnReferenceData(productId, reportId);
+         }
+
+         [WebMethod]
+         public static int UpdatePOPChar(int productId, int subProductId, string strPOPChar, string strColumnHeader1, string strColumnHeader2, string strColumnHeader3, int ColumnValidCd)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.UpdatePOPChar(productId, subProductId, strPOPChar, strColumnHeader1, strColumnHeader2, strColumnHeader3, ColumnValidCd);
+         }
+
+         [WebMethod]
+         public static int UpdateChar(int productId, int subProductId, int reportId, string strChar, int charTypeId, string strColumnHeader1, string strColumnHeader2, string strColumnHeader3, string strColumnValidCd, string userId, string strProductMappedId, int orderCd)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.UpdateChar(productId, subProductId, reportId, strChar, charTypeId, strColumnHeader1, strColumnHeader2, strColumnHeader3, strColumnValidCd, userId, strProductMappedId, orderCd);
+         }
+
+         [WebMethod]
+         public static int DeleteChar(int reportId, int orderCd)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.DeleteChar(reportId, orderCd);
+         }
+         [WebMethod]
+         public static int UpdateDefineStandardData(int productId, int subProductId, int reportId, string standardColHeader, string standardColWidth, string StandardValid, string StandardDisplayOrder, string ColRefWidth, string ColRefDisplayOrder, string ColPOPWidth, string ColPOPDisplayOrder, string WrapTextData, string SLAData, string userId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.UpdateDefineStandardData(productId, subProductId, reportId, standardColHeader, standardColWidth, StandardValid, StandardDisplayOrder, ColRefWidth, ColRefDisplayOrder, ColPOPWidth, ColPOPDisplayOrder, WrapTextData, SLAData, userId);
+         }
+         [WebMethod]
+         public static List<SLAAttributeData> GetdisplaySLAAttributesForProduct(int productId, int subProductId, int reportId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetdisplaySLAAttributesForProduct(productId, subProductId, reportId);
+         }
+         [WebMethod]
+         public static List<UpdatedDateDetail> GetUpdatedDateDetails(int productId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetUpdatedDateDetails(productId);
+         }
+         [WebMethod]
+         public static List<UpdatedDateDetail> GetUpdatedDateDetailsForCharData(int productId, int reportId, int orderCd)
+         {
+              ReportsBAL objReportsBAL = new ReportsBAL();
+              return objReportsBAL.GetUpdatedDateDetailsForCharData(productId, reportId, orderCd);
+         }
+         [WebMethod]
+         public static int SaveSLAAttributeData(int productId, string colAssuranceWidth, string colDeliveryWidth, string SLAAssuranceColCd, string SLADeliveryColCd, string userId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.SaveSLAAttributeData(productId, colAssuranceWidth, colDeliveryWidth, SLAAssuranceColCd, SLADeliveryColCd, userId);
+         }
+         [WebMethod]
+         public static int UpdateSLAFlag(int productId, int reportId, int subProductId, int SLAFlag)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.UpdateSLAFlag(productId, reportId, subProductId, SLAFlag);
+         }
+         [WebMethod]
+         public static List<UpdatedDateDetail> GetSLAUpdatedDateDetails(int productId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetSLAUpdatedDateDetails(productId);
+         }
+         [WebMethod]
+         public static int GetDisplaySLAInformation(int productId, int subProductId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetDisplaySLAInformation(productId, subProductId);
+         }
+         [WebMethod]
+         public static int GetShowSLAFlag(int productId, int reportId, int subProductId)
+         {
+             ReportsBAL objReportsBAL = new ReportsBAL();
+             return objReportsBAL.GetShowSLAFlag(productId, reportId, subProductId);
+         }
+    }
+}

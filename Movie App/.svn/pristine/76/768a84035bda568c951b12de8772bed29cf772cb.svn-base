@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://LDAPQuery.org/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://LDAPQuery.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://LDAPQuery.org/">
+      <s:element name="GetUserDtls">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="EIN" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserDtlsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserDtlsResult" type="tns:UserDetails" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="UserDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ErrorMsg" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="EIN" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="FirstName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="LastName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="EmailID" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OUC" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DeskPhone" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btGFR" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="workforceID" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="EmpClass" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CmpyIndicator" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="AllProperties" type="tns:ArrayOfString" />
+          <s:element minOccurs="0" maxOccurs="1" name="AllUsers" type="tns:ArrayOfString" />
+        </s:sequence>
+        <s:attribute name="ID" type="s:int" use="required" />
+      </s:complexType>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetUserDtlsByEmail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserDtlsByEmailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUserDtlsByEmailResult" type="tns:UserDetails" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserDtlsByFirstName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="FName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserDtlsByFirstNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="UserDtlsResult" nillable="true" type="tns:UserDesc" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="UserDesc">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ErrorMsg" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UsersList" type="tns:UsersList" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="UsersList">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="User" type="tns:UserDetails" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetUserDtlsByLastName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUserDtlsByLastNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="UserDtlsResult" nillable="true" type="tns:UserDesc" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAllPropertyName">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetAllPropertyNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetAllPropertyNameResult" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetLocationDetails">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="searchString" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="LocationDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="btLocationCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btBuildingName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btAddress1" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btAddress2" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btAddress3" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btAddress4" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btPostTown" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="postalAddress" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="postalCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="c" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btCountryCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btCountryDescription" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="btSkylineCode" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetLocationDetailsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetLocationDetailsResult" type="tns:LocationDetails" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UserDetails" nillable="true" type="tns:UserDetails" />
+      <s:element name="UserDtlsResult" nillable="true" type="tns:UserDesc" />
+      <s:element name="anyType" nillable="true" />
+      <s:element name="LocationDetails" nillable="true" type="tns:LocationDetails" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetUserDtlsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserDtls" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserDtlsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByEmailSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserDtlsByEmail" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByEmailSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserDtlsByEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByFirstNameSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserDtlsByFirstName" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByFirstNameSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserDtlsByFirstNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByLastNameSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUserDtlsByLastName" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByLastNameSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUserDtlsByLastNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAllPropertyNameSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAllPropertyName" />
+  </wsdl:message>
+  <wsdl:message name="GetAllPropertyNameSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAllPropertyNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetLocationDetailsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetLocationDetails" />
+  </wsdl:message>
+  <wsdl:message name="GetLocationDetailsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetLocationDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsHttpGetIn">
+    <wsdl:part name="EIN" type="s:string" />
+    <wsdl:part name="UserName" type="s:string" />
+    <wsdl:part name="Password" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsHttpGetOut">
+    <wsdl:part name="Body" element="tns:UserDetails" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByEmailHttpGetIn">
+    <wsdl:part name="email" type="s:string" />
+    <wsdl:part name="UserName" type="s:string" />
+    <wsdl:part name="Password" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByEmailHttpGetOut">
+    <wsdl:part name="Body" element="tns:UserDetails" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByFirstNameHttpGetIn">
+    <wsdl:part name="FName" type="s:string" />
+    <wsdl:part name="UserName" type="s:string" />
+    <wsdl:part name="Password" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByFirstNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:UserDtlsResult" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByLastNameHttpGetIn">
+    <wsdl:part name="LName" type="s:string" />
+    <wsdl:part name="UserName" type="s:string" />
+    <wsdl:part name="Password" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByLastNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:UserDtlsResult" />
+  </wsdl:message>
+  <wsdl:message name="GetAllPropertyNameHttpGetIn" />
+  <wsdl:message name="GetAllPropertyNameHttpGetOut">
+    <wsdl:part name="Body" element="tns:anyType" />
+  </wsdl:message>
+  <wsdl:message name="GetLocationDetailsHttpGetIn">
+    <wsdl:part name="searchString" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetLocationDetailsHttpGetOut">
+    <wsdl:part name="Body" element="tns:LocationDetails" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsHttpPostIn">
+    <wsdl:part name="EIN" type="s:string" />
+    <wsdl:part name="UserName" type="s:string" />
+    <wsdl:part name="Password" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsHttpPostOut">
+    <wsdl:part name="Body" element="tns:UserDetails" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByEmailHttpPostIn">
+    <wsdl:part name="email" type="s:string" />
+    <wsdl:part name="UserName" type="s:string" />
+    <wsdl:part name="Password" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByEmailHttpPostOut">
+    <wsdl:part name="Body" element="tns:UserDetails" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByFirstNameHttpPostIn">
+    <wsdl:part name="FName" type="s:string" />
+    <wsdl:part name="UserName" type="s:string" />
+    <wsdl:part name="Password" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByFirstNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:UserDtlsResult" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByLastNameHttpPostIn">
+    <wsdl:part name="LName" type="s:string" />
+    <wsdl:part name="UserName" type="s:string" />
+    <wsdl:part name="Password" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetUserDtlsByLastNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:UserDtlsResult" />
+  </wsdl:message>
+  <wsdl:message name="GetAllPropertyNameHttpPostIn" />
+  <wsdl:message name="GetAllPropertyNameHttpPostOut">
+    <wsdl:part name="Body" element="tns:anyType" />
+  </wsdl:message>
+  <wsdl:message name="GetLocationDetailsHttpPostIn">
+    <wsdl:part name="searchString" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetLocationDetailsHttpPostOut">
+    <wsdl:part name="Body" element="tns:LocationDetails" />
+  </wsdl:message>
+  <wsdl:portType name="ServiceSoap">
+    <wsdl:operation name="GetUserDtls">
+      <wsdl:input message="tns:GetUserDtlsSoapIn" />
+      <wsdl:output message="tns:GetUserDtlsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByEmail">
+      <wsdl:input message="tns:GetUserDtlsByEmailSoapIn" />
+      <wsdl:output message="tns:GetUserDtlsByEmailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByFirstName">
+      <wsdl:input message="tns:GetUserDtlsByFirstNameSoapIn" />
+      <wsdl:output message="tns:GetUserDtlsByFirstNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByLastName">
+      <wsdl:input message="tns:GetUserDtlsByLastNameSoapIn" />
+      <wsdl:output message="tns:GetUserDtlsByLastNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllPropertyName">
+      <wsdl:input message="tns:GetAllPropertyNameSoapIn" />
+      <wsdl:output message="tns:GetAllPropertyNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetLocationDetails">
+      <wsdl:input message="tns:GetLocationDetailsSoapIn" />
+      <wsdl:output message="tns:GetLocationDetailsSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ServiceHttpGet">
+    <wsdl:operation name="GetUserDtls">
+      <wsdl:input message="tns:GetUserDtlsHttpGetIn" />
+      <wsdl:output message="tns:GetUserDtlsHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByEmail">
+      <wsdl:input message="tns:GetUserDtlsByEmailHttpGetIn" />
+      <wsdl:output message="tns:GetUserDtlsByEmailHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByFirstName">
+      <wsdl:input message="tns:GetUserDtlsByFirstNameHttpGetIn" />
+      <wsdl:output message="tns:GetUserDtlsByFirstNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByLastName">
+      <wsdl:input message="tns:GetUserDtlsByLastNameHttpGetIn" />
+      <wsdl:output message="tns:GetUserDtlsByLastNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllPropertyName">
+      <wsdl:input message="tns:GetAllPropertyNameHttpGetIn" />
+      <wsdl:output message="tns:GetAllPropertyNameHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetLocationDetails">
+      <wsdl:input message="tns:GetLocationDetailsHttpGetIn" />
+      <wsdl:output message="tns:GetLocationDetailsHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ServiceHttpPost">
+    <wsdl:operation name="GetUserDtls">
+      <wsdl:input message="tns:GetUserDtlsHttpPostIn" />
+      <wsdl:output message="tns:GetUserDtlsHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByEmail">
+      <wsdl:input message="tns:GetUserDtlsByEmailHttpPostIn" />
+      <wsdl:output message="tns:GetUserDtlsByEmailHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByFirstName">
+      <wsdl:input message="tns:GetUserDtlsByFirstNameHttpPostIn" />
+      <wsdl:output message="tns:GetUserDtlsByFirstNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByLastName">
+      <wsdl:input message="tns:GetUserDtlsByLastNameHttpPostIn" />
+      <wsdl:output message="tns:GetUserDtlsByLastNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllPropertyName">
+      <wsdl:input message="tns:GetAllPropertyNameHttpPostIn" />
+      <wsdl:output message="tns:GetAllPropertyNameHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetLocationDetails">
+      <wsdl:input message="tns:GetLocationDetailsHttpPostIn" />
+      <wsdl:output message="tns:GetLocationDetailsHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServiceSoap" type="tns:ServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetUserDtls">
+      <soap:operation soapAction="http://LDAPQuery.org/GetUserDtls" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByEmail">
+      <soap:operation soapAction="http://LDAPQuery.org/GetUserDtlsByEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByFirstName">
+      <soap:operation soapAction="http://LDAPQuery.org/GetUserDtlsByFirstName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByLastName">
+      <soap:operation soapAction="http://LDAPQuery.org/GetUserDtlsByLastName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllPropertyName">
+      <soap:operation soapAction="http://LDAPQuery.org/GetAllPropertyName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLocationDetails">
+      <soap:operation soapAction="http://LDAPQuery.org/GetLocationDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceSoap12" type="tns:ServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetUserDtls">
+      <soap12:operation soapAction="http://LDAPQuery.org/GetUserDtls" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByEmail">
+      <soap12:operation soapAction="http://LDAPQuery.org/GetUserDtlsByEmail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByFirstName">
+      <soap12:operation soapAction="http://LDAPQuery.org/GetUserDtlsByFirstName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByLastName">
+      <soap12:operation soapAction="http://LDAPQuery.org/GetUserDtlsByLastName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllPropertyName">
+      <soap12:operation soapAction="http://LDAPQuery.org/GetAllPropertyName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLocationDetails">
+      <soap12:operation soapAction="http://LDAPQuery.org/GetLocationDetails" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceHttpGet" type="tns:ServiceHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="GetUserDtls">
+      <http:operation location="/GetUserDtls" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByEmail">
+      <http:operation location="/GetUserDtlsByEmail" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByFirstName">
+      <http:operation location="/GetUserDtlsByFirstName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByLastName">
+      <http:operation location="/GetUserDtlsByLastName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllPropertyName">
+      <http:operation location="/GetAllPropertyName" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLocationDetails">
+      <http:operation location="/GetLocationDetails" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceHttpPost" type="tns:ServiceHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="GetUserDtls">
+      <http:operation location="/GetUserDtls" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByEmail">
+      <http:operation location="/GetUserDtlsByEmail" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByFirstName">
+      <http:operation location="/GetUserDtlsByFirstName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUserDtlsByLastName">
+      <http:operation location="/GetUserDtlsByLastName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllPropertyName">
+      <http:operation location="/GetAllPropertyName" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLocationDetails">
+      <http:operation location="/GetLocationDetails" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Service">
+    <wsdl:port name="ServiceSoap" binding="tns:ServiceSoap">
+      <soap:address location="http://10.29.81.147/LDAPQuery/Service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceSoap12" binding="tns:ServiceSoap12">
+      <soap12:address location="http://10.29.81.147/LDAPQuery/Service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceHttpGet" binding="tns:ServiceHttpGet">
+      <http:address location="http://10.29.81.147/LDAPQuery/Service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceHttpPost" binding="tns:ServiceHttpPost">
+      <http:address location="http://10.29.81.147/LDAPQuery/Service.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

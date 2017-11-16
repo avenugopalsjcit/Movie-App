@@ -1,0 +1,652 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Configuration;
+using Oracle.DataAccess.Client;
+
+namespace SCAdminDAL
+{
+    public class CPEBundlesDAL
+    {
+        private StringBuilder strQuery = new StringBuilder();
+        private string tempQuery = string.Empty;
+        private string tempqueryaccessid = string.Empty;
+
+        public DataTable GetCPEProducts()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+            try
+            {
+                strbuilder.Append(" SELECT DISTINCT a.PRODUCT_CD, a.PRODUCT_NAME, a.SERVICE_TYPE_CD, a.PRODUCT_LOC_LEVEL_CD,a.PRODUCT_VALID_CD,a.PRODUCT_ABBR, a.CREATED_EMP_ID,a.CREATED_DT,a.UPDATED_EMP_ID,a.UPDATED_DT, a.PRODUCT_TYPE, a.COUNTRY_CD,a.ALIAS_ID,a.DISPLAY_LEAD_TIME,a.PARENT_PRODUCT_CD,a.INTERFACE_UPDATE_DT,a.INTERFACE_UPDATED_BY, a.USE_CPE_PRODUCT, a.VALIDATE_PARENT_PORTSPEED,a.DISPLAY_MPLS_PRODUCT, a.ACCESS_METHOD_REQUIRED, a.EFM_REQUIRED,a.FLEXIPORT, a.UNBUNDLEDSERVICE,a.PLAT_RESIL_MAP");
+                strbuilder.Append(" FROM csu_product a,csu_cpe_product_bndls b ");
+                strbuilder.Append(" WHERE a.product_cd = b.PRODUCT_CD ");
+                strbuilder.Append(" AND a. PRODUCT_cd IN ( 11, 14, 15, 16, 21, 25, 30, 32, 58, 62, 63, 67, 72, 79, 96, 97, 101, 102, 103, 104, 105, 108, 116, 117, 118, 119, 121, 122, 123, 124, 125, 126, 127, 128, 130, 131, 129, 75, 76, 78, 82, 85, 120, 31, 98, 99, 100, 106, 12 )");
+                strbuilder.Append(" AND a.product_cd  IN (SELECT DISTINCT a.product_cd FROM CSU_PRODUCT a WHERE a.product_cd NOT IN (SELECT DISTINCT b.product_cd FROM CSU_REF_SUBPRODUCT b )AND (a.product_valid_cd = 1 AND a.use_cpe_product = 1)UNION SELECT DISTINCT a.product_cd FROM CSU_PRODUCT a, CSU_REF_SUBPRODUCT b WHERE a.product_cd = b.product_cd AND b.subproduct_valid_cd = 1 AND b.use_cpe_subproduct  = 1 AND a.product_valid_cd = 1 AND a.use_cpe_product = 1)");
+                strbuilder.Append(" ORDER BY upper(PRODUCT_NAME)");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+
+        public DataTable GetCPERegion()
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+            try
+            {
+                strbuilder.Append("select * from csu_region where region_name!='None'");
+               
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+
+        public DataTable GetCPECountry(int RegionID)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+            try
+            {
+               // strbuilder.Append("select * from csu_country where region_id= " + RegionID + "");
+
+                strbuilder.Append("select * from csu_country order by Country_name");
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+
+        public DataTable FetchUpdatedByuserName(string  UserId)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+            try
+            {
+               // strbuilder.Append("select * from csu_country where region_id= " + RegionID + "");
+
+                strbuilder.Append("select * from csu_user where EMP_ID='"+UserId+"'");
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+        
+        public DataTable GetCPERouter(int ProductID, int RegionID, int CountryID)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+            try
+            {
+                strbuilder.Append("select distinct ROUTER_NAME FROM VW_STD_RPT_CPE_BNDLS_TEST WHERE product_id=" + ProductID + " and country_id="+CountryID+" and  part_type in('Opt','Var','IOS')");
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+
+        public DataTable GetCPEBundle(int ProductID, int RegionID, int CountryID, List<string> RouterNamedd)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+            string RouterNameList = "";
+            string replacedrouter = "";
+            if (RouterNamedd.Count > 1)
+            {
+                for (int i = 0; i < RouterNamedd.Count; i++)
+                {
+                    RouterNameList += RouterNamedd[i] + ",";
+                }
+                replacedrouter = string.Join(",", RouterNameList.Split(',').Select(x => string.Format("'{0}'", x)).ToList());
+            }
+
+            else
+            {
+                if (RouterNamedd.Count > 0 && RouterNamedd.Count <= 1)
+                {
+                    replacedrouter = "'" + RouterNamedd[0].ToString() + "'";
+                }
+            }
+            try
+            {
+               // strbuilder.Append("select distinct BUNDLE_NAME FROM VW_STD_RPT_CPE_BNDLS_TEST WHERE product_id=" + ProductID + " and region_id=" + RegionID + " and country_id=" + CountryID + " and ROUTER_NAME IN (" + replacedrouter + ") and  part_type in('Opt','Var','IOS')");
+                strbuilder.Append("select distinct BUNDLE_NAME FROM VW_STD_RPT_CPE_BNDLS_TEST WHERE product_id=" + ProductID + " and country_id=" + CountryID + " and ROUTER_NAME IN (" + replacedrouter + ") and  part_type in('Opt','Var','IOS')");
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+
+
+        public DataTable ShowAssignedCountries(string BundleName, string AccessType)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+           
+
+
+            
+            try
+            {
+                strbuilder.Append("SELECT * FROM CSU_CPE_CNTRY_BNDLS_ACCTYPE a, csu_country b WHERE a.COUNTRY_ID = b.COUNTRY_ID AND a.BUNDLE_ID    = (SELECT CHAR_ID FROM csu_ref_valid_char WHERE char_name= '"+BundleName+"') and a.access_type=(SELECT CHAR_ID FROM csu_ref_valid_char WHERE char_name= '"+ AccessType.TrimEnd()+"') ORDER BY COUNTRY_NAME");
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+
+
+        public DataTable ShowUnAssignedCountries(string BundleName, string AccessType)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+
+
+
+
+            try
+            {
+                strbuilder.Append("  select  * from csu_country where COUNTRY_ID NOT IN ( SELECT DISTINCT country_id FROM CSU_CPE_CNTRY_BNDLS_ACCTYPE  WHERE bundle_id =(SELECT CHAR_ID FROM csu_ref_valid_char WHERE char_name= '" + BundleName + "')  AND ACCESS_Type =(SELECT CHAR_ID FROM csu_ref_valid_char WHERE char_name= '" + AccessType.TrimEnd() + "'))  order by COUNTRY_NAME ");
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return objGetDataFromDB.GetDataTable(strbuilder.ToString());
+        }
+        
+        public DataTable GetCPEBundleTableDetails(int ProductID, int RegionID, int CountryID, List<string> RouterNamedd, List<string> BundleNamedd)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+            string RouterNameList = "";
+            string BundleNameList = "";
+            string replacedrouter = "";
+            string replacedbundle = "";
+            try
+            {
+                //tempQuery = GetBundleIDArray(ProductID);
+                tempqueryaccessid = GetAllAccessIDArray();
+
+                strQuery.Clear();
+
+                if (RouterNamedd.Count > 1)
+                {
+                    for (int i = 0; i < RouterNamedd.Count; i++)
+                    {
+                        RouterNameList += RouterNamedd[i] + ",";
+                    }
+                    replacedrouter = string.Join(",", RouterNameList.Split(',').Select(x => string.Format("'{0}'", x)).ToList());
+                }
+                   
+                else {
+                    replacedrouter = "'" + RouterNamedd[0].ToString() + "'";
+                }
+
+              
+              
+
+                if (BundleNamedd.Count > 1)
+                {
+                    for (int i = 0; i < BundleNamedd.Count; i++)
+                    {
+                        BundleNameList += BundleNamedd[i] + ",";
+                    }
+                    replacedbundle = string.Join(",", BundleNameList.Split(',').Select(x => string.Format("'{0}'", x)).ToList());
+                }
+                else
+                {
+                    replacedbundle = "'" + BundleNamedd[0].ToString() + "'";
+                }
+               
+                    //strQuery.Append("select char_name, char_valid_cd ,(select char_name from csu_ref_valid_char where char_id= (select router_id from CSU_CPE_BNDLS where id =BUNDLE_ID)) FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID and b.PRODUCT_CD = 76 ORDER BY 2),");
+                    //strQuery.Append(" ( select distinct c.char_name,d.name,c.char_id from csu_cpe_ios_parts i,");
+                    //strQuery.Append(" left outer join csu_ref_valid_char c on c.char_id=i.access_type_id,");
+                    //strQuery.Append(" left outer join csu_cpe_parts d on d.id=i.part_id ");
+                    //strQuery.Append("  where bundle_id in (" + tempQuery + ")");
+                    //strQuery.Append(" order by char_id),");
+                    //strQuery.Append(" (select distinct b.id, b.name, b.description  from csu_cpe_var_parts a, csu_cpe_parts b where a.part_id = b.id  and bundle_id in (" + tempQuery + ") order by b.id),");
+
+                    //strQuery.Append(" (	 select distinct b.id, b.name, b.description from csu_cpe_opt_parts a, csu_cpe_parts b where a.part_id = b.id and a.bundle_id in (" + tempQuery + ")  and a.access_type_id in ("+tempqueryaccessid+") order by b.name),");
+                    //strQuery.Append(" ( select * FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID  and b.PRODUCT_CD = 76 ORDER BY a.CHAR_NUM_VALUE),");
+                    //strQuery.Append(" ( select ROUTER_EOQ_DATE,ROUTER_EOS_DATE,ROUTER_EOL_DATE,ROUTER_VALID_FLAG,CREATED_EMP_ID,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT from csu_cpe_routers,csu_ref_valid_char where csu_cpe_routers.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                    //strQuery.Append(" (  select EOQ_DATE,EOS_DATE,EOL_DATE,EXPECTED_DATE,QUOTABLE_START_DATE from csu_cpe_bndls,csu_ref_valid_char where csu_cpe_bndls.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                    //strQuery.Append(" ( select CREATED_EMP_ID,to_char(CREATED_DT,'DD-MON-YYYY HH:MI:SS AM'),UPDATED_EMP_ID,to_char(UPDATED_DT,'DD-MON-YYYY HH:MI:SS AM') from CSU_REF_VALID_CHAR where CHAR_ID in (" + tempQuery + ")) ");
+
+
+                    //  strQuery.Append("SELECT DISTINCT C.CHAR_NAME  access_type_name, D.NAME PART_NAME,i.bundle_id bundleid,(SELECT a.char_name bundle_name FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b WHERE a.CHAR_ID  = b.BUNDLE_ID and a.char_id=i.bundle_id AND B.PRODUCT_CD = " + ProductID + ") bundle_name, (SELECT a.char_valid_cd bundle_name FROM CSU_REF_VALID_CHAR a,  CSU_CPE_PRODUCT_BNDLS b WHERE a.CHAR_ID  = b.BUNDLE_ID and a.char_id=i.bundle_id AND B.PRODUCT_CD = " + ProductID + ") CHAR_VALID_CD, substr(c.char_name,1,(instr(c.char_name,'with')-2)) as router_name, i.access_type_id acesstypeid, c.char_id access_type_id FROM csu_cpe_ios_parts i LEFT OUTER JOIN csu_ref_valid_char c ON c.char_id=i.access_type_id  LEFT OUTER JOIN csu_cpe_parts d ON d.id          =i.part_id WHERE bundle_id  IN  (SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,   CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID  = b.BUNDLE_ID AND b.PRODUCT_CD = " + ProductID + " ) ORDER BY access_type_name");
+
+               
+   //  strQuery.Append("select  distinct * FROM VW_STD_RPT_CPE_BNDLS_TEST WHERE product_id=" + ProductID + " and region_id=" + RegionID + " and country_id=" + CountryID + " and  part_type in('Opt','Var','IOS') and ROUTER_NAME IN (" + replacedrouter + ") and BUNDLE_NAME IN (" + replacedbundle + ")   order by BUNDLE_NAME,CHAR_NAME");
+                strQuery.Append("select  distinct * FROM VW_STD_RPT_CPE_BNDLS_TEST WHERE product_id=" + ProductID + " and country_id=" + CountryID + " and  part_type in('Opt','Var','IOS') and ROUTER_NAME IN (" + replacedrouter + ") and BUNDLE_NAME IN (" + replacedbundle + ")   order by BUNDLE_NAME,CHAR_NAME");
+              //  strQuery.Append("select * FROM VW_STD_RPT_CPE_BNDLS_TEST WHERE product_id=" + ProductID + " and region_id=" + RegionID + " and country_id=" + CountryID + " and  part_type in('Opt','Var','IOS')   order by BUNDLE_NAME");
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+
+        }
+
+        public DataTable GetCPEBundleTableDetails_UpdateBundleValidity(int ProductID, int RegionID, int CountryID, List<string> RouterNamedd, List<string> BundleNamedd)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+            string RouterNameList = "";
+            string BundleNameList = "";
+            string replacedrouter = "";
+            string replacedbundle = "";
+            try
+            {
+                //tempQuery = GetBundleIDArray(ProductID);
+                tempqueryaccessid = GetAllAccessIDArray();
+
+                strQuery.Clear();
+
+                if (RouterNamedd.Count > 1)
+                {
+                    for (int i = 0; i < RouterNamedd.Count; i++)
+                    {
+                        RouterNameList += RouterNamedd[i] + ",";
+                    }
+                    replacedrouter = string.Join(",", RouterNameList.Split(',').Select(x => string.Format("'{0}'", x)).ToList());
+                }
+
+                else
+                {
+                    replacedrouter = "'" + RouterNamedd[0].ToString() + "'";
+                }
+
+
+
+
+                if (BundleNamedd.Count > 1)
+                {
+                    for (int i = 0; i < BundleNamedd.Count; i++)
+                    {
+                        BundleNameList += BundleNamedd[i] + ",";
+                    }
+                    replacedbundle = string.Join(",", BundleNameList.Split(',').Select(x => string.Format("'{0}'", x)).ToList());
+                }
+                else
+                {
+                    replacedbundle = "'" + BundleNamedd[0].ToString() + "'";
+                }
+
+                //strQuery.Append("select char_name, char_valid_cd ,(select char_name from csu_ref_valid_char where char_id= (select router_id from CSU_CPE_BNDLS where id =BUNDLE_ID)) FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID and b.PRODUCT_CD = 76 ORDER BY 2),");
+                //strQuery.Append(" ( select distinct c.char_name,d.name,c.char_id from csu_cpe_ios_parts i,");
+                //strQuery.Append(" left outer join csu_ref_valid_char c on c.char_id=i.access_type_id,");
+                //strQuery.Append(" left outer join csu_cpe_parts d on d.id=i.part_id ");
+                //strQuery.Append("  where bundle_id in (" + tempQuery + ")");
+                //strQuery.Append(" order by char_id),");
+                //strQuery.Append(" (select distinct b.id, b.name, b.description  from csu_cpe_var_parts a, csu_cpe_parts b where a.part_id = b.id  and bundle_id in (" + tempQuery + ") order by b.id),");
+
+                //strQuery.Append(" (	 select distinct b.id, b.name, b.description from csu_cpe_opt_parts a, csu_cpe_parts b where a.part_id = b.id and a.bundle_id in (" + tempQuery + ")  and a.access_type_id in ("+tempqueryaccessid+") order by b.name),");
+                //strQuery.Append(" ( select * FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID  and b.PRODUCT_CD = 76 ORDER BY a.CHAR_NUM_VALUE),");
+                //strQuery.Append(" ( select ROUTER_EOQ_DATE,ROUTER_EOS_DATE,ROUTER_EOL_DATE,ROUTER_VALID_FLAG,CREATED_EMP_ID,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT from csu_cpe_routers,csu_ref_valid_char where csu_cpe_routers.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                //strQuery.Append(" (  select EOQ_DATE,EOS_DATE,EOL_DATE,EXPECTED_DATE,QUOTABLE_START_DATE from csu_cpe_bndls,csu_ref_valid_char where csu_cpe_bndls.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                //strQuery.Append(" ( select CREATED_EMP_ID,to_char(CREATED_DT,'DD-MON-YYYY HH:MI:SS AM'),UPDATED_EMP_ID,to_char(UPDATED_DT,'DD-MON-YYYY HH:MI:SS AM') from CSU_REF_VALID_CHAR where CHAR_ID in (" + tempQuery + ")) ");
+
+
+                //  strQuery.Append("SELECT DISTINCT C.CHAR_NAME  access_type_name, D.NAME PART_NAME,i.bundle_id bundleid,(SELECT a.char_name bundle_name FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b WHERE a.CHAR_ID  = b.BUNDLE_ID and a.char_id=i.bundle_id AND B.PRODUCT_CD = " + ProductID + ") bundle_name, (SELECT a.char_valid_cd bundle_name FROM CSU_REF_VALID_CHAR a,  CSU_CPE_PRODUCT_BNDLS b WHERE a.CHAR_ID  = b.BUNDLE_ID and a.char_id=i.bundle_id AND B.PRODUCT_CD = " + ProductID + ") CHAR_VALID_CD, substr(c.char_name,1,(instr(c.char_name,'with')-2)) as router_name, i.access_type_id acesstypeid, c.char_id access_type_id FROM csu_cpe_ios_parts i LEFT OUTER JOIN csu_ref_valid_char c ON c.char_id=i.access_type_id  LEFT OUTER JOIN csu_cpe_parts d ON d.id          =i.part_id WHERE bundle_id  IN  (SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,   CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID  = b.BUNDLE_ID AND b.PRODUCT_CD = " + ProductID + " ) ORDER BY access_type_name");
+
+                strQuery.Append("select distinct Bundle_Name,Valid_Bundle FROM VW_STD_RPT_CPE_BNDLS_TEST WHERE product_id=" + ProductID + " and region_id=" + RegionID + " and country_id=" + CountryID + " and  part_type in('Opt','Var','IOS') and ROUTER_NAME IN (" + replacedrouter + ") and BUNDLE_NAME IN (" + replacedbundle + ")   order by BUNDLE_NAME");
+
+                //  strQuery.Append("select * FROM VW_STD_RPT_CPE_BNDLS_TEST WHERE product_id=" + ProductID + " and region_id=" + RegionID + " and country_id=" + CountryID + " and  part_type in('Opt','Var','IOS')   order by BUNDLE_NAME");
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+
+        }
+
+        public int UpdateCPEBundleValidity(string BundleNameValues, string Userid)
+        {
+            string query = string.Empty;
+            int status = 0;
+            string BundleNameList = "";
+            string replacedbundle = "";
+            List<string> BundleNamesChecked = BundleNameValues.Split(',').ToList();
+            if (BundleNamesChecked.Count > 1)
+            {
+                for (int i = 0; i < BundleNamesChecked.Count; i++)
+                {
+                    BundleNameList += BundleNamesChecked[i] + ",";
+                }
+                replacedbundle = string.Join(",", BundleNameList.Split(',').Select(x => string.Format("'{0}'", x)).ToList());
+            }
+            else
+            {
+                replacedbundle = "'" + BundleNamesChecked[0].ToString() + "'";
+            }
+
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+         //   query = "update VW_STD_RPT_CPE_BNDLS_TEST set CHAR_VALID_CD='1' where BUNDLE_NAME in (" + replacedbundle + ")";
+
+            query = "update csu_ref_valid_char set CHAR_VALID_CD='1',UPDATED_EMP_ID=" + Userid + ",UPDATED_DT=sysdate where CHAR_NAME in (" + replacedbundle + ")";
+                status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+            
+
+            return status;
+
+
+
+        }
+
+        public int UpdateCPEBundleValidity1(string BundleNameValuesUnchecked, string Userid)
+        {
+            string query = string.Empty;
+            int status = 0;
+            string BundleNameList = "";
+            string replacedbundle = "";
+            List<string> BundleNamesUnCheckedList = BundleNameValuesUnchecked.Split(',').ToList();
+            if (BundleNamesUnCheckedList.Count > 1)
+            {
+                for (int i = 0; i < BundleNamesUnCheckedList.Count; i++)
+                {
+                    BundleNameList += BundleNamesUnCheckedList[i] + ",";
+                }
+                replacedbundle = string.Join(",", BundleNameList.Split(',').Select(x => string.Format("'{0}'", x)).ToList());
+            }
+            else
+            {
+                replacedbundle = "'" + BundleNamesUnCheckedList[0].ToString() + "'";
+            }
+
+
+            OracleConnection con = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+
+
+            //query = "update VW_STD_RPT_CPE_BNDLS_TEST set CHAR_VALID_CD='0' where BUNDLE_NAME in (" + replacedbundle + ")";
+
+            query = "update csu_ref_valid_char set CHAR_VALID_CD='0',UPDATED_EMP_ID=" + Userid + ",UPDATED_DT=sysdate  where CHAR_NAME in (" + replacedbundle + ")";
+            status = OracleDataAccess.ExecuteNonQuery(con, CommandType.Text, query);
+
+
+            return status;
+
+
+
+        }
+        
+
+        public DataTable GetCPEBundleTableDetails2(int ProductID)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+
+
+            try
+            {
+               
+               
+
+                strQuery.Clear();
+                //strQuery.Append("select char_name, char_valid_cd ,(select char_name from csu_ref_valid_char where char_id= (select router_id from CSU_CPE_BNDLS where id =BUNDLE_ID)) FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID and b.PRODUCT_CD = 76 ORDER BY 2),");
+                //strQuery.Append(" ( select distinct c.char_name,d.name,c.char_id from csu_cpe_ios_parts i,");
+                //strQuery.Append(" left outer join csu_ref_valid_char c on c.char_id=i.access_type_id,");
+                //strQuery.Append(" left outer join csu_cpe_parts d on d.id=i.part_id ");
+                //strQuery.Append("  where bundle_id in (" + tempQuery + ")");
+                //strQuery.Append(" order by char_id),");
+                //strQuery.Append(" (select distinct b.id, b.name, b.description  from csu_cpe_var_parts a, csu_cpe_parts b where a.part_id = b.id  and bundle_id in (" + tempQuery + ") order by b.id),");
+
+                //strQuery.Append(" (	 select distinct b.id, b.name, b.description from csu_cpe_opt_parts a, csu_cpe_parts b where a.part_id = b.id and a.bundle_id in (" + tempQuery + ")  and a.access_type_id in ("+tempqueryaccessid+") order by b.name),");
+                //strQuery.Append(" ( select * FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID  and b.PRODUCT_CD = 76 ORDER BY a.CHAR_NUM_VALUE),");
+                //strQuery.Append(" ( select ROUTER_EOQ_DATE,ROUTER_EOS_DATE,ROUTER_EOL_DATE,ROUTER_VALID_FLAG,CREATED_EMP_ID,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT from csu_cpe_routers,csu_ref_valid_char where csu_cpe_routers.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                //strQuery.Append(" (  select EOQ_DATE,EOS_DATE,EOL_DATE,EXPECTED_DATE,QUOTABLE_START_DATE from csu_cpe_bndls,csu_ref_valid_char where csu_cpe_bndls.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                //strQuery.Append(" ( select CREATED_EMP_ID,to_char(CREATED_DT,'DD-MON-YYYY HH:MI:SS AM'),UPDATED_EMP_ID,to_char(UPDATED_DT,'DD-MON-YYYY HH:MI:SS AM') from CSU_REF_VALID_CHAR where CHAR_ID in (" + tempQuery + ")) ");
+
+
+                strQuery.Append("select distinct b.id, b.name variable_parts,(select char_name from CSU_REF_VALID_CHAR where char_id=bundle_id) bundle_name  from csu_cpe_var_parts a, csu_cpe_parts b  where a.part_id = b.id  and bundle_id  IN   (SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,    CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID  = b.BUNDLE_ID   AND B.PRODUCT_CD = " + ProductID + "  )order by 3");
+
+
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+
+        }
+
+
+        public DataTable GetCPEBundleTableDetails3(int ProductID)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+
+
+            try
+            {
+               
+
+                strQuery.Clear();
+                //strQuery.Append("select char_name, char_valid_cd ,(select char_name from csu_ref_valid_char where char_id= (select router_id from CSU_CPE_BNDLS where id =BUNDLE_ID)) FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID and b.PRODUCT_CD = 76 ORDER BY 2),");
+                //strQuery.Append(" ( select distinct c.char_name,d.name,c.char_id from csu_cpe_ios_parts i,");
+                //strQuery.Append(" left outer join csu_ref_valid_char c on c.char_id=i.access_type_id,");
+                //strQuery.Append(" left outer join csu_cpe_parts d on d.id=i.part_id ");
+                //strQuery.Append("  where bundle_id in (" + tempQuery + ")");
+                //strQuery.Append(" order by char_id),");
+                //strQuery.Append(" (select distinct b.id, b.name, b.description  from csu_cpe_var_parts a, csu_cpe_parts b where a.part_id = b.id  and bundle_id in (" + tempQuery + ") order by b.id),");
+
+                //strQuery.Append(" (	 select distinct b.id, b.name, b.description from csu_cpe_opt_parts a, csu_cpe_parts b where a.part_id = b.id and a.bundle_id in (" + tempQuery + ")  and a.access_type_id in ("+tempqueryaccessid+") order by b.name),");
+                //strQuery.Append(" ( select * FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID  and b.PRODUCT_CD = 76 ORDER BY a.CHAR_NUM_VALUE),");
+                //strQuery.Append(" ( select ROUTER_EOQ_DATE,ROUTER_EOS_DATE,ROUTER_EOL_DATE,ROUTER_VALID_FLAG,CREATED_EMP_ID,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT from csu_cpe_routers,csu_ref_valid_char where csu_cpe_routers.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                //strQuery.Append(" (  select EOQ_DATE,EOS_DATE,EOL_DATE,EXPECTED_DATE,QUOTABLE_START_DATE from csu_cpe_bndls,csu_ref_valid_char where csu_cpe_bndls.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                //strQuery.Append(" ( select CREATED_EMP_ID,to_char(CREATED_DT,'DD-MON-YYYY HH:MI:SS AM'),UPDATED_EMP_ID,to_char(UPDATED_DT,'DD-MON-YYYY HH:MI:SS AM') from CSU_REF_VALID_CHAR where CHAR_ID in (" + tempQuery + ")) ");
+
+
+                //strQuery.Append("SELECT * FROM(SELECT DISTINCT B.ID part_id,B.NAME PART_NAME,  B.DESCRIPTION PART_DESCRIPTION,  'VAR' TYPE_OF_PART FROM CSU_CPE_VAR_PARTS A, CSU_CPE_PARTS B WHERE a.part_id = b.id AND bundle_id  IN  (SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,    CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID  = b.BUNDLE_ID  AND b.PRODUCT_CD = 76  ) UNION  SELECT DISTINCT B.ID PART_ID, B.NAME PART_NAME,  B.DESCRIPTION PART_DESCRIPTION,  'OPT' TYPE_OF_PART FROM CSU_CPE_OPT_PARTS A, CSU_CPE_PARTS B WHERE a.part_id  = b.id AND a.bundle_id IN  (SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,  CSU_CPE_PRODUCT_BNDLS b WHERE a.CHAR_ID  = b.BUNDLE_ID  AND b.PRODUCT_CD = 76 ) AND a.access_type_id IN  (SELECT DISTINCT ACCESS_TYPE_ID FROM CSU_CPE_BNDL_ACC_TYPES WHERE BUNDLE_ID IN ( SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,   CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID  = b.BUNDLE_ID  AND b.PRODUCT_CD = 76  ) ) )ORDER BY PART_NAME");
+                strQuery.Append("SELECT DISTINCT B.ID, B.NAME OPTIONAL_PART, B.DESCRIPTION ,  (SELECT CHAR_NAME FROM CSU_REF_VALID_CHAR WHERE CHAR_ID=A.BUNDLE_ID  ) BUNDLE_NAME, (SELECT char_name FROM CSU_REF_VALID_CHAR WHERE char_id=a.access_type_id  ) ACCESS_TYPE_NAME FROM csu_cpe_opt_parts a,  csu_cpe_parts b WHERE a.part_id  = b.id AND a.bundle_id IN (SELECT BUNDLE_ID  FROM CSU_REF_VALID_CHAR a,   CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID  = b.BUNDLE_ID  AND b.PRODUCT_CD = " + ProductID + "  ) AND a.access_type_id IN (SELECT DISTINCT access_type_id  FROM CSU_CPE_BNDL_ACC_TYPES  WHERE bundle_id IN   (SELECT BUNDLE_ID    FROM CSU_REF_VALID_CHAR a,    CSU_CPE_PRODUCT_BNDLS b   WHERE a.CHAR_ID  = b.BUNDLE_ID   AND B.PRODUCT_CD = " + ProductID + "   ) ) and rownum<10 ORDER BY Bundle_Name");
+
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+
+        }
+
+
+        public DataTable GetCPEBundleTableDetails4(int ProductID)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+
+
+            try
+            {
+                
+                strQuery.Clear();
+                //strQuery.Append("select char_name, char_valid_cd ,(select char_name from csu_ref_valid_char where char_id= (select router_id from CSU_CPE_BNDLS where id =BUNDLE_ID)) FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID and b.PRODUCT_CD = 76 ORDER BY 2),");
+                //strQuery.Append(" ( select distinct c.char_name,d.name,c.char_id from csu_cpe_ios_parts i,");
+                //strQuery.Append(" left outer join csu_ref_valid_char c on c.char_id=i.access_type_id,");
+                //strQuery.Append(" left outer join csu_cpe_parts d on d.id=i.part_id ");
+                //strQuery.Append("  where bundle_id in (" + tempQuery + ")");
+                //strQuery.Append(" order by char_id),");
+                //strQuery.Append(" (select distinct b.id, b.name, b.description  from csu_cpe_var_parts a, csu_cpe_parts b where a.part_id = b.id  and bundle_id in (" + tempQuery + ") order by b.id),");
+
+                //strQuery.Append(" (	 select distinct b.id, b.name, b.description from csu_cpe_opt_parts a, csu_cpe_parts b where a.part_id = b.id and a.bundle_id in (" + tempQuery + ")  and a.access_type_id in ("+tempqueryaccessid+") order by b.name),");
+                //strQuery.Append(" ( select * FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID  and b.PRODUCT_CD = 76 ORDER BY a.CHAR_NUM_VALUE),");
+                //strQuery.Append(" ( select ROUTER_EOQ_DATE,ROUTER_EOS_DATE,ROUTER_EOL_DATE,ROUTER_VALID_FLAG,CREATED_EMP_ID,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT from csu_cpe_routers,csu_ref_valid_char where csu_cpe_routers.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                //strQuery.Append(" (  select EOQ_DATE,EOS_DATE,EOL_DATE,EXPECTED_DATE,QUOTABLE_START_DATE from csu_cpe_bndls,csu_ref_valid_char where csu_cpe_bndls.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                //strQuery.Append(" ( select CREATED_EMP_ID,to_char(CREATED_DT,'DD-MON-YYYY HH:MI:SS AM'),UPDATED_EMP_ID,to_char(UPDATED_DT,'DD-MON-YYYY HH:MI:SS AM') from CSU_REF_VALID_CHAR where CHAR_ID in (" + tempQuery + ")) ");
+
+
+               //strQuery.Append("  SELECT c.char_name, EOQ_DATE, EOS_DATE,  EOL_DATE, EXPECTED_DATE, QUOTABLE_START_DATE,CREATED_EMP_ID , TO_CHAR(CREATED_DT,'DD-MON-YYYY HH:MI:SS AM') bundle_created_dt,  UPDATED_EMP_ID, TO_CHAR(UPDATED_DT,'DD-MON-YYYY HH:MI:SS AM') BUNDLE_UPDATED_DT FROM CSU_REF_VALID_CHAR C,CSU_CPE_BNDLS d WHERE d.ID = c.char_id and CHAR_ID IN  (SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,    CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID  = b.BUNDLE_ID AND b.PRODUCT_CD = 76 )  order by 1");
+                strQuery.Append("select * from (SELECT C.CHAR_NAME BUNDLE_NAME, d.router_id , EOQ_DATE BUNDLE_EOQ_DATE, EOS_DATE BUNDLE_EOS_DATE,  EOL_DATE bundle_eol_date, EXPECTED_DATE,  QUOTABLE_START_DATE, CREATED_EMP_ID , TO_CHAR(CREATED_DT,'DD-MON-YYYY HH:MI:SS AM') bundle_created_dt, UPDATED_EMP_ID, TO_CHAR(UPDATED_DT,'DD-MON-YYYY HH:MI:SS AM') BUNDLE_UPDATED_DT FROM CSU_REF_VALID_CHAR C,CSU_CPE_BNDLS d WHERE d.ID = c.char_id and CHAR_ID IN (SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,    CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID  = b.BUNDLE_ID  AND B.PRODUCT_CD = " + ProductID + "  ))A LEFT OUTER JOIN (SELECT C.CHAR_NAME ROUTER_NAME , r.id, ROUTER_EOQ_DATE ROUTER_EOQ_DATE, ROUTER_EOS_DATE ROUTER_EOS_DATE,  ROUTER_EOL_DATE ROUTER_EOL_DATE FROM csu_cpe_routers r,  csu_ref_valid_char c WHERE r.ID = c.char_id and ID in ( select router_id from  CSU_CPE_BNDLS  where id in ( (SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,   CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID  = b.BUNDLE_ID   AND B.PRODUCT_CD = " + ProductID + "   ) )))b ON A.ROUTER_ID=B.ID order by 1");
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+
+        }
+
+        public DataTable GetCPEBundleTableDetails5(int ProductID)
+        {
+            GetDataFromDB objGetDataFromDB = new GetDataFromDB();
+            StringBuilder strbuilder = new StringBuilder();
+
+
+            try
+            {
+
+                strQuery.Clear();
+                //strQuery.Append("select char_name, char_valid_cd ,(select char_name from csu_ref_valid_char where char_id= (select router_id from CSU_CPE_BNDLS where id =BUNDLE_ID)) FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID and b.PRODUCT_CD = 76 ORDER BY 2),");
+                //strQuery.Append(" ( select distinct c.char_name,d.name,c.char_id from csu_cpe_ios_parts i,");
+                //strQuery.Append(" left outer join csu_ref_valid_char c on c.char_id=i.access_type_id,");
+                //strQuery.Append(" left outer join csu_cpe_parts d on d.id=i.part_id ");
+                //strQuery.Append("  where bundle_id in (" + tempQuery + ")");
+                //strQuery.Append(" order by char_id),");
+                //strQuery.Append(" (select distinct b.id, b.name, b.description  from csu_cpe_var_parts a, csu_cpe_parts b where a.part_id = b.id  and bundle_id in (" + tempQuery + ") order by b.id),");
+
+                //strQuery.Append(" (	 select distinct b.id, b.name, b.description from csu_cpe_opt_parts a, csu_cpe_parts b where a.part_id = b.id and a.bundle_id in (" + tempQuery + ")  and a.access_type_id in ("+tempqueryaccessid+") order by b.name),");
+                //strQuery.Append(" ( select * FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID  and b.PRODUCT_CD = 76 ORDER BY a.CHAR_NUM_VALUE),");
+                //strQuery.Append(" ( select ROUTER_EOQ_DATE,ROUTER_EOS_DATE,ROUTER_EOL_DATE,ROUTER_VALID_FLAG,CREATED_EMP_ID,CREATED_DT,UPDATED_EMP_ID,UPDATED_DT from csu_cpe_routers,csu_ref_valid_char where csu_cpe_routers.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                //strQuery.Append(" (  select EOQ_DATE,EOS_DATE,EOL_DATE,EXPECTED_DATE,QUOTABLE_START_DATE from csu_cpe_bndls,csu_ref_valid_char where csu_cpe_bndls.ID = csu_ref_valid_char.char_id and ID in ("+tempQuery+")),");
+                //strQuery.Append(" ( select CREATED_EMP_ID,to_char(CREATED_DT,'DD-MON-YYYY HH:MI:SS AM'),UPDATED_EMP_ID,to_char(UPDATED_DT,'DD-MON-YYYY HH:MI:SS AM') from CSU_REF_VALID_CHAR where CHAR_ID in (" + tempQuery + ")) ");
+
+
+                //strQuery.Append("  SELECT c.char_name, EOQ_DATE, EOS_DATE,  EOL_DATE, EXPECTED_DATE, QUOTABLE_START_DATE,CREATED_EMP_ID , TO_CHAR(CREATED_DT,'DD-MON-YYYY HH:MI:SS AM') bundle_created_dt,  UPDATED_EMP_ID, TO_CHAR(UPDATED_DT,'DD-MON-YYYY HH:MI:SS AM') BUNDLE_UPDATED_DT FROM CSU_REF_VALID_CHAR C,CSU_CPE_BNDLS d WHERE d.ID = c.char_id and CHAR_ID IN  (SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,    CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID  = b.BUNDLE_ID AND b.PRODUCT_CD = 76 )  order by 1");
+                strQuery.Append("select distinct ROUTER_NAME,bundle_name,name,part_type ,char_name,eol_date,eos_date FROM vw_std_rpt_cpe_bndls WHERE product_id=76 and region_id=6 and country_id=14 and  part_type in('Opt','Var','IOS') and rownum<10 order by BUNDLE_NAME");
+                return objGetDataFromDB.GetDataTable(strQuery.ToString());
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+
+        }
+
+        //public static List<DataTable> GetCPEBundleTableDetails(string ProductID)
+        //{
+        //    List<DataTable> list = new List<DataTable>();
+
+        //    //DataTable primaryAccessTechnology = new DataTable();
+        //    //DataTable primaryServiceVariant = new DataTable();
+        //    //DataTable PrimaryDeliveryMode = new DataTable();
+        //    //DataTable SLAcategory = new DataTable();
+
+        //    //OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        //    //OracleCommand command1 = new OracleCommand("select *  from csu_ref_acc_tech_map;", connection);
+        //    //OracleDataAdapter adapter1 = new OracleDataAdapter(command1);
+        //    //DataTable dt1 = new DataTable();
+
+        //    OracleConnection connection = new OracleConnection(ConfigurationManager.AppSettings.Get("OraConnString"));
+        //    OracleCommand command1 = new OracleCommand("SELECT char_name bundle_name, char_valid_cd , (SELECT char_name  FROM csu_ref_valid_char  WHERE char_id=   (SELECT router_id FROM CSU_CPE_BNDLS WHERE id =BUNDLE_ID  )) as router_name FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b WHERE a.CHAR_ID  = b.BUNDLE_ID AND B.PRODUCT_CD = 76 ORDER BY 2;", connection);
+        //    OracleDataAdapter adapter1 = new OracleDataAdapter(command1);
+        //    DataTable dt1 = new DataTable();
+
+
+        //    OracleCommand command2 = new OracleCommand("SELECT DISTINCT C.CHAR_NAME access_type_name,  D.NAME PART_NAME,  c.char_id access_type_id FROM csu_cpe_ios_parts i LEFT OUTER JOIN csu_ref_valid_char c ON c.char_id=i.access_type_id LEFT OUTER JOIN csu_cpe_parts d ON d.id          =i.part_id WHERE bundle_id IN (SELECT BUNDLE_ID FROM CSU_REF_VALID_CHAR a,   CSU_CPE_PRODUCT_BNDLS b WHERE a.CHAR_ID  = b.BUNDLE_ID AND b.PRODUCT_CD = 76) ORDER BY CHAR_ID;", connection);
+        //    OracleDataAdapter adapter2 = new OracleDataAdapter(command2);
+        //    DataTable dt2 = new DataTable();
+
+
+        //    //OracleCommand command3 = new OracleCommand("select * from access_service_variant;", connection);
+        //    //OracleDataAdapter adapter3 = new OracleDataAdapter(command3);
+        //    //DataTable dt3 = new DataTable();
+
+
+        //    //OracleCommand command4 = new OracleCommand("select char_id,char_name,char_type_id from csu_ref_valid_char where char_type_id in (3842,3846)", connection);
+        //    //OracleDataAdapter adapter4 = new OracleDataAdapter(command4);
+        //    //DataTable dt4 = new DataTable();
+
+
+        //    try
+        //    {
+        //        connection.Open();
+        //        adapter1.Fill(dt1);
+        //        adapter2.Fill(dt2);
+        //        //adapter3.Fill(dt3);
+        //        //adapter4.Fill(dt4);
+        //    }
+        //    finally
+        //    {
+        //        connection.Close();
+        //        connection.Dispose();
+        //    }
+        //    list.Add(dt1); list.Add(dt2);
+
+        //    return list;
+
+
+        //}
+
+        public string GetBundleIDArray(string ProductID)
+        {
+            strQuery.Clear();
+
+            strQuery.Append("select BUNDLE_ID FROM CSU_REF_VALID_CHAR a, CSU_CPE_PRODUCT_BNDLS b  WHERE a.CHAR_ID = b.BUNDLE_ID and b.PRODUCT_CD = 76");
+            return strQuery.ToString();
+        }
+
+        public string GetAllAccessIDArray()
+        {
+             strQuery.Clear();
+
+             strQuery.Append("select distinct access_type_id from CSU_CPE_BNDL_ACC_TYPES where bundle_id in " + tempQuery + " ");
+             return strQuery.ToString();
+                             
+        }
+
+    }
+}

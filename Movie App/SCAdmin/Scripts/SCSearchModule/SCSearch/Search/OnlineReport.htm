@@ -1,0 +1,68 @@
+﻿<!DOCTYPE>
+<html ng-app="appModule">
+<head>
+    <title></title>
+</head>
+<body>
+    <div class="container" ng-controller="CISReportCntrl">
+        <div class="row">
+            <button type="button" class="close" ng-click="$dismiss()">
+                &times;</button><br />
+            <div class="panel panel-primary">
+                <div class="panel-heading Arrow">
+                    <h3 class="panel-title text-center">
+                        Online Reports
+                    </h3>
+                </div>
+                <div class="panel-body clickable1">
+                    <div class="panel panel-info">
+                        <div class="panel-heading upDownIconToggle collapsed clickable1" data-toggle="collapse"
+                            ng-click="getRegionList()" data-target="#OnlineReportPanel">
+                            <h4 class="panel-title">
+                                In-Region Caller Access Availability
+                            </h4>
+                            <span class="pull-right"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                        </div>
+                        <div class="panel-collapse collapse" id="OnlineReportPanel">
+                            <div class="panel-body">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading Arrow">
+                                        <h3 class="panel-title text-center">
+                                            Terminating Countries
+                                        </h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <p class="Arrow">
+                                            <b>Upon selecting a terminating country from the following list, you will be able to
+                                                view Caller Access Type Availability for in-region originating countries only. For
+                                                out of region originations, please refer to the data matrix.<br>
+                                                Please note that some of these countries may not allow dedicated terminations. Refer
+                                                to the CIS terminating country section for details.</b>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="panel panel-info" style="display: none" id="regList">
+                                    <div class="panel-body">
+                                        <table class="table table-bordered">
+                                            <tr ng-repeat="item in CountryList">
+                                                <td>
+                                                    {{item.dispRegName}}&nbsp;
+                                                </td>
+                                                <td>
+                                                    <a ng-click="openCISAccessReport(item.regID,item.regName,item.countryID)">{{item.countryName}}</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pageLoaderOverlay">
+        </div>
+    </div>
+</body>
+</html>

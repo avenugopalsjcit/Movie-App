@@ -1,0 +1,1004 @@
+﻿app.controller("AdminNotesCtrl", function ($scope, $rootScope, $http, $sce, AdminNotes, NgTableParams, $filter) {
+    $scope.NotesData = false;
+    $scope.RegiontData = false;
+    $scope.CountrytData = false;
+    $scope.CitytData = false;
+    $scope.noteDetails = false;
+    $scope.NoGridData = false;
+    $scope.showGridData = false;
+    $scope.FlagNoOfRows = false;
+    $scope.ShowNotesInfo = false;
+    $scope.ShowProductsInfo = false;
+    $scope.ShowRegionInfo = false;
+    $scope.ShowCityInfo = false;
+    $scope.ShowCountryInfo = false;
+    $scope.ShowEditPriorityInfo = false;
+    $scope.ShowEditCategoryInfo = false;
+    $scope.FlagPriority = true;
+    $scope.FlagCategory = false;
+    $scope.ShowCategoryInfo = false;
+    $scope.ShowPriorityInfo = false;
+    $scope.FlagCheckAddData = false;
+    $scope.FlagEditNote = false;
+    $scope.ShowTitleMsg = false;
+    $scope.NoteId = [];
+    $scope.modEditPriorityType = "";
+    $scope.modEditCategoryType = "";
+    $scope.rowCount = 100;
+    $scope.recordNo = 100;
+    $scope.ActualRows = "";
+
+    $(".pageLoaderOverlay").show();
+
+    AdminNotes.GetUserName($rootScope.User_Id).success(function (data) {
+        $("#Select1").select2({});
+        $scope.modOwner = data.d;
+    });
+    //parseInt($rootScope.User_Id)
+    AdminNotes.GetProducts(101, 608619284, 3, "", 910, 1, 1).success(function (data) {
+        $("#Select1").select2({});
+        $("#notes").select2({});
+        $("#region").select2({});
+        $("#country").select2({});
+        $("#city").select2({});
+        $scope.NotesData = false;
+        $scope.RegiontData = false;
+        $scope.CountrytData = false;
+        $scope.CitytData = false;
+        $scope.noteDetails = false;
+        $scope.NoGridData = false;
+        $scope.showGridData = false;
+        $scope.ShowNotesInfo = false;
+        $scope.ShowRegionInfo = false;
+        $scope.ShowCityInfo = false;
+        $scope.ShowCountryInfo = false;
+        $scope.ShowProductsInfo = false;
+        $scope.ProductsType = data.d;
+        $scope.rowCount = 100;
+        $scope.recordNo = 100;
+        $(".pageLoaderOverlay").hide();
+    });
+
+    $scope.GetProducts = function () {
+        if ($scope.modProductType != null) {
+            $scope.NotesData = false;
+            $scope.RegiontData = false;
+            $scope.CountrytData = false;
+            $scope.CitytData = false;
+            $scope.noteDetails = false;
+            $scope.NoGridData = false;
+            $scope.showGridData = false;
+            $scope.ShowNotesInfo = false;
+            $scope.ShowRegionInfo = false;
+            $scope.ShowCityInfo = false;
+            $scope.ShowCountryInfo = false;
+            $scope.ShowProductsInfo = false;
+            $scope.NotesType = [
+                                 { NotesId: "1", NotesName: "Note for " + $scope.modProductType.ProductName + " " },
+                                 { NotesId: "2", NotesName: "Note for a Region" },
+                                 { NotesId: "3", NotesName: "Note for a Country" },
+                                 { NotesId: "4", NotesName: "Note for a City" }
+                                 ];
+            $scope.NotesData = true;
+            $scope.ShowNotesInfo = false;
+            $('#notesDiv .select2-chosen').html("-- Please Select --");
+            $scope.modNotesType = "";
+            $scope.rowCount = 100;
+            $scope.recordNo = 100;
+        }
+        else {
+            $scope.ShowProductsInfo = true;
+            $scope.NotesData = false;
+            $scope.RegiontData = false;
+            $scope.CountrytData = false;
+            $scope.CitytData = false;
+            $scope.noteDetails = false;
+            $scope.NoGridData = false;
+            $scope.showGridData = false;
+        }
+    }
+
+    $scope.GetNotes = function () {
+        if ($scope.modNotesType != null) {
+            $(".pageLoaderOverlay").show();
+            $scope.RegiontData = false;
+            $scope.CountrytData = false;
+            $scope.CitytData = false;
+            $scope.noteDetails = false;
+            $scope.NoGridData = false;
+            $scope.showGridData = false;
+            $scope.ShowNotesInfo = false;
+            $scope.ShowRegionInfo = false;
+            $scope.ShowCityInfo = false;
+            $scope.ShowCountryInfo = false;
+            $scope.ShowProductsInfo = false;
+            $scope.rowCount = 100;
+            $scope.recordNo = 100;
+            $('#DivRegion .select2-chosen').html("-- Please Select --");
+            $('#DivCountry .select2-chosen').html("-- Please Select --");
+            $('#DivCity .select2-chosen').html("-- Please Select --");
+
+            if ($scope.modNotesType.NotesName == "Note for " + $scope.modProductType.ProductName + " ") {
+                $scope.noteDetails = true;
+                //int Criteria, int productId, int regionId, int countryId, int cityId
+                if ($scope.modRegion == "" || $scope.modRegion == undefined) {
+                    $scope.modRegion = 0;
+                }
+                if ($scope.modCountry == "" || $scope.modCountry == undefined) {
+                    $scope.modCountry = 0;
+                }
+                if ($scope.modCity == "" || $scope.modCity == undefined) {
+                    $scope.modCity = 0;
+                }
+                AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, parseInt($scope.rowCount)).success(function (data) {
+                    if (data.d.length > 0) {
+                        if (data.d.length != 100) {
+                            $scope.FlagNoOfRows = false;
+                            $scope.ActualRows = data.d.length;
+                            $scope.recordNo = data.d.length;
+                        }
+                        else {
+                            $scope.FlagNoOfRows = true;
+                            $scope.recordNo = data.d.length;
+                        }
+                        $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                        $scope.showGridData = true;
+                        $scope.NoGridData = false;
+                        $scope.noteDetails = true;
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    else {
+                        $scope.showGridData = false;
+                        $scope.NoGridData = true;
+                        $scope.noteDetails = true;
+                        $scope.FlagNoOfRows = false;
+                        $(".pageLoaderOverlay").hide();
+                    }
+                });
+
+            }
+            else if ($scope.modNotesType.NotesName == "Note for a Region") {
+                AdminNotes.GetRegions($scope.modProductType.ProductCD).success(function (data) {
+                    $scope.RegionsType = data.d;
+                    $scope.RegiontData = true;
+                    $scope.CountrytData = false;
+                    $scope.CitytData = false;
+                    $scope.noteDetails = false;
+                    $scope.NoGridData = false;
+                    $scope.showGridData = false;
+                    $scope.ShowRegionInfo = false;
+                    $scope.modRegion = "";
+                    $(".pageLoaderOverlay").hide();
+                });
+            }
+            else if ($scope.modNotesType.NotesName == "Note for a Country") {
+                AdminNotes.GetCountries($scope.modProductType.ProductCD).success(function (data) {
+                    $scope.CountryType = data.d;
+                    $scope.CountrytData = true;
+                    $scope.CitytData = false;
+                    $scope.RegiontData = false;
+                    $scope.noteDetails = false;
+                    $scope.NoGridData = false;
+                    $scope.showGridData = false;
+                    $scope.ShowCountryInfo = false;
+                    $scope.modCountry = "";
+                    $(".pageLoaderOverlay").hide();
+                });
+            }
+            else if ($scope.modNotesType.NotesName == "Note for a City") {
+                AdminNotes.GetCountries($scope.modProductType.ProductCD).success(function (data) {
+                    $scope.CountryType = data.d;
+                    $scope.CountrytData = true;
+                    $scope.CitytData = false;
+                    $scope.RegiontData = false;
+                    $scope.noteDetails = false;
+                    $scope.NoGridData = false;
+                    $scope.showGridData = false;
+                    $scope.ShowCountryInfo = false;
+                    $scope.modCountry = "";
+                    $(".pageLoaderOverlay").hide();
+                });
+            }
+        }
+        else {
+            $scope.CountrytData = false;
+            $scope.CitytData = false;
+            $scope.RegiontData = false;
+            $scope.noteDetails = false;
+            $scope.NoGridData = false;
+            $scope.showGridData = false;
+            $scope.ShowRegionInfo = false;
+            $scope.ShowCityInfo = false;
+            $scope.ShowCityInfo = false;
+            //bootbox.alert("Please select Any note from Notes dropdown.");
+            $scope.ShowNotesInfo = true;
+            $scope.ShowProductsInfo = false;
+        }
+    }
+
+    $scope.GetRegions = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.noteDetails = false;
+        $scope.ShowRegionInfo = false;
+        $scope.modCountry = 0;
+        $scope.modCity = 0;
+        $scope.rowCount = 100;
+        $scope.recordNo = 100;
+        if ($scope.modRegion != null) {
+
+            AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, parseInt($scope.modRegion), parseInt($scope.modCountry), parseInt($scope.modCity), parseInt($scope.rowCount)).success(function (data) {
+                if (data.d.length > 0) {
+                    if (data.d.length != 100) {
+                        $scope.FlagNoOfRows = false;
+                        $scope.ActualRows = data.d.length;
+                        $scope.recordNo = data.d.length;
+                    }
+                    else {
+                        $scope.FlagNoOfRows = true;
+                        $scope.recordNo = data.d.length;
+                    }
+                    $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                    $scope.showGridData = true;
+                    $scope.noteDetails = true;
+                    $scope.NoGridData = false;
+                    $(".pageLoaderOverlay").hide();
+                }
+                else {
+                    $scope.showGridData = false;
+                    $scope.noteDetails = true;
+                    $scope.NoGridData = true;
+                    $scope.FlagNoOfRows = false;
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        }
+        else {
+            //bootbox.alert("Please select Any dropdown value from Regions dropdown.");
+            $scope.showGridData = false;
+            $scope.noteDetails = false;
+            $scope.NoGridData = false;
+            $scope.FlagNoOfRows = false;
+            $scope.ShowRegionInfo = true;
+            $(".pageLoaderOverlay").hide();
+        }
+    }
+
+    $scope.GetCities = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.noteDetails = false;
+        $scope.ShowCityInfo = false;
+        $scope.modRegion = 0;
+        //        $scope.modCountry = 0;
+        $scope.rowCount = 100;
+        $scope.recordNo = 100;
+        if ($scope.modCity != null) {
+            AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, parseInt($scope.modRegion), parseInt($scope.modCountry), parseInt($scope.modCity), parseInt($scope.rowCount)).success(function (data) {
+                if (data.d.length > 0) {
+                    if (data.d.length != 100) {
+                        $scope.FlagNoOfRows = false;
+                        $scope.ActualRows = data.d.length;
+                        $scope.recordNo = data.d.length;
+                    }
+                    else {
+                        $scope.FlagNoOfRows = true;
+                        $scope.recordNo = data.d.length;
+                    }
+                    $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                    $scope.showGridData = true;
+                    $scope.NoGridData = false;
+                    $scope.noteDetails = true;
+                    $scope.FlagNoOfRows = false;
+                    $(".pageLoaderOverlay").hide();
+                }
+                else {
+                    $scope.showGridData = false;
+                    $scope.NoGridData = true;
+                    $scope.noteDetails = true;
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        }
+        else {
+            $scope.showGridData = false;
+            $scope.noteDetails = false;
+            $scope.NoGridData = false;
+            $scope.FlagNoOfRows = false;
+            $scope.ShowCityInfo = true;
+            $(".pageLoaderOverlay").hide();
+        }
+    }
+
+    $scope.GetCountries = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.noteDetails = false;
+        $scope.ShowCountryInfo = false;
+        $scope.modRegion = 0;
+        $scope.modCity = 0;
+        $scope.rowCount = 100;
+        $scope.recordNo = 100;
+        if ($scope.modCountry != null) {
+            if ($scope.modNotesType.NotesName == "Note for a City") {
+                $('#DivCity .select2-chosen').html("-- Please Select --");
+                AdminNotes.GetCities($scope.modProductType.ProductCD, parseInt($scope.modCountry)).success(function (data) {
+                    $scope.CityType = data.d;
+                    $scope.CitytData = true;
+                    $scope.RegiontData = false;
+                    $scope.CountrytData = true;
+                    $scope.noteDetails = false;
+                    $scope.NoGridData = false;
+                    $scope.showGridData = false;
+                    $scope.ShowCityInfo = false;
+                    $scope.modCity = "";
+                    $(".pageLoaderOverlay").hide();
+                });
+            }
+            else {
+                AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, parseInt($scope.modRegion), parseInt($scope.modCountry), parseInt($scope.modCity), parseInt($scope.rowCount)).success(function (data) {
+                    if (data.d.length > 0) {
+                        if (data.d.length != 100) {
+                            $scope.FlagNoOfRows = false;
+                            $scope.ActualRows = data.d.length;
+                            $scope.recordNo = data.d.length;
+                        }
+                        else {
+                            $scope.FlagNoOfRows = true;
+                            $scope.recordNo = data.d.length;
+                        }
+                        $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                        $scope.showGridData = true;
+                        $scope.NoGridData = false;
+                        $scope.noteDetails = true;
+                        $scope.FlagNoOfRows = false;
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    else {
+                        $scope.showGridData = false;
+                        $scope.NoGridData = true;
+                        $scope.noteDetails = true;
+                        $(".pageLoaderOverlay").hide();
+                    }
+                });
+            }
+        }
+        else {
+            $scope.showGridData = false;
+            $scope.noteDetails = false;
+            $scope.NoGridData = false;
+            $scope.FlagNoOfRows = false;
+            $scope.ShowCountryInfo = true;
+            $scope.CitytData = false;
+            $(".pageLoaderOverlay").hide();
+        }
+    }
+    $scope.AddNotes = function () {
+        $(".pageLoaderOverlay").show();
+        $("#priority").select2({});
+        $("#category").select2({});
+        $scope.ShowCategoryInfo = false;
+        $scope.ShowPriorityInfo = false;
+        $scope.FlagPriority = false;
+        $scope.FlagCategory = false;
+        $scope.FlagCheckAddData = true;
+        $('#catDiv .select2-chosen').html("-- Please Select --");
+        $('#priorDiv .select2-chosen').html("-- Please Select --");
+        $scope.modStartDate = "";
+        $scope.modEndDate = "";
+        $scope.modTitle = "";
+        $scope.modNewNote = "";
+
+        $scope.mainScope = {};
+        $scope.mainScope.myDate = moment().toDate();
+        $scope.dateFormat = "DD-MMM-YYYY";
+        $scope.dates = [new Date(), new Date(), new Date(), new Date()];
+
+        $scope.modCurrentDate = $filter("date")(Date.now(), 'dd-MMM-yyyy');
+        //        $scope.modStartDate = $filter("date")(Date.now(), 'dd-MMM-yyyy');
+        //        var CurrDate = new Date();
+        //        var nextyearDate = (CurrDate.getMonth() + 1) + '-' + CurrDate.getDate() + '-' + (CurrDate.getFullYear() + 1);
+        //        $scope.modEndDate = $filter('date')(new Date(nextyearDate), 'dd-MMM-yyyy'); 
+        AdminNotes.GetNotePriority().success(function (data) {
+            $scope.PriorityType = data.d;
+            AdminNotes.GetNoteCategory().success(function (data) {
+                $scope.CategoryType = data.d;
+                $(".pageLoaderOverlay").hide();
+            });
+        });
+        $("#NoteModal").modal('show');
+    }
+
+    $scope.addNewNote = function () {
+        $(".pageLoaderOverlay").show();
+        if ($scope.modTitle == "") {
+            $scope.ShowTitleMsg = true;
+        }
+        else {
+            $scope.ShowTitleMsg = false;
+        }
+        //Criteria, productId, regionId, countryId, cityId, title, category, priority, BegDate, EndDate, userId
+        if ($scope.modCategoryType != null && $scope.modPriorityType != null && $scope.ShowTitleMsg == false) {
+            AdminNotes.AddNewNote(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, $scope.modTitle, parseInt($scope.modCategoryType.categoryId), parseInt($scope.modPriorityType.priorityId), $scope.modStartDate, $scope.modEndDate, $rootScope.User_Id, $scope.modNewNote).success(function (data) {
+                if (data.d == 1) {
+                    bootbox.alert("Note added successfully.");
+                    closeNote.click();
+                    $scope.showGridData = true;
+                    $scope.NoGridData = false;
+                    $scope.noteDetails = true;
+                    AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, parseInt($scope.rowCount)).success(function (data) {
+                        if (data.d.length > 0) {
+                            if (data.d.length != 100) {
+                                $scope.FlagNoOfRows = false;
+                            }
+                            else {
+                                $scope.FlagNoOfRows = true;
+                            }
+                            $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                            $scope.showGridData = true;
+                            $scope.NoGridData = false;
+                            $scope.noteDetails = true;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                        else {
+                            $scope.showGridData = false;
+                            $scope.NoGridData = true;
+                            $scope.noteDetails = false;
+                            $scope.FlagNoOfRows = false;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                    });
+
+                }
+                else {
+                    bootbox.alert("No region and country code available.");
+                    closeNote.click();
+                    $scope.showGridData = false;
+                    $scope.NoGridData = true;
+                    $scope.noteDetails = false;
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        }
+        else {
+            $(".pageLoaderOverlay").hide();
+        }
+
+    }
+
+    $scope.GetNextRecords = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.rowCount = parseInt($scope.rowCount + 100);
+        if ($scope.FlagNoOfRows == false) {
+            $scope.recordNo = $scope.ActualRows;
+        }
+        else {
+            $scope.recordNo = $scope.rowCount;
+        }
+        AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, parseInt($scope.rowCount)).success(function (data) {
+            if (data.d.length > 0) {
+                if (data.d.length != 100) {
+                    $scope.FlagNoOfRows = false;
+                }
+                else {
+                    $scope.FlagNoOfRows = true;
+                }
+                $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                $scope.showGridData = true;
+                $scope.NoGridData = false;
+                $scope.noteDetails = true;
+                $(".pageLoaderOverlay").hide();
+            }
+            else {
+                $scope.showGridData = false;
+                $scope.NoGridData = true;
+                $scope.noteDetails = false;
+                $scope.FlagNoOfRows = false;
+                $(".pageLoaderOverlay").hide();
+            }
+        });
+    }
+
+    $scope.GetPreviousRecords = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.rowCount = parseInt($scope.rowCount - 100);
+        if ($scope.FlagNoOfRows == false) {
+            $scope.recordNo = $scope.ActualRows;
+        }
+        else {
+            $scope.recordNo = $scope.rowCount;
+        }
+        AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, parseInt($scope.rowCount)).success(function (data) {
+            if (data.d.length > 0) {
+                $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                $scope.showGridData = true;
+                $scope.NoGridData = false;
+                $scope.noteDetails = true;
+                $(".pageLoaderOverlay").hide();
+            }
+            else {
+                $scope.showGridData = false;
+                $scope.NoGridData = true;
+                $scope.noteDetails = false;
+                $(".pageLoaderOverlay").hide();
+            }
+        });
+    }
+
+    $scope.passNotesValues = function (title, category, priority, description, cdate, edate, nid, categoryId, priorityId, owner) {
+        $(".pageLoaderOverlay").show();
+        $("#priorityEdit").select2({});
+        $("#categoryEdit").select2({});
+        $scope.ShowEditPriorityInfo = false;
+        $scope.ShowEditCategoryInfo = false;
+        $scope.FlagPriority = false;
+        $scope.FlagCategory = false;
+        $scope.FlagEditNote = true;
+        //        AdminNotes.GetEmpName(owner).success(function (data) {
+        //            if (data.d != "") {
+        //                $scope.modEditOwner = data.d;
+        //            }
+        //            else {
+        //                $scope.modEditOwner = "UNKNOWN";
+        //            }
+        //        });
+        $scope.modEditOwner = owner;
+        $scope.NoteId = nid;
+        $scope.currentCategory = category;
+        $scope.currentPriority = priority;
+        $scope.modEditStartDate = cdate;
+        $scope.currentSDate = cdate;
+        $scope.modEditEndDate = edate;
+        $scope.currentEDate = edate;
+        $scope.modEditTitle = title;
+        $scope.currentTittle = title;
+        $scope.modEditNote = description;
+        $scope.currentDescription = description;
+        $scope.mainScope = {};
+        $scope.mainScope.myDate = moment().toDate();
+        $scope.dateFormat = "DD-MMM-YYYY";
+        $scope.dates = [new Date(), new Date(), new Date(), new Date()];
+
+        AdminNotes.GetNotePriority().success(function (data) {
+            $scope.EditPriorityType = data.d;
+            AdminNotes.GetNoteCategory().success(function (data) {
+                $scope.EditCategoryType = data.d;
+                $('#categoryDiv .select2-chosen').html(" " + category + " ");
+                $('#priorityDiv .select2-chosen').html(" " + priority + " ");
+                $scope.priorId = priorityId;
+                $scope.catId = categoryId;
+                $("#EditNoteModal").modal('show');
+                $(".pageLoaderOverlay").hide();
+            });
+        });
+     
+
+    }
+
+    $scope.updateNote = function () {
+        $(".pageLoaderOverlay").show();
+        $scope.ShowEditPriorityInfo = false;
+        $scope.ShowEditCategoryInfo = false;
+        if ($scope.modEditStartDate.match("-") == null) {
+            $scope.modEditStartDate = $filter('date')(new Date($scope.modEditStartDate), 'dd-MMM-yyyy');
+        }
+        if ($scope.modEditEndDate.match("-") == null) {
+            $scope.modEditEndDate = $filter('date')(new Date($scope.modEditEndDate), 'dd-MMM-yyyy');
+        }
+        //        if ($scope.modEditCategoryType != null && $scope.modEditPriorityType != null) {
+        if ($scope.modEditCategoryType == "" && $scope.modEditPriorityType == "") {
+            AdminNotes.UpdateNote(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, $scope.modEditTitle, $scope.catId, $scope.priorId, $scope.modEditStartDate, $scope.modEditEndDate, $rootScope.User_Id, $scope.NoteId, $scope.modEditNote).success(function (data) {
+                if (data.d == 1) {
+                    closeUpdateNote.click();
+                    bootbox.alert("Note Successfully updated.");
+                    AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, parseInt($scope.rowCount)).success(function (data) {
+                        if (data.d.length > 0) {
+                            $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                            $scope.showGridData = true;
+                            $scope.NoGridData = false;
+                            $scope.noteDetails = true;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                        else {
+                            $scope.showGridData = false;
+                            $scope.NoGridData = true;
+                            $scope.noteDetails = false;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                    });
+
+                }
+                else {
+                    closeUpdateNote.click();
+                    bootbox.alert("Update was not successful");
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        }
+
+        else if ($scope.modEditCategoryType == "" && $scope.modEditPriorityType != "") {
+            AdminNotes.UpdateNote(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, $scope.modEditTitle, $scope.catId, $scope.modEditPriorityType.priorityId, $scope.modEditStartDate, $scope.modEditEndDate, $rootScope.User_Id, $scope.NoteId, $scope.modEditNote).success(function (data) {
+                if (data.d == 1) {
+                    closeUpdateNote.click();
+                    bootbox.alert("Note Successfully updated.");
+                    AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, parseInt($scope.rowCount)).success(function (data) {
+                        if (data.d.length > 0) {
+                            $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                            $scope.showGridData = true;
+                            $scope.NoGridData = false;
+                            $scope.noteDetails = true;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                        else {
+                            $scope.showGridData = false;
+                            $scope.NoGridData = true;
+                            $scope.noteDetails = false;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                    });
+
+                }
+                else {
+                    closeUpdateNote.click();
+                    bootbox.alert("Update was not successful");
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        }
+        else if ($scope.modEditPriorityType == "" && $scope.modEditCategoryType != "") {
+            AdminNotes.UpdateNote(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, $scope.modEditTitle, $scope.modEditCategoryType.categoryId, $scope.priorId, $scope.modEditStartDate, $scope.modEditEndDate, $rootScope.User_Id, $scope.NoteId, $scope.modEditNote).success(function (data) {
+                if (data.d == 1) {
+                    closeUpdateNote.click();
+                    bootbox.alert("Note Successfully updated.");
+                    AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, parseInt($scope.rowCount)).success(function (data) {
+                        if (data.d.length > 0) {
+                            $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                            $scope.showGridData = true;
+                            $scope.NoGridData = false;
+                            $scope.noteDetails = true;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                        else {
+                            $scope.showGridData = false;
+                            $scope.NoGridData = true;
+                            $scope.noteDetails = false;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                    });
+
+                }
+                else {
+                    closeUpdateNote.click();
+                    bootbox.alert("Update was not successful");
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        }
+        else if ($scope.modEditPriorityType != "" && $scope.modEditCategoryType != "") {
+            AdminNotes.UpdateNote(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, $scope.modEditTitle, $scope.modEditCategoryType.categoryId, $scope.modEditPriorityType.priorityId, $scope.modEditStartDate, $scope.modEditEndDate, $rootScope.User_Id, $scope.NoteId, $scope.modEditNote).success(function (data) {
+                if (data.d == 1) {
+                    closeUpdateNote.click();
+                    bootbox.alert("Note Successfully updated.");
+                    AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, parseInt($scope.rowCount)).success(function (data) {
+                        if (data.d.length > 0) {
+                            $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                            $scope.showGridData = true;
+                            $scope.NoGridData = false;
+                            $scope.noteDetails = true;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                        else {
+                            $scope.showGridData = false;
+                            $scope.NoGridData = true;
+                            $scope.noteDetails = false;
+                            $(".pageLoaderOverlay").hide();
+                        }
+                    });
+
+                }
+                else {
+                    closeUpdateNote.click();
+                    bootbox.alert("Update was not successful");
+                    $(".pageLoaderOverlay").hide();
+                }
+            });
+        }
+        //        }
+        //        else if ($scope.modEditPriorityType == null && ($scope.modEditCategoryType != null || $scope.modEditCategoryType == undefined)) {
+        //            $scope.ShowEditPriorityInfo = true;
+        //            $scope.ShowEditCategoryInfo = false;
+        //            $(".pageLoaderOverlay").hide();
+        //        }
+        //        else if ($scope.modEditCategoryType == null && ($scope.modEditPriorityType != null && $scope.modEditPriorityType == undefined)) {
+        //            $scope.ShowEditPriorityInfo = false;
+        //            $scope.ShowEditCategoryInfo = true;
+        //            $(".pageLoaderOverlay").hide();
+        //        }
+        //        else if ($scope.modEditCategoryType == null && $scope.modEditCategoryType == null) {
+        //            $scope.ShowEditPriorityInfo = true;
+        //            $scope.ShowEditCategoryInfo = true;
+        //            $(".pageLoaderOverlay").hide();
+        //        }
+    }
+
+    $scope.GetNoteCategory = function () {
+        $scope.FlagCategory = true;
+        if ($scope.modCategoryType != null) {
+            $scope.ShowCategoryInfo = false;
+        }
+        else {
+            $scope.ShowCategoryInfo = true;
+        }
+    }
+    $scope.GetNotePriority = function () {
+        $scope.FlagPriority = true;
+        if ($scope.modPriorityType != null) {
+            $scope.ShowPriorityInfo = false;
+        }
+        else {
+            $scope.ShowPriorityInfo = true;
+        }
+    }
+
+    $scope.GetCategory = function () {
+        $scope.FlagCategory = true;
+        if ($scope.modEditCategoryType != null) {
+            $scope.ShowEditCategoryInfo = false;
+        }
+        else {
+            $scope.ShowEditCategoryInfo = true;
+        }
+    }
+    $scope.GetPriority = function () {
+        $scope.FlagPriority = true;
+        if ($scope.modEditPriorityType != null) {
+            $scope.ShowEditPriorityInfo = false;
+        }
+        else {
+            $scope.ShowEditPriorityInfo = true;
+        }
+    }
+
+    $scope.resetUpdatedNote = function () {
+        $('#priorityDiv .select2-chosen').html(" " + $scope.currentPriority + " ");
+        $('#categoryDiv .select2-chosen').html(" " + $scope.currentCategory + " ");
+        $scope.modEditOwner = $scope.modOwner;
+        $scope.modEditStartDate = $scope.currentSDate;
+        $scope.modEditEndDate = $scope.currentEDate;
+        $scope.modEditTitle = $scope.currentTittle;
+        $scope.modEditNote = $scope.currentDescription;
+        $scope.ShowEditCategoryInfo = false;
+        $scope.ShowEditPriorityInfo = false;
+        $scope.FlagPriority = false;
+        $scope.FlagCategory = false;
+        $("#EditNoteModal").modal('show');
+
+    }
+
+
+    $scope.deleteNote = function (title, noteId) {
+        $(".pageLoaderOverlay").show();
+        //closeUpdateNote.click();
+        $scope.titleDelete = title;
+        $scope.deleteNoteId = noteId;
+        $("#msgDeleteNote").modal('show');
+        $(".pageLoaderOverlay").hide();
+    }
+    $scope.deleteConfirm = function () {
+        $(".pageLoaderOverlay").show();
+        AdminNotes.DeleteNote($scope.deleteNoteId).success(function (data) {
+            if (data.d == 1) {
+                $("#msgDeleteNote").modal('hide');
+                closeUpdateNote.click();
+                bootbox.alert("Note Successfully deleted.");
+                AdminNotes.GetNotesGridData(parseInt($scope.modNotesType.NotesId), $scope.modProductType.ProductCD, $scope.modRegion, $scope.modCountry, $scope.modCity, parseInt($scope.rowCount)).success(function (data) {
+                    if (data.d.length > 0) {
+                        $scope.NotesTable = new NgTableParams({}, { 'dataset': data.d });
+                        $scope.showGridData = true;
+                        $scope.NoGridData = false;
+                        $scope.noteDetails = true;
+                        $(".pageLoaderOverlay").hide();
+                    }
+                    else {
+                        $scope.showGridData = false;
+                        $scope.NoGridData = true;
+                        $scope.noteDetails = false;
+                        $(".pageLoaderOverlay").hide();
+                    }
+                });
+
+
+            }
+            else {
+                bootbox.alert("Delete was not successful");
+                $(".pageLoaderOverlay").hide();
+            }
+        });
+    }
+    $scope.NoChange = function () {
+        closeConfirm.click();
+    }
+
+    $scope.ResetNote = function () {
+        $('#priorDiv .select2-chosen').html("-- Please Select --");
+        $('#catDiv .select2-chosen').html("-- Please Select --");
+        $scope.ShowCategoryInfo = false;
+        $scope.ShowPriorityInfo = false;
+        $scope.FlagPriority = false;
+        $scope.FlagCategory = false;
+        $scope.ShowTitleMsg = false;
+        //        $scope.modStartDate = $filter("date")(Date.now(), 'dd-MMM-yyyy');
+        //        $scope.modEndDate = $filter("date")(Date.now(), 'dd-MMM-yyyy');
+        $scope.modStartDate = "";
+        $scope.modEndDate = "";
+        $scope.modTitle = "";
+        $scope.modNewNote = "";
+        $("#NoteModal").modal('show');
+    }
+
+    $scope.HidePrevRow = function () {
+        if (parseInt($scope.rowCount) == 100) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    $scope.HideNextRow = function () {
+        if ($scope.FlagNoOfRows == false) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    $scope.HideUpdateNote = function () {
+        if ($scope.priorId != undefined && $scope.catId != undefined) {
+            if (($scope.FlagCategory == true || $scope.FlagPriority == true || $scope.modEditStartDate != $scope.currentSDate || $scope.modEditEndDate != $scope.currentEDate || $scope.modEditTitle != $scope.currentTittle || $scope.modEditNote != $scope.currentDescription) && $scope.ShowEditPriorityInfo == false && $scope.ShowEditCategoryInfo == false && $scope.modEditPriorityType != null && $scope.modEditCategoryType != null) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    }
+
+    $scope.HideResetNote = function () {
+        if ($scope.priorId != undefined && $scope.catId != undefined) {
+            if (($scope.modEditCategoryType == undefined || $scope.FlagCategory == false) && ($scope.modEditPriorityType == undefined || $scope.FlagPriority == false) && $scope.modEditStartDate == $scope.currentSDate && $scope.modEditEndDate == $scope.currentEDate && $scope.modEditTitle == $scope.currentTittle && $scope.modEditNote == $scope.currentDescription && $scope.ShowEditCategoryInfo == false && $scope.ShowEditPriorityInfo == false) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
+    $scope.HideAddNote = function () {
+        if ($scope.FlagCheckAddData == true) {
+            if (($scope.FlagCategory == true || $scope.modCategoryType != null) && ($scope.FlagPriority == true || $scope.modPriorityType != null) && $scope.modStartDate != "" && $scope.modEndDate != "" && $scope.modTitle != "") {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    }
+
+    $scope.HideResetAddNote = function () {
+        if ($scope.FlagCheckAddData == true) {
+            if (($scope.modCategoryType == undefined || $scope.FlagCategory == false) && ($scope.modPriorityType == undefined || $scope.FlagPriority == false) && $scope.modStartDate == "" && $scope.modEndDate == "" && $scope.modTitle == "" && $scope.modNewNote == "" && $scope.ShowPriorityInfo == false && $scope.ShowCategoryInfo == false) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
+
+    $(function () {
+
+        $("#inputDate").datepicker({ startDate: new Date() });
+        $("#editinputDate").datepicker({ startDate: new Date() });
+
+        $("#inputendDate").datepicker({ startDate: new Date() });
+
+        $("#editinputendDate").datepicker({ startDate: new Date() });
+
+        $("#inputendDate").datepicker();
+
+        $('#btnstartdate').on('click', function () {
+
+            $("#inputDate").datepicker('show');
+        })
+
+        $('#btnenddate').on('click', function () {
+
+            $("#inputendDate").datepicker('show');
+        })
+
+
+        $('#btnstartdateupdate').on('click', function () {
+            $('#btnenddateupdate').trigger('click');
+            $("#editinputendDate").datepicker('hide');
+            $("#editinputDate").datepicker('show');
+        })
+
+        $('#btnenddateupdate').on('click', function () {
+
+            $("#editinputendDate").datepicker('show');
+        })
+
+
+        $("#inputendDate").datepicker().on('changeDate', function (ev) {
+
+            $('#inputDate').datepicker('setEndDate', new Date($(this).val()));
+            $("#inputendDate").datepicker('hide');
+
+
+
+        });
+
+        $("#inputDate").datepicker().on('changeDate', function (ev) {
+            //            $('.datepicker').hide();
+            $('#inputendDate').datepicker('setStartDate', new Date($(this).val()));
+            $("#inputDate").datepicker('hide');
+
+
+        });
+        $("#editinputDate").datepicker().on('changeDate', function (ev) {
+
+            //            $('.datepicker').hide();
+
+            $('#notesUpdate').removeAttr('disabled');
+            $('#editinputendDate').datepicker('setStartDate', new Date($(this).val()));
+            $("#editinputDate").datepicker('hide');
+        });
+        $("#editinputendDate").datepicker().on('changeDate', function (ev) {
+
+            $('#notesUpdate').removeAttr('disabled');
+            $('#editinputDate').datepicker('setEndDate', new Date($(this).val()));
+            $("#editinputendDate").datepicker('hide');
+        });
+
+        $("#inputtitle").keyup(function () {
+
+            $('#divduplicatetitleerror').hide();
+
+        });
+
+        $("#Text3").keyup(function () {
+
+            $('#divduplicatetitleerroredit').hide();
+
+
+        });
+
+
+        //To handle Screen hang on backpress 
+
+        $(document).on('keydown', function (e) {
+            var $target = $(e.target || e.srcElement);
+            if (e.keyCode == 8 && !$target.is('input,[contenteditable="true"],textarea')) {
+                e.preventDefault();
+            }
+        })
+
+        $('#EditNoteModal').on('click', function () {
+
+            if ($('#editinputDate').val() == "") {
+                $('#notesUpdate').attr('disabled', 'disabled');
+            }
+
+
+            if ($('#editinputendDate').val() == "") {
+
+                $('#notesUpdate').attr('disabled', 'disabled');
+            }
+
+
+        });
+
+    });
+
+
+});
